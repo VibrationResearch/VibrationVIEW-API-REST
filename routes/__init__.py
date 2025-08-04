@@ -14,7 +14,6 @@ __version__ = '1.0.0'
 from .basic_control import basic_control_bp
 from .status_properties import status_properties_bp
 from .data_retrieval import data_retrieval_bp
-from .vector_properties import vector_properties_bp
 from .advanced_control import advanced_control_bp
 from .hardware_config import hardware_config_bp
 from .input_config import input_config_bp
