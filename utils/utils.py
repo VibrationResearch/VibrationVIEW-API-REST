@@ -171,3 +171,32 @@ def extract_com_error_info(exception):
     except Exception:
         # Fallback if ExtractComErrorInfo fails
         return str(exception)
+
+def convert_channel_to_com_index(channel_user):
+    """
+    Convert user-provided 1-based channel number to 0-based COM index
+    
+    Args:
+        channel_user: User-provided channel number (1-based)
+        
+    Returns:
+        tuple: (channel_com, error_response, status_code)
+               - channel_com: 0-based channel for COM calls (None if error)
+               - error_response: Error dict if invalid (None if valid)
+               - status_code: HTTP status code if error (None if valid)
+    """
+    try:
+        channel = int(channel_user)
+        if channel < 1:
+            from utils.response_helpers import error_response
+            return None, error_response(
+                'Channel parameter must be >= 1',
+                'INVALID_PARAMETER'
+            ), 400
+        return channel - 1, None, None
+    except (ValueError, TypeError):
+        from utils.response_helpers import error_response
+        return None, error_response(
+            'Invalid channel parameter - must be an integer',
+            'INVALID_PARAMETER'
+        ), 400
