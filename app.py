@@ -22,6 +22,7 @@ from routes import (
     data_retrieval_bp,
     advanced_control_bp,
     hardware_config_bp,
+    input_config_bp,
     teds_bp,
     recording_bp,
     reporting_bp,
@@ -112,6 +113,7 @@ def create_app(config_class=Config):
     app.register_blueprint(data_retrieval_bp, url_prefix='/api')
     app.register_blueprint(advanced_control_bp, url_prefix='/api')
     app.register_blueprint(hardware_config_bp, url_prefix='/api')
+    app.register_blueprint(input_config_bp, url_prefix='/api')
     app.register_blueprint(teds_bp, url_prefix='/api')
     app.register_blueprint(recording_bp, url_prefix='/api')
     app.register_blueprint(reporting_bp, url_prefix='/api')
@@ -137,6 +139,7 @@ def create_app(config_class=Config):
                 'data_retrieval',
                 'advanced_control',
                 'hardware_config',
+                'input_config',
                 'teds',
                 'recording',
                 'reporting',
@@ -186,7 +189,8 @@ def create_app(config_class=Config):
                 'status_properties': 'System status and state checking',
                 'data_retrieval': 'Real-time data access (Channel, Demand, etc.)',
                 'advanced_control': 'Advanced test control (sweeps, parameters)',
-                'hardware_config': 'Hardware and input configuration',
+                'hardware_config': 'Hardware information and capability checks',
+                'input_config': 'Input channel properties, settings, and configuration',
                 'teds': 'TEDS (Transducer Electronic Data Sheet) information',
                 'recording': 'Recorder Control',
                 'reporting': 'Reporting parameters',
@@ -199,6 +203,7 @@ def create_app(config_class=Config):
                 'data_retrieval': request.host_url + 'api/docs/data_retrieval',
                 'advanced_control': request.host_url + 'api/docs/advanced_control',
                 'hardware_config': request.host_url + 'api/docs/hardware_config',
+                'input_config': request.host_url + 'api/docs/input_config',
                 'teds': request.host_url + 'api/docs/teds', 
                 'recording': request.host_url + 'api/docs/recording', 
                 'reporting': request.host_url + 'api/docs/reporting', 

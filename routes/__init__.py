@@ -17,6 +17,7 @@ from .data_retrieval import data_retrieval_bp
 from .vector_properties import vector_properties_bp
 from .advanced_control import advanced_control_bp
 from .hardware_config import hardware_config_bp
+from .input_config import input_config_bp
 from .recording import recording_bp
 from .teds import teds_bp
 from .reporting import reporting_bp
@@ -30,6 +31,7 @@ __all__ = [
     'vector_properties_bp',
     'advanced_control_bp',
     'hardware_config_bp',
+    'input_config_bp',
     'recording_bp',
     'teds_bp',
     'reporting_bp',
