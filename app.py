@@ -21,6 +21,7 @@ from routes import (
     status_properties_bp,
     data_retrieval_bp,
     advanced_control_bp,
+    advanced_control_sine_bp,
     hardware_config_bp,
     input_config_bp,
     teds_bp,
@@ -112,6 +113,7 @@ def create_app(config_class=Config):
     app.register_blueprint(status_properties_bp, url_prefix='/api')
     app.register_blueprint(data_retrieval_bp, url_prefix='/api')
     app.register_blueprint(advanced_control_bp, url_prefix='/api')
+    app.register_blueprint(advanced_control_sine_bp, url_prefix='/api')
     app.register_blueprint(hardware_config_bp, url_prefix='/api')
     app.register_blueprint(input_config_bp, url_prefix='/api')
     app.register_blueprint(teds_bp, url_prefix='/api')
@@ -138,6 +140,7 @@ def create_app(config_class=Config):
                 'status_properties', 
                 'data_retrieval',
                 'advanced_control',
+                'advanced_control_sine',
                 'hardware_config',
                 'input_config',
                 'teds',
@@ -188,7 +191,8 @@ def create_app(config_class=Config):
                 'basic_control': 'Core test control operations (StartTest, StopTest, etc.)',
                 'status_properties': 'System status and state checking',
                 'data_retrieval': 'Real-time data access (Channel, Demand, etc.)',
-                'advanced_control': 'Advanced test control (sweeps, parameters)',
+                'advanced_control': 'Advanced test control (parameters, non-sine)',
+                'advanced_control_sine': 'Sine-specific advanced control (sweep operations)',
                 'hardware_config': 'Hardware information and capability checks',
                 'input_config': 'Input channel properties, settings, and configuration',
                 'teds': 'TEDS (Transducer Electronic Data Sheet) information',
@@ -202,6 +206,7 @@ def create_app(config_class=Config):
                 'status_properties': request.host_url + 'api/docs/status_properties',
                 'data_retrieval': request.host_url + 'api/docs/data_retrieval',
                 'advanced_control': request.host_url + 'api/docs/advanced_control',
+                'advanced_control_sine': request.host_url + 'api/docs/advanced_control_sine',
                 'hardware_config': request.host_url + 'api/docs/hardware_config',
                 'input_config': request.host_url + 'api/docs/input_config',
                 'teds': request.host_url + 'api/docs/teds', 

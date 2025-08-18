@@ -1255,100 +1255,13 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-      - name: Sine
+      - name: General Parameters
         meta:
           id: fld_215c661cfccc48bbb3f467844fb4498c
           created: 1753985609684
           modified: 1753985622184
           sortKey: -1753985088222
         children:
-          - url: "{{ _.base_url }}/sweepup"
-            name: sweepup
-            meta:
-              id: req_114cfe7d0e6b4579996cc508b95cb1f2
-              created: 1690628400000
-              modified: 1753986427665
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239776.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepdown"
-            name: sweepdown
-            meta:
-              id: req_e255915894614befbd2112eb3282c399
-              created: 1753818672365
-              modified: 1753986503228
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239826.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweephold"
-            name: Sweephold Control
-            meta:
-              id: req_a9b369e6393342c984158625644464c6
-              created: 1753818974227
-              modified: 1753986168306
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239801.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
           - url: "{{ _.base_url }}/demandmultiplier"
             name: demandmultiplier
             meta:
@@ -1357,46 +1270,6 @@ collection:
               modified: 1753985660459
               isPrivate: false
               sortKey: -1753985660335
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sinefrequency"
-            name: sinefrequency
-            meta:
-              id: req_08a06f82a74f4d3183237ad5bd89f45a
-              created: 1753984998949
-              modified: 1753985931973
-              isPrivate: false
-              sortKey: -1753985660435
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepmultiplier"
-            name: sweepmultiplier
-            meta:
-              id: req_ba6c7649eab6498aa7c85ea697def687
-              created: 1753985024760
-              modified: 1753985988139
-              isPrivate: false
-              sortKey: -1753985379962.5
             method: GET
             headers:
               - name: User-Agent
@@ -1421,133 +1294,6 @@ collection:
             headers:
               - name: User-Agent
                 value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sinefrequency?value=30"
-            name: sinefrequency
-            meta:
-              id: req_e8f407fa11f0401e8848e18d336caf89
-              created: 1753985941121
-              modified: 1753985949781
-              isPrivate: false
-              sortKey: -1753985660385
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepmultiplier?value=2"
-            name: sweepmultiplier
-            meta:
-              id: req_137252336a25425a8f3c2780bc70a352
-              created: 1753985995575
-              modified: 1753986042966
-              isPrivate: false
-              sortKey: -1753985239876.25
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepresonancehold"
-            name: sweepresonancehold
-            meta:
-              id: req_30ec7f24d01842d7916f34a2a9d4f9ea
-              created: 1753986284147
-              modified: 1753986286276
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239788.75
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepstepdown"
-            name: sweepstepdown
-            meta:
-              id: req_e7347065bd454699b847b5db24fea5c8
-              created: 1753986340274
-              modified: 1753986344100
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239813.75
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepstepup"
-            name: sweepstepup
-            meta:
-              id: req_ebf186f06c01457a9ad26c8beb8a4b6e
-              created: 1753986396552
-              modified: 1753986403461
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985169783.125
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1622,6 +1368,234 @@ collection:
           cookies:
             send: true
             store: true
+  - name: Sine Advanced Control
+    meta:
+      id: fld_64e04d6f52a9457d93ed18fe091b2d95
+      created: 1690628400000
+      modified: 1753994102264
+      sortKey: -1753972452398
+      description: Sine-specific advanced test control
+    children:
+      - url: "{{ _.base_url }}/docs/sine_advanced_control"
+        name: Sine Advanced Control Docs
+        meta:
+          id: req_59db0167d8114b36b440cc282436470d
+          created: 1690628400000
+          modified: 1753994134388
+          isPrivate: false
+          description: Get sine advanced control documentation
+          sortKey: -1753985088247
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - name: Sine Sweep Control
+        meta:
+          id: fld_215c661cfccc48bbb3f467844fb4499c
+          created: 1753985609684
+          modified: 1753985622184
+          sortKey: -1753985088222
+        children:
+          - url: "{{ _.base_url }}/sweepup"
+            name: sweepup
+            meta:
+              id: req_114cfe7d0e6b4579996cc508b95cb1f2
+              created: 1690628400000
+              modified: 1753986427665
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985239776.25
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweepdown"
+            name: sweepdown
+            meta:
+              id: req_e255915894614befbd2112eb3282c399
+              created: 1753818672365
+              modified: 1753986503228
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985239826.25
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweepstepup"
+            name: sweepstepup
+            meta:
+              id: req_ebf186f06c01457a9ad26c8beb8a4b6e
+              created: 1753986396552
+              modified: 1753986403461
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985169783.125
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweepstepdown"
+            name: sweepstepdown
+            meta:
+              id: req_e7347065bd454699b847b5db24fea5c8
+              created: 1753986340274
+              modified: 1753986344100
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985239813.75
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweephold"
+            name: sweephold
+            meta:
+              id: req_a9b369e6393342c984158625644464c6
+              created: 1753818974227
+              modified: 1753986168306
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985239801.25
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweepresonancehold"
+            name: sweepresonancehold
+            meta:
+              id: req_30ec7f24d01842d7916f34a2a9d4f9ea
+              created: 1753986284147
+              modified: 1753986286276
+              isPrivate: false
+              description: Control sweep parameters
+              sortKey: -1753985239788.75
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Sine Parameter Control
+        meta:
+          id: fld_215c661cfccc48bbb3f467844fb4500c
+          created: 1753985609684
+          modified: 1753985622184
+          sortKey: -1753985088221
+        children:
+          - url: "{{ _.base_url }}/sweepmultiplier"
+            name: sweepmultiplier (GET)
+            meta:
+              id: req_ba6c7649eab6498aa7c85ea697def687
+              created: 1753985024760
+              modified: 1753985988139
+              isPrivate: false
+              sortKey: -1753985379962.5
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sweepmultiplier?value=2"
+            name: sweepmultiplier (POST)
+            meta:
+              id: req_137252336a25425a8f3c2780bc70a352
+              created: 1753985995575
+              modified: 1753986042966
+              isPrivate: false
+              sortKey: -1753985239876.25
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sinefrequency"
+            name: sinefrequency (GET)
+            meta:
+              id: req_08a06f82a74f4d3183237ad5bd89f45a
+              created: 1753984998949
+              modified: 1753985931973
+              isPrivate: false
+              sortKey: -1753985660435
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/sinefrequency?value=30"
+            name: sinefrequency (POST)
+            meta:
+              id: req_e8f407fa11f0401e8848e18d336caf89
+              created: 1753985941121
+              modified: 1753985949781
+              isPrivate: false
+              sortKey: -1753985660385
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
   - name: Status Properties
     meta:
       id: fld_82b559d9278b426ca54ecfbb7c0a48e6
