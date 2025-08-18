@@ -37,28 +37,6 @@ def get_documentation():
                     "returns": "int - Current test type",
                     "example": "POST /api/testtype?value=1",
                 },
-                "GET|POST /systemcheckfrequency": {
-                    "description": "Get/Set system check frequency",
-                    "com_method": (
-                        "SystemCheckFrequency() or SystemCheckFrequency(value)"
-                    ),
-                    "parameters": {
-                        "value": "float - Frequency value (POST URL parameter only)"
-                    },
-                    "returns": "float - Current frequency",
-                    "example": "POST /api/systemcheckfrequency?value=50.0",
-                },
-                "GET|POST /systemcheckoutputvoltage": {
-                    "description": "Get/Set system check output level",
-                    "com_method": (
-                        "SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)"
-                    ),
-                    "parameters": {
-                        "value": "float - Voltage value (POST URL parameter only)"
-                    },
-                    "returns": "float - Current voltage",
-                    "example": "POST /api/systemcheckoutputvoltage?value=5.0",
-                },
             }
         },
         "notes": [
@@ -109,91 +87,5 @@ def test_type(vv_instance):
             success_response(
                 {"result": result, "value_set": value},
                 f"TestType set to {value}, returned: {result}",
-            )
-        )
-
-
-@advanced_control_bp.route("/systemcheckfrequency", methods=["GET", "POST"])
-@handle_errors
-@with_vibrationview
-def system_check_frequency(vv_instance):
-    """
-    Get/Set System Check Frequency
-
-    COM Method: SystemCheckFrequency() or SystemCheckFrequency(value)
-    Controls the system check frequency.
-
-    GET: Returns current frequency
-    POST: Sets frequency from URL parameter 'value'
-
-    Example: POST /api/systemcheckfrequency?value=50.0
-    """
-    if request.method == "GET":
-        result = vv_instance.SystemCheckFrequency()
-        return jsonify(
-            success_response(
-                {"result": result}, f"SystemCheckFrequency retrieved: {result} Hz"
-            )
-        )
-    else:
-        value = request.args.get("value", type=float)
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
-
-        result = vv_instance.SystemCheckFrequency(value)
-        return jsonify(
-            success_response(
-                {"result": result, "value_set": value},
-                f"SystemCheckFrequency set to {value} Hz, returned: {result} Hz",
-            )
-        )
-
-
-@advanced_control_bp.route("/systemcheckoutputvoltage", methods=["GET", "POST"])
-@handle_errors
-@with_vibrationview
-def system_check_output_voltage(vv_instance):
-    """
-    Get/Set System Check Output Voltage
-
-    COM Method: SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)
-    Controls the system check output level.
-
-    GET: Returns current voltage
-    POST: Sets voltage from URL parameter 'value'
-
-    Example: POST /api/systemcheckoutputvoltage?value=5.0
-    """
-    if request.method == "GET":
-        result = vv_instance.SystemCheckOutputVoltage()
-        return jsonify(
-            success_response(
-                {"result": result}, f"SystemCheckOutputVoltage retrieved: {result} V"
-            )
-        )
-    else:
-        value = request.args.get("value", type=float)
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
-
-        result = vv_instance.SystemCheckOutputVoltage(value)
-        return jsonify(
-            success_response(
-                {"result": result, "value_set": value},
-                f"SystemCheckOutputVoltage set to {value} V, returned: {result} V",
             )
         )

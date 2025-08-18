@@ -16,6 +16,7 @@ from .status_properties import status_properties_bp
 from .data_retrieval import data_retrieval_bp
 from .advanced_control import advanced_control_bp
 from .advanced_control_sine import advanced_control_sine_bp
+from .advanced_control_system_check import advanced_control_system_check_bp
 from .hardware_config import hardware_config_bp
 from .input_config import input_config_bp
 from .recording import recording_bp
@@ -30,6 +31,7 @@ __all__ = [
     'data_retrieval_bp',
     'advanced_control_bp',
     'advanced_control_sine_bp',
+    'advanced_control_system_check_bp',
     'hardware_config_bp',
     'input_config_bp',
     'recording_bp',
