@@ -11,7 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, extract_com_error_info
+from utils.utils import handle_binary_upload, extract_com_error_info, is_template_file, get_new_test_defaults_path, is_default_template_filename
 
 import logging
 from datetime import datetime
@@ -357,11 +357,37 @@ def upload_and_open_test(vv_instance):
             return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
         
         binary_data = request.get_data()
-        result, error, status_code = handle_binary_upload(filename, binary_data)
+        
+        # Check if this is a template file and handle accordingly
+        if is_template_file(filename):
+            # Get the New Test Defaults path from registry
+            defaults_path = get_new_test_defaults_path()
+            if defaults_path:
+                # Use the New Test Defaults folder for template files
+                result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=defaults_path, usetemporaryfile=False)
+            else:
+                # Fallback to regular Uploads folder if registry path not found
+                result, error, status_code = handle_binary_upload(filename, binary_data)
+        else:
+            # Regular file handling
+            result, error, status_code = handle_binary_upload(filename, binary_data)
+        
         if error:
             return jsonify(error), status_code
 
         file_path = result['FilePath']
+
+        # Check if this is a default template filename that should only be copied
+        if is_default_template_filename(filename):
+            return jsonify(success_response(
+                {
+                    'result': True,
+                    'filepath': filename,
+                    'executed': False,
+                    'copied_only': True
+                },
+                f"Default template file uploaded and copied only (OpenTest automation skipped): {filename}"
+            ))
 
         # Open the uploaded test file
         result = vv_instance.OpenTest(file_path)
