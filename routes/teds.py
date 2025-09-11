@@ -85,28 +85,74 @@ def get_input_teds_all(vv_instance):
         try:
             teds_info = vv_instance.Teds(channel)
             teds_data = {
-                "channel": channel,
-                "channel_display": channel + 1,  # 1-based for display
-                "teds": teds_info,
-                "success": True
+                "channel": channel + 1,  # 1-based for display
+                "success": True,
+                "teds": teds_info
             }
             all_teds_data.append(teds_data)
 
         except Exception as e:
             teds_error = {
-                "channel": channel,
-                "channel_display": channel + 1,  # 1-based for display
+                "channel": channel + 1,  # 1-based for display
+                "success": False,
                 "error": str(e),
-                "success": False
+                "teds": []
             }
             all_teds_data.append(teds_error)
+
+    # Count channels with actual TEDS data and errors
+    channels_with_teds_data = 0
+    channels_with_errors = 0
+    
+    for t in all_teds_data:
+        if not t.get('success', True):
+            # Channel failed to retrieve TEDS data
+            channels_with_errors += 1
+        elif 'teds' in t:
+            # Check if TEDS data contains actual information
+            teds_data = t['teds']
+            has_real_teds = False
+            has_error = False
+            
+            if isinstance(teds_data, list):
+                if len(teds_data) == 0:
+                    # Empty list - no TEDS data
+                    pass
+                else:
+                    for teds_entry in teds_data:
+                        if isinstance(teds_entry, dict):
+                            if "Error" in teds_entry:
+                                has_error = True
+                                break
+                            elif "Teds" in teds_entry:
+                                # VibrationVIEW format with "Teds" array
+                                if isinstance(teds_entry["Teds"], list) and len(teds_entry["Teds"]) > 0:
+                                    has_real_teds = True
+                                    break
+                            elif len(teds_entry) > 0:
+                                # Direct TEDS data (like mock format with sensitivity, units, etc.)
+                                has_real_teds = True
+                                break
+            elif isinstance(teds_data, dict) and len(teds_data) > 0:
+                # Direct dict format (mock or simplified format)
+                if "Error" not in teds_data:
+                    has_real_teds = True
+            
+            if has_error:
+                channels_with_errors += 1
+            elif has_real_teds:
+                channels_with_teds_data += 1
+
+    # Calculate total channels with TEDS enabled (data + errors)
+    channels_with_teds_enabled = channels_with_teds_data + channels_with_errors
 
     return jsonify(success_response(
         {
             'result': all_teds_data,
             'total_channels': num_channels,
-            'channels_with_teds': len([t for t in all_teds_data if t.get('success', False)]),
-            'channels_with_errors': len([t for t in all_teds_data if not t.get('success', True)])
+            'channels_with_teds': channels_with_teds_data,
+            'channels_with_errors': channels_with_errors,
+            'channels_with_teds_enabled': channels_with_teds_enabled
         },
         f"TEDS information retrieved for {num_channels} channels"
     ))
@@ -168,7 +214,6 @@ def get_input_teds_channel(vv_instance):
                 'result': teds_info,
                 'channel': channel_1based,
                 'internal_channel': channel_0based,
-                'channel_display': channel_1based,  # Same as channel now (both 1-based)
                 'success': True
             },
             f"TEDS information retrieved for channel {channel_1based} (1-based)"
