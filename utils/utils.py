@@ -22,7 +22,12 @@ def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usete
     if ext not in ALLOWED_EXTENSIONS:
         return None, {'Error': f'Invalid file extension: .{ext}'}, 400
 
-    temp_folder = os.path.join(config.Config.PROFILE_FOLDER, uploadsubfolder)
+    # Check if uploadsubfolder is an absolute path (for template files)
+    if os.path.isabs(uploadsubfolder):
+        temp_folder = uploadsubfolder
+    else:
+        temp_folder = os.path.join(config.Config.PROFILE_FOLDER, uploadsubfolder)
+    
     os.makedirs(temp_folder, exist_ok=True)
 
     if usetemporaryfile:
