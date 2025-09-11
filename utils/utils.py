@@ -210,3 +210,57 @@ def convert_channel_to_com_index(channel_user):
             'Invalid channel parameter - must be an integer',
             'INVALID_PARAMETER'
         ), 400
+
+def is_template_file(filename):
+    """
+    Check if a file has a template extension
+    
+    Args:
+        filename: The filename to check
+        
+    Returns:
+        bool: True if the file is a template file, False otherwise
+    """
+    if not filename or '.' not in filename:
+        return False
+    
+    ext = filename.rsplit('.', 1)[1].lower()
+    return ext in TEMPLATE_EXTENSIONS
+
+def get_new_test_defaults_path():
+    """
+    Get the New Test Defaults folder path from configuration
+    
+    Returns:
+        str: Path to the New Test Defaults folder
+    """
+    return config.Config.NEW_TEST_DEFAULTS_FOLDER
+
+# Pre-computed lowercase default template filenames for performance
+DEFAULT_TEMPLATE_FILENAMES = {
+    'random.vrandomt',
+    'sine.vsinet', 
+    'shock.vshockt',
+    'fdr.vfdrt',
+    'sor.vsort',
+    'sos.vsost',
+    'ror.vrort',
+    'sororor.vsorort',
+    'srs.vsrst',
+    'user-defined transient.vudtt',
+    'transient.vtransientt',
+    'analyzer.vanalyzert'
+}
+
+def is_default_template_filename(filename):
+    """
+    Check if filename matches one of the default VibrationVIEW template files
+    that should be copied but not opened with automation command
+    
+    Args:
+        filename: The filename to check
+        
+    Returns:
+        bool: True if filename matches a default template, False otherwise
+    """
+    return filename.lower() in DEFAULT_TEMPLATE_FILENAMES
