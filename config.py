@@ -29,10 +29,11 @@ class Config:
     VV_RETRY_ATTEMPTS = int(os.environ.get('VV_RETRY_ATTEMPTS') or '5')
     VV_MAX_INSTANCES = int(os.environ.get('VV_MAX_INSTANCES') or '5')
 
-    # VibrationVIEW folders
-    PROFILE_FOLDER = 'C:\\VibrationVIEW\\Profiles'
-    REPORT_FOLDER = 'C:\\VibrationVIEW\\Reports'
-    EXE_NAME = 'C:\\Program Files\\VibrationVIEW 2025\\VibrationVIEW.exe'
+    # VibrationVIEW folders - configurable via environment variables
+    PROFILE_FOLDER = os.environ.get('PROFILE_FOLDER') or 'C:\\VibrationVIEW\\Profiles'
+    NEW_TEST_DEFAULTS_FOLDER = os.environ.get('NEW_TEST_DEFAULTS_FOLDER') or 'C:\\VibrationVIEW\\New Test Defaults'
+    REPORT_FOLDER = os.environ.get('REPORT_FOLDER') or 'C:\\VibrationVIEW\\Reports'
+    EXE_NAME = os.environ.get('EXE_NAME') or 'C:\\Program Files\\VibrationVIEW 2025\\VibrationVIEW.exe'
     
     # Flask Settings
     TESTING = False
