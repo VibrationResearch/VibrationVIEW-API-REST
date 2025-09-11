@@ -63,6 +63,11 @@ class MockVibrationVIEW:
         self.GetHardwareInputChannels = MagicMock(return_value=4)
         self.GetHardwareOutputChannels = MagicMock(return_value=2)
         
+        # Add missing basic control methods
+        self.OpenTest = MagicMock(return_value=True)
+        self.RunTest = MagicMock(return_value=True)
+        self.ResumeTest = MagicMock(return_value=True)
+        
         # Add missing vector properties methods
         self.ChannelUnit = MagicMock()
         self.ChannelLabel = MagicMock()
@@ -109,8 +114,9 @@ class MockVibrationVIEW:
             'RearInputLabel', 'RearInputUnit', 'Demand', 'Control', 'Channel', 
             'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest', 
             'IsReady', 'IsRunning', 'Teds', 'GetHardwareInputChannels', 
-            'GetHardwareOutputChannels', 'ChannelUnit', 'ChannelLabel', 
-            'ControlUnit', 'ControlLabel', 'VectorUnit', 'VectorLabel', 'VectorLength'
+            'GetHardwareOutputChannels', 'OpenTest', 'RunTest', 'ResumeTest',
+            'ChannelUnit', 'ChannelLabel', 'ControlUnit', 'ControlLabel', 
+            'VectorUnit', 'VectorLabel', 'VectorLength'
         ]
         
         for attr_name in magic_mock_attrs:
