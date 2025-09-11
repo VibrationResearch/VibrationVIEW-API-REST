@@ -7,7 +7,12 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'vrp', 'vasor', 'vkp', 'vkd', 'vsp', 'vsd', 'vdp', 'vdd'}
+ALLOWED_EXTENSIONS = {'vrp', 'vasor', 'vkp', 'vkd', 'vsp', 'vsd', 'vdp', 'vdd', 
+                     'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
+                     'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
+
+TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
+                      'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
 
 def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usetemporaryfile=False):
     if not filename or '.' not in filename:
