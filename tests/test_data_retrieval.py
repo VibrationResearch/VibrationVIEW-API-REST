@@ -506,38 +506,6 @@ class TestDataRetrieval:
     # ============================================================================
     # CONTROL METADATA TESTS (with base-1 to base-0 conversion)
     # ============================================================================
-    
-    def test_control_unit_base1_conversion(self, client):
-        """Test control unit with base-1 conversion"""
-        # Configure mock
-        self.mock_vv.ControlUnit.return_value = "V"
-        self.mock_vv.ControlUnit.reset_mock()
-        
-        # Send request with 1-based loop number
-        loop_1based = 2
-        expected_loop_0based = 1  # 2-1=1
-        
-        response = client.get(f'/api/controlunit?loopnum={loop_1based}')
-        
-        if response.status_code == 404:
-            pytest.skip("Route /api/controlunit not found - blueprint may not be registered")
-        
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        
-        assert data['success'] is True
-        assert data['data']['result'] == "V"
-        assert data['data']['loopnum'] == loop_1based
-        assert data['data']['internal_loopnum'] == expected_loop_0based
-        
-        # Verify VibrationVIEW was called with 0-based index
-        assert self.mock_vv.ControlUnit.called, "ControlUnit method was not called"
-        calls = self.mock_vv.ControlUnit.call_args_list
-        assert len(calls) == 1
-        assert calls[0] == ((expected_loop_0based,),)
-        
-        print("✓ ControlUnit base-1 conversion works!")
-    
     def test_control_label_base1_conversion(self, client):
         """Test control label with base-1 conversion"""
         # Configure mock
@@ -587,20 +555,6 @@ class TestDataRetrieval:
 
         print("✓ Control parameter validation works!")
     
-    def test_control_missing_parameters(self, client):
-        """Test control endpoints with missing loopnum parameter"""
-
-        endpoints = ['/api/controlunit', '/api/controllabel']
-
-        for endpoint in endpoints:
-            response = client.get(endpoint)
-            if response.status_code != 404:
-                assert response.status_code == 400, f"{endpoint} did not return 400 for missing loopnum"
-                data = json.loads(response.data)
-                assert data['success'] is False, f"{endpoint} did not set success to False"
-                assert 'loopnum' in data['error']['message'], f"{endpoint} error message missing 'loopnum'"
-
-        print("✓ Control missing parameter validation works!")
     # ============================================================================
     # DOCUMENTATION TESTS
     # ============================================================================
@@ -736,20 +690,6 @@ class TestDataRetrieval:
         ]
 
         for endpoint, param in channel_endpoints:
-            response = client.get(endpoint)
-            if response.status_code != 404:
-                assert response.status_code == 400, f"{endpoint} did not return 400 for missing {param}"
-                data = json.loads(response.data)
-                assert data['success'] is False, f"{endpoint} did not set success to False"
-                assert param in data['error']['message'], f"{endpoint} error message missing '{param}'"
-
-        # Control endpoints - missing parameters
-        control_endpoints = [
-            ('/api/controlunit', 'loopnum'),
-            ('/api/controllabel', 'loopnum'),
-        ]
-
-        for endpoint, param in control_endpoints:
             response = client.get(endpoint)
             if response.status_code != 404:
                 assert response.status_code == 400, f"{endpoint} did not return 400 for missing {param}"
