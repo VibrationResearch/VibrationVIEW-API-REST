@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'vrp', 'vasor', 'vkp', 'vkd', 'vsp', 'vsd', 'vdp', 'vdd', 
                      'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
-                     'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
+                     'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt', 'vic'}
 
 TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
                       'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}

@@ -118,13 +118,15 @@ def get_documentation():
                     },
                     'returns': 'bool - Success status'
                 },
-                'POST /setinputconfigurationfile': {
-                    'description': 'Load input configuration file',
-                    'com_method': 'SetInputConfigurationFile(configName)',
+                'GET|POST /setinputconfigurationfile': {
+                    'description': 'Get/Set input configuration file',
+                    'com_method': 'GetInputConfigurationFile() or SetInputConfigurationFile(configName)',
                     'parameters': {
-                        'configName': 'str - Configuration file name'
+                        'configName': 'str - Configuration file name (POST URL parameter only)'
                     },
-                    'returns': 'bool - Success status'
+                    'returns': 'str|bool - Current config name (GET) or success status (POST)',
+                    'example': 'POST /api/setinputconfigurationfile?configName=10mv per G.vic or ' +
+                               '/api/setinputconfigurationfile?10mv per G.vic'
                 }
             }
         },
@@ -555,29 +557,54 @@ def input_calibration(vv_instance):
         f"Channel {channel_user} calibration {'set successfully' if result else 'setting failed'}"
     ))
 
-@input_config_bp.route('/setinputconfigurationfile', methods=['POST'])
+@input_config_bp.route('/setinputconfigurationfile', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def set_input_configuration_file(vv_instance):
     """
-    Set Input Configuration File
+    Get/Set Input Configuration File
     
-    COM Method: SetInputConfigurationFile(configName)
-    Loads an input configuration file.
+    COM Method: GetInputConfigurationFile() or SetInputConfigurationFile(configName)
+    Gets current configuration file or loads a new input configuration file.
+    GET: Returns current configuration file name
+    POST: Sets configuration file from URL parameter 'configName' or unnamed parameter
     
-    JSON Parameters:
-        configName: Configuration file name
+    Example: POST /api/setinputconfigurationfile?configName=10mv per G.vic or 
+             POST /api/setinputconfigurationfile?10mv per G.vic
     """
-    data = request.get_json()
-    if not data or 'configName' not in data:
-        return jsonify(error_response(
-            'Missing required parameter: configName',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    result = vv_instance.SetInputConfigurationFile(data['configName'])
-    
-    return jsonify(success_response(
-        {'result': result, 'configName': data['configName']},
-        f"Input configuration file '{data['configName']}' {'loaded successfully' if result else 'loading failed'}"
-    ))
+    if request.method == "GET" and not request.args:
+        # GET without parameters - return current configuration file
+        result = vv_instance.GetInputConfigurationFile()
+        return jsonify(
+            success_response(
+                {"result": result}, f"Current input configuration file: {result}"
+            )
+        )
+    else:
+        # Set configuration file from parameters
+        config_name = request.args.get("configName")
+        
+        # If no 'configName' parameter, try to get the first unnamed parameter
+        if config_name is None:
+            args = list(request.args.keys())
+            if args:
+                config_name = args[0]
+        
+        if config_name is None:
+            return (
+                jsonify(
+                    error_response(
+                        "Missing required URL parameter: configName (or unnamed parameter)",
+                        "MISSING_PARAMETER"
+                    )
+                ),
+                400,
+            )
+
+        vv_instance.SetInputConfigurationFile(config_name)
+        return jsonify(
+            success_response(
+                {"configName": config_name},
+                f"Input configuration file '{config_name}' loaded successfully"
+            )
+        )
