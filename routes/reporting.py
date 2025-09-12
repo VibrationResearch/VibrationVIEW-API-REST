@@ -33,10 +33,10 @@ def get_documentation():
                 'description': 'Get report value specified by field name',
                 'com_method': 'ReportField(sField)',
                 'parameters': {
-                    'field': 'string - Query parameter with report field name'
+                    'field': 'string - Query parameter with report field name (optional - if missing, uses first query parameter)'
                 },
                 'returns': 'string - Report field value',
-                'example': 'GET /api/reportfield?field=TestName'
+                'examples': ['GET /api/reportfield?field=TestName', 'GET /api/reportfield?TestName=']
             },
             'POST /reportfields': {
                 'description': 'Get multiple report field values in one call',
@@ -71,18 +71,25 @@ def report_field(vv_instance):
     Gets the report value specified by the field name.
     
     Query Parameters:
-        field: Report field name to retrieve
+        field: Report field name to retrieve (optional - if missing, uses first query parameter)
     
-    Example: GET /api/reportfield?field=TestName
+    Examples: 
+        GET /api/reportfield?field=TestName
+        GET /api/reportfield?TestName
     """
-    # Get field name from query string
+    # Get field name from query string, use first parameter if 'field' is missing
     field_name = request.args.get('field')
     
     if not field_name:
-        return jsonify(error_response(
-            'Missing required query parameter: field',
-            'MISSING_PARAMETER'
-        )), 400
+        # Use the first query parameter if 'field' is missing
+        if request.args:
+            field_name = list(request.args.keys())[0]
+        
+        if not field_name:
+            return jsonify(error_response(
+                'Missing query parameter: either "field" or provide any query parameter',
+                'MISSING_PARAMETER'
+            )), 400
     
     result = vv_instance.ReportField(field_name)
     
