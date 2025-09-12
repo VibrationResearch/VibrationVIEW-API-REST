@@ -227,19 +227,25 @@ def get_documentation():
                 }
             },
             'Control Metadata (1-based indexing)': {
-                'GET /controlunit': {
-                    'description': 'Get control loop units',
-                    'com_method': 'ControlUnit(loopnum - 1)',
-                    'parameters': {'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter)'},
+                'GET|POST /controlunit': {
+                    'description': 'Get/Set control loop units',
+                    'com_method': 'ControlUnit(loopnum - 1) or ControlUnit(loopnum - 1, value)',
+                    'parameters': {
+                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)',
+                        'value': 'string - Unit value (POST URL parameter only)'
+                    },
                     'returns': 'str - Units for the control loop',
-                    'example': 'GET /api/controlunit?loopnum=2'
+                    'example': 'GET /api/controlunit (defaults to loop 1) or GET /api/controlunit?loopnum=2 or POST /api/controlunit?loopnum=2&value=V/EU or POST /api/controlunit?2&V/EU'
                 },
-                'GET /controllabel': {
-                    'description': 'Get control loop label',
-                    'com_method': 'ControlLabel(loopnum - 1)',
-                    'parameters': {'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter)'},
+                'GET|POST /controllabel': {
+                    'description': 'Get/Set control loop label',
+                    'com_method': 'ControlLabel(loopnum - 1) or ControlLabel(loopnum - 1, value)',
+                    'parameters': {
+                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)',
+                        'value': 'string - Label value (POST URL parameter only)'
+                    },
                     'returns': 'str - Label for the control loop',
-                    'example': 'GET /api/controllabel?loopnum=4'
+                    'example': 'GET /api/controllabel (defaults to loop 1) or GET /api/controllabel?loopnum=2 or POST /api/controllabel?loopnum=2&value=Acceleration or POST /api/controllabel?2&Acceleration'
                 }
             }
         },
@@ -410,16 +416,30 @@ def vector_unit(vv_instance):
     Returns the units string for the specified vector enumeration.
     
     Query Parameters:
-        vectorenum: Vector enumeration identifier (required)
+        vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorunit?vectorenum=1
+        GET /api/vectorunit?1
     """
-    vectorenum = request.args.get('vectorenum', type=int)
-    if vectorenum is None:
+    # Get vectorenum from query parameters (first parameter)
+    if not request.args:
         return jsonify(error_response(
             'Missing required query parameter: vectorenum',
             'MISSING_PARAMETER'
+        )), 400
+    
+    # Get first query parameter (key or value)
+    try:
+        # Try to get 'vectorenum' parameter first, then fall back to first key
+        vectorenum = request.args.get('vectorenum', type=int)
+        if vectorenum is None:
+            # If no 'vectorenum' parameter, try the first key as the value
+            first_key = list(request.args.keys())[0]
+            vectorenum = int(first_key)
+    except (ValueError, IndexError):
+        return jsonify(error_response(
+            'vectorenum must be an integer',
+            'INVALID_PARAMETER'
         )), 400
     
     result = vv_instance.VectorUnit(vectorenum)
@@ -440,16 +460,30 @@ def vector_label(vv_instance):
     Returns the label string for the specified vector enumeration.
     
     Query Parameters:
-        vectorenum: Vector enumeration identifier (required)
+        vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorlabel?vectorenum=2
+        GET /api/vectorlabel?2
     """
-    vectorenum = request.args.get('vectorenum', type=int)
-    if vectorenum is None:
+    # Get vectorenum from query parameters (first parameter)
+    if not request.args:
         return jsonify(error_response(
             'Missing required query parameter: vectorenum',
             'MISSING_PARAMETER'
+        )), 400
+    
+    # Get first query parameter (key or value)
+    try:
+        # Try to get 'vectorenum' parameter first, then fall back to first key
+        vectorenum = request.args.get('vectorenum', type=int)
+        if vectorenum is None:
+            # If no 'vectorenum' parameter, try the first key as the value
+            first_key = list(request.args.keys())[0]
+            vectorenum = int(first_key)
+    except (ValueError, IndexError):
+        return jsonify(error_response(
+            'vectorenum must be an integer',
+            'INVALID_PARAMETER'
         )), 400
     
     result = vv_instance.VectorLabel(vectorenum)
@@ -470,16 +504,30 @@ def vector_length(vv_instance):
     Returns the required array length for the specified vector enumeration.
     
     Query Parameters:
-        vectorenum: Vector enumeration identifier (required)
+        vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorlength?vectorenum=3
+        GET /api/vectorlength?3
     """
-    vectorenum = request.args.get('vectorenum', type=int)
-    if vectorenum is None:
+    # Get vectorenum from query parameters (first parameter)
+    if not request.args:
         return jsonify(error_response(
             'Missing required query parameter: vectorenum',
             'MISSING_PARAMETER'
+        )), 400
+    
+    # Get first query parameter (key or value)
+    try:
+        # Try to get 'vectorenum' parameter first, then fall back to first key
+        vectorenum = request.args.get('vectorenum', type=int)
+        if vectorenum is None:
+            # If no 'vectorenum' parameter, try the first key as the value
+            first_key = list(request.args.keys())[0]
+            vectorenum = int(first_key)
+    except (ValueError, IndexError):
+        return jsonify(error_response(
+            'vectorenum must be an integer',
+            'INVALID_PARAMETER'
         )), 400
     
     result = vv_instance.VectorLength(vectorenum)
@@ -504,16 +552,30 @@ def channel_unit(vv_instance):
     Channel numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
-        channelnum: Channel number (1-based, required)
+        channelnum (no parameter name required)
     
     Example:
-        GET /api/channelunit?channelnum=3
+        GET /api/channelunit?3
     """
-    channelnum = request.args.get('channelnum', type=int)
-    if channelnum is None:
+    # Get channelnum from query parameters (first parameter)
+    if not request.args:
         return jsonify(error_response(
             'Missing required query parameter: channelnum',
             'MISSING_PARAMETER'
+        )), 400
+    
+    # Get first query parameter (key or value)
+    try:
+        # Try to get 'channelnum' parameter first, then fall back to first key
+        channelnum = request.args.get('channelnum', type=int)
+        if channelnum is None:
+            # If no 'channelnum' parameter, try the first key as the value
+            first_key = list(request.args.keys())[0]
+            channelnum = int(first_key)
+    except (ValueError, IndexError):
+        return jsonify(error_response(
+            'channelnum must be an integer',
+            'INVALID_PARAMETER'
         )), 400
     
     # Convert from 1-based to 0-based
@@ -544,16 +606,30 @@ def channel_label(vv_instance):
     Channel numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
-        channelnum: Channel number (1-based, required)
+        channelnum (no parameter name required)
     
     Example:
-        GET /api/channellabel?channelnum=1
+        GET /api/channellabel?1
     """
-    channelnum = request.args.get('channelnum', type=int)
-    if channelnum is None:
+    # Get channelnum from query parameters (first parameter)
+    if not request.args:
         return jsonify(error_response(
             'Missing required query parameter: channelnum',
             'MISSING_PARAMETER'
+        )), 400
+    
+    # Get first query parameter (key or value)
+    try:
+        # Try to get 'channelnum' parameter first, then fall back to first key
+        channelnum = request.args.get('channelnum', type=int)
+        if channelnum is None:
+            # If no 'channelnum' parameter, try the first key as the value
+            first_key = list(request.args.keys())[0]
+            channelnum = int(first_key)
+    except (ValueError, IndexError):
+        return jsonify(error_response(
+            'channelnum must be an integer',
+            'INVALID_PARAMETER'
         )), 400
     
     # Convert from 1-based to 0-based
@@ -577,28 +653,43 @@ def channel_label(vv_instance):
 # CONTROL METADATA (1-based indexing with conversion)
 # ============================================================================
 
-@data_retrieval_bp.route('/controlunit', methods=['GET'])
+@data_retrieval_bp.route('/controlunit', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def control_unit(vv_instance):
     """
-    Get the channel unit associated with loop number (1-based)
+    Get/Set control loop units
     
-    COM Method: ControlUnit(loopnum - 1)
+    COM Method: ControlUnit(loopnum - 1) or ControlUnit(loopnum - 1, value)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
-        loopnum: Loop number (1-based, required)
+        loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
+        value: string - Unit value (POST only)
     
-    Example:
+    Examples:
+        GET /api/controlunit (defaults to loop 1)
         GET /api/controlunit?loopnum=2
+        GET /api/controlunit?2
+        POST /api/controlunit?loopnum=2&value=V/EU
+        POST /api/controlunit?2&V/EU
     """
-    loopnum = request.args.get('loopnum', type=int)
-    if loopnum is None:
-        return jsonify(error_response(
-            'Missing required query parameter: loopnum',
-            'MISSING_PARAMETER'
-        )), 400
+    # Determine loop number - default to 1 if no parameters
+    if not request.args:
+        loopnum = 1
+    else:
+        try:
+            # Try to get 'loopnum' parameter first, then fall back to first key
+            loopnum = request.args.get('loopnum', type=int)
+            if loopnum is None:
+                # If no 'loopnum' parameter, try the first key as the value
+                first_key = list(request.args.keys())[0]
+                loopnum = int(first_key)
+        except (ValueError, IndexError):
+            return jsonify(error_response(
+                'loopnum must be an integer',
+                'INVALID_PARAMETER'
+            )), 400
     
     # Convert from 1-based to 0-based
     if loopnum < 1:
@@ -609,36 +700,82 @@ def control_unit(vv_instance):
     
     loop_num_0based = loopnum - 1
     
-    result = vv_instance.ControlUnit(loop_num_0based)
-    
-    return jsonify(success_response({
-        'result': result,
-        'loopnum': loopnum,
-        'internal_loopnum': loop_num_0based
-    }))
+    if request.method == "GET":
+        # GET - return current units for the specified loop
+        result = vv_instance.ControlUnit(loop_num_0based)
+        return jsonify(success_response({
+            'result': result,
+            'loopnum': loopnum,
+            'internal_loopnum': loop_num_0based
+        }, f"ControlUnit retrieved for loop {loopnum}: {result}"))
+    else:
+        # POST - set units for the specified loop
+        # Get value parameter - check named parameter first, then unnamed
+        value = request.args.get("value")
+        
+        # If no 'value' parameter, try to get the second parameter or first value
+        if value is None:
+            args = list(request.args.items())
+            # Skip the loopnum parameter and look for value
+            for key, val in args:
+                if key != 'loopnum' and key != str(loopnum):
+                    if val:  # parameter has a value
+                        value = val
+                    else:  # parameter is the value itself
+                        value = key
+                    break
+        
+        if value is None:
+            return jsonify(error_response(
+                "Missing required parameter: value (for setting control unit)", 
+                "MISSING_PARAMETER"
+            )), 400
 
-@data_retrieval_bp.route('/controllabel', methods=['GET'])
+        result = vv_instance.ControlUnit(loop_num_0based, value)
+        return jsonify(success_response({
+            'result': result,
+            'loopnum': loopnum,
+            'internal_loopnum': loop_num_0based,
+            'value_set': value
+        }, f"ControlUnit set for loop {loopnum} to '{value}', returned: {result}"))
+
+@data_retrieval_bp.route('/controllabel', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def control_label(vv_instance):
     """
-    Get the control unit label associated with loop number (1-based)
+    Get/Set control loop label
     
-    COM Method: ControlLabel(loopnum - 1)
+    COM Method: ControlLabel(loopnum - 1) or ControlLabel(loopnum - 1, value)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
-        loopnum: Loop number (1-based, required)
+        loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
+        value: string - Label value (POST only)
     
-    Example:
-        GET /api/controllabel?loopnum=4
+    Examples:
+        GET /api/controllabel (defaults to loop 1)
+        GET /api/controllabel?loopnum=2
+        GET /api/controllabel?2
+        POST /api/controllabel?loopnum=2&value=Acceleration
+        POST /api/controllabel?2&Acceleration
     """
-    loopnum = request.args.get('loopnum', type=int)
-    if loopnum is None:
-        return jsonify(error_response(
-            'Missing required query parameter: loopnum',
-            'MISSING_PARAMETER'
-        )), 400
+    # Determine loop number - default to 1 if no parameters
+    if not request.args:
+        loopnum = 1
+    else:
+        try:
+            # Try to get 'loopnum' parameter first, then fall back to first key
+            loopnum = request.args.get('loopnum', type=int)
+            if loopnum is None:
+                # If no 'loopnum' parameter, try the first key as the value
+                first_key = list(request.args.keys())[0]
+                loopnum = int(first_key)
+        except (ValueError, IndexError):
+            return jsonify(error_response(
+                'loopnum must be an integer',
+                'INVALID_PARAMETER'
+            )), 400
     
     # Convert from 1-based to 0-based
     if loopnum < 1:
@@ -649,10 +786,41 @@ def control_label(vv_instance):
     
     loop_num_0based = loopnum - 1
     
-    result = vv_instance.ControlLabel(loop_num_0based)
-    
-    return jsonify(success_response({
-        'result': result,
-        'loopnum': loopnum,
-        'internal_loopnum': loop_num_0based
-    }))
+    if request.method == "GET":
+        # GET - return current label for the specified loop
+        result = vv_instance.ControlLabel(loop_num_0based)
+        return jsonify(success_response({
+            'result': result,
+            'loopnum': loopnum,
+            'internal_loopnum': loop_num_0based
+        }, f"ControlLabel retrieved for loop {loopnum}: {result}"))
+    else:
+        # POST - set label for the specified loop
+        # Get value parameter - check named parameter first, then unnamed
+        value = request.args.get("value")
+        
+        # If no 'value' parameter, try to get the second parameter or first value
+        if value is None:
+            args = list(request.args.items())
+            # Skip the loopnum parameter and look for value
+            for key, val in args:
+                if key != 'loopnum' and key != str(loopnum):
+                    if val:  # parameter has a value
+                        value = val
+                    else:  # parameter is the value itself
+                        value = key
+                    break
+        
+        if value is None:
+            return jsonify(error_response(
+                "Missing required parameter: value (for setting control label)", 
+                "MISSING_PARAMETER"
+            )), 400
+
+        result = vv_instance.ControlLabel(loop_num_0based, value)
+        return jsonify(success_response({
+            'result': result,
+            'loopnum': loopnum,
+            'internal_loopnum': loop_num_0based,
+            'value_set': value
+        }, f"ControlLabel set for loop {loopnum} to '{value}', returned: {result}"))
