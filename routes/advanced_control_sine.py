@@ -77,7 +77,7 @@ def get_documentation():
                         )
                     },
                     "returns": "float - Current multiplier value",
-                    "example": "POST /api/demandmultiplier?value=6.0",
+                    "example": "POST /api/demandmultiplier?value=6.0 or /api/demandmultiplier?6.0",
                 },
                 "GET|POST /sweepmultiplier": {
                     "description": "Get/Set sine sweep multiplier (linear)",
@@ -86,7 +86,7 @@ def get_documentation():
                         "value": "float - Multiplier value (POST URL parameter only)"
                     },
                     "returns": "float - Current multiplier value",
-                    "example": "POST /api/sweepmultiplier?value=1.5",
+                    "example": "POST /api/sweepmultiplier?value=1.5 or /api/sweepmultiplier?1.5",
                 },
                 "GET|POST /sinefrequency": {
                     "description": "Get/Set sine frequency",
@@ -95,7 +95,7 @@ def get_documentation():
                         "value": "float - Frequency value (POST URL parameter only)"
                     },
                     "returns": "float - Current frequency",
-                    "example": "POST /api/sinefrequency?value=100.0",
+                    "example": "POST /api/sinefrequency?value=100.0 or /api/sinefrequency?30",
                 },
             },
         },
@@ -252,9 +252,9 @@ def demand_multiplier(vv_instance):
     Controls the multiplier for demand output in dB.
 
     GET: Returns current multiplier value
-    POST: Sets multiplier value from URL parameter 'value'
+    POST: Sets multiplier value from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/demandmultiplier?value=6.0
+    Example: POST /api/demandmultiplier?value=6.0 or POST /api/demandmultiplier?6.0
     """
     if request.method == "GET":
         result = vv_instance.DemandMultiplier()
@@ -265,11 +265,21 @@ def demand_multiplier(vv_instance):
         )
     else:
         value = request.args.get("value", type=float)
+        
+        # If no 'value' parameter, try to get the first unnamed parameter
+        if value is None:
+            args = list(request.args.keys())
+            if args and args[0].replace('.', '').replace('-', '').isdigit():
+                try:
+                    value = float(args[0])
+                except ValueError:
+                    pass
+        
         if value is None:
             return (
                 jsonify(
                     error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
+                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
                     )
                 ),
                 400,
@@ -295,9 +305,9 @@ def sweep_multiplier(vv_instance):
     Controls the multiplier for sine sweep (linear scale).
 
     GET: Returns current multiplier value
-    POST: Sets multiplier value from URL parameter 'value'
+    POST: Sets multiplier value from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/sweepmultiplier?value=1.5
+    Example: POST /api/sweepmultiplier?value=1.5 or POST /api/sweepmultiplier?1.5
     """
     if request.method == "GET":
         result = vv_instance.SweepMultiplier()
@@ -306,11 +316,21 @@ def sweep_multiplier(vv_instance):
         )
     else:
         value = request.args.get("value", type=float)
+        
+        # If no 'value' parameter, try to get the first unnamed parameter
+        if value is None:
+            args = list(request.args.keys())
+            if args and args[0].replace('.', '').replace('-', '').isdigit():
+                try:
+                    value = float(args[0])
+                except ValueError:
+                    pass
+        
         if value is None:
             return (
                 jsonify(
                     error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
+                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
                     )
                 ),
                 400,
@@ -336,9 +356,9 @@ def sine_frequency(vv_instance):
     Controls the sine test frequency.
 
     GET: Returns current frequency
-    POST: Sets frequency from URL parameter 'value'
+    POST: Sets frequency from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/sinefrequency?value=100.0
+    Example: POST /api/sinefrequency?value=100.0 or POST /api/sinefrequency?30
     """
     if request.method == "GET":
         result = vv_instance.SineFrequency()
@@ -349,11 +369,21 @@ def sine_frequency(vv_instance):
         )
     else:
         value = request.args.get("value", type=float)
+        
+        # If no 'value' parameter, try to get the first unnamed parameter
+        if value is None:
+            args = list(request.args.keys())
+            if args and args[0].replace('.', '').replace('-', '').isdigit():
+                try:
+                    value = float(args[0])
+                except ValueError:
+                    pass
+        
         if value is None:
             return (
                 jsonify(
                     error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
+                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
                     )
                 ),
                 400,
