@@ -30,33 +30,42 @@ def get_docs():
                 "description": "Get documentation for this module",
                 "returns": "dict - This documentation",
             },
+            "GET /systemcheckfrequency": {
+                "description": "Get current system check frequency",
+                "com_method": "SystemCheckFrequency()",
+                "returns": "float - Current frequency",
+                "example": "GET /api/systemcheckfrequency",
+            },
             "GET|POST /systemcheckfrequency": {
                 "description": "Get/Set system check frequency",
-                "com_method": (
-                    "SystemCheckFrequency() or SystemCheckFrequency(value)"
-                ),
+                "com_method": "SystemCheckFrequency() or SystemCheckFrequency(value)",
                 "parameters": {
                     "value": "float - Frequency value (POST URL parameter only)"
                 },
                 "returns": "float - Current frequency",
-                "example": "POST /api/systemcheckfrequency?value=50.0",
+                "example": "POST /api/systemcheckfrequency?value=120.0 or /api/systemcheckfrequency?120.0",
+            },
+            "GET /systemcheckoutputvoltage": {
+                "description": "Get current system check output voltage",
+                "com_method": "SystemCheckOutputVoltage()",
+                "returns": "float - Current voltage",
+                "example": "GET /api/systemcheckoutputvoltage",
             },
             "GET|POST /systemcheckoutputvoltage": {
-                "description": "Get/Set system check output level",
-                "com_method": (
-                    "SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)"
-                ),
+                "description": "Get/Set system check output voltage",
+                "com_method": "SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)",
                 "parameters": {
                     "value": "float - Voltage value (POST URL parameter only)"
                 },
                 "returns": "float - Current voltage",
-                "example": "POST /api/systemcheckoutputvoltage?value=5.0",
+                "example": "POST /api/systemcheckoutputvoltage?value=5.0 or /api/systemcheckoutputvoltage?5.0",
             },
         },
         "notes": [
-            "GET requests return current parameter value",
-            'POST requests with "value" URL parameter set parameter and return new value',
-            "All POST parameter setting uses URL parameters, not JSON body",
+            "GET /systemcheckfrequency returns current frequency value",
+            "POST /systemcheckfrequency with value parameter sets frequency",
+            "GET /systemcheckoutputvoltage returns current voltage value",
+            "POST /systemcheckoutputvoltage with value parameter sets voltage",
             "COM interface uses 0-based indexing for all arrays",
         ],
     })
@@ -71,13 +80,13 @@ def system_check_frequency(vv_instance):
 
     COM Method: SystemCheckFrequency() or SystemCheckFrequency(value)
     Controls the system check frequency.
-
     GET: Returns current frequency
-    POST: Sets frequency from URL parameter 'value'
+    POST: Sets frequency from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/systemcheckfrequency?value=50.0
+    Example: POST /api/systemcheckfrequency?value=120.0 or POST /api/systemcheckfrequency?120.0
     """
-    if request.method == "GET":
+    if request.method == "GET" and not request.args:
+        # GET without parameters - return current value
         result = vv_instance.SystemCheckFrequency()
         return jsonify(
             success_response(
@@ -85,12 +94,23 @@ def system_check_frequency(vv_instance):
             )
         )
     else:
+        # Set frequency from parameters
         value = request.args.get("value", type=float)
+        
+        # If no 'value' parameter, try to get the first unnamed parameter
+        if value is None:
+            args = list(request.args.keys())
+            if args and args[0].replace('.', '').replace('-', '').isdigit():
+                try:
+                    value = float(args[0])
+                except ValueError:
+                    pass
+        
         if value is None:
             return (
                 jsonify(
                     error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
+                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
                     )
                 ),
                 400,
@@ -114,13 +134,13 @@ def system_check_output_voltage(vv_instance):
 
     COM Method: SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)
     Controls the system check output level.
-
     GET: Returns current voltage
-    POST: Sets voltage from URL parameter 'value'
+    POST: Sets voltage from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/systemcheckoutputvoltage?value=5.0
+    Example: POST /api/systemcheckoutputvoltage?value=5.0 or POST /api/systemcheckoutputvoltage?5.0
     """
-    if request.method == "GET":
+    if request.method == "GET" and not request.args:
+        # GET without parameters - return current value
         result = vv_instance.SystemCheckOutputVoltage()
         return jsonify(
             success_response(
@@ -128,12 +148,23 @@ def system_check_output_voltage(vv_instance):
             )
         )
     else:
+        # Set voltage from parameters
         value = request.args.get("value", type=float)
+        
+        # If no 'value' parameter, try to get the first unnamed parameter
+        if value is None:
+            args = list(request.args.keys())
+            if args and args[0].replace('.', '').replace('-', '').isdigit():
+                try:
+                    value = float(args[0])
+                except ValueError:
+                    pass
+        
         if value is None:
             return (
                 jsonify(
                     error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
+                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
                     )
                 ),
                 400,
