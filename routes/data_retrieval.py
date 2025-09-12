@@ -227,25 +227,23 @@ def get_documentation():
                 }
             },
             'Control Metadata (1-based indexing)': {
-                'GET|POST /controlunit': {
-                    'description': 'Get/Set control loop units',
-                    'com_method': 'ControlUnit(loopnum - 1) or ControlUnit(loopnum - 1, value)',
+                'GET /controlunit': {
+                    'description': 'Get control loop units',
+                    'com_method': 'ControlUnit(loopnum - 1)',
                     'parameters': {
-                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)',
-                        'value': 'string - Unit value (POST URL parameter only)'
+                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Units for the control loop',
-                    'example': 'GET /api/controlunit (defaults to loop 1) or GET /api/controlunit?loopnum=2 or POST /api/controlunit?loopnum=2&value=V/EU or POST /api/controlunit?2&V/EU'
+                    'example': 'GET /api/controlunit (defaults to loop 1) or GET /api/controlunit?loopnum=2'
                 },
-                'GET|POST /controllabel': {
-                    'description': 'Get/Set control loop label',
-                    'com_method': 'ControlLabel(loopnum - 1) or ControlLabel(loopnum - 1, value)',
+                'GET /controllabel': {
+                    'description': 'Get control loop label',
+                    'com_method': 'ControlLabel(loopnum - 1)',
                     'parameters': {
-                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)',
-                        'value': 'string - Label value (POST URL parameter only)'
+                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Label for the control loop',
-                    'example': 'GET /api/controllabel (defaults to loop 1) or GET /api/controllabel?loopnum=2 or POST /api/controllabel?loopnum=2&value=Acceleration or POST /api/controllabel?2&Acceleration'
+                    'example': 'GET /api/controllabel (defaults to loop 1) or GET /api/controllabel?loopnum=2'
                 }
             }
         },
@@ -653,26 +651,23 @@ def channel_label(vv_instance):
 # CONTROL METADATA (1-based indexing with conversion)
 # ============================================================================
 
-@data_retrieval_bp.route('/controlunit', methods=['GET', 'POST'])
+@data_retrieval_bp.route('/controlunit', methods=['GET'])
 @handle_errors
 @with_vibrationview
 def control_unit(vv_instance):
     """
-    Get/Set control loop units
+    Get control loop units
     
-    COM Method: ControlUnit(loopnum - 1) or ControlUnit(loopnum - 1, value)
+    COM Method: ControlUnit(loopnum - 1)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
         loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
-        value: string - Unit value (POST only)
     
     Examples:
         GET /api/controlunit (defaults to loop 1)
         GET /api/controlunit?loopnum=2
         GET /api/controlunit?2
-        POST /api/controlunit?loopnum=2&value=V/EU
-        POST /api/controlunit?2&V/EU
     """
     # Determine loop number - default to 1 if no parameters
     if not request.args:
@@ -700,65 +695,29 @@ def control_unit(vv_instance):
     
     loop_num_0based = loopnum - 1
     
-    if request.method == "GET":
-        # GET - return current units for the specified loop
-        result = vv_instance.ControlUnit(loop_num_0based)
-        return jsonify(success_response({
-            'result': result,
-            'loopnum': loopnum,
-            'internal_loopnum': loop_num_0based
-        }, f"ControlUnit retrieved for loop {loopnum}: {result}"))
-    else:
-        # POST - set units for the specified loop
-        # Get value parameter - check named parameter first, then unnamed
-        value = request.args.get("value")
-        
-        # If no 'value' parameter, try to get the second parameter or first value
-        if value is None:
-            args = list(request.args.items())
-            # Skip the loopnum parameter and look for value
-            for key, val in args:
-                if key != 'loopnum' and key != str(loopnum):
-                    if val:  # parameter has a value
-                        value = val
-                    else:  # parameter is the value itself
-                        value = key
-                    break
-        
-        if value is None:
-            return jsonify(error_response(
-                "Missing required parameter: value (for setting control unit)", 
-                "MISSING_PARAMETER"
-            )), 400
+    result = vv_instance.ControlUnit(loop_num_0based)
+    return jsonify(success_response({
+        'result': result,
+        'loopnum': loopnum,
+    }, f"ControlUnit retrieved for loop {loopnum}: {result}"))
 
-        result = vv_instance.ControlUnit(loop_num_0based, value)
-        return jsonify(success_response({
-            'result': result,
-            'loopnum': loopnum,
-            'internal_loopnum': loop_num_0based,
-            'value_set': value
-        }, f"ControlUnit set for loop {loopnum} to '{value}', returned: {result}"))
-
-@data_retrieval_bp.route('/controllabel', methods=['GET', 'POST'])
+@data_retrieval_bp.route('/controllabel', methods=['GET'])
 @handle_errors
 @with_vibrationview
 def control_label(vv_instance):
     """
-    Get/Set control loop label
+    Get control loop label
     
-    COM Method: ControlLabel(loopnum - 1) or ControlLabel(loopnum - 1, value)
+    COM Method: ControlLabel(loopnum - 1)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
     
     Query Parameters:
         loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
-        value: string - Label value (POST only)
     
     Examples:
         GET /api/controllabel (defaults to loop 1)
         GET /api/controllabel?loopnum=2
         GET /api/controllabel?2
-        POST /api/controllabel?loopnum=2&value=Acceleration
-        POST /api/controllabel?2&Acceleration
     """
     # Determine loop number - default to 1 if no parameters
     if not request.args:
@@ -786,41 +745,9 @@ def control_label(vv_instance):
     
     loop_num_0based = loopnum - 1
     
-    if request.method == "GET":
-        # GET - return current label for the specified loop
-        result = vv_instance.ControlLabel(loop_num_0based)
-        return jsonify(success_response({
-            'result': result,
-            'loopnum': loopnum,
-            'internal_loopnum': loop_num_0based
-        }, f"ControlLabel retrieved for loop {loopnum}: {result}"))
-    else:
-        # POST - set label for the specified loop
-        # Get value parameter - check named parameter first, then unnamed
-        value = request.args.get("value")
-        
-        # If no 'value' parameter, try to get the second parameter or first value
-        if value is None:
-            args = list(request.args.items())
-            # Skip the loopnum parameter and look for value
-            for key, val in args:
-                if key != 'loopnum' and key != str(loopnum):
-                    if val:  # parameter has a value
-                        value = val
-                    else:  # parameter is the value itself
-                        value = key
-                    break
-        
-        if value is None:
-            return jsonify(error_response(
-                "Missing required parameter: value (for setting control label)", 
-                "MISSING_PARAMETER"
-            )), 400
-
-        result = vv_instance.ControlLabel(loop_num_0based, value)
-        return jsonify(success_response({
-            'result': result,
-            'loopnum': loopnum,
-            'internal_loopnum': loop_num_0based,
-            'value_set': value
-        }, f"ControlLabel set for loop {loopnum} to '{value}', returned: {result}"))
+    result = vv_instance.ControlLabel(loop_num_0based)
+    return jsonify(success_response({
+        'result': result,
+        'loopnum': loopnum,
+        'internal_loopnum': loop_num_0based
+    }, f"ControlLabel retrieved for loop {loopnum}: {result}"))
