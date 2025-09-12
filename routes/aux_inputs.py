@@ -26,7 +26,9 @@ def auxinputs_docs():
         'endpoints': {
             'Rear Input Metadata': {
                 'GET /rearinputunit?channel=<int>': 'RearInputUnit(channel: int) -> str - Get rear input units (1-based)',
-                'GET /rearinputlabel?channel=<int>': 'RearInputLabel(channel: int) -> str - Get rear input label (1-based)'
+                'GET /rearinputunit?<int>': 'RearInputUnit(channel: int) -> str - Get rear input units using unnamed parameter (1-based)',
+                'GET /rearinputlabel?channel=<int>': 'RearInputLabel(channel: int) -> str - Get rear input label (1-based)',
+                'GET /rearinputlabel?<int>': 'RearInputLabel(channel: int) -> str - Get rear input label using unnamed parameter (1-based)'
             }
         },
         'parameter_notes': {
@@ -42,11 +44,22 @@ def auxinputs_docs():
 @with_vibrationview
 def rear_input_unit(vv_instance):
     """Get units for the rear input channel (1-based indexing)"""
+    # Get channel from 'channel' parameter or first unnamed parameter
     channel_1based = request.args.get('channel', type=int)
+    
+    # If no 'channel' parameter, try to get the first unnamed parameter
+    if channel_1based is None:
+        args = list(request.args.keys())
+        if args and args[0].replace('-', '').isdigit():
+            try:
+                channel_1based = int(args[0])
+            except ValueError:
+                pass
+    
     if channel_1based is None:
         return jsonify({
             'success': False, 
-            'error': 'Missing required parameter: channel'
+            'error': 'Missing required parameter: channel (or unnamed numeric parameter)'
         }), 400
     
     # Validate 1-based channel number
@@ -72,11 +85,22 @@ def rear_input_unit(vv_instance):
 @with_vibrationview
 def rear_input_label(vv_instance):
     """Get label for the rear input channel (1-based indexing)"""
+    # Get channel from 'channel' parameter or first unnamed parameter
     channel_1based = request.args.get('channel', type=int)
+    
+    # If no 'channel' parameter, try to get the first unnamed parameter
+    if channel_1based is None:
+        args = list(request.args.keys())
+        if args and args[0].replace('-', '').isdigit():
+            try:
+                channel_1based = int(args[0])
+            except ValueError:
+                pass
+    
     if channel_1based is None:
         return jsonify({
             'success': False, 
-            'error': 'Missing required parameter: channel'
+            'error': 'Missing required parameter: channel (or unnamed numeric parameter)'
         }), 400
     
     # Validate 1-based channel number
