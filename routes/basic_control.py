@@ -47,8 +47,8 @@ def get_documentation():
                     'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
                     'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
-                'returns': 'Result from RunTest()',
-                'example': 'GET /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp'
+                'returns': 'boolean - Test running status verified by IsRunning()',
+                'example': 'GET /api/runtest (status) or GET /api/runtest?testname=test1.vsp or POST /api/runtest?testname=test1.vsp'
             },
             'PUT /runtest': {
                 'description': 'Upload and run a complete test (combines upload + OpenTest + StartTest)',
@@ -130,12 +130,16 @@ def start_test(vv_instance):
     """
     result = vv_instance.StartTest()
 
+    # Check if test is actually running
+    success = vv_instance.IsRunning()
+
     return jsonify(success_response(
         {'result': result},
         "StartTest command executed"
     ))
 
 @basic_control_bp.route('/runtest', methods=['PUT'])
+@handle_errors
 @with_vibrationview
 def upload_and_run_test(vv_instance):
     """
@@ -156,58 +160,51 @@ def upload_and_run_test(vv_instance):
     
     Example: PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)
     """
-    try:
-        # Get filename from parameters - check named parameter first, then unnamed
-        filename = request.args.get("filename")
-        
-        # If no 'filename' parameter, try to get the first unnamed parameter
-        if filename is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                # URL decode the query string to handle special characters
-                filename = unquote(query_string)
-        
-        content_length = request.content_length
+    # Get filename from parameters - check named parameter first, then unnamed
+    filename = request.args.get("filename")
 
-        if not filename:
-            return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
+    # If no 'filename' parameter, try to get the first unnamed parameter
+    if filename is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters
+            filename = unquote(query_string)
 
-        if content_length is None:
-            return jsonify({'Error': 'Missing Content-Length header'}), 411  # Length Required
-        
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
-        
-        binary_data = request.get_data()
-        result, error, status_code = handle_binary_upload(filename, binary_data)
-        if error:
-            return jsonify(error), status_code
+    content_length = request.content_length
 
-        file_path = result['FilePath']
+    if not filename:
+        return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
 
-        # Open the uploaded test file
-        open_result = vv_instance.OpenTest(file_path)
-        
-        # Start the test
-        start_result = vv_instance.StartTest()
-        
-        # Check if test is actually running
-        success = vv_instance.IsRunning()
-        
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filename,
-                'file_uploaded': True,
-                'test_opened': True,
-                'test_started': success,
-                'executed': True
-            },
-            f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
-        ))
+    if content_length is None:
+        return jsonify({'Error': 'Missing Content-Length header'}), 411  # Length Required
 
-    except Exception as e:
-        return jsonify(extract_com_error_info(e)), 500
+    if content_length > MAX_CONTENT_LENGTH:
+        return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
+
+    binary_data = request.get_data()
+    result, error, status_code = handle_binary_upload(filename, binary_data)
+    if error:
+        return jsonify(error), status_code
+
+    file_path = result['FilePath']
+
+    # Open the uploaded test file
+    run_result = vv_instance.RunTest(file_path)
+
+    # Check if test is actually running
+    success = vv_instance.IsRunning()
+
+    return jsonify(success_response(
+        {
+            'result': success,
+            'filepath': filename,
+            'file_uploaded': True,
+            'test_opened': True,
+            'test_started': success,
+            'executed': True
+        },
+        f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
+    ))
     
 @basic_control_bp.route('/runtest', methods=['GET', 'POST'])
 @handle_errors
@@ -266,6 +263,8 @@ def stop_test(vv_instance):
     Terminates the currently running vibration test.
     """
     result = vv_instance.StopTest()
+    # Check if test actually stopped
+    success = not vv_instance.IsRunning()
 
     return jsonify(success_response(
         {'result': result},
@@ -283,6 +282,9 @@ def resume_test(vv_instance):
     Resumes a previously paused vibration test.
     """
     result = vv_instance.ResumeTest()
+
+    # Check if test is actually running
+    success = vv_instance.IsRunning()
 
     return jsonify(success_response(
         {'result': result},
