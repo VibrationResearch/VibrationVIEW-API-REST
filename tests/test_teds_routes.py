@@ -319,4 +319,113 @@ class TestTEDSRoutes:
         assert '1-based' in teds_endpoint['description'] or '1-based' in str(teds_endpoint)
         
         print("✓ TEDS documentation is complete!")
+
+    def test_tedsfromurn_success(self, client, mock_vv):
+        """Test GET /tedsfromurn with valid URN"""
+        # Configure mock
+        mock_teds_data = [
+            {'sensitivity': 100.0, 'units': 'mV/g', 'serial_number': 'SN123456'},
+            {'frequency_range': '1-1000 Hz', 'calibration_date': '2024-01-15'}
+        ]
+        mock_vv.TedsFromURN.return_value = mock_teds_data
+        mock_vv.clear_method_calls()
+
+        urn = "test_urn_123456"
+        response = client.get(f'/api/tedsfromurn?{urn}')
+
+        if response.status_code == 404:
+            pytest.skip("Route /api/tedsfromurn not found")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data['success'] is True
+        assert data['data']['urn'] == urn
+        assert data['data']['success'] is True
+        # The response contains formatted transducer data, not raw result
+        assert 'transducer' in data['data']
+
+        # Verify VibrationVIEW was called with correct URN
+        assert mock_vv.TedsFromURN.called, "TedsFromURN method was not called"
+        mock_vv.TedsFromURN.assert_called_with(urn)
+
+        print("✓ GET /tedsfromurn with valid URN works!")
+
+    def test_tedsfromurn_missing_urn(self, client, mock_vv):
+        """Test GET /tedsfromurn without URN parameter"""
+        response = client.get('/api/tedsfromurn')
+
+        if response.status_code == 404:
+            pytest.skip("Route /api/tedsfromurn not found")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+
+        assert data['success'] is False
+        assert data['error']['message'] == 'Missing required query parameter: urn'
+        assert data['error']['code'] == 'MISSING_PARAMETER'
+
+        print("✓ GET /tedsfromurn rejects missing URN correctly!")
+
+    def test_tedsfromurn_empty_urn(self, client, mock_vv):
+        """Test GET /tedsfromurn with empty URN parameter"""
+        response = client.get('/api/tedsfromurn?')
+
+        if response.status_code == 404:
+            pytest.skip("Route /api/tedsfromurn not found")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+
+        assert data['success'] is False
+        # With empty query string, it's treated as missing parameter
+        assert data['error']['message'] == 'Missing required query parameter: urn'
+        assert data['error']['code'] == 'MISSING_PARAMETER'
+
+        print("✓ GET /tedsfromurn rejects empty URN correctly!")
+
+    def test_tedsfromurn_com_error(self, client, mock_vv):
+        """Test GET /tedsfromurn when VibrationVIEW raises an exception"""
+        # Configure mock to raise exception
+        mock_vv.TedsFromURN.side_effect = Exception("URN not found in database")
+
+        urn = "invalid_urn_999"
+        response = client.get(f'/api/tedsfromurn?{urn}')
+
+        if response.status_code == 404:
+            pytest.skip("Route /api/tedsfromurn not found")
+
+        assert response.status_code == 500
+        data = json.loads(response.data)
+
+        assert data['success'] is False
+        assert 'URN not found in database' in data['error']
+        # The @with_vibrationview decorator returns error as a string, not a dict
+
+        print("✓ GET /tedsfromurn handles COM errors correctly!")
+
+    def test_tedsfromurn_special_characters(self, client, mock_vv):
+        """Test GET /tedsfromurn with URN containing special characters"""
+        # Configure mock
+        mock_teds_data = [{'sensitivity': 50.0, 'units': 'mV/g'}]
+        mock_vv.TedsFromURN.return_value = mock_teds_data
+        mock_vv.clear_method_calls()
+
+        urn = "urn-with-dashes_and_underscores.123"
+        response = client.get(f'/api/tedsfromurn?{urn}')
+
+        if response.status_code == 404:
+            pytest.skip("Route /api/tedsfromurn not found")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data['success'] is True
+        assert 'transducer' in data['data']  # Formatted response, not raw result
+        assert data['data']['urn'] == urn
+
+        # Verify VibrationVIEW was called with correct URN
+        mock_vv.TedsFromURN.assert_called_with(urn)
+
+        print("✓ GET /tedsfromurn handles special characters in URN correctly!")
         

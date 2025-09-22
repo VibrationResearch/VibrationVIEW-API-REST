@@ -60,6 +60,7 @@ class MockVibrationVIEW:
         self.IsReady = MagicMock(side_effect=lambda: self._is_ready)
         self.IsRunning = MagicMock(side_effect=lambda: self._is_running)
         self.Teds = MagicMock()
+        self.TedsFromURN = MagicMock()
         self.GetHardwareInputChannels = MagicMock(return_value=4)
         self.GetHardwareOutputChannels = MagicMock(return_value=2)
         
@@ -90,8 +91,8 @@ class MockVibrationVIEW:
         # Handle MagicMock methods
         magic_mock_methods = [
             "RearInputLabel", "RearInputUnit", "ChannelUnit", "ChannelLabel",
-            "ControlUnit", "ControlLabel", "VectorUnit", "VectorLabel", 
-            "VectorLength", "Teds"
+            "ControlUnit", "ControlLabel", "VectorUnit", "VectorLabel",
+            "VectorLength", "Teds", "TedsFromURN"
         ]
         
         if method_name in magic_mock_methods:
@@ -111,11 +112,11 @@ class MockVibrationVIEW:
         
         # Reset all MagicMock methods
         magic_mock_attrs = [
-            'RearInputLabel', 'RearInputUnit', 'Demand', 'Control', 'Channel', 
-            'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest', 
-            'IsReady', 'IsRunning', 'Teds', 'GetHardwareInputChannels', 
+            'RearInputLabel', 'RearInputUnit', 'Demand', 'Control', 'Channel',
+            'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest',
+            'IsReady', 'IsRunning', 'Teds', 'TedsFromURN', 'GetHardwareInputChannels',
             'GetHardwareOutputChannels', 'OpenTest', 'RunTest', 'ResumeTest',
-            'ChannelUnit', 'ChannelLabel', 'ControlUnit', 'ControlLabel', 
+            'ChannelUnit', 'ChannelLabel', 'ControlUnit', 'ControlLabel',
             'VectorUnit', 'VectorLabel', 'VectorLength'
         ]
         
