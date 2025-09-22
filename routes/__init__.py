@@ -24,6 +24,7 @@ from .teds import teds_bp
 from .reporting import reporting_bp
 from .aux_inputs import auxinputs_bp
 from .gui_control import gui_control_bp
+from .report_generation import report_generation_bp
 
 __all__ = [
     'basic_control_bp',
@@ -38,5 +39,6 @@ __all__ = [
     'teds_bp',
     'reporting_bp',
     'auxinputs_bp',
-    'gui_control_bp'
+    'gui_control_bp',
+    'report_generation_bp'
 ]

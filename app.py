@@ -29,7 +29,8 @@ from routes import (
     recording_bp,
     reporting_bp,
     auxinputs_bp,
-    gui_control_bp
+    gui_control_bp,
+    report_generation_bp
 )
 
 # Import configuration
@@ -123,6 +124,7 @@ def create_app(config_class=Config):
     app.register_blueprint(reporting_bp, url_prefix='/api')
     app.register_blueprint(auxinputs_bp, url_prefix='/api')
     app.register_blueprint(gui_control_bp, url_prefix='/api')
+    app.register_blueprint(report_generation_bp, url_prefix='/api')
 
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
@@ -290,7 +292,7 @@ if __name__ == '__main__':
     app.logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/docs/basic_control")
     
     try:
-        app.run(host=args.host, port=args.port, debug=args.debug, threaded=True)
+        app.run(host=args.host, port=args.port, debug=args.debug, threaded=False)
     except KeyboardInterrupt:
         print("\nShutting down...")
     except Exception as e:
