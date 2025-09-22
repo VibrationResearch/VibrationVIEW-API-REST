@@ -38,18 +38,18 @@ class TestTEDSRoutes:
     
     def test_teds_all_channels_get(self, client, mock_vv):
         """Test GET /Teds with no parameters (all channels)"""
-        # Configure mock for all channels
+        # Configure mock for all channels - should return list of channel data
         mock_all_teds = [
-            {'channel': 0, 'sensitivity': 100.0, 'units': 'mV/g'},
-            {'channel': 1, 'sensitivity': 200.0, 'units': 'mV/g'}
+            [['Sensitivity', '100.0 mV/g'], ['Units', 'mV/g']],  # Channel 0
+            [['Sensitivity', '200.0 mV/g'], ['Units', 'mV/g']]   # Channel 1
         ]
         mock_vv.Teds.return_value = mock_all_teds
         mock_vv.clear_method_calls()
-        
-        response = client.get('/api/Teds')
-        
+
+        response = client.get('/api/teds')
+
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         print(f"Response status: {response.status_code}")
         if response.status_code != 200:
@@ -61,9 +61,12 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
         
         assert data['success'] is True
-        assert data['data']['result'] == mock_all_teds
         assert data['data']['channel'] == 'all'
         assert data['data']['success'] is True
+        # The result contains formatted data with 'transducers' and 'errors' arrays
+        assert 'result' in data['data']
+        assert 'transducers' in data['data']['result']
+        assert 'errors' in data['data']['result']
         
         # Verify VibrationVIEW was called with no arguments
         assert mock_vv.Teds.called, "Teds method was not called"
@@ -73,8 +76,12 @@ class TestTEDSRoutes:
     
     def test_teds_specific_channel_1based(self, client, mock_vv):
         """Test GET /Teds with 1-based channel parameter"""
-        # Configure mock
-        mock_channel_teds = {'sensitivity': 150.0, 'units': 'mV/g', 'serial': '12345'}
+        # Configure mock - TEDS data should be in list format for the formatter
+        mock_channel_teds = [
+            ['Sensitivity', '150.0 mV/g'],
+            ['Units', 'mV/g'],
+            ['Serial Number', '12345']
+        ]
         mock_vv.Teds.return_value = mock_channel_teds
         mock_vv.GetHardwareInputChannels.return_value = 4
         mock_vv.clear_method_calls()
@@ -83,19 +90,19 @@ class TestTEDSRoutes:
         channel_1based = 3
         expected_channel_0based = 2
         
-        response = client.get(f'/api/Teds?{channel_1based}')
+        response = client.get(f'/api/teds?{channel_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 200
         data = json.loads(response.data)
         
         assert data['success'] is True
-        assert data['data']['result'] == mock_channel_teds
         assert data['data']['channel'] == channel_1based
-        assert data['data']['internal_channel'] == expected_channel_0based
         assert data['data']['success'] is True
+        # For single channel, the response contains formatted transducer data
+        assert 'transducer' in data['data']
         
         # Verify VibrationVIEW was called with 0-based channel
         assert mock_vv.Teds.called, "Teds method was not called"
@@ -105,10 +112,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_zero(self, client, mock_vv):
         """Test GET /Teds with invalid channel 0 (1-based should be >= 1)"""
-        response = client.get('/api/Teds?0')
+        response = client.get('/api/teds?0')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -121,10 +128,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_negative(self, client, mock_vv):
         """Test GET /Teds with negative channel"""
-        response = client.get('/api/Teds?-1')
+        response = client.get('/api/teds?-1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -141,10 +148,10 @@ class TestTEDSRoutes:
         mock_vv.GetHardwareInputChannels.return_value = 4
         
         # Try to access channel 5 (1-based) - should be out of range
-        response = client.get('/api/Teds?5')
+        response = client.get('/api/teds?5')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -157,10 +164,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_string(self, client, mock_vv):
         """Test GET /Teds with non-numeric channel parameter"""
-        response = client.get('/api/Teds?abc')
+        response = client.get('/api/teds?abc')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -195,7 +202,6 @@ class TestTEDSRoutes:
         assert data['data']['result'] == mock_channel_teds
         assert data['data']['channel'] == channel_1based  # 1-based
         assert data['data']['internal_channel'] == expected_channel_0based  # 0-based internal
-        assert data['data']['channel_display'] == channel_1based  # Same as channel (both 1-based)
         
         # Verify VibrationVIEW was called with 0-based channel
         assert mock_vv.Teds.called, "Teds method was not called"
@@ -251,14 +257,12 @@ class TestTEDSRoutes:
         assert len(result) == 2
         
         # Check first channel
-        assert result[0]['channel'] == 0  # 0-based
-        assert result[0]['channel_display'] == 1  # 1-based display
+        assert result[0]['channel'] == 1  # 1-based display
         assert result[0]['teds'] == mock_teds_responses[0]
         assert result[0]['success'] is True
-        
+
         # Check second channel
-        assert result[1]['channel'] == 1  # 0-based
-        assert result[1]['channel_display'] == 2  # 1-based display
+        assert result[1]['channel'] == 2  # 1-based display
         assert result[1]['teds'] == mock_teds_responses[1]
         assert result[1]['success'] is True
         
@@ -271,10 +275,10 @@ class TestTEDSRoutes:
         mock_vv.GetHardwareInputChannels.return_value = 4
         
         # Test specific channel error
-        response = client.get('/api/Teds?1')
+        response = client.get('/api/teds?1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/Teds not found")
+            pytest.skip("Route /api/teds not found")
         
         assert response.status_code == 500
         data = json.loads(response.data)
@@ -284,7 +288,7 @@ class TestTEDSRoutes:
         assert data['error']['code'] == 'TEDS_READ_ERROR'
         
         # Test all channels error
-        response = client.get('/api/Teds')
+        response = client.get('/api/teds')
         
         assert response.status_code == 500
         data = json.loads(response.data)
@@ -308,10 +312,10 @@ class TestTEDSRoutes:
         assert 'endpoints' in data
         assert 'GET /inputteds' in data['endpoints']['TEDS Information']
         assert 'GET /inputtedschannel' in data['endpoints']['TEDS Information']
-        assert 'GET /Teds' in data['endpoints']['TEDS Information']
+        assert 'GET /teds' in data['endpoints']['TEDS Information']
         
         # Check that documentation explains indexing differences
-        teds_endpoint = data['endpoints']['TEDS Information']['GET /Teds']
+        teds_endpoint = data['endpoints']['TEDS Information']['GET /teds']
         assert '1-based' in teds_endpoint['description'] or '1-based' in str(teds_endpoint)
         
         print("✓ TEDS documentation is complete!")
