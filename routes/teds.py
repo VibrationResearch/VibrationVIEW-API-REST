@@ -43,16 +43,16 @@ def get_documentation():
                     'returns': 'object - TEDS information for specified channel',
                     'example': 'GET /api/inputtedschannel?3 (channel 3, 1-based)'
                 },
-                'GET /Teds': {
-                    'description': 'Get TEDS information for specific channel or all channels',
+                'GET /teds': {
+                    'description': 'Get formatted TEDS information for specific channel or all channels',
                     'com_method': 'Teds(channel) or Teds()',
                     'parameters': {
                         'channel': 'int - Optional channel number (1-based, first query parameter)'
                     },
-                    'returns': 'object - TEDS information for specified channel or all channels',
+                    'returns': 'object - Structured transducer data for specific channel or transducers/errors arrays for all channels',
                     'examples': [
-                        'GET /api/Teds (all channels)',
-                        'GET /api/Teds?3 (channel 3, 1-based)'
+                        'GET /api/teds (all channels - transducers/errors arrays)',
+                        'GET /api/teds?3 (channel 3, 1-based - single transducer object)'
                     ]
                 }
             }
