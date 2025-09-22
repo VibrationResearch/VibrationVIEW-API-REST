@@ -14,11 +14,13 @@ Includes:
 - Channel and control metadata
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.path_validator import validate_file_path, PathValidationError
 import logging
+import os
 
 # Create blueprint
 data_retrieval_bp = Blueprint('data_retrieval', __name__)
@@ -751,3 +753,89 @@ def control_label(vv_instance):
         'loopnum': loopnum,
         'internal_loopnum': loop_num_0based
     }, f"ControlLabel retrieved for loop {loopnum}: {result}"))
+
+
+# ============================================================================
+# RAW DATA FILE RETRIEVAL
+# ============================================================================
+
+@data_retrieval_bp.route('/getdatafile', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def get_data_file(vv_instance):
+    """
+    Get Raw VibrationVIEW Data File
+
+    Retrieves the most recent VibrationVIEW data file (.vrd) and returns it as raw binary data.
+    Uses the same parameter scheme as generatetxt for consistency.
+
+    Request Body (JSON, optional) or Query Parameters:
+        file_path: string - Path to specific VibrationVIEW data file (optional - uses last data file if not specified)
+
+    Note: Returns the raw .vrd file as binary data, not JSON.
+          Use Content-Type: application/octet-stream for binary download.
+
+    Example: GET /api/getdatafile (uses last data file)
+             GET /api/getdatafile?file_path=specific_file.vrd
+             POST /api/getdatafile with JSON body: {"file_path": "specific_file.vrd"}
+    """
+    # Get parameters from JSON body (optional) or query parameters
+    try:
+        request_data = request.get_json() or {}
+    except Exception:
+        # If JSON parsing fails, use empty dict and fall back to query parameters
+        request_data = {}
+
+    file_path = request_data.get('file_path') or request.args.get('file_path')
+
+    # If file_path is not provided, use the last data file from VibrationVIEW
+    if not file_path:
+        try:
+            file_path = vv_instance.ReportField('LastDataFile')
+            if not file_path:
+                return jsonify(error_response(
+                    'No file_path provided and no last data file available in VibrationVIEW',
+                    'NO_DATA_FILE_AVAILABLE'
+                )), 400
+        except Exception as e:
+            return jsonify(error_response(
+                f'Failed to get last data file from VibrationVIEW: {str(e)}',
+                'LAST_DATA_FILE_ERROR'
+            )), 500
+
+    # Validate file_path security and existence
+    try:
+        validated_file_path = validate_file_path(file_path, "data file retrieval")
+    except PathValidationError as e:
+        return jsonify(error_response(
+            str(e),
+            'PATH_VALIDATION_ERROR'
+        )), 403
+
+    if not os.path.exists(validated_file_path):
+        return jsonify(error_response(
+            f'File not found: {validated_file_path}',
+            'FILE_NOT_FOUND'
+        )), 404
+
+    # Use validated path
+    file_path = validated_file_path
+
+    try:
+        # Get file info
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+
+        # Return raw file as binary download
+        return send_file(
+            file_path,
+            as_attachment=True,
+            download_name=file_name,
+            mimetype='application/octet-stream'
+        )
+
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to retrieve data file: {str(e)}',
+            'DATA_FILE_RETRIEVAL_ERROR'
+        )), 500

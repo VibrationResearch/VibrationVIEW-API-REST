@@ -48,6 +48,7 @@ class MockVibrationVIEW:
         """Initialize all MagicMock methods"""
         # Existing methods
         self.RearInputLabel = MagicMock()
+        self.ReportField = MagicMock()
         self.RearInputUnit = MagicMock()
         self.Demand = MagicMock()
         self.Control = MagicMock()
@@ -232,6 +233,7 @@ class MockVibrationVIEW:
         """Mock GetReportField method"""
         self._log_call('GetReportField', field_name)
         return self._report_fields.get(field_name, "")
+
 
     def SetReportField(self, field_name: str, value: str):
         """Mock SetReportField method"""
