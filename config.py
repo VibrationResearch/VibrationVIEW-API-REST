@@ -34,6 +34,7 @@ class Config:
     INPUTCONFIG_FOLDER = os.environ.get('INPUTCONFIG_FOLDER') or 'C:\\VibrationVIEW\\InputConfig'
     NEW_TEST_DEFAULTS_FOLDER = os.environ.get('NEW_TEST_DEFAULTS_FOLDER') or 'C:\\VibrationVIEW\\New Test Defaults'
     REPORT_FOLDER = os.environ.get('REPORT_FOLDER') or 'C:\\VibrationVIEW\\Reports'
+    DATA_FOLDER = os.environ.get('DATA_FOLDER') or 'C:\\VibrationVIEW\\Data'
     EXE_NAME = os.environ.get('EXE_NAME') or 'C:\\Program Files\\VibrationVIEW 2025\\VibrationVIEW.exe'
     
     # Flask Settings
