@@ -33,7 +33,7 @@ def get_documentation():
         'description': '1:1 mapping of VibrationVIEW COM basic control methods',
         'com_object': 'VibrationVIEW.Application',
         'endpoints': {
-            'POST /starttest': {
+            'GET|POST /starttest': {
                 'description': 'Start currently loaded VibrationVIEW test',
                 'com_method': 'StartTest()',
                 'parameters': 'None',
@@ -50,11 +50,11 @@ def get_documentation():
                 'description': 'Get test status / Open and run a complete test (combines OpenTest + StartTest)',
                 'com_method': 'IsRunning() or RunTest(filepath)',
                 'parameters': {
-                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter, POST only)',
-                    'OR unnamed parameter': 'string - Test filename as first URL parameter (POST only)'
+                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
+                    'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
                 'returns': 'boolean - Test running status verified by IsRunning()',
-                'example': 'GET /api/runtest (status) or POST /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp'
+                'example': 'GET /api/runtest (status) or GET /api/runtest?testname=test1.vsp or POST /api/runtest?testname=test1.vsp'
             },
             'PUT /runtest': {
                 'description': 'Upload and run a complete test (combines upload + OpenTest + StartTest)',
@@ -70,13 +70,13 @@ def get_documentation():
                 'returns': 'object - Status, test running verification, file path, and size information',
                 'example': 'PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)'
             },
-           'POST /stoptest': {
+           'GET|POST /stoptest': {
                 'description': 'Stop currently running test',
                 'com_method': 'StopTest()',
                 'parameters': 'None',
                 'returns': 'boolean - Test stopped status verified by IsRunning()'
             },
-            'POST /resumetest': {
+            'GET|POST /resumetest': {
                 'description': 'Resume paused test',
                 'com_method': 'ResumeTest()',
                 'parameters': 'None',
@@ -132,28 +132,29 @@ def get_documentation():
     }
     return jsonify(docs)
 
-@basic_control_bp.route('/starttest', methods=['POST'])
+@basic_control_bp.route('/starttest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def start_test(vv_instance):
     """
     Start Currently Loaded VibrationVIEW Test
-    
+
     COM Method: StartTest()
     Starts execution of a test that has been previously loaded with
     OpenTest. If no test is loaded, this will fail.
     """
     result = vv_instance.StartTest()
-    
+
     # Check if test is actually running
     success = vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
         {'result': success, 'executed': True},
         f"StartTest command {'executed successfully' if success else 'failed'}"
     ))
 
 @basic_control_bp.route('/runtest', methods=['PUT'])
+@handle_errors
 @with_vibrationview
 def upload_and_run_test(vv_instance):
     """
@@ -174,58 +175,51 @@ def upload_and_run_test(vv_instance):
     
     Example: PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)
     """
-    try:
-        # Get filename from parameters - check named parameter first, then unnamed
-        filename = request.args.get("filename")
-        
-        # If no 'filename' parameter, try to get the first unnamed parameter
-        if filename is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                # URL decode the query string to handle special characters
-                filename = unquote(query_string)
-        
-        content_length = request.content_length
+    # Get filename from parameters - check named parameter first, then unnamed
+    filename = request.args.get("filename")
 
-        if not filename:
-            return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
+    # If no 'filename' parameter, try to get the first unnamed parameter
+    if filename is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters
+            filename = unquote(query_string)
 
-        if content_length is None:
-            return jsonify({'Error': 'Missing Content-Length header'}), 411  # Length Required
-        
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
-        
-        binary_data = request.get_data()
-        result, error, status_code = handle_binary_upload(filename, binary_data)
-        if error:
-            return jsonify(error), status_code
+    content_length = request.content_length
 
-        file_path = result['FilePath']
+    if not filename:
+        return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
 
-        # Open the uploaded test file
-        open_result = vv_instance.OpenTest(file_path)
-        
-        # Start the test
-        start_result = vv_instance.StartTest()
-        
-        # Check if test is actually running
-        success = vv_instance.IsRunning()
-        
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filename,
-                'file_uploaded': True,
-                'test_opened': True,
-                'test_started': success,
-                'executed': True
-            },
-            f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
-        ))
+    if content_length is None:
+        return jsonify({'Error': 'Missing Content-Length header'}), 411  # Length Required
 
-    except Exception as e:
-        return jsonify(extract_com_error_info(e)), 500
+    if content_length > MAX_CONTENT_LENGTH:
+        return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
+
+    binary_data = request.get_data()
+    result, error, status_code = handle_binary_upload(filename, binary_data)
+    if error:
+        return jsonify(error), status_code
+
+    file_path = result['FilePath']
+
+    # Open the uploaded test file
+    run_result = vv_instance.RunTest(file_path)
+
+    # Check if test is actually running
+    success = vv_instance.IsRunning()
+
+    return jsonify(success_response(
+        {
+            'result': success,
+            'filepath': filename,
+            'file_uploaded': True,
+            'test_opened': True,
+            'test_started': success,
+            'executed': True
+        },
+        f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
+    ))
     
 @basic_control_bp.route('/runtest', methods=['GET', 'POST'])
 @handle_errors
@@ -233,27 +227,27 @@ def upload_and_run_test(vv_instance):
 def run_test(vv_instance):
     """
     Get Current Running Test / Run Complete Test (Open + Start)
-    
+
     COM Method: RunTest(filepath) or OpenTest() + StartTest()
-    GET: Returns current running test status
-    POST: Opens a VibrationVIEW profile file and starts execution in one operation.
-    
-    Query Parameters (POST only):
+    GET/POST: Returns current running test status when no parameters provided
+    GET/POST: Opens a VibrationVIEW profile file and starts execution when parameters provided
+
+    Query Parameters (optional):
         testname: string - Test filename (named parameter)
         OR unnamed parameter: string - Test filename as first URL parameter
-    
+
     Example: GET /api/runtest (returns current status)
-    Example: POST /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp
+    Example: GET /api/runtest?testname=test1.vsp or POST /api/runtest?testname=test1.vsp
     """
-    if request.method == "GET" and not request.args:
-        # GET without parameters - return current running status
+    if (request.method == "GET" or request.method == "POST") and not request.args:
+        # GET/POST without parameters - return current running status
         is_running = vv_instance.IsRunning()
         return jsonify(success_response(
             {'result': is_running, 'is_running': is_running},
             f"Current test running status: {'Running' if is_running else 'Not running'}"
         ))
     else:
-        # POST - Run test with parameters
+        # GET/POST - Run test with parameters
         # Get test name from parameters - check named parameter first, then unnamed
         test_name = request.args.get("testname")
         
@@ -292,40 +286,40 @@ def run_test(vv_instance):
             f"RunTest command {'executed successfully' if success else 'failed'}: {test_name}"
         ))
 
-@basic_control_bp.route('/stoptest', methods=['POST'])
+@basic_control_bp.route('/stoptest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def stop_test(vv_instance):
     """
     Stop Currently Running Test
-    
+
     COM Method: StopTest()
     Terminates the currently running vibration test.
     """
     result = vv_instance.StopTest()
     # Check if test actually stopped
     success = not vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
         {'result': success, 'executed': True},
         f"StopTest command {'executed successfully' if success else 'failed'}"
     ))
 
-@basic_control_bp.route('/resumetest', methods=['POST'])
+@basic_control_bp.route('/resumetest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def resume_test(vv_instance):
     """
     Resume Paused Test
-    
+
     COM Method: ResumeTest()
     Resumes a previously paused vibration test.
     """
     result = vv_instance.ResumeTest()
-    
+
     # Check if test is actually running
     success = vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
         {'result': success, 'executed': True},
         f"ResumeTest command {'executed successfully' if success else 'failed'}"
