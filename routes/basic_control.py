@@ -33,28 +33,22 @@ def get_documentation():
         'description': '1:1 mapping of VibrationVIEW COM basic control methods',
         'com_object': 'VibrationVIEW.Application',
         'endpoints': {
-            'POST /starttest': {
+            'GET|POST /starttest': {
                 'description': 'Start currently loaded VibrationVIEW test',
                 'com_method': 'StartTest()',
                 'parameters': 'None',
-                'returns': 'boolean - Test running status verified by IsRunning()'
-            },
-            'GET /runtest': {
-                'description': 'Get current running test status',
-                'com_method': 'IsRunning()',
-                'parameters': 'None',
-                'returns': 'boolean - Current test running status',
-                'example': 'GET /api/runtest'
+                'returns': 'Result from StartTest()',
+                'example': 'GET /api/starttest or POST /api/starttest'
             },
             'GET|POST /runtest': {
-                'description': 'Get test status / Open and run a complete test (combines OpenTest + StartTest)',
-                'com_method': 'IsRunning() or RunTest(filepath)',
+                'description': 'Open and run a complete test (combines OpenTest + StartTest)',
+                'com_method': 'RunTest(filepath)',
                 'parameters': {
-                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter, POST only)',
-                    'OR unnamed parameter': 'string - Test filename as first URL parameter (POST only)'
+                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
+                    'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
-                'returns': 'boolean - Test running status verified by IsRunning()',
-                'example': 'GET /api/runtest (status) or POST /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp'
+                'returns': 'Result from RunTest()',
+                'example': 'GET /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp'
             },
             'PUT /runtest': {
                 'description': 'Upload and run a complete test (combines upload + OpenTest + StartTest)',
@@ -70,34 +64,29 @@ def get_documentation():
                 'returns': 'object - Status, test running verification, file path, and size information',
                 'example': 'PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)'
             },
-           'POST /stoptest': {
+           'GET|POST /stoptest': {
                 'description': 'Stop currently running test',
                 'com_method': 'StopTest()',
                 'parameters': 'None',
-                'returns': 'boolean - Test stopped status verified by IsRunning()'
+                'returns': 'Result from StopTest()',
+                'example': 'GET /api/stoptest or POST /api/stoptest'
             },
-            'POST /resumetest': {
+            'GET|POST /resumetest': {
                 'description': 'Resume paused test',
                 'com_method': 'ResumeTest()',
                 'parameters': 'None',
-                'returns': 'boolean - Test running status verified by IsRunning()'
-            },
-            'GET /opentest': {
-                'description': 'Get current test ready status',
-                'com_method': 'IsReady()',
-                'parameters': 'None',
-                'returns': 'boolean - Current test ready status',
-                'example': 'GET /api/opentest'
+                'returns': 'Result from ResumeTest()',
+                'example': 'GET /api/resumetest or POST /api/resumetest'
             },
             'GET|POST /opentest': {
-                'description': 'Get test ready status / Open test profile file by filename',
-                'com_method': 'IsReady() or OpenTest(filepath)',
+                'description': 'Open test profile file by filename',
+                'com_method': 'OpenTest(filepath)',
                 'parameters': {
-                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter, POST only)',
-                    'OR unnamed parameter': 'string - Test filename as first URL parameter (POST only)'
+                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
+                    'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
-                'returns': 'boolean - Success status from COM method',
-                'example': 'GET /api/opentest (status) or POST /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp'
+                'returns': 'Result from OpenTest()',
+                'example': 'GET /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp'
             },
             'PUT /opentest': {
                 'description': 'Upload and open test profile file',
@@ -115,42 +104,35 @@ def get_documentation():
             }
         },
         'notes': [
-            'Success for start/run/resume operations verified by IsRunning() status',
-            'Success for stop operation verified by NOT IsRunning() status',
+            'All endpoints are 1:1 COM method mappings unless explicitly noted as composite operations',
             'If COM method raises exception, it will be caught and returned as error',
             'StartTest requires a test to be previously loaded with OpenTest',
             'File paths should use full absolute paths',
             'COM interface uses 0-based indexing for all arrays',
-            'PUT /opentest accepts binary file uploads up to 10MB',
-            'POST /opentest works with existing files by filename',
+            'PUT endpoints accept binary file uploads up to 10MB',
             'All endpoints support both named parameters (e.g., testname=file.vsp) and unnamed parameters (e.g., file.vsp)',
             'Query strings are URL-decoded to handle special characters in filenames',
-            'GET /runtest returns current test running status without parameters',
-            'GET /opentest returns current test ready status without parameters',
-            'POST /runtest and POST /opentest require testname parameter or unnamed parameter'
+            'GET and POST methods behave identically for all endpoints that support both'
         ]
     }
     return jsonify(docs)
 
-@basic_control_bp.route('/starttest', methods=['POST'])
+@basic_control_bp.route('/starttest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def start_test(vv_instance):
     """
     Start Currently Loaded VibrationVIEW Test
-    
+
     COM Method: StartTest()
     Starts execution of a test that has been previously loaded with
     OpenTest. If no test is loaded, this will fail.
     """
     result = vv_instance.StartTest()
-    
-    # Check if test is actually running
-    success = vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
-        {'result': success, 'executed': True},
-        f"StartTest command {'executed successfully' if success else 'failed'}"
+        {'result': result},
+        "StartTest command executed"
     ))
 
 @basic_control_bp.route('/runtest', methods=['PUT'])
@@ -232,103 +214,79 @@ def upload_and_run_test(vv_instance):
 @with_vibrationview
 def run_test(vv_instance):
     """
-    Get Current Running Test / Run Complete Test (Open + Start)
-    
-    COM Method: RunTest(filepath) or OpenTest() + StartTest()
-    GET: Returns current running test status
-    POST: Opens a VibrationVIEW profile file and starts execution in one operation.
-    
-    Query Parameters (POST only):
+    Run Complete Test (Open + Start)
+
+    COM Method: RunTest(filepath)
+    Opens a VibrationVIEW profile file and starts execution in one operation.
+
+    Query Parameters:
         testname: string - Test filename (named parameter)
         OR unnamed parameter: string - Test filename as first URL parameter
-    
-    Example: GET /api/runtest (returns current status)
-    Example: POST /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp
-    """
-    if request.method == "GET" and not request.args:
-        # GET without parameters - return current running status
-        is_running = vv_instance.IsRunning()
-        return jsonify(success_response(
-            {'result': is_running, 'is_running': is_running},
-            f"Current test running status: {'Running' if is_running else 'Not running'}"
-        ))
-    else:
-        # POST - Run test with parameters
-        # Get test name from parameters - check named parameter first, then unnamed
-        test_name = request.args.get("testname")
-        
-        # If no 'testname' parameter, try to get the first unnamed parameter
-        if test_name is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                # URL decode the query string to handle special characters like : and \
-                test_name = unquote(query_string)
-        
-        if not test_name:
-            return jsonify(error_response(
-                'Missing required query parameter: testname (or unnamed test filename parameter)',
-                'MISSING_PARAMETER'
-            )), 400
-        
-        # Use test_name as provided
-        filepath = test_name
-        
-        # Try RunTest method
-        try:
-            result = vv_instance.RunTest(filepath)
-        except Exception as e:
-            # Re-raise to be handled by @handle_errors decorator
-            raise
-        
-        # Check if test is actually running
-        success = vv_instance.IsRunning()
-        
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filepath,
-                'executed': True
-            },
-            f"RunTest command {'executed successfully' if success else 'failed'}: {test_name}"
-        ))
 
-@basic_control_bp.route('/stoptest', methods=['POST'])
+    Example: GET /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp
+    """
+    # Get test name from parameters - check named parameter first, then unnamed
+    test_name = request.args.get("testname")
+
+    # If no 'testname' parameter, try to get the first unnamed parameter
+    if test_name is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters like : and \
+            test_name = unquote(query_string)
+
+    if not test_name:
+        return jsonify(error_response(
+            'Missing required query parameter: testname (or unnamed test filename parameter)',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # Use test_name as provided
+    filepath = test_name
+
+    # Call RunTest method
+    result = vv_instance.RunTest(filepath)
+
+    return jsonify(success_response(
+        {
+            'result': result,
+            'filepath': filepath
+        },
+        f"RunTest command executed: {test_name}"
+    ))
+
+@basic_control_bp.route('/stoptest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def stop_test(vv_instance):
     """
     Stop Currently Running Test
-    
+
     COM Method: StopTest()
     Terminates the currently running vibration test.
     """
     result = vv_instance.StopTest()
-    # Check if test actually stopped
-    success = not vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
-        {'result': success, 'executed': True},
-        f"StopTest command {'executed successfully' if success else 'failed'}"
+        {'result': result},
+        "StopTest command executed"
     ))
 
-@basic_control_bp.route('/resumetest', methods=['POST'])
+@basic_control_bp.route('/resumetest', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def resume_test(vv_instance):
     """
     Resume Paused Test
-    
+
     COM Method: ResumeTest()
     Resumes a previously paused vibration test.
     """
     result = vv_instance.ResumeTest()
-    
-    # Check if test is actually running
-    success = vv_instance.IsRunning()
-    
+
     return jsonify(success_response(
-        {'result': success, 'executed': True},
-        f"ResumeTest command {'executed successfully' if success else 'failed'}"
+        {'result': result},
+        "ResumeTest command executed"
     ))
 
 @basic_control_bp.route('/opentest', methods=['GET', 'POST'])
@@ -336,61 +294,46 @@ def resume_test(vv_instance):
 @with_vibrationview
 def open_test(vv_instance):
     """
-    Get Current Opened Test / Open Test Profile File by Filename
-    
+    Open Test Profile File by Filename
+
     COM Method: OpenTest(filepath)
-    GET: Returns current test ready status
-    POST: Opens a VibrationVIEW profile file for execution.
+    Opens a VibrationVIEW profile file for execution.
     The test can then be started with StartTest.
-    
-    Query Parameters (POST only):
+
+    Query Parameters:
         testname: string - Test filename (named parameter)
         OR unnamed parameter: string - Test filename as first URL parameter
-    
-    Example: GET /api/opentest (returns current ready status)
-    Example: POST /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp
+
+    Example: GET /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp
     """
-    if request.method == "GET" and not request.args:
-        # GET without parameters - return current ready status
-        is_ready = vv_instance.IsReady()
-        return jsonify(success_response(
-            {'result': is_ready, 'is_ready': is_ready},
-            f"Current test ready status: {'Ready' if is_ready else 'Not ready'}"
-        ))
-    else:
-        # POST - Open test with parameters
-        # Get test name from parameters - check named parameter first, then unnamed
-        test_name = request.args.get("testname")
-        
-        # If no 'testname' parameter, try to get the first unnamed parameter
-        if test_name is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                # URL decode the query string to handle special characters like : and \
-                test_name = unquote(query_string)
-        
-        if not test_name:
-            return jsonify(error_response(
-                'Missing required query parameter: testname (or unnamed test filename parameter)',
-                'MISSING_PARAMETER'
-            )), 400
-        
-        # Use test_name as provided
-        filepath = test_name
-        
-        result = vv_instance.OpenTest(filepath)
-        
-        # Handle None return - assume success if no exception was raised
-        success = True  # True if result is None or True
-        
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filepath,
-                'executed': True
-            },
-            f"OpenTest command {'executed successfully' if success else 'failed'}: {test_name}"
-        ))
+    # Get test name from parameters - check named parameter first, then unnamed
+    test_name = request.args.get("testname")
+
+    # If no 'testname' parameter, try to get the first unnamed parameter
+    if test_name is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters like : and \
+            test_name = unquote(query_string)
+
+    if not test_name:
+        return jsonify(error_response(
+            'Missing required query parameter: testname (or unnamed test filename parameter)',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # Use test_name as provided
+    filepath = test_name
+
+    result = vv_instance.OpenTest(filepath)
+
+    return jsonify(success_response(
+        {
+            'result': result,
+            'filepath': filepath
+        },
+        f"OpenTest command executed: {test_name}"
+    ))
 
 @basic_control_bp.route('/opentest', methods=['PUT'])
 @with_vibrationview
