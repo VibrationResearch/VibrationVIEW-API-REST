@@ -29,23 +29,26 @@ def get_documentation():
         'description': '1:1 mapping of VibrationVIEW COM recording control methods',
         'com_object': 'VibrationVIEW.Application',
         'endpoints': {
-            'POST /recordstart': {
+            'GET|POST /recordstart': {
                 'description': 'Start recording data',
                 'com_method': 'RecordStart()',
                 'parameters': 'None',
-                'returns': 'boolean - Recording start status'
+                'returns': 'Result from RecordStart()',
+                'example': 'GET /api/recordstart or POST /api/recordstart'
             },
-            'POST /recordstop': {
+            'GET|POST /recordstop': {
                 'description': 'Stop recording data',
                 'com_method': 'RecordStop()',
                 'parameters': 'None',
-                'returns': 'boolean - Recording stop status'
+                'returns': 'Result from RecordStop()',
+                'example': 'GET /api/recordstop or POST /api/recordstop'
             },
-            'POST /recordpause': {
+            'GET|POST /recordpause': {
                 'description': 'Pause recording data',
                 'com_method': 'RecordPause()',
                 'parameters': 'None',
-                'returns': 'boolean - Recording pause status'
+                'returns': 'Result from RecordPause()',
+                'example': 'GET /api/recordpause or POST /api/recordpause'
             },
             'GET /recordgetfilename': {
                 'description': 'Get the last recording filename',
@@ -65,57 +68,57 @@ def get_documentation():
     }
     return jsonify(docs)
 
-@recording_bp.route('/recordstart', methods=['POST'])
+@recording_bp.route('/recordstart', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def record_start(vv_instance):
     """
     Start Recording Data
-    
+
     COM Method: RecordStart()
     Begins recording data from the currently running test.
     Test must be loaded and running before recording can start.
     """
     result = vv_instance.RecordStart()
-    
+
     return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"RecordStart command {'executed successfully' if result else 'failed'}"
+        {'result': result},
+        "RecordStart command executed"
     ))
 
-@recording_bp.route('/recordstop', methods=['POST'])
+@recording_bp.route('/recordstop', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def record_stop(vv_instance):
     """
     Stop Recording Data
-    
+
     COM Method: RecordStop()
     Stops the current data recording session.
     """
     result = vv_instance.RecordStop()
-    
+
     return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"RecordStop command {'executed successfully' if result else 'failed'}"
+        {'result': result},
+        "RecordStop command executed"
     ))
 
-@recording_bp.route('/recordpause', methods=['POST'])
+@recording_bp.route('/recordpause', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def record_pause(vv_instance):
     """
     Pause Recording Data
-    
+
     COM Method: RecordPause()
     Pauses the current data recording session.
     Recording can be resumed with RecordStart.
     """
     result = vv_instance.RecordPause()
-    
+
     return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"RecordPause command {'executed successfully' if result else 'failed'}"
+        {'result': result},
+        "RecordPause command executed"
     ))
 
 @recording_bp.route('/recordgetfilename', methods=['GET'])
