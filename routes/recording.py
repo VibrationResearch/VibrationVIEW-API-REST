@@ -76,8 +76,9 @@ def record_start(vv_instance):
     Begins recording data from the currently running test.
     Test must be loaded and running before recording can start.
     """
-    result = vv_instance.RecordStart()
-    
+    vv_instance.RecordStart()
+    result = True  # If no exception, assume success
+
     return jsonify(success_response(
         {'result': result, 'executed': True},
         f"RecordStart command {'executed successfully' if result else 'failed'}"
@@ -93,8 +94,9 @@ def record_stop(vv_instance):
     COM Method: RecordStop()
     Stops the current data recording session.
     """
-    result = vv_instance.RecordStop()
-    
+    vv_instance.RecordStop()
+    result = True  # If no exception, assume success
+
     return jsonify(success_response(
         {'result': result, 'executed': True},
         f"RecordStop command {'executed successfully' if result else 'failed'}"
@@ -111,8 +113,9 @@ def record_pause(vv_instance):
     Pauses the current data recording session.
     Recording can be resumed with RecordStart.
     """
-    result = vv_instance.RecordPause()
-    
+    vv_instance.RecordPause()
+    result = True  # If no exception, assume success
+
     return jsonify(success_response(
         {'result': result, 'executed': True},
         f"RecordPause command {'executed successfully' if result else 'failed'}"
