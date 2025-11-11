@@ -557,7 +557,8 @@ def input_calibration(vv_instance):
     
     channel_user = int(data['channel'])  # Keep original for response
     
-    result = vv_instance.InputCalibration(
+    result = True # If no exception, assume success
+    vv_instance.InputCalibration(
         channel_com,
         data['sensitivity'],
         data['serialNumber'],
