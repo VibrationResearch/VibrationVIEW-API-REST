@@ -7,7 +7,7 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'vrp', 'vasor', 'vkp', 'vkd', 'vsp', 'vsd', 'vdp', 'vdd', 
+ALLOWED_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vkd', 'vsp', 'vspj', 'vsd', 'vdp', 'vdpj', 'vdd', 
                      'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
                      'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt', 'vic'}
 
