@@ -101,6 +101,32 @@ def get_documentation():
                 },
                 'returns': 'object - Status, color, file path, and size information',
                 'example': 'PUT /api/opentest?filename=test1.vsp or PUT /api/opentest?test1.vsp (with binary file in body)'
+            },
+            'GET|POST /closetest': {
+                'description': 'Close test profile by name',
+                'com_method': 'CloseTest(profile_name)',
+                'parameters': {
+                    'profilename': 'string - Query parameter with profile name (named parameter)',
+                    'OR unnamed parameter': 'string - Profile name as first URL parameter'
+                },
+                'returns': 'boolean - test_was_closed status',
+                'example': 'GET /api/closetest?profilename=test1.vsp or POST /api/closetest?test1.vsp'
+            },
+            'GET|POST /closetab': {
+                'description': 'Close test tab by index',
+                'com_method': 'CloseTab(tab_index)',
+                'parameters': {
+                    'tabindex': 'integer - Query parameter with tab index (0-based)'
+                },
+                'returns': 'boolean - test_was_closed status',
+                'example': 'GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1'
+            },
+            'GET /listopentests': {
+                'description': 'List all open test profiles',
+                'com_method': 'ListOpenTests()',
+                'parameters': 'None',
+                'returns': 'array - List of open test profile names',
+                'example': 'GET /api/listopentests'
             }
         },
         'notes': [
@@ -431,6 +457,130 @@ def upload_and_open_test(vv_instance):
 
     except Exception as e:
         return jsonify(extract_com_error_info(e)), 500
+
+@basic_control_bp.route('/closetest', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def close_test(vv_instance):
+    """
+    Close Test Profile by Name
+
+    COM Method: CloseTest(profile_name)
+    Closes an open VibrationVIEW test profile by its filename.
+
+    Query Parameters:
+        profilename: string - Profile name (named parameter)
+        OR unnamed parameter: string - Profile name as first URL parameter
+
+    Returns:
+        boolean - test_was_closed status indicating whether the test was successfully closed
+
+    Example: GET /api/closetest?profilename=test1.vsp or POST /api/closetest?test1.vsp
+    """
+    # Get profile name from parameters - check named parameter first, then unnamed
+    profile_name = request.args.get("profilename")
+
+    # If no 'profilename' parameter, try to get the first unnamed parameter
+    if profile_name is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters
+            profile_name = unquote(query_string)
+
+    if not profile_name:
+        return jsonify(error_response(
+            'Missing required query parameter: profilename (or unnamed profile name parameter)',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # Call CloseTest method
+    test_was_closed = vv_instance.CloseTest(profile_name)
+
+    return jsonify(success_response(
+        {
+            'test_was_closed': test_was_closed,
+            'profile_name': profile_name
+        },
+        f"CloseTest command executed: {profile_name}"
+    ))
+
+@basic_control_bp.route('/closetab', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def close_tab(vv_instance):
+    """
+    Close Test Tab by Index
+
+    COM Method: CloseTab(tab_index)
+    Closes an open VibrationVIEW test tab by its index (0-based).
+
+    Query Parameters:
+        tabindex: integer - Tab index (0-based)
+
+    Returns:
+        boolean - test_was_closed status indicating whether the tab was successfully closed
+
+    Example: GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1
+    """
+    # Get tab index from parameters
+    tab_index_str = request.args.get("tabindex")
+
+    if tab_index_str is None:
+        return jsonify(error_response(
+            'Missing required query parameter: tabindex',
+            'MISSING_PARAMETER'
+        )), 400
+
+    try:
+        tab_index = int(tab_index_str)
+    except ValueError:
+        return jsonify(error_response(
+            f'Invalid tab index: {tab_index_str}. Must be an integer.',
+            'INVALID_PARAMETER'
+        )), 400
+
+    # Call CloseTab method
+    test_was_closed = vv_instance.CloseTab(tab_index)
+
+    return jsonify(success_response(
+        {
+            'test_was_closed': test_was_closed,
+            'tab_index': tab_index
+        },
+        f"CloseTab command executed: tab {tab_index}"
+    ))
+
+@basic_control_bp.route('/listopentests', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def list_open_tests(vv_instance):
+    """
+    List All Open Test Profiles
+
+    COM Method: ListOpenTests()
+    Returns an array of all currently open VibrationVIEW test profile names.
+
+    Returns:
+        array - List of open test profile names
+
+    Example: GET /api/listopentests
+    """
+    # Call ListOpenTests method
+    open_tests = vv_instance.ListOpenTests()
+
+    # Convert to list if it's a tuple or other iterable
+    if open_tests is not None:
+        open_tests_list = list(open_tests)
+    else:
+        open_tests_list = []
+
+    return jsonify(success_response(
+        {
+            'open_tests': open_tests_list,
+            'count': len(open_tests_list)
+        },
+        f"ListOpenTests command executed: {len(open_tests_list)} test(s) open"
+    ))
 
 @basic_control_bp.route('/testcom', methods=['GET'])
 @handle_errors
