@@ -69,6 +69,9 @@ class MockVibrationVIEW:
         self.OpenTest = MagicMock(return_value=True)
         self.RunTest = MagicMock(return_value=True)
         self.ResumeTest = MagicMock(return_value=True)
+        self.CloseTest = MagicMock(return_value=True)
+        self.CloseTab = MagicMock(return_value=True)
+        self.ListOpenTests = MagicMock(return_value=tuple())
         
         # Add missing vector properties methods
         self.ChannelUnit = MagicMock()
@@ -117,6 +120,7 @@ class MockVibrationVIEW:
             'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest',
             'IsReady', 'IsRunning', 'Teds', 'TedsFromURN', 'GetHardwareInputChannels',
             'GetHardwareOutputChannels', 'OpenTest', 'RunTest', 'ResumeTest',
+            'CloseTest', 'CloseTab', 'ListOpenTests',
             'ChannelUnit', 'ChannelLabel', 'ControlUnit', 'ControlLabel',
             'VectorUnit', 'VectorLabel', 'VectorLength'
         ]

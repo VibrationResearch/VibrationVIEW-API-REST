@@ -284,3 +284,194 @@ class TestBasicControl:
             assert response.status_code == 500
             data = json.loads(response.data)
             assert "File upload failed" in data["Error"]
+
+    def test_closetest_get_success(self, client):
+        """Test GET /closetest with successful profile close"""
+        profile_name = "Random_Profile.vrpj"
+
+        # Configure mock to return success
+        self.mock_instance.CloseTest.return_value = True
+
+        response = client.get(f"/api/closetest?profilename={profile_name}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["profile_name"] == profile_name
+        assert "CloseTest command executed" in data["message"]
+
+        # Verify the COM method was called with correct parameters
+        self.mock_instance.CloseTest.assert_called_once_with(profile_name)
+
+    def test_closetest_post_success(self, client):
+        """Test POST /closetest with successful profile close"""
+        profile_name = "Random_Profile.vrpj"
+
+        # Configure mock to return success
+        self.mock_instance.CloseTest.return_value = True
+
+        response = client.post(f"/api/closetest?profilename={profile_name}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["profile_name"] == profile_name
+
+        # Verify the COM method was called
+        self.mock_instance.CloseTest.assert_called_once_with(profile_name)
+
+    def test_closetest_unnamed_parameter(self, client):
+        """Test /closetest with unnamed parameter syntax"""
+        profile_name = "Random_Profile.vrpj"
+
+        # Configure mock
+        self.mock_instance.CloseTest.return_value = True
+
+        # Use unnamed parameter (query string without '=')
+        response = client.get(f"/api/closetest?{profile_name}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["profile_name"] == profile_name
+
+    def test_closetest_not_closed(self, client):
+        """Test /closetest when profile was not closed (returns False)"""
+        profile_name = "nonexistent_profile.vsp"
+
+        # Configure mock to return False (profile not closed)
+        self.mock_instance.CloseTest.return_value = False
+
+        response = client.get(f"/api/closetest?profilename={profile_name}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is False
+
+    def test_closetest_missing_parameter(self, client):
+        """Test /closetest without required profile name parameter"""
+        response = client.get("/api/closetest")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert "Missing required query parameter: profilename" in data["error"]["message"]
+
+    def test_closetab_get_success(self, client):
+        """Test GET /closetab with successful tab close"""
+        tab_index = 0
+
+        # Configure mock to return success
+        self.mock_instance.CloseTab.return_value = True
+
+        response = client.get(f"/api/closetab?tabindex={tab_index}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["tab_index"] == tab_index
+        assert "CloseTab command executed" in data["message"]
+
+        # Verify the COM method was called with correct parameters
+        self.mock_instance.CloseTab.assert_called_once_with(tab_index)
+
+    def test_closetab_post_success(self, client):
+        """Test POST /closetab with successful tab close"""
+        tab_index = 2
+
+        # Configure mock to return success
+        self.mock_instance.CloseTab.return_value = True
+
+        response = client.post(f"/api/closetab?tabindex={tab_index}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["tab_index"] == tab_index
+
+        # Verify the COM method was called
+        self.mock_instance.CloseTab.assert_called_once_with(tab_index)
+
+    def test_closetab_not_closed(self, client):
+        """Test /closetab when tab was not closed (returns False)"""
+        tab_index = 99  # Invalid tab index
+
+        # Configure mock to return False (tab not closed)
+        self.mock_instance.CloseTab.return_value = False
+
+        response = client.get(f"/api/closetab?tabindex={tab_index}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is False
+
+    def test_closetab_missing_parameter(self, client):
+        """Test /closetab without required tab index parameter"""
+        response = client.get("/api/closetab")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert "Missing required query parameter: tabindex" in data["error"]["message"]
+
+    def test_closetab_invalid_parameter(self, client):
+        """Test /closetab with invalid (non-integer) tab index"""
+        response = client.get("/api/closetab?tabindex=invalid")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert "Invalid tab index" in data["error"]["message"]
+        assert "Must be an integer" in data["error"]["message"]
+
+    def test_listopentests_success_with_tests(self, client):
+        """Test GET /listopentests with multiple open tests"""
+        open_tests = ["Random_Profile.vrpj", "test2.vrp", "test3.vsp"]
+
+        # Configure mock to return list of open tests
+        self.mock_instance.ListOpenTests.return_value = tuple(open_tests)
+
+        response = client.get("/api/listopentests")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["open_tests"] == open_tests
+        assert data["data"]["count"] == 3
+        assert "3 test(s) open" in data["message"]
+
+        # Verify the COM method was called
+        self.mock_instance.ListOpenTests.assert_called_once()
+
+    def test_listopentests_success_no_tests(self, client):
+        """Test GET /listopentests with no open tests"""
+        # Configure mock to return empty tuple
+        self.mock_instance.ListOpenTests.return_value = tuple()
+
+        response = client.get("/api/listopentests")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["open_tests"] == []
+        assert data["data"]["count"] == 0
+        assert "0 test(s) open" in data["message"]
+
+    def test_listopentests_none_return(self, client):
+        """Test GET /listopentests when COM method returns None"""
+        # Configure mock to return None (edge case)
+        self.mock_instance.ListOpenTests.return_value = None
+
+        response = client.get("/api/listopentests")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["open_tests"] == []
+        assert data["data"]["count"] == 0
