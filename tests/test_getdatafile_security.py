@@ -63,7 +63,7 @@ class TestGetDataFileSecurity:
             with patch('os.path.exists') as mock_exists, \
                  patch('os.path.getsize') as mock_getsize, \
                  patch('utils.path_validator.is_path_within_authorized_directories') as mock_auth, \
-                 patch('flask.send_file') as mock_send:
+                 patch('routes.data_retrieval.send_file') as mock_send:
 
                 mock_exists.return_value = True
                 mock_getsize.return_value = 1024
@@ -141,7 +141,7 @@ class TestGetDataFileSecurity:
         with patch('os.path.exists') as mock_exists, \
              patch('os.path.getsize') as mock_getsize, \
              patch('utils.path_validator.is_path_within_authorized_directories') as mock_auth, \
-             patch('flask.send_file') as mock_send:
+             patch('routes.data_retrieval.send_file') as mock_send:
 
             mock_exists.return_value = True
             mock_getsize.return_value = 2048
@@ -176,7 +176,7 @@ class TestGetDataFileSecurity:
         with patch('os.path.exists') as mock_exists, \
              patch('os.path.getsize') as mock_getsize, \
              patch('utils.path_validator.is_path_within_authorized_directories') as mock_auth, \
-             patch('flask.send_file') as mock_send:
+             patch('routes.data_retrieval.send_file') as mock_send:
 
             mock_exists.return_value = True
             mock_getsize.return_value = 1024
