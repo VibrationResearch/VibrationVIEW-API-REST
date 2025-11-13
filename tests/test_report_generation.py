@@ -102,7 +102,7 @@ class TestReportGeneration:
                 assert data['data']['generated_file_path'] == mock_generated_path
                 assert data['data']['template_name'] == template_name
                 assert data['data']['output_name'] == output_name
-                assert data['data']['uploaded_file_size'] == file_size
+                assert data['data']['used_upload'] is True  # Verify upload mode was used
                 assert data['data']['file_exists'] is True
                 assert data['data']['file_size'] == len(mock_file_content)
 
@@ -191,6 +191,9 @@ class TestReportGeneration:
     def test_generatereport_empty_file_content(self, client, mock_vv):
         """Test POST /generatereport with empty file content"""
 
+        # Setup mock to return None for last data file
+        mock_vv.ReportField.return_value = None
+
         response = client.post(
             '/api/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
             data=b'',  # Empty content
@@ -201,9 +204,11 @@ class TestReportGeneration:
         )
 
         # Empty content with Content-Length 0 should be handled as file path mode
+        # Since no file_path provided and no last data file, should return 400
         assert response.status_code == 400
         data = response.get_json()
         assert data['success'] is False
+        assert data['error']['code'] == 'NO_DATA_FILE_AVAILABLE'
 
     def test_generatereport_file_too_large(self, client, mock_vv):
         """Test POST /generatereport with file exceeding size limit"""
