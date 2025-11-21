@@ -15,6 +15,9 @@ import os
 from datetime import datetime
 import threading
 
+# Module-level logger
+logger = logging.getLogger(__name__)
+
 # Import route modules - clean imports using __init__.py
 from routes import ( 
     basic_control_bp,
@@ -285,11 +288,11 @@ if __name__ == '__main__':
     parser.add_argument('--config', default='development', help='Configuration environment')
     
     args = parser.parse_args()
-    
-    app.logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
-    app.logger.info(f"Configuration: {args.config}")
-    app.logger.info(f"API documentation: http://{args.host}:{args.port}/api/docs")
-    app.logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/docs/basic_control")
+
+    logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
+    logger.info(f"Configuration: {args.config}")
+    logger.info(f"API documentation: http://{args.host}:{args.port}/api/docs")
+    logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/docs/basic_control")
     
     try:
         app.run(host=args.host, port=args.port, debug=args.debug, threaded=False)
