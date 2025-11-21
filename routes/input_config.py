@@ -106,8 +106,8 @@ def get_documentation():
                     'com_method': 'InputMode(channel, powerSource, capCoupled, differential)',
                     'parameters': {
                         'channel': 'int - Input channel number',
-                        'powerSource': 'bool - Power source setting',
-                        'capCoupled': 'bool - Capacitor coupled setting',
+                        'powersource': 'bool - Power source setting',
+                        'capcoupled': 'bool - Capacitor coupled setting',
                         'differential': 'bool - Differential setting'
                     },
                     'returns': 'bool - Success status'
@@ -118,8 +118,8 @@ def get_documentation():
                     'parameters': {
                         'channel': 'int - Input channel number',
                         'sensitivity': 'float - Sensitivity value',
-                        'serialNumber': 'str - Serial number',
-                        'calDate': 'str - Calibration date'
+                        'serialnumber': 'str - Serial number',
+                        'caldate': 'str - Calibration date'
                     },
                     'returns': 'bool - Success status'
                 },
@@ -474,13 +474,13 @@ def input_mode(vv_instance):
     
     JSON Parameters:
         channel: Input channel number (1-based)
-        powerSource: Power source setting
-        capCoupled: Capacitor coupled setting
+        powersource: Power source setting
+        capcoupled: Capacitor coupled setting
         differential: Differential setting
     """
     data = request.get_json()
-    required_params = ['channel', 'powerSource', 'capCoupled', 'differential']
-    
+    required_params = ['channel', 'powersource', 'capcoupled', 'differential']
+
     if not data:
         return jsonify(error_response(
             'Missing JSON body',
@@ -502,8 +502,8 @@ def input_mode(vv_instance):
     
     vv_instance.InputMode(
         channel_com,
-        data['powerSource'],
-        data['capCoupled'],
+        data['powersource'],
+        data['capcoupled'],
         data['differential']
     )
     
@@ -512,8 +512,8 @@ def input_mode(vv_instance):
         {
             'result': result,
             'channel': channel_user,
-            'powerSource': data['powerSource'],
-            'capCoupled': data['capCoupled'],
+            'powersource': data['powersource'],
+            'capcoupled': data['capcoupled'],
             'differential': data['differential']
         },
         f"Channel {channel_user} input mode {'configured successfully' if result else 'configuration failed'}"
@@ -532,12 +532,12 @@ def input_calibration(vv_instance):
     JSON Parameters:
         channel: Input channel number (1-based)
         sensitivity: Sensitivity value
-        serialNumber: Serial number
-        calDate: Calibration date
+        serialnumber: Serial number
+        caldate: Calibration date
     """
     data = request.get_json()
-    required_params = ['channel', 'sensitivity', 'serialNumber', 'calDate']
-    
+    required_params = ['channel', 'sensitivity', 'serialnumber', 'caldate']
+
     if not data:
         return jsonify(error_response(
             'Missing JSON body',
@@ -561,8 +561,8 @@ def input_calibration(vv_instance):
     vv_instance.InputCalibration(
         channel_com,
         data['sensitivity'],
-        data['serialNumber'],
-        data['calDate']
+        data['serialnumber'],
+        data['caldate']
     )
     
     return jsonify(success_response(
@@ -570,8 +570,8 @@ def input_calibration(vv_instance):
             'result': result,
             'channel': channel_user,
             'sensitivity': data['sensitivity'],
-            'serialNumber': data['serialNumber'],
-            'calDate': data['calDate']
+            'serialnumber': data['serialnumber'],
+            'caldate': data['caldate']
         },
         f"Channel {channel_user} calibration {'set successfully' if result else 'setting failed'}"
     ))
