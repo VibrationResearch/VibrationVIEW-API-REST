@@ -112,16 +112,21 @@ def get_documentation():
                     },
                     'returns': 'bool - Success status'
                 },
-                'POST /inputcalibration': {
+                'GET|POST /inputcalibration': {
                     'description': 'Set input calibration for a channel',
-                    'com_method': 'InputCalibration(channel, sensitivity, serialNumber, calDate)',
+                    'com_method': 'InputCalibration(channel, sensitivity, serialnumber, caldate)',
                     'parameters': {
-                        'channel': 'int - Input channel number',
-                        'sensitivity': 'float - Sensitivity value',
-                        'serialnumber': 'str - Serial number',
-                        'caldate': 'str - Calibration date'
+                        'channel': 'int - Input channel number (query param or JSON)',
+                        'sensitivity': 'float - Sensitivity value (query param or JSON)',
+                        'serialnumber': 'str - Serial number (query param or JSON)',
+                        'caldate': 'str - Calibration date (query param or JSON)'
                     },
-                    'returns': 'bool - Success status'
+                    'returns': 'bool - Success status',
+                    'examples': [
+                        'GET /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
+                        'POST /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
+                        'POST /api/inputcalibration (with JSON body)'
+                    ]
                 },
                 'GET|POST /inputconfigurationfile': {
                     'description': 'Get/Set input configuration file by name',
@@ -522,61 +527,82 @@ def input_mode(vv_instance):
         f"Channel {channel_user} input mode {'configured successfully' if result else 'configuration failed'}"
     ))
 
-@input_config_bp.route('/inputcalibration', methods=['POST'])
+@input_config_bp.route('/inputcalibration', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def input_calibration(vv_instance):
     """
     Set Input Calibration
-    
-    COM Method: InputCalibration(channel, sensitivity, serialNumber, calDate)
+
+    COM Method: InputCalibration(channel, sensitivity, serialnumber, caldate)
     Sets the calibration information for the specified input channel.
-    
-    JSON Parameters:
+
+    Parameters (query params or JSON body):
         channel: Input channel number (1-based)
         sensitivity: Sensitivity value
         serialnumber: Serial number
         caldate: Calibration date
-    """
-    data = request.get_json()
-    required_params = ['channel', 'sensitivity', 'serialnumber', 'caldate']
 
-    if not data:
-        return jsonify(error_response(
-            'Missing JSON body',
-            'MISSING_BODY'
-        )), 400
-    
-    missing_params = [param for param in required_params if param not in data]
+    Examples:
+        GET /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
+        POST /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
+    """
+    # Try query parameters first, then JSON body
+    if request.args:
+        data = {
+            'channel': request.args.get('channel'),
+            'sensitivity': request.args.get('sensitivity'),
+            'serialnumber': request.args.get('serialnumber'),
+            'caldate': request.args.get('caldate')
+        }
+    else:
+        data = request.get_json()
+        if not data:
+            return jsonify(error_response(
+                'Missing parameters (provide query params or JSON body)',
+                'MISSING_PARAMETERS'
+            )), 400
+
+    required_params = ['channel', 'sensitivity', 'serialnumber', 'caldate']
+    missing_params = [param for param in required_params if not data.get(param)]
     if missing_params:
         return jsonify(error_response(
             f'Missing required parameters: {", ".join(missing_params)}',
             'MISSING_PARAMETER'
         )), 400
-    
+
     channel_com, error_resp, status_code = convert_channel_to_com_index(data['channel'])
     if error_resp:
         return jsonify(error_resp), status_code
-    
+
     channel_user = int(data['channel'])  # Keep original for response
-    
+
+    # Convert sensitivity to float
+    try:
+        sensitivity = float(data['sensitivity'])
+    except (ValueError, TypeError):
+        return jsonify(error_response(
+            f'Invalid sensitivity value: {data["sensitivity"]}',
+            'INVALID_PARAMETER'
+        )), 400
+
     result = True # If no exception, assume success
     vv_instance.InputCalibration(
         channel_com,
-        data['sensitivity'],
+        sensitivity,
         data['serialnumber'],
         data['caldate']
     )
-    
+
     return jsonify(success_response(
         {
             'result': result,
             'channel': channel_user,
-            'sensitivity': data['sensitivity'],
+            'sensitivity': sensitivity,
             'serialnumber': data['serialnumber'],
             'caldate': data['caldate']
         },
-        f"Channel {channel_user} calibration {'set successfully' if result else 'setting failed'}"
+        f"Channel {channel_user} calibration set successfully"
     ))
 
 @input_config_bp.route('/inputconfigurationfile', methods=['GET', 'POST'])
