@@ -116,16 +116,32 @@ def get_documentation():
                 'description': 'Close test tab by index',
                 'com_method': 'CloseTab(tab_index)',
                 'parameters': {
-                    'tabindex': 'integer - Query parameter with tab index (0-based)'
+                    'tabindex': 'integer - Query parameter with tab index (0-based, named parameter)',
+                    'OR unnamed parameter': 'integer - Tab index as first URL parameter'
                 },
-                'returns': 'boolean - test_was_closed status',
-                'example': 'GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1'
+                'returns': 'boolean - test_was_closed status (200 on success, 405 if tab could not be closed)',
+                'status_codes': {
+                    '200': 'Success - tab was closed',
+                    '400': 'Missing or invalid tab index parameter',
+                    '405': 'Tab could not be closed (may not exist or may be running a test)'
+                },
+                'example': 'GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1 or GET /api/closetab?0'
             },
             'GET /listopentests': {
-                'description': 'List all open test profiles',
+                'description': 'List all open test profiles with detailed information',
                 'com_method': 'ListOpenTests()',
                 'parameters': 'None',
-                'returns': 'array - List of open test profile names',
+                'returns': {
+                    'open_tests': '2D array - Each row contains [Tab Index, Test Type, File Path, Test Name]',
+                    'columns': 'array - Column headers ["Tab Index", "Test Type", "File Path", "Test Name"]',
+                    'count': 'integer - Number of open tests'
+                },
+                'column_structure': [
+                    'Column 0: Tab index (1-based string, e.g., "1", "2", "3")',
+                    'Column 1: Test type label (e.g., "Random", "Sine", "Shock")',
+                    'Column 2: Full file path of the test profile',
+                    'Column 3: Test name (displayed on tabs)'
+                ],
                 'example': 'GET /api/listopentests'
             }
         },
@@ -440,6 +456,11 @@ def upload_and_open_test(vv_instance):
                 f"Default template file uploaded and copied only (OpenTest automation not run on default filename): {filename}"
             ))
 
+        # close any existing test with the same name to avoid conflicts
+        existing_tests = vv_instance.ListOpenTests()
+        if existing_tests and filename in existing_tests:
+            vv_instance.CloseTest(filename)
+            
         # Open the uploaded test file
         result = vv_instance.OpenTest(file_path)
 
@@ -515,19 +536,30 @@ def close_tab(vv_instance):
     Closes an open VibrationVIEW test tab by its index (0-based).
 
     Query Parameters:
-        tabindex: integer - Tab index (0-based)
+        tabindex: integer - Tab index (0-based, named parameter)
+        OR unnamed parameter: integer - Tab index as first URL parameter
 
     Returns:
-        boolean - test_was_closed status indicating whether the tab was successfully closed
+        200: Success - tab was closed successfully
+        400: Missing or invalid tab index parameter
+        405: Tab could not be closed (may not exist or may be running a test)
 
     Example: GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1
+             GET /api/closetab?0 or POST /api/closetab?2 (unnamed parameter)
     """
-    # Get tab index from parameters
+    # Get tab index from parameters - check named parameter first, then unnamed
     tab_index_str = request.args.get("tabindex")
 
+    # If no 'tabindex' parameter, try to get the first unnamed parameter
     if tab_index_str is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            # URL decode the query string to handle special characters
+            tab_index_str = unquote(query_string)
+
+    if not tab_index_str:
         return jsonify(error_response(
-            'Missing required query parameter: tabindex',
+            'Missing required query parameter: tabindex (or unnamed tab index parameter)',
             'MISSING_PARAMETER'
         )), 400
 
@@ -541,6 +573,13 @@ def close_tab(vv_instance):
 
     # Call CloseTab method
     test_was_closed = vv_instance.CloseTab(tab_index)
+
+    # Return 405 if the tab was not closed
+    if not test_was_closed:
+        return jsonify(error_response(
+            f'Tab {tab_index} could not be closed (may not exist or may be running a test)',
+            'TAB_NOT_CLOSED'
+        )), 405
 
     return jsonify(success_response(
         {
@@ -558,10 +597,19 @@ def list_open_tests(vv_instance):
     List All Open Test Profiles
 
     COM Method: ListOpenTests()
-    Returns an array of all currently open VibrationVIEW test profile names.
+    Returns a 2D array of all currently open VibrationVIEW test profiles.
+    Each row contains 4 columns of information about an open test.
 
     Returns:
-        array - List of open test profile names
+        array - List of open test profiles (2D array)
+        columns - Column headers describing the data structure
+        count - Number of open tests
+
+    Column Structure:
+        - Column 0: Tab index (1-based string, e.g., "1", "2", "3")
+        - Column 1: Test type label (e.g., "Random", "Sine", "Shock")
+        - Column 2: Full file path of the test profile
+        - Column 3: Test name (displayed on tabs)
 
     Example: GET /api/listopentests
     """
@@ -574,9 +622,18 @@ def list_open_tests(vv_instance):
     else:
         open_tests_list = []
 
+    # Column headers for the data structure
+    column_headers = [
+        "Tab Index",       # Column 0: 1-based tab index
+        "Test Type",       # Column 1: Test type label (Random, Sine, Shock, etc.)
+        "File Path",       # Column 2: Full file path
+        "Test Name"        # Column 3: Test name on tab
+    ]
+
     return jsonify(success_response(
         {
             'open_tests': open_tests_list,
+            'columns': column_headers,
             'count': len(open_tests_list)
         },
         f"ListOpenTests command executed: {len(open_tests_list)} test(s) open"

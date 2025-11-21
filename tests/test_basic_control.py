@@ -397,6 +397,22 @@ class TestBasicControl:
         # Verify the COM method was called
         self.mock_instance.CloseTab.assert_called_once_with(tab_index)
 
+    def test_closetab_unnamed_parameter(self, client):
+        """Test /closetab with unnamed parameter syntax"""
+        tab_index = 1
+
+        # Configure mock
+        self.mock_instance.CloseTab.return_value = True
+
+        # Use unnamed parameter (query string without '=')
+        response = client.get(f"/api/closetab?{tab_index}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["tab_index"] == tab_index
+
     def test_closetab_not_closed(self, client):
         """Test /closetab when tab was not closed (returns False)"""
         tab_index = 99  # Invalid tab index
@@ -406,10 +422,11 @@ class TestBasicControl:
 
         response = client.get(f"/api/closetab?tabindex={tab_index}")
 
-        assert response.status_code == 200
+        assert response.status_code == 405
         data = json.loads(response.data)
-        assert data["success"] is True
-        assert data["data"]["test_was_closed"] is False
+        assert data["success"] is False
+        assert data["error"]["code"] == "TAB_NOT_CLOSED"
+        assert f"Tab {tab_index} could not be closed" in data["error"]["message"]
 
     def test_closetab_missing_parameter(self, client):
         """Test /closetab without required tab index parameter"""
@@ -419,6 +436,7 @@ class TestBasicControl:
         data = json.loads(response.data)
         assert data["success"] is False
         assert "Missing required query parameter: tabindex" in data["error"]["message"]
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_closetab_invalid_parameter(self, client):
         """Test /closetab with invalid (non-integer) tab index"""
@@ -432,9 +450,13 @@ class TestBasicControl:
 
     def test_listopentests_success_with_tests(self, client):
         """Test GET /listopentests with multiple open tests"""
-        open_tests = ["Random_Profile.vrpj", "test2.vrp", "test3.vsp"]
+        open_tests = [
+            ["1", "Random", "C:\\VibrationVIEW\\Profiles\\Random_Profile.vrpj", "Random_Profile"],
+            ["2", "Sine", "C:\\VibrationVIEW\\Profiles\\test2.vrp", "test2"],
+            ["3", "Shock", "C:\\VibrationVIEW\\Profiles\\test3.vsp", "test3"]
+        ]
 
-        # Configure mock to return list of open tests
+        # Configure mock to return list of open tests (2D array)
         self.mock_instance.ListOpenTests.return_value = tuple(open_tests)
 
         response = client.get("/api/listopentests")
@@ -444,6 +466,8 @@ class TestBasicControl:
         assert data["success"] is True
         assert data["data"]["open_tests"] == open_tests
         assert data["data"]["count"] == 3
+        assert "columns" in data["data"]
+        assert data["data"]["columns"] == ["Tab Index", "Test Type", "File Path", "Test Name"]
         assert "3 test(s) open" in data["message"]
 
         # Verify the COM method was called
@@ -461,6 +485,8 @@ class TestBasicControl:
         assert data["success"] is True
         assert data["data"]["open_tests"] == []
         assert data["data"]["count"] == 0
+        assert "columns" in data["data"]
+        assert data["data"]["columns"] == ["Tab Index", "Test Type", "File Path", "Test Name"]
         assert "0 test(s) open" in data["message"]
 
     def test_listopentests_none_return(self, client):
@@ -475,3 +501,5 @@ class TestBasicControl:
         assert data["success"] is True
         assert data["data"]["open_tests"] == []
         assert data["data"]["count"] == 0
+        assert "columns" in data["data"]
+        assert data["data"]["columns"] == ["Tab Index", "Test Type", "File Path", "Test Name"]
