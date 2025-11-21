@@ -1,403 +1,13 @@
 type: collection.insomnia.rest/5.0
 name: VibrationVIEW API
 meta:
-  id: wrk_618b04489da447d8b0621538511f8634
-  created: 1753798832361
-  modified: 1753798832361
+  id: wrk_a85fb4ee6e154fea9a0a4ca72b9fb402
+  created: 1763750655671
+  modified: 1763750655671
 collection:
-  - name: Basic Control
-    meta:
-      id: fld_18a3325aeb924f429cfc9f2bb9e6bfd3
-      created: 1690628400000
-      modified: 1753973192874
-      sortKey: -1753972452349
-      description: Core test control operations
-    children:
-      - url: "{{ _.base_url }}/docs/basic_control"
-        name: Basic Control Docs
-        meta:
-          id: req_3a9fa993509f42f1a07dcfb10cbfd5c1
-          created: 1690628400000
-          modified: 1753803942814
-          isPrivate: false
-          description: Get basic control documentation
-          sortKey: -1690628398000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/starttest"
-        name: starttest
-        meta:
-          id: req_3bc969371bb648f58e7ae2f4c0a318a7
-          created: 1690628400000
-          modified: 1753885415684
-          isPrivate: false
-          description: Start test execution
-          sortKey: -1690628396000
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "test_file": "path/to/test.vvs"
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/runtest?C:\\VibrationVIEW\\Profiles\\random.vrp"
-        name: runtest
-        meta:
-          id: req_a4a5d1a0bfec41148e506e206a603026
-          created: 1690628400000
-          modified: 1757623116690
-          isPrivate: false
-          description: Execute a complete test run
-          sortKey: -1690628397000
-        method: POST
-        body:
-          mimeType: application/json
-        parameters:
-          - id: pair_f42012ba1c1848bcb8b918b81114c9a6
-            disabled: false
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/stoptest"
-        name: stoptest
-        meta:
-          id: req_b5e6aaeeac9048a0a23fb25ad715813c
-          created: 1690628400000
-          modified: 1753885423172
-          isPrivate: false
-          description: Stop test execution
-          sortKey: -1690628395000
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/resumetest"
-        name: resumetest
-        meta:
-          id: req_bb2cf53b222046bea65686168391a36a
-          created: 1690628400000
-          modified: 1753885432233
-          isPrivate: false
-          description: Resume paused test execution
-          sortKey: -1690628393000
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testcom"
-        name: testcom
-        meta:
-          id: req_e13076a85d9a4f5b929ef2df64a462c2
-          created: 1690628400000
-          modified: 1755778123807
-          isPrivate: false
-          description: Test COM connection (diagnostic)
-          sortKey: -1690628397500
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/opentest?C:\\VibrationVIEW\\Profiles\\random.vrp"
-        name: opentest
-        meta:
-          id: req_1d9009ef9dff4f5f8e1c786cd09b6e7f
-          created: 1753811551540
-          modified: 1757619331241
-          isPrivate: false
-          description: Execute a complete test run
-          sortKey: -1690628396500
-        method: POST
-        body:
-          mimeType: application/json
-        parameters:
-          - id: pair_4dca6c5c8156499dbb06aa26be73e09a
-            disabled: false
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/opentest"
-        name: opentest (with file)
-        meta:
-          id: req_09a6fa9c4b2649cba8e6dbdc251b5122
-          created: 1753882734116
-          modified: 1757611325704
-          isPrivate: false
-          sortKey: -1690628396250
-        method: PUT
-        body:
-          mimeType: application/octet-stream
-          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
-        parameters:
-          - name: filename
-            value: randomtest-withpretest.vrp
-            disabled: false
-        headers:
-          - id: pair_d87de7eb0a5546afbd208a1d50acdd0a
-            disabled: false
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/runtest?gingerman_Test 1.vrp"
-        name: runtest (with file)
-        meta:
-          id: req_0291e973e3b147839cd229e887464555
-          created: 1753890454660
-          modified: 1757623175527
-          isPrivate: false
-          sortKey: -1690628396750
-        method: PUT
-        body:
-          mimeType: application/octet-stream
-          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
-        parameters:
-          - id: pair_9ec2ef7788ee4edf9151f93efe69959d
-            disabled: false
-        headers:
-          - name: filename
-            value: gingerman_Test 1.vrp
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/opentest?random.vrandomt"
-        name: opentest (with template file)
-        meta:
-          id: req_6f5f1f0b18ca4ff2b77ef7f55ed02871
-          created: 1757610952942
-          modified: 1757623224771
-          isPrivate: false
-          sortKey: -1690628396125
-        method: PUT
-        body:
-          mimeType: application/octet-stream
-          fileName: D:\Data\VibrationVIEW-API-REST\profiles\random.vrandomt
-        parameters:
-          - id: pair_43fc2643ea964f09b4344f2a558686bb
-            disabled: false
-        headers:
-          - id: pair_ef908b3fd8f54e899658c4211f885c1b
-            disabled: false
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-  - name: Hardware Config
-    meta:
-      id: fld_20414a910c6d4734955dfac90822f59f
-      created: 1690628400000
-      modified: 1753984713981
-      sortKey: -1753972452330.25
-      description: Hardware configuration
-    children:
-      - url: "{{ _.base_url }}/docs/hardware_config"
-        name: Hardware Config Docs
-        meta:
-          id: req_2202c1a428e9496d8722ee23dd9f2194
-          created: 1690628400000
-          modified: 1690628400000
-          isPrivate: false
-          description: Get hardware config documentation
-          sortKey: -1690628377000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/gethardwareinputchannels"
-        name: gethardwareinputchannels
-        meta:
-          id: req_40df907989094a65a3ed8cdad2619057
-          created: 1690628400000
-          modified: 1753819303571
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1690628376000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/gethardwareoutputchannels"
-        name: gethardwareoutputchannels
-        meta:
-          id: req_fa515e884da446fbbab207947a7ca019
-          created: 1753819319277
-          modified: 1753819321167
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1690628375500
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/gethardwareserialnumber"
-        name: gethardwareserialnumber
-        meta:
-          id: req_0cb788271e2a4ce4a9229e9342ab1a22
-          created: 1753819336742
-          modified: 1753819342367
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1690628375250
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/getsoftwareversion"
-        name: getsoftwareversion
-        meta:
-          id: req_41398e5f516d4f5fa04cc86b7ad06365
-          created: 1753819359553
-          modified: 1753819360987
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1690628375125
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/hardwaresupportsdifferential?1"
-        name: hardwaresupportsdifferential
-        meta:
-          id: req_63af5cf32b834445885aa3370342c69d
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Check differential support
-          sortKey: -1690628373000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/hardwaresupportscapacitorcoupled?1"
-        name: hardwaresupportscapacitorcoupled
-        meta:
-          id: req_bdb353b068f342f7b0e58ba5a4b8add7
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Check capacitor coupled support
-          sortKey: -1690628374000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/hardwaresupportsaccelpowersource?1"
-        name: hardwaresupportsaccelpowersource
-        meta:
-          id: req_f583621da1464d1fb13eefcd3c59c776
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Check accel power source support
-          sortKey: -1690628373500
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
   - name: Core Endpoints
     meta:
-      id: fld_223454c6abff45849cc1b92b22a381ab
+      id: fld_2867c4e3587d4316bd507b3528c1e978
       created: 1690628400000
       modified: 1753974251556
       sortKey: -1753972452424
@@ -405,7 +15,7 @@ collection:
     children:
       - name: Advanced Test Control (System Check)
         meta:
-          id: fld_79fe3c10166b4d5a8278b82c5dc27ba9
+          id: fld_1db3dc21847c4d04adc988877a691cac
           created: 1753985088147
           modified: 1755548012691
           sortKey: -1690628398950
@@ -413,7 +23,7 @@ collection:
           - url: "{{ _.base_url }}/systemcheckfrequency"
             name: systemcheckfrequency
             meta:
-              id: req_89a25e70e3574d09b1088fa9c97b427a
+              id: req_1d4632c737f44f479e6161c1fc2432fc
               created: 1753985048668
               modified: 1753985099899
               isPrivate: false
@@ -433,7 +43,7 @@ collection:
           - url: "{{ _.base_url }}/systemcheckfrequency?22"
             name: set systemcheckfrequency
             meta:
-              id: req_2e90fee8f75a4ababd70b184d8ffe652
+              id: req_fa89118ee03c44eba4b35e4636e8b56a
               created: 1753985137370
               modified: 1757622712377
               isPrivate: false
@@ -453,7 +63,7 @@ collection:
           - url: "{{ _.base_url }}/systemcheckoutputvoltage?0.14"
             name: systemcheckoutputvoltage
             meta:
-              id: req_b27f0d3352684d1b95ea6569fadf8027
+              id: req_bb9ad4417e5b4892b05dbd6b5092764f
               created: 1753986069825
               modified: 1757622529338
               isPrivate: false
@@ -473,7 +83,7 @@ collection:
           - url: "{{ _.base_url }}/systemcheckoutputvoltage"
             name: systemcheckoutputvoltage
             meta:
-              id: req_aba75d67b4e74be2a5eeb27df18a1d0b
+              id: req_2670b4a1bccb469fa17b05ba852268b1
               created: 1753986110511
               modified: 1753986135569
               isPrivate: false
@@ -493,7 +103,7 @@ collection:
           - url: "{{ _.base_url }}/docs/advanced_control_system_check"
             name: Systemcheck Test Control Docs
             meta:
-              id: req_da98d1b7aecb4d70827f07e971ed3100
+              id: req_360d63b40eee4fa087036ba1e6cd7b7c
               created: 1755548098604
               modified: 1755548140779
               isPrivate: false
@@ -510,7 +120,7 @@ collection:
               rebuildPath: true
       - name: Advanced Test Control (Sine)
         meta:
-          id: fld_215c661cfccc48bbb3f467844fb4498c
+          id: fld_1063d293e700496f9b1cfa69c89a4329
           created: 1753985609684
           modified: 1755545912985
           sortKey: -1690628398900
@@ -518,7 +128,7 @@ collection:
           - url: "{{ _.base_url }}/sweepup"
             name: sweepup
             meta:
-              id: req_114cfe7d0e6b4579996cc508b95cb1f2
+              id: req_c115e8658cc04932a658f04c949651b4
               created: 1690628400000
               modified: 1753986427665
               isPrivate: false
@@ -547,7 +157,7 @@ collection:
           - url: "{{ _.base_url }}/sweepdown"
             name: sweepdown
             meta:
-              id: req_e255915894614befbd2112eb3282c399
+              id: req_e554828d07194c2f9190e299f7de04f6
               created: 1753818672365
               modified: 1753986503228
               isPrivate: false
@@ -576,7 +186,7 @@ collection:
           - url: "{{ _.base_url }}/sweephold"
             name: Sweephold Control
             meta:
-              id: req_a9b369e6393342c984158625644464c6
+              id: req_391935825327420dbec9cb290ce0aecc
               created: 1753818974227
               modified: 1753986168306
               isPrivate: false
@@ -605,7 +215,7 @@ collection:
           - url: "{{ _.base_url }}/demandmultiplier"
             name: demandmultiplier
             meta:
-              id: req_d1feffa9946544ea9b8e9d64da27e868
+              id: req_e046903fcca84d61bc4eb93eb4917f5c
               created: 1753984951569
               modified: 1753985660459
               isPrivate: false
@@ -625,7 +235,7 @@ collection:
           - url: "{{ _.base_url }}/sinefrequency"
             name: sinefrequency
             meta:
-              id: req_08a06f82a74f4d3183237ad5bd89f45a
+              id: req_e5638a71709146429be5f5f71700e616
               created: 1753984998949
               modified: 1753985931973
               isPrivate: false
@@ -645,7 +255,7 @@ collection:
           - url: "{{ _.base_url }}/sweepmultiplier"
             name: sweepmultiplier
             meta:
-              id: req_ba6c7649eab6498aa7c85ea697def687
+              id: req_b69fb03e61944d619c6df1eb2eb73999
               created: 1753985024760
               modified: 1753985988139
               isPrivate: false
@@ -665,7 +275,7 @@ collection:
           - url: "{{ _.base_url }}/demandmultiplier?value=0.5"
             name: demandmultiplier
             meta:
-              id: req_571e8921f6f14db8968e3cec001de790
+              id: req_8686da2edcde4f79affc9099350ff158
               created: 1753985687779
               modified: 1753985702816
               isPrivate: false
@@ -685,7 +295,7 @@ collection:
           - url: "{{ _.base_url }}/sinefrequency?30"
             name: sinefrequency
             meta:
-              id: req_e8f407fa11f0401e8848e18d336caf89
+              id: req_a6c9b14dd2284b498b3cf220e81a76d2
               created: 1753985941121
               modified: 1757622045349
               isPrivate: false
@@ -705,7 +315,7 @@ collection:
           - url: "{{ _.base_url }}/sweepmultiplier?1.2"
             name: sweepmultiplier
             meta:
-              id: req_137252336a25425a8f3c2780bc70a352
+              id: req_b633eae34ccc4efc98c06ea71b3e25ea
               created: 1753985995575
               modified: 1757622613271
               isPrivate: false
@@ -725,7 +335,7 @@ collection:
           - url: "{{ _.base_url }}/sweepresonancehold"
             name: sweepresonancehold
             meta:
-              id: req_30ec7f24d01842d7916f34a2a9d4f9ea
+              id: req_37c8b59426d244e3a48b61396aa0032c
               created: 1753986284147
               modified: 1753986286276
               isPrivate: false
@@ -754,7 +364,7 @@ collection:
           - url: "{{ _.base_url }}/sweepstepdown"
             name: sweepstepdown
             meta:
-              id: req_e7347065bd454699b847b5db24fea5c8
+              id: req_ee436e0202fe4dd3a98ebcb69b212411
               created: 1753986340274
               modified: 1753986344100
               isPrivate: false
@@ -783,7 +393,7 @@ collection:
           - url: "{{ _.base_url }}/sweepstepup"
             name: sweepstepup
             meta:
-              id: req_ebf186f06c01457a9ad26c8beb8a4b6e
+              id: req_299385f6859041e9a60404d4b57559a8
               created: 1753986396552
               modified: 1753986403461
               isPrivate: false
@@ -812,7 +422,7 @@ collection:
           - url: "{{ _.base_url }}/docs/advanced_control_sine"
             name: Sine Test Control Docs
             meta:
-              id: req_a209446bdf7b4becbb6bb1dced290336
+              id: req_bfbfca76474d4b69a0eb7233e026a36d
               created: 1755545936420
               modified: 1755545962359
               isPrivate: false
@@ -830,9 +440,9 @@ collection:
       - url: "{{ _.base_url }}/docs"
         name: API Documentation
         meta:
-          id: req_57147b11eaf64445aff18d2758f6dca8
+          id: req_655ac105195e4a0d8fd379bdfcb819e5
           created: 1690628400000
-          modified: 1753803935063
+          modified: 1763750682420
           isPrivate: false
           description: Get API documentation
           sortKey: -1690628399000
@@ -848,7 +458,7 @@ collection:
       - url: "{{ _.base_url }}/health"
         name: Health Check
         meta:
-          id: req_f9316e19eaba41cc8b58cd46a329fe1d
+          id: req_6966a87cf3054272975f1d4fb5dbc3e5
           created: 1690628400000
           modified: 1753803925054
           isPrivate: false
@@ -863,18 +473,590 @@ collection:
             send: true
             store: true
           rebuildPath: true
+  - name: Hardware Config
+    meta:
+      id: fld_4507dc18999a4b949e8f5bd7a1687629
+      created: 1690628400000
+      modified: 1753984713981
+      sortKey: -1753972452330.25
+      description: Hardware configuration
+    children:
+      - url: "{{ _.base_url }}/docs/hardware_config"
+        name: Hardware Config Docs
+        meta:
+          id: req_200c3b5287124f179df848158a4905b3
+          created: 1690628400000
+          modified: 1690628400000
+          isPrivate: false
+          description: Get hardware config documentation
+          sortKey: -1690628377000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/gethardwareinputchannels"
+        name: gethardwareinputchannels
+        meta:
+          id: req_2087c936dc4e4051acba10de410a712b
+          created: 1690628400000
+          modified: 1753819303571
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1690628376000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/gethardwareoutputchannels"
+        name: gethardwareoutputchannels
+        meta:
+          id: req_17432579a233427ea39df923b930aaf6
+          created: 1753819319277
+          modified: 1753819321167
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1690628375500
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/gethardwareserialnumber"
+        name: gethardwareserialnumber
+        meta:
+          id: req_da1c0f01b00a403793c974dfa44fbfc5
+          created: 1753819336742
+          modified: 1753819342367
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1690628375250
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/getsoftwareversion"
+        name: getsoftwareversion
+        meta:
+          id: req_30fa8ac90aa747b8b58bdbc60b306fe3
+          created: 1753819359553
+          modified: 1753819360987
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1690628375125
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/hardwaresupportsaccelpowersource?1"
+        name: hardwaresupportsaccelpowersource
+        meta:
+          id: req_0a7ddb3ac45b4b6098bec46bcc1effb5
+          created: 1754400000000
+          modified: 1754400000000
+          isPrivate: false
+          description: Check accel power source support
+          sortKey: -1690628373500
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/hardwaresupportsdifferential?1"
+        name: hardwaresupportsdifferential
+        meta:
+          id: req_21e10c770aa648aba098c0bffc462840
+          created: 1754400000000
+          modified: 1754400000000
+          isPrivate: false
+          description: Check differential support
+          sortKey: -1690628373000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/hardwaresupportscapacitorcoupled?1"
+        name: hardwaresupportscapacitorcoupled
+        meta:
+          id: req_5521a506c0224fe2aeaf58c59c3c4bed
+          created: 1754400000000
+          modified: 1754400000000
+          isPrivate: false
+          description: Check capacitor coupled support
+          sortKey: -1690628374000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Advanced Test Control
+    meta:
+      id: fld_8994aa3afd9f404282d968fd737fcf92
+      created: 1690628400000
+      modified: 1753994102264
+      sortKey: -1753972452399
+      description: Advanced test control
+    children:
+      - url: "{{ _.base_url }}/docs/advanced_control"
+        name: Test Control Docs
+        meta:
+          id: req_5f1128a376044c7a8c58759f24d946ac
+          created: 1690628400000
+          modified: 1753994134388
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088247
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype"
+        name: testtype
+        meta:
+          id: req_3a09edc5c1cc4c679c6b2148ad713ba2
+          created: 1753986189981
+          modified: 1753986254822
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088240.75
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=1"
+        name: testtype - sine
+        meta:
+          id: req_3b8d9d5e5ab345f9b031b937f2c76ae9
+          created: 1753986206706
+          modified: 1755524284215
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088237.625
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=2"
+        name: testtype - random
+        meta:
+          id: req_d391d221d60240ac8a0c9601e8a99da4
+          created: 1755524291227
+          modified: 1755524298730
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088229.8125
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=0"
+        name: testtype - systemcheck
+        meta:
+          id: req_de5ad656d3f540c594c8a9063cd82383
+          created: 1755524315095
+          modified: 1755524434436
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088239.1875
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=5"
+        name: testtype - shock
+        meta:
+          id: req_bb9aa1f003ca4962a1e9aff0ee4a4ad4
+          created: 1755524901910
+          modified: 1755723716229
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088225.9062
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=9"
+        name: testtype - transient capture
+        meta:
+          id: req_33dd9d5d68e741fd95f726008ac52923
+          created: 1755525059596
+          modified: 1755723746937
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088223.9531
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=6"
+        name: testtype - datareplay
+        meta:
+          id: req_e1d150d86ae243f681150ca4832031e2
+          created: 1755525092053
+          modified: 1755525098861
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088222.9766
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Basic Control
+    meta:
+      id: fld_aa10650085c746129b9ddb614b5502be
+      created: 1690628400000
+      modified: 1753973192874
+      sortKey: -1753972452349
+      description: Core test control operations
+    children:
+      - url: "{{ _.base_url }}/resumetest"
+        name: resumetest
+        meta:
+          id: req_1f8b1ccf11af4ef6a81be7569db8a301
+          created: 1690628400000
+          modified: 1753885432233
+          isPrivate: false
+          description: Resume paused test execution
+          sortKey: -1690628393000
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/runtest?C:\\VibrationVIEW\\Profiles\\random.vrp"
+        name: runtest
+        meta:
+          id: req_4c7a1b3957a74347a08545d6bccf6a0c
+          created: 1690628400000
+          modified: 1757623116690
+          isPrivate: false
+          description: Execute a complete test run
+          sortKey: -1690628397000
+        method: POST
+        body:
+          mimeType: application/json
+        parameters:
+          - disabled: false
+            id: pair_f42012ba1c1848bcb8b918b81114c9a6
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/starttest"
+        name: starttest
+        meta:
+          id: req_5b6bc0b5316f49efb5a32a3386dcc64f
+          created: 1690628400000
+          modified: 1753885415684
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1690628396000
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: stoptest
+        meta:
+          id: req_5d95b87adca04b29bc28aa9154ea1c94
+          created: 1690628400000
+          modified: 1753885423172
+          isPrivate: false
+          description: Stop test execution
+          sortKey: -1690628395000
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/docs/basic_control"
+        name: Basic Control Docs
+        meta:
+          id: req_e48629cc1ea344b0a9264569b30c7775
+          created: 1690628400000
+          modified: 1753803942814
+          isPrivate: false
+          description: Get basic control documentation
+          sortKey: -1690628398000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testcom"
+        name: testcom
+        meta:
+          id: req_e577f6f990534f2db74c13e46c2e4f2f
+          created: 1690628400000
+          modified: 1755778123807
+          isPrivate: false
+          description: Test COM connection (diagnostic)
+          sortKey: -1690628397500
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest?C:\\VibrationVIEW\\Profiles\\random.vrp"
+        name: opentest
+        meta:
+          id: req_24c31d5bec0e4d4b9a0917d5782d4bc0
+          created: 1753811551540
+          modified: 1757619331241
+          isPrivate: false
+          description: Execute a complete test run
+          sortKey: -1690628396500
+        method: POST
+        body:
+          mimeType: application/json
+        parameters:
+          - disabled: false
+            id: pair_4dca6c5c8156499dbb06aa26be73e09a
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest"
+        name: opentest (with file)
+        meta:
+          id: req_7638fda43f57475a97852418a82bf893
+          created: 1753882734116
+          modified: 1757611325704
+          isPrivate: false
+          sortKey: -1690628396250
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
+        parameters:
+          - name: filename
+            value: randomtest-withpretest.vrp
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/runtest?gingerman_Test 1.vrp"
+        name: runtest (with file)
+        meta:
+          id: req_09d754968a424fe8a204d4a6df5bfebe
+          created: 1753890454660
+          modified: 1757623175527
+          isPrivate: false
+          sortKey: -1690628396750
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
+        parameters:
+          - disabled: false
+            id: pair_9ec2ef7788ee4edf9151f93efe69959d
+        headers:
+          - name: filename
+            value: gingerman_Test 1.vrp
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest?random.vrandomt"
+        name: opentest (with template file)
+        meta:
+          id: req_6b58515a71754a4e82aa9678dff91d86
+          created: 1757610952942
+          modified: 1757623224771
+          isPrivate: false
+          sortKey: -1690628396125
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: D:\Data\VibrationVIEW-API-REST\profiles\random.vrandomt
+        parameters:
+          - disabled: false
+            id: pair_43fc2643ea964f09b4344f2a558686bb
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
   - name: Recording
     meta:
-      id: fld_313cd01192e84c0b95803faabd3350cd
+      id: fld_ba4168c6391046758db2ac9d7e03c978
       created: 1690628400000
       modified: 1690628400000
       sortKey: -1690628373000
       description: Data recording control
     children:
+      - url: "{{ _.base_url }}/docs/recording"
+        name: Recording Docs
+        meta:
+          id: req_3675b57ad569414b8432d69cbc09253a
+          created: 1690628400000
+          modified: 1690628400000
+          isPrivate: false
+          description: Get recording documentation
+          sortKey: -1690628373000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/recordstop"
+        name: recordstop
+        meta:
+          id: req_78f54edb2e7748a78720e3d6c238875a
+          created: 1690628400000
+          modified: 1753885635178
+          isPrivate: false
+          description: Stop data recording
+          sortKey: -1690628371000
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/recordstart"
         name: recordstart
         meta:
-          id: req_793118e7fbbf4612a0006d78ee1e5c7e
+          id: req_f68d7b9ffe8045c9b2219a1c1b6216f8
           created: 1690628400000
           modified: 1753885627265
           isPrivate: false
@@ -899,46 +1081,10 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/docs/recording"
-        name: Recording Docs
-        meta:
-          id: req_94d2bfecc2f54bcfb59d1e095b66af53
-          created: 1690628400000
-          modified: 1690628400000
-          isPrivate: false
-          description: Get recording documentation
-          sortKey: -1690628373000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/recordstop"
-        name: recordstop
-        meta:
-          id: req_af3e9ec171c149dca647d1621aa5c449
-          created: 1690628400000
-          modified: 1753885635178
-          isPrivate: false
-          description: Stop data recording
-          sortKey: -1690628371000
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/testrecording"
         name: testrecording
         meta:
-          id: req_26564a1cd9d14d988fac1809a3856884
+          id: req_5c6713d775704d95baf6badc39a5ae74
           created: 1754400000000
           modified: 1754400000000
           isPrivate: false
@@ -953,28 +1099,10 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/recordpause"
-        name: recordpause
-        meta:
-          id: req_e910ebd8e0a84364bb27947c40c7f18e
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Pause data recording
-          sortKey: -1690628371500
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/recordgetfilename"
         name: recordgetfilename
         meta:
-          id: req_fe1647feaf384c9dbdc86242a187cbc3
+          id: req_ae2be2dfe91549159094293b2bc550ba
           created: 1754400000000
           modified: 1754400000000
           isPrivate: false
@@ -989,54 +1117,242 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/recordpause"
+        name: recordpause
+        meta:
+          id: req_f0c59a05f5fb404ca361ca6e8cc69181
+          created: 1754400000000
+          modified: 1754400000000
+          isPrivate: false
+          description: Pause data recording
+          sortKey: -1690628371500
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Status Properties
+    meta:
+      id: fld_be01b001e157492d83542d65dcf7b46c
+      created: 1690628400000
+      modified: 1690628400000
+      sortKey: -1690628392000
+      description: System status and state checking
+    children:
+      - url: "{{ _.base_url }}/isrunning"
+        name: isrunning
+        meta:
+          id: req_5c0cc1bb7963467398e6fae121cc6e63
+          created: 1690628400000
+          modified: 1753891103017
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628391000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/docs/status_properties"
+        name: Status Properties Docs
+        meta:
+          id: req_98449a3ac74e48eeb484a9e6dff71e26
+          created: 1690628400000
+          modified: 1753815164941
+          isPrivate: false
+          description: Get status properties documentation
+          sortKey: -1690628392000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/status"
+        name: status
+        meta:
+          id: req_edbe0ba29dc947a09c49f69aaf0463d6
+          created: 1753815232433
+          modified: 1753885443715
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628391500
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isready"
+        name: isready
+        meta:
+          id: req_5b4df714dc1e4256b9eb4074e54cffca
+          created: 1753815308105
+          modified: 1753891097653
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628391250
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isstarting"
+        name: isstarting
+        meta:
+          id: req_869feb64665749f48ab69ffd9ec40fa6
+          created: 1753815354769
+          modified: 1753891108484
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628390000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/ischanginglevel"
+        name: ischanginglevel
+        meta:
+          id: req_613272e99f534fbe81f059674ffb95e2
+          created: 1753815387406
+          modified: 1753891089680
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389875
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isholdlevel"
+        name: isholdlevel
+        meta:
+          id: req_97504ee06d0943a3a2346ef719bc236f
+          created: 1753815483661
+          modified: 1753885537050
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389750
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isopenloop"
+        name: isopenloop
+        meta:
+          id: req_c1c87648c1a2492a96492c61fc50ccce
+          created: 1753815518582
+          modified: 1753885548764
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389250
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isaborted"
+        name: " isaborted"
+        meta:
+          id: req_08b5ffff579348ec82ecae9d2d4a6139
+          created: 1753815542496
+          modified: 1753885555183
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389125
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/canresumetest"
+        name: canresumetest
+        meta:
+          id: req_0ea92da208884821b3e680e39669a470
+          created: 1753815570367
+          modified: 1753885562538
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389062.5
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/allstatus"
+        name: allstatus
+        meta:
+          id: req_74d87957b5334e368612dd5ca04e1444
+          created: 1753891206769
+          modified: 1753974451281
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628388531.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
   - name: Data Retrieval
     meta:
-      id: fld_36801d4801ae4ae0b1e2bb5a5226c60f
+      id: fld_ff18525e965440ecab11e15aca9de69e
       created: 1690628400000
       modified: 1754054677291
       sortKey: -1753972452336.5
       description: Real-time data access
     children:
-      - url: "{{ _.base_url }}/docs/data_retrieval"
-        name: Data Retrieval Docs
-        meta:
-          id: req_115a12ef50aa482eb54700d45b161720
-          created: 1690628400000
-          modified: 1754054995454
-          isPrivate: false
-          description: Get data retrieval documentation
-          sortKey: -1690628388000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/control"
-        name: control
-        meta:
-          id: req_18c841988322409f950976477002c020
-          created: 1690628400000
-          modified: 1753885480789
-          isPrivate: false
-          description: Get current response values
-          sortKey: -1690628385000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/demand"
         name: demand
         meta:
-          id: req_5727cc09f65243b096b6a3893a237bed
+          id: req_294779f1e730480da44c28897032e9a3
           created: 1690628400000
           modified: 1753885473215
           isPrivate: false
@@ -1054,7 +1370,7 @@ collection:
       - url: "{{ _.base_url }}/channel"
         name: channel
         meta:
-          id: req_f245900ca3094ae6b78742945ec1bc64
+          id: req_483135addc294f2c8df93b4b83f266e6
           created: 1690628400000
           modified: 1753885465952
           isPrivate: false
@@ -1069,10 +1385,46 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/docs/data_retrieval"
+        name: Data Retrieval Docs
+        meta:
+          id: req_5281fdb801684fc9b677b35c069b8a81
+          created: 1690628400000
+          modified: 1754054995454
+          isPrivate: false
+          description: Get data retrieval documentation
+          sortKey: -1690628388000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/control"
+        name: control
+        meta:
+          id: req_e9703a68a00f4ccbbf4c1ba5b783fb55
+          created: 1690628400000
+          modified: 1753885480789
+          isPrivate: false
+          description: Get current response values
+          sortKey: -1690628385000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/output"
         name: output
         meta:
-          id: req_4da14fc7143a4583bfe10a4c9f80e5cf
+          id: req_336ae29e64de4cfc9fa33aa597620f4d
           created: 1753817499973
           modified: 1753885488780
           isPrivate: false
@@ -1090,7 +1442,7 @@ collection:
       - url: "{{ _.base_url }}/vector?vectorenum=0&columns=5"
         name: vector
         meta:
-          id: req_29d3fe1ac616422c98b29367728ab9ee
+          id: req_b5d773d9e8f3464ab6b4fcb548e1c3d7
           created: 1754053763716
           modified: 1754054641904
           isPrivate: false
@@ -1110,7 +1462,7 @@ collection:
       - url: "{{ _.base_url }}/vector?vectorenum=100"
         name: vector (Frequency Axis)
         meta:
-          id: req_65e807f3f48641758b888f02d08e241c
+          id: req_717bd5d17ee8457aa97abcd88d81a385
           created: 1754054838304
           modified: 1754054903994
           isPrivate: false
@@ -1130,7 +1482,7 @@ collection:
       - url: "{{ _.base_url }}/docs/vector_enums"
         name: Data Retrieval Vector ENUMS
         meta:
-          id: req_b02c00771ac647bcaab371e395d6bebc
+          id: req_03cfb8b03aee47eaa3f887910747dd0f
           created: 1754054965624
           modified: 1754054965624
           isPrivate: false
@@ -1148,7 +1500,7 @@ collection:
       - url: "{{ _.base_url }}/vector?vectorenum=190&columns=2"
         name: vector (Frequency Demand,Control)
         meta:
-          id: req_16ed84735dcb44b9b8748590f17198df
+          id: req_672e7bb42e4144c4b76fe45b4ff856ba
           created: 1754055027417
           modified: 1754055144072
           isPrivate: false
@@ -1168,7 +1520,7 @@ collection:
       - url: "{{ _.base_url }}/channellabel?2"
         name: channellabel
         meta:
-          id: req_70b0e0be7e7c4f6890b47f4036226834
+          id: req_e61af38cf213481d8090f2690780fa8b
           created: 1754077111330
           modified: 1757623281054
           isPrivate: false
@@ -1186,7 +1538,7 @@ collection:
       - url: "{{ _.base_url }}/channelunit?1"
         name: channelunit
         meta:
-          id: req_595d54b7a4814680b2ecaedb0bc53f6f
+          id: req_60ede7cc589d4489ad4729e290659cce
           created: 1754077145804
           modified: 1757623292686
           isPrivate: false
@@ -1204,7 +1556,7 @@ collection:
       - url: "{{ _.base_url }}/controlunit"
         name: controlunit
         meta:
-          id: req_c228ae1facf541d4aca90ab1780c6cfd
+          id: req_d50abd5ada7d49d98ebcc8f9e6cc8cbb
           created: 1754077729137
           modified: 1757687591254
           isPrivate: false
@@ -1222,7 +1574,7 @@ collection:
       - url: "{{ _.base_url }}/controllabel"
         name: controllabel
         meta:
-          id: req_c124faf866f64681ab932c293a99540a
+          id: req_cd2a2f865d644b8a8cba25cabff7f486
           created: 1754077821757
           modified: 1757686580917
           isPrivate: false
@@ -1240,7 +1592,7 @@ collection:
       - url: "{{ _.base_url }}/vectorlabel?0"
         name: vectorlabel
         meta:
-          id: req_e694946b3934490da93ed86080e2511d
+          id: req_55235073ef8843269223aecfef11aadd
           created: 1754077879141
           modified: 1757623400201
           isPrivate: false
@@ -1260,7 +1612,7 @@ collection:
       - url: "{{ _.base_url }}/vectorunit?0"
         name: vectorunit
         meta:
-          id: req_70cdea5cc146422ca7250593a2050ae0
+          id: req_970bac3f425d427fa536281cc80fe5dc
           created: 1754077899554
           modified: 1757623425592
           isPrivate: false
@@ -1280,7 +1632,7 @@ collection:
       - url: "{{ _.base_url }}/vectorlength?0"
         name: vectorlength
         meta:
-          id: req_eece2308da4244808983503ae2361ab7
+          id: req_300ff364bea54d928b7f3b4397bcbd6b
           created: 1754077967194
           modified: 1757623338248
           isPrivate: false
@@ -1297,367 +1649,9 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: Advanced Test Control
-    meta:
-      id: fld_64e04d6f52a9457d93ed18fe091b2d94
-      created: 1690628400000
-      modified: 1753994102264
-      sortKey: -1753972452399
-      description: Advanced test control
-    children:
-      - url: "{{ _.base_url }}/docs/advanced_control"
-        name: Test Control Docs
-        meta:
-          id: req_59db0167d8114b36b440cc282436469d
-          created: 1690628400000
-          modified: 1753994134388
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088247
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype"
-        name: testtype
-        meta:
-          id: req_525f512799bf4eceb6a3cfae0a01e4b0
-          created: 1753986189981
-          modified: 1753986254822
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088240.75
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=1"
-        name: testtype - sine
-        meta:
-          id: req_ab4c637a694b4bd4a5c17d680788f6f1
-          created: 1753986206706
-          modified: 1755524284215
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088237.625
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=2"
-        name: testtype - random
-        meta:
-          id: req_58de40a69de24f7e9f9f72a4b91e3e97
-          created: 1755524291227
-          modified: 1755524298730
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088229.8125
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=0"
-        name: testtype - systemcheck
-        meta:
-          id: req_28b765a7059d4b60bb506e86de8ac264
-          created: 1755524315095
-          modified: 1755524434436
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088239.1875
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=5"
-        name: testtype - shock
-        meta:
-          id: req_cfe6f09799634df6b8b9032f9252aa57
-          created: 1755524901910
-          modified: 1755723716229
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088225.9062
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=9"
-        name: testtype - transient capture
-        meta:
-          id: req_7b22276ef7c44643862df0f978082832
-          created: 1755525059596
-          modified: 1755723746937
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088223.9531
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=6"
-        name: testtype - datareplay
-        meta:
-          id: req_d95a0ee2fa054eeba5f4ab7ddf0ddb62
-          created: 1755525092053
-          modified: 1755525098861
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088222.9766
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-  - name: Status Properties
-    meta:
-      id: fld_82b559d9278b426ca54ecfbb7c0a48e6
-      created: 1690628400000
-      modified: 1690628400000
-      sortKey: -1690628392000
-      description: System status and state checking
-    children:
-      - url: "{{ _.base_url }}/isrunning"
-        name: isrunning
-        meta:
-          id: req_0a705cef7cdf4be39fd345663d535713
-          created: 1690628400000
-          modified: 1753891103017
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628391000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/docs/status_properties"
-        name: Status Properties Docs
-        meta:
-          id: req_51735a2b56be4f78b8af616a6fcc9aa5
-          created: 1690628400000
-          modified: 1753815164941
-          isPrivate: false
-          description: Get status properties documentation
-          sortKey: -1690628392000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/status"
-        name: status
-        meta:
-          id: req_c14d1e0b55ed477285e4a8cf163b859f
-          created: 1753815232433
-          modified: 1753885443715
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628391500
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isready"
-        name: isready
-        meta:
-          id: req_c59062b2d9be4d91b489267d3c77ad01
-          created: 1753815308105
-          modified: 1753891097653
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628391250
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isstarting"
-        name: isstarting
-        meta:
-          id: req_854aa8da44434ff1a6898283f8787967
-          created: 1753815354769
-          modified: 1753891108484
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628390000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/ischanginglevel"
-        name: ischanginglevel
-        meta:
-          id: req_695f4da11f964809a74fa19760edaf93
-          created: 1753815387406
-          modified: 1753891089680
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389875
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isholdlevel"
-        name: isholdlevel
-        meta:
-          id: req_e6fd2337d0324908a1fb1e8ea8f738c8
-          created: 1753815483661
-          modified: 1753885537050
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389750
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isopenloop"
-        name: isopenloop
-        meta:
-          id: req_fc8026920ff24257ab6e42cda110904b
-          created: 1753815518582
-          modified: 1753885548764
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389250
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isaborted"
-        name: " isaborted"
-        meta:
-          id: req_29b392d6e90942359ed668a39020b9de
-          created: 1753815542496
-          modified: 1753885555183
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389125
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/canresumetest"
-        name: canresumetest
-        meta:
-          id: req_e0a03517c7884277ac7ed4d0f5483b0c
-          created: 1753815570367
-          modified: 1753885562538
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389062.5
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/allstatus"
-        name: allstatus
-        meta:
-          id: req_c257ea60921847ea95a56e7fa0b2e1a7
-          created: 1753891206769
-          modified: 1753974451281
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628388531.25
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
   - name: TEDS
     meta:
-      id: fld_711d2777cba44bda899828d1fdab782e
+      id: fld_c3a0628d776f481bbadf58f760b1fd32
       created: 1753822803418
       modified: 1753822831643
       sortKey: -1690628379000
@@ -1665,7 +1659,7 @@ collection:
       - url: "{{ _.base_url }}/docs/teds"
         name: TEDS Config Docs
         meta:
-          id: req_331eb1a1cad74ec888eaf094deb1c709
+          id: req_a2d77e394b5a40478da68b1d3632450e
           created: 1753822873573
           modified: 1753822893317
           isPrivate: false
@@ -1683,7 +1677,7 @@ collection:
       - url: "{{ _.base_url }}/inputteds"
         name: inputteds
         meta:
-          id: req_6aaac013da7f445b85b78e41526b9420
+          id: req_de2defd8c2f64bbebfa0899f63c50f0f
           created: 1753822964934
           modified: 1753823007537
           isPrivate: false
@@ -1703,7 +1697,7 @@ collection:
       - url: "{{ _.base_url }}/inputtedschannel?0"
         name: inputtedschannel
         meta:
-          id: req_2279eb87f0a146c993b0696b23211537
+          id: req_fd8afcb27bc2456da79f16ec0f4c22fb
           created: 1753823031644
           modified: 1753877085145
           isPrivate: false
@@ -1727,31 +1721,10 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/Teds"
-        name: Teds (all channels)
-        meta:
-          id: req_5996bfa016be46f89f4f380a6c9efae8
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Get TEDS for all channels
-          sortKey: -1753822876200
-        method: GET
-        headers:
-          - name: User-Agent
-            value: insomnia/11.0.2
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/Teds?1"
         name: Teds (specific channel)
         meta:
-          id: req_e9048767d48640f2ac1fe391edf4393f
+          id: req_bc79d8c8a7cf4d72a0e7fd3b15f66da6
           created: 1754400000000
           modified: 1754400000000
           isPrivate: false
@@ -1769,9 +1742,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/Teds"
+        name: Teds (all channels)
+        meta:
+          id: req_dfcfbcb4209a429492f887b9c5c5f75e
+          created: 1754400000000
+          modified: 1754400000000
+          isPrivate: false
+          description: Get TEDS for all channels
+          sortKey: -1753822876200
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
   - name: Reporting
     meta:
-      id: fld_d4cb45f11b4d4d2a9e2face0a009e0e0
+      id: fld_bbd5a33b44f2438a8142654c0b27c538
       created: 1753885060661
       modified: 1753885060661
       sortKey: -1753885060661
@@ -1779,7 +1773,7 @@ collection:
       - url: "{{ _.base_url }}/docs/reporting"
         name: reporting docs
         meta:
-          id: req_f302d4601278456a8760890275085107
+          id: req_6352da99a26d4b789c64f183fae1355b
           created: 1753885085511
           modified: 1753973176648
           isPrivate: false
@@ -1797,15 +1791,15 @@ collection:
       - url: "{{ _.base_url }}/reportfield?Filename"
         name: reportfield
         meta:
-          id: req_71d9787474dc4ae58c8cc4398d50ce6b
+          id: req_24ae4f6dfe924c1c9f53dd1cfea7c810
           created: 1753885135839
           modified: 1757617916469
           isPrivate: false
           sortKey: -1753885096848
         method: GET
         parameters:
-          - id: pair_04edeb37043b464a8ccdad29cab38883
-            disabled: false
+          - disabled: false
+            id: pair_04edeb37043b464a8ccdad29cab38883
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1817,7 +1811,7 @@ collection:
       - url: "{{ _.base_url }}/reportfields"
         name: reportfields
         meta:
-          id: req_77c11418143f46d5b8de6f2d0d206eb0
+          id: req_c2c553f015714e08bd79e2b3b8fc2439
           created: 1753975003220
           modified: 1753975798970
           isPrivate: false
@@ -1849,7 +1843,7 @@ collection:
       - url: "{{ _.base_url }}/reportfields?channel=1"
         name: reportfields with channels
         meta:
-          id: req_824630bfdf3e4866a4739b0447583d5e
+          id: req_df19066fcf284175b7b18160afd7e314
           created: 1753975808266
           modified: 1753976071685
           isPrivate: false
@@ -1884,7 +1878,7 @@ collection:
       - url: "{{ _.base_url }}/reportfields?loop=all"
         name: reportfields with all loops
         meta:
-          id: req_2533eab964fd43b6b563f93c9f93fed0
+          id: req_6a0a298753824e1b9e39a2dce5c101db
           created: 1753977139063
           modified: 1753977322609
           isPrivate: false
@@ -1913,7 +1907,7 @@ collection:
       - url: "{{ _.base_url }}/testreporting"
         name: testreporting
         meta:
-          id: req_49d64c5fb3b6420f8a5eb8a69605a04d
+          id: req_04f8a566f56e43e28c053d9436565ade
           created: 1754400000000
           modified: 1754400000000
           isPrivate: false
@@ -1931,7 +1925,7 @@ collection:
       - url: "{{ _.base_url }}/reportfield?ChName*|ChStatus*|chstatusTEDS*"
         name: "reportfields Check System Health and Status "
         meta:
-          id: req_d930018f450045f8a0da73e5319b72f2
+          id: req_39c503851a834260a43de157e4cd7649
           created: 1757616460409
           modified: 1757618166240
           isPrivate: false
@@ -1959,7 +1953,7 @@ collection:
           rebuildPath: true
   - name: Aux Inputs
     meta:
-      id: fld_1e44dde9541043e9a85b63e0c4b29461
+      id: fld_4d2cf34f66474dc7bf72f62e715ae44e
       created: 1753904322263
       modified: 1757686139544
       sortKey: -1753972452374
@@ -1967,7 +1961,7 @@ collection:
       - url: "{{ _.base_url }}/rearinputlabel?1"
         name: rearinputlabel
         meta:
-          id: req_97b82a4c38c943528a2e9fee7835d728
+          id: req_733867e8a69f4acb8b46e5827ee206c5
           created: 1753817533002
           modified: 1757623523471
           isPrivate: false
@@ -1975,8 +1969,8 @@ collection:
           sortKey: -1753904348688
         method: GET
         parameters:
-          - id: pair_24fe82ac9e8c46f2850801c59b61ccdf
-            disabled: false
+          - disabled: false
+            id: pair_24fe82ac9e8c46f2850801c59b61ccdf
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1988,7 +1982,7 @@ collection:
       - url: "{{ _.base_url }}/docs/auxinputs"
         name: auxinputs docs
         meta:
-          id: req_33d4796ff2794af6b68c246e027e3881
+          id: req_e24543f80fdd483c9a5442bacd79e06d
           created: 1753906951682
           modified: 1753907416497
           isPrivate: false
@@ -2005,7 +1999,7 @@ collection:
       - url: "{{ _.base_url }}/rearinputunit?1"
         name: rearinputunit
         meta:
-          id: req_67d71cf2229143aeb0e1efab92b7d341
+          id: req_2776b6a3553d4c37ac74a2e717f7770c
           created: 1753907659102
           modified: 1757623536714
           isPrivate: false
@@ -2013,8 +2007,8 @@ collection:
           sortKey: -1753894722818
         method: GET
         parameters:
-          - id: pair_606a9927b58649028e332285bc81a4d3
-            disabled: false
+          - disabled: false
+            id: pair_606a9927b58649028e332285bc81a4d3
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2026,7 +2020,7 @@ collection:
       - url: "{{ _.base_url }}/reportfield?AuxLabel*|AuxInput*%g|AuxUnit*"
         name: Aux Input Report Fields
         meta:
-          id: req_b8e447f41e0a4c8d86f99a7aca7b17a7
+          id: req_cf12d0d5ca4c4ca29ac140699e6007de
           created: 1757618589634
           modified: 1757618918384
           isPrivate: false
@@ -2045,7 +2039,7 @@ collection:
           rebuildPath: true
   - name: GUI Control
     meta:
-      id: fld_be01ec27010c472083b687f9ee9d6458
+      id: fld_dfde6315735848b8b95a78e7bd55711d
       created: 1753972452324
       modified: 1753984719567
       sortKey: -1753972452333.375
@@ -2053,7 +2047,7 @@ collection:
       - url: "{{ _.base_url }}/docs/gui_control"
         name: gui_control docs
         meta:
-          id: req_0c3e07737744490e88d5c01de5f91ac2
+          id: req_b82f9bc20ad04bbe861584b9c3303aeb
           created: 1753972468585
           modified: 1753972519557
           isPrivate: false
@@ -2070,7 +2064,7 @@ collection:
       - url: "{{ _.base_url }}/abortedit"
         name: abortedit
         meta:
-          id: req_9f0d55a652ed49d28466b452b713cd98
+          id: req_2fcdf35247624c0fac4d9f43b18c8f82
           created: 1753972540949
           modified: 1753972560922
           isPrivate: false
@@ -2094,7 +2088,7 @@ collection:
           }}/edittest?testname=C:\\VibrationVIEW\\Profiles\\random1.vrp"
         name: edittest
         meta:
-          id: req_3e690ef611ea4e08b5b47080094f03a9
+          id: req_d6f7ebc8960b49cfa088a7ce5a52a920
           created: 1753972582247
           modified: 1753972856247
           isPrivate: false
@@ -2121,7 +2115,7 @@ collection:
       - url: "{{ _.base_url }}/minimize"
         name: minimize
         meta:
-          id: req_29d64e6d4bfc41abb28ac93abab8d390
+          id: req_dd49b28743014346a7ad13dd8e54be99
           created: 1753972933687
           modified: 1753972993717
           isPrivate: false
@@ -2138,7 +2132,7 @@ collection:
       - url: "{{ _.base_url }}/maximize"
         name: maximize
         meta:
-          id: req_7e5caabcb4e840beb1634bbad2c8eba7
+          id: req_dd17e6acb55344758e241fa5d90ad55e
           created: 1753973016012
           modified: 1753973021347
           isPrivate: false
@@ -2155,7 +2149,7 @@ collection:
       - url: "{{ _.base_url }}/restore"
         name: restore
         meta:
-          id: req_d5d34cad994a4b39aaead59bab9b3fdc
+          id: req_ae6e5549c5484df5b917624ace2c2273
           created: 1753973051870
           modified: 1753973054489
           isPrivate: false
@@ -2172,7 +2166,7 @@ collection:
       - url: "{{ _.base_url }}/activate"
         name: activate
         meta:
-          id: req_3ecffb6a16284feca8908eefb04f08ec
+          id: req_0122e9eb407c432f8381105dfa1cb2a7
           created: 1753973075417
           modified: 1753973082971
           isPrivate: false
@@ -2188,7 +2182,7 @@ collection:
           rebuildPath: true
   - name: Input Configuration
     meta:
-      id: fld_e0bca818666d47b2b34afaf6045a9763
+      id: fld_924a5d6821734797824f4be0a7cba838
       created: 1754315936055
       modified: 1757624448143
       sortKey: -1753928756495.625
@@ -2196,7 +2190,7 @@ collection:
       - url: "{{ _.base_url }}/inputmode"
         name: inputmode
         meta:
-          id: req_c49fbba71b48497c8f6dae2771a10d77
+          id: req_575ec091429340a1ae55c0a50e0e4ae5
           created: 1690628400000
           modified: 1757683741561
           isPrivate: false
@@ -2206,22 +2200,22 @@ collection:
         body:
           mimeType: application/json
         parameters:
-          - id: pair_b9eb83b1d355484d9160b66b363e1c4b
-            name: channel
+          - name: channel
             value: "1"
             disabled: false
-          - id: pair_66367ac6247c4ba2864db95a74f8d706
-            name: powersource
+            id: pair_b9eb83b1d355484d9160b66b363e1c4b
+          - name: powersource
             value: "true"
             disabled: false
-          - id: pair_9dd7cc8f34f640ae9d626025be8ca69e
-            name: capcoupled
+            id: pair_66367ac6247c4ba2864db95a74f8d706
+          - name: capcoupled
             value: "false"
             disabled: false
-          - id: pair_bf53e9c8a0044bf5b07ebda784dfc0f0
-            name: differential
+            id: pair_9dd7cc8f34f640ae9d626025be8ca69e
+          - name: differential
             value: "false"
             disabled: false
+            id: pair_bf53e9c8a0044bf5b07ebda784dfc0f0
         headers:
           - name: Content-Type
             value: application/json
@@ -2236,7 +2230,7 @@ collection:
       - url: "{{ _.base_url }}/inputcaldate?1"
         name: inputcaldate
         meta:
-          id: req_e36547a0e2764b918ffe27913766ef38
+          id: req_bfc9f64b5b674f0582700ae3fbb084d9
           created: 1753819374523
           modified: 1754316066406
           isPrivate: false
@@ -2254,7 +2248,7 @@ collection:
       - url: "{{ _.base_url }}/inputserialnumber?1"
         name: inputserialnumber
         meta:
-          id: req_74a57b870bef4e3b9881762c3f1c5f70
+          id: req_1329ea6d2d6c43cd8e5bf0d203595c36
           created: 1753819903710
           modified: 1757683362696
           isPrivate: false
@@ -2272,7 +2266,7 @@ collection:
       - url: "{{ _.base_url }}/inputsensitivity?1"
         name: inputsensitivity
         meta:
-          id: req_55c9c1080e0c4639ad7e30d38eebedc8
+          id: req_1264b0feed8a44f9a5005148c68dc6fd
           created: 1753819939643
           modified: 1754316086925
           isPrivate: false
@@ -2290,7 +2284,7 @@ collection:
       - url: "{{ _.base_url }}/inputengineeringscale?1"
         name: inputengineeringscale
         meta:
-          id: req_549a2f22a8cb44bd92ef21eca351a15e
+          id: req_ff5f7e0388d34643a8611c1669641f5c
           created: 1753819973918
           modified: 1754316124376
           isPrivate: false
@@ -2308,7 +2302,7 @@ collection:
       - url: "{{ _.base_url }}/inputcapacitorcoupled?1"
         name: inputcapacitorcoupled (READ)
         meta:
-          id: req_fe506a1edd7444a892ec1e25b10bf530
+          id: req_2d25b566338c45ca9db03318b2343d11
           created: 1753820002470
           modified: 1754315992736
           isPrivate: false
@@ -2326,7 +2320,7 @@ collection:
       - url: "{{ _.base_url }}/inputcapacitorcoupled?1&false"
         name: inputcapacitorcoupled (WRITE)
         meta:
-          id: req_008b02cd8fc646b2b18be43bce10d28f
+          id: req_1bb2b7792bfd4f27af5d763d13f896b0
           created: 1753820388129
           modified: 1757683484703
           isPrivate: false
@@ -2344,7 +2338,7 @@ collection:
       - url: "{{ _.base_url }}/inputaccelpowersource?1"
         name: inputaccelpowersource (READ)
         meta:
-          id: req_5e83c8fc437547ea90642b55c7a8c720
+          id: req_4e00bd371ddf4878b4246e19f5b58776
           created: 1753820509675
           modified: 1754316000963
           isPrivate: false
@@ -2362,7 +2356,7 @@ collection:
       - url: "{{ _.base_url }}/inputaccelpowersource?1&false"
         name: inputaccelpowersource (WRITE)
         meta:
-          id: req_4740a5ee3f3148b5b263bc3a4daa4e61
+          id: req_0168fc60586f48afa6e2faf4b9f3d308
           created: 1753820521621
           modified: 1757683402816
           isPrivate: false
@@ -2380,7 +2374,7 @@ collection:
       - url: "{{ _.base_url }}/inputdifferential?1&false"
         name: inputdifferential (WRITE)
         meta:
-          id: req_31067a6e97f841aeb505834d24b16a24
+          id: req_0c1cc432d5854280ad97301bd743e7a8
           created: 1753820601904
           modified: 1757683437863
           isPrivate: false
@@ -2398,7 +2392,7 @@ collection:
       - url: "{{ _.base_url }}/inputdifferential?1"
         name: inputdifferential (READ)
         meta:
-          id: req_45f235262316494997175830266a76cb
+          id: req_453c1569e6e542d6b134e2c24ecc61bd
           created: 1753820606789
           modified: 1754315997079
           isPrivate: false
@@ -2416,7 +2410,7 @@ collection:
       - url: "{{ _.base_url }}/docs/input_config"
         name: Input Config Docs
         meta:
-          id: req_56a0e001567f4000bb9114f5c86a8072
+          id: req_0fc05df5f8aa4d03be5f9632d12c095b
           created: 1754316012030
           modified: 1754341960954
           isPrivate: false
@@ -2431,40 +2425,10 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/setinputconfigurationfile?10mv per G.vic"
-        name: setinputconfigurationfile
-        meta:
-          id: req_6cba1473bcbe49a1ae839926adedbe76
-          created: 1754400000000
-          modified: 1757683312896
-          isPrivate: false
-          description: Load input configuration file
-          sortKey: -1754315964340
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "filename": "config.inp"
-            }
-        parameters:
-          - id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
-            disabled: false
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/inputcalibration"
         name: inputcalibration
         meta:
-          id: req_7aa70efecf364ed9b9d1968ee8ac60e6
+          id: req_07e04f3f232f45fdba06d6dccb9f76b9
           created: 1754400000000
           modified: 1757681419162
           isPrivate: false
@@ -2479,28 +2443,55 @@ collection:
               "sensitivity": 100.0
             }
         parameters:
-          - id: pair_9c29441ae26f4748b56995a44f78e77a
-            name: channel
+          - name: channel
             value: "4"
             disabled: false
-          - id: pair_398ded5d35104cf9a7cc2562fdad8498
-            name: sensitivity
+            id: pair_9c29441ae26f4748b56995a44f78e77a
+          - name: sensitivity
             value: "100"
             disabled: false
-          - id: pair_e6b56d2715ec4b468c7364d486b8ad0e
-            name: serialnumber
+            id: pair_398ded5d35104cf9a7cc2562fdad8498
+          - name: serialnumber
             value: "199"
             disabled: false
-          - id: pair_2f0d5d90a3ad404a903af508d34e7edf
-            name: caldate
+            id: pair_e6b56d2715ec4b468c7364d486b8ad0e
+          - name: caldate
             value: 1/1/1999
             disabled: false
+            id: pair_2f0d5d90a3ad404a903af508d34e7edf
         headers:
           - name: Content-Type
             value: application/json
-            id: pair_f8b74f0bc8bf499f817fd1acaffc9fc4
-            type: text
-            multiline: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/inputconfigurationfile?10mv per G.vic"
+        name: inputconfigurationfile
+        meta:
+          id: req_995aa333fbde4cc28e1094f033b3af75
+          created: 1754400000000
+          modified: 1763751303045
+          isPrivate: false
+          description: Load input configuration file
+          sortKey: -1754315964340
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "filename": "config.inp"
+            }
+        parameters:
+          - disabled: false
+            id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
+        headers:
+          - name: Content-Type
+            value: application/json
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2512,15 +2503,15 @@ collection:
 cookieJar:
   name: Default Jar
   meta:
-    id: jar_d445484fe1037af74f98f13f6051002743dfc44f
+    id: jar_ad3047b8de094a00814b37c5f72f6d2c
     created: 1753798870788
     modified: 1753798870788
 environments:
   name: Base Environment
   meta:
-    id: env_2abaac5e093c4769993f6e67d2cf5866
+    id: env_d2f03c6e69a643459175347780cd639c
     created: 1690628400000
-    modified: 1753803913134
+    modified: 1763751256055
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api
