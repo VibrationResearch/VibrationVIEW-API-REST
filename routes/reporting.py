@@ -46,6 +46,24 @@ def get_documentation():
                 },
                 'returns': 'dict - Report field values with success/error status for each field',
                 'example': 'POST /api/reportfields with body: {"fields": ["TestName", "StartTime", "Duration"]}'
+            },
+            'GET /reportvector': {
+                'description': 'Get report vector data',
+                'com_method': 'ReportVector(vectors, array_out)',
+                'parameters': {
+                    'vectors': 'str - Vector names to retrieve'
+                },
+                'returns': 'list - Vector data',
+                'example': 'GET /api/reportvector?vectors=Frequency'
+            },
+            'GET /reportvectorheader': {
+                'description': 'Get report vector header information',
+                'com_method': 'ReportVectorHeader(vectors, array_out)',
+                'parameters': {
+                    'vectors': 'str - Vector names to retrieve headers for'
+                },
+                'returns': 'list - Vector header data',
+                'example': 'GET /api/reportvectorheader?vectors=Frequency'
             }
         },
         'notes': [
@@ -343,6 +361,66 @@ def report_fields(vv_instance):
         message += f" (with {', '.join(param_info)})"
     
     return jsonify(success_response(response_data, message))
+
+@reporting_bp.route('/reportvector', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def report_vector(vv_instance):
+    """
+    Get Report Vector Data
+
+    COM Method: ReportVector(vectors, array_out)
+    Retrieves vector data from the report system.
+
+    Query Parameters:
+        vectors: Vector names to retrieve (named parameter)
+
+    Example: GET /api/reportvector?vectors=Frequency
+    """
+    vectors = request.args.get('vectors')
+    if not vectors:
+        return jsonify(error_response(
+            'Missing required query parameter: vectors',
+            'MISSING_PARAMETER'
+        )), 400
+
+    result = vv_instance.ReportVector(vectors)
+
+    return jsonify(success_response(
+        {'result': result, 'vectors': vectors},
+        f"ReportVector executed for: {vectors}"
+    ))
+
+
+@reporting_bp.route('/reportvectorheader', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def report_vector_header(vv_instance):
+    """
+    Get Report Vector Header Information
+
+    COM Method: ReportVectorHeader(vectors, array_out)
+    Retrieves vector header information from the report system.
+
+    Query Parameters:
+        vectors: Vector names to retrieve headers for (named parameter)
+
+    Example: GET /api/reportvectorheader?vectors=Frequency
+    """
+    vectors = request.args.get('vectors')
+    if not vectors:
+        return jsonify(error_response(
+            'Missing required query parameter: vectors',
+            'MISSING_PARAMETER'
+        )), 400
+
+    result = vv_instance.ReportVectorHeader(vectors)
+
+    return jsonify(success_response(
+        {'result': result, 'vectors': vectors},
+        f"ReportVectorHeader executed for: {vectors}"
+    ))
+
 
 @reporting_bp.route('/testreporting', methods=['GET'])
 @handle_errors
