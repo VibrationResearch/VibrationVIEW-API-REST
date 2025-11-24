@@ -86,7 +86,7 @@ def get_documentation():
             'Channel numbers are 0-based (first channel is 0)',
             'Hardware capability checks help determine available features',
             'COM interface uses 0-based indexing for all arrays',
-            'Input-specific endpoints moved to input_config module: /api/docs/input_config'
+            'Input-specific endpoints moved to input_config module: /api/v1/docs/input_config'
         ]
     }
     return jsonify(docs)
@@ -175,7 +175,7 @@ def hardware_supports_capacitor_coupled(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/hardwaresupportscapacitorcoupled?1
+    Example: GET /api/v1/hardwaresupportscapacitorcoupled?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -213,7 +213,7 @@ def hardware_supports_accel_power_source(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/hardwaresupportsaccelpowersource?1
+    Example: GET /api/v1/hardwaresupportsaccelpowersource?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -251,7 +251,7 @@ def hardware_supports_differential(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/hardwaresupportsdifferential?1
+    Example: GET /api/v1/hardwaresupportsdifferential?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())

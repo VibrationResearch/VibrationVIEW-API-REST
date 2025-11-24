@@ -34,7 +34,7 @@ class TestSimple:
         
         # Now test the route
         print("\n--- Testing route ---")
-        response = client.get('/api/demandmultiplier')
+        response = client.get('/api/v1/demandmultiplier')
         print(f"Response status: {response.status_code}")
         
         if response.status_code == 200:
@@ -56,7 +56,7 @@ class TestSimple:
         print("=== Testing route import behavior ===")
         
         # First, call the route without our mock to see what it does
-        response1 = client.get('/api/demandmultiplier')
+        response1 = client.get('/api/v1/demandmultiplier')
         print(f"Response without mock: {response1.status_code}")
         if response1.status_code == 200:
             data1 = json.loads(response1.data)
@@ -72,7 +72,7 @@ class TestSimple:
         set_vv_instance(mock_instance)
         
         # Test again
-        response2 = client.get('/api/demandmultiplier')
+        response2 = client.get('/api/v1/demandmultiplier')
         print(f"Response with mock set: {response2.status_code}")
         if response2.status_code == 200:
             data2 = json.loads(response2.data)
@@ -106,7 +106,7 @@ class TestSimple:
             print(f"Instance DemandMultiplier: {instance.DemandMultiplier()}")
         
         # Test the route
-        response = client.get('/api/demandmultiplier')
+        response = client.get('/api/v1/demandmultiplier')
         assert response.status_code == 200
         
         data = json.loads(response.data)

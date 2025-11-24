@@ -41,7 +41,7 @@ def get_documentation():
                 'com_method': 'StartTest()',
                 'parameters': 'None',
                 'returns': 'Result from StartTest()',
-                'example': 'GET /api/starttest or POST /api/starttest'
+                'example': 'GET /api/v1/starttest or POST /api/v1/starttest'
             },
             'GET|POST /runtest': {
                 'description': 'Open and run a complete test (combines OpenTest + StartTest)',
@@ -51,7 +51,7 @@ def get_documentation():
                     'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
                 'returns': 'boolean - Test running status verified by IsRunning()',
-                'example': 'GET /api/runtest (status) or GET /api/runtest?testname=test1.vsp or POST /api/runtest?testname=test1.vsp'
+                'example': 'GET /api/v1/runtest (status) or GET /api/v1/runtest?testname=test1.vsp or POST /api/v1/runtest?testname=test1.vsp'
             },
             'PUT /runtest': {
                 'description': 'Upload and run a complete test (combines upload + OpenTest + StartTest)',
@@ -65,21 +65,21 @@ def get_documentation():
                     'Content-Length': 'required - File size in bytes (max 10MB)'
                 },
                 'returns': 'object - Status, test running verification, file path, and size information',
-                'example': 'PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)'
+                'example': 'PUT /api/v1/runtest?filename=test1.vsp or PUT /api/v1/runtest?test1.vsp (with binary file in body)'
             },
            'GET|POST /stoptest': {
                 'description': 'Stop currently running test',
                 'com_method': 'StopTest()',
                 'parameters': 'None',
                 'returns': 'Result from StopTest()',
-                'example': 'GET /api/stoptest or POST /api/stoptest'
+                'example': 'GET /api/v1/stoptest or POST /api/v1/stoptest'
             },
             'GET|POST /resumetest': {
                 'description': 'Resume paused test',
                 'com_method': 'ResumeTest()',
                 'parameters': 'None',
                 'returns': 'Result from ResumeTest()',
-                'example': 'GET /api/resumetest or POST /api/resumetest'
+                'example': 'GET /api/v1/resumetest or POST /api/v1/resumetest'
             },
             'GET|POST /opentest': {
                 'description': 'Open test profile file by filename',
@@ -89,7 +89,7 @@ def get_documentation():
                     'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
                 'returns': 'Result from OpenTest()',
-                'example': 'GET /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp'
+                'example': 'GET /api/v1/opentest?testname=test1.vsp or POST /api/v1/opentest?test1.vsp'
             },
             'PUT /opentest': {
                 'description': 'Upload and open test profile file',
@@ -103,7 +103,7 @@ def get_documentation():
                     'Content-Length': 'required - File size in bytes (max 10MB)'
                 },
                 'returns': 'object - Status, color, file path, and size information',
-                'example': 'PUT /api/opentest?filename=test1.vsp or PUT /api/opentest?test1.vsp (with binary file in body)'
+                'example': 'PUT /api/v1/opentest?filename=test1.vsp or PUT /api/v1/opentest?test1.vsp (with binary file in body)'
             },
             'GET|POST /closetest': {
                 'description': 'Close test profile by name',
@@ -113,7 +113,7 @@ def get_documentation():
                     'OR unnamed parameter': 'string - Profile name as first URL parameter'
                 },
                 'returns': 'boolean - test_was_closed status',
-                'example': 'GET /api/closetest?profilename=test1.vsp or POST /api/closetest?test1.vsp'
+                'example': 'GET /api/v1/closetest?profilename=test1.vsp or POST /api/v1/closetest?test1.vsp'
             },
             'GET|POST /closetab': {
                 'description': 'Close test tab by index',
@@ -128,7 +128,7 @@ def get_documentation():
                     '400': 'Missing or invalid tab index parameter',
                     '405': 'Tab could not be closed (may not exist or may be running a test)'
                 },
-                'example': 'GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1 or GET /api/closetab?0'
+                'example': 'GET /api/v1/closetab?tabindex=0 or POST /api/v1/closetab?tabindex=1 or GET /api/v1/closetab?0'
             },
             'GET /listopentests': {
                 'description': 'List all open test profiles with detailed information',
@@ -145,7 +145,7 @@ def get_documentation():
                     'Column 2: Full file path of the test profile',
                     'Column 3: Test name (displayed on tabs)'
                 ],
-                'example': 'GET /api/listopentests'
+                'example': 'GET /api/v1/listopentests'
             },
             'GET|POST /savedata': {
                 'description': 'Save current test data to file',
@@ -155,8 +155,8 @@ def get_documentation():
                 },
                 'returns': 'Success status with saved file path',
                 'examples': [
-                    'POST /api/savedata?filename=savefile.vsd (saves to DATA_FOLDER)',
-                    'POST /api/savedata?filename=C:\\Custom\\Path\\savefile.vsd (saves to custom path)'
+                    'POST /api/v1/savedata?filename=savefile.vsd (saves to DATA_FOLDER)',
+                    'POST /api/v1/savedata?filename=C:\\Custom\\Path\\savefile.vsd (saves to custom path)'
                 ]
             }
         },
@@ -215,7 +215,7 @@ def upload_and_run_test(vv_instance):
     Body:
         Binary file content
     
-    Example: PUT /api/runtest?filename=test1.vsp or PUT /api/runtest?test1.vsp (with binary file in body)
+    Example: PUT /api/v1/runtest?filename=test1.vsp or PUT /api/v1/runtest?test1.vsp (with binary file in body)
     """
     # Get filename from parameters - check named parameter first, then unnamed
     filename = request.args.get("filename")
@@ -277,7 +277,7 @@ def run_test(vv_instance):
         testname: string - Test filename (named parameter)
         OR unnamed parameter: string - Test filename as first URL parameter
 
-    Example: GET /api/runtest?testname=test1.vsp or POST /api/runtest?test1.vsp
+    Example: GET /api/v1/runtest?testname=test1.vsp or POST /api/v1/runtest?test1.vsp
     """
     # Get test name from parameters - check named parameter first, then unnamed
     test_name = request.args.get("testname")
@@ -363,7 +363,7 @@ def open_test(vv_instance):
         testname: string - Test filename (named parameter)
         OR unnamed parameter: string - Test filename as first URL parameter
 
-    Example: GET /api/opentest?testname=test1.vsp or POST /api/opentest?test1.vsp
+    Example: GET /api/v1/opentest?testname=test1.vsp or POST /api/v1/opentest?test1.vsp
     """
     # Get test name from parameters - check named parameter first, then unnamed
     test_name = request.args.get("testname")
@@ -414,7 +414,7 @@ def upload_and_open_test(vv_instance):
     Body:
         Binary file content
     
-    Example: PUT /api/opentest?filename=test1.vsp or PUT /api/opentest?test1.vsp (with binary file in body)
+    Example: PUT /api/v1/opentest?filename=test1.vsp or PUT /api/v1/opentest?test1.vsp (with binary file in body)
     """
     try:
         # Get filename from parameters - check named parameter first, then unnamed
@@ -511,7 +511,7 @@ def close_test(vv_instance):
     Returns:
         boolean - test_was_closed status indicating whether the test was successfully closed
 
-    Example: GET /api/closetest?profilename=test1.vsp or POST /api/closetest?test1.vsp
+    Example: GET /api/v1/closetest?profilename=test1.vsp or POST /api/v1/closetest?test1.vsp
     """
     # Get profile name from parameters - check named parameter first, then unnamed
     profile_name = request.args.get("profilename")
@@ -559,8 +559,8 @@ def close_tab(vv_instance):
         400: Missing or invalid tab index parameter
         405: Tab could not be closed (may not exist or may be running a test)
 
-    Example: GET /api/closetab?tabindex=0 or POST /api/closetab?tabindex=1
-             GET /api/closetab?0 or POST /api/closetab?2 (unnamed parameter)
+    Example: GET /api/v1/closetab?tabindex=0 or POST /api/v1/closetab?tabindex=1
+             GET /api/v1/closetab?0 or POST /api/v1/closetab?2 (unnamed parameter)
     """
     # Get tab index from parameters - check named parameter first, then unnamed
     tab_index_str = request.args.get("tabindex")
@@ -626,7 +626,7 @@ def list_open_tests(vv_instance):
         - Column 2: Full file path of the test profile
         - Column 3: Test name (displayed on tabs)
 
-    Example: GET /api/listopentests
+    Example: GET /api/v1/listopentests
     """
     # Call ListOpenTests method
     open_tests = vv_instance.ListOpenTests()
@@ -670,8 +670,8 @@ def save_data(vv_instance):
         filename: Filename or full path to save data to (named parameter)
 
     Examples:
-        POST /api/savedata?filename=savefile.vsd (saves to DATA_FOLDER/savefile.vsd)
-        POST /api/savedata?filename=C:\Custom\Path\savefile.vsd (saves to specified path)
+        POST /api/v1/savedata?filename=savefile.vsd (saves to DATA_FOLDER/savefile.vsd)
+        POST /api/v1/savedata?filename=C:\Custom\Path\savefile.vsd (saves to specified path)
     """
     filename = request.args.get('filename')
     if not filename:

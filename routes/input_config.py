@@ -41,7 +41,7 @@ def get_documentation():
                         'channel': 'int - Input channel number (first query parameter)'
                     },
                     'returns': 'str - Calibration date',
-                    'example': 'GET /api/inputcaldate?1'
+                    'example': 'GET /api/v1/inputcaldate?1'
                 },
                 'GET /inputserialnumber': {
                     'description': 'Get input serial number for a channel',
@@ -50,7 +50,7 @@ def get_documentation():
                         'channel': 'int - Input channel number (first query parameter)'
                     },
                     'returns': 'str - Serial number',
-                    'example': 'GET /api/inputserialnumber?1'
+                    'example': 'GET /api/v1/inputserialnumber?1'
                 },
                 'GET /inputsensitivity': {
                     'description': 'Get input sensitivity for a channel',
@@ -59,7 +59,7 @@ def get_documentation():
                         'channel': 'int - Input channel number (first query parameter)'
                     },
                     'returns': 'float - Sensitivity value',
-                    'example': 'GET /api/inputsensitivity?1'
+                    'example': 'GET /api/v1/inputsensitivity?1'
                 },
                 'GET /inputengineeringscale': {
                     'description': 'Get input engineering scale for a channel',
@@ -68,7 +68,7 @@ def get_documentation():
                         'channel': 'int - Input channel number (first query parameter)'
                     },
                     'returns': 'float - Engineering scale value',
-                    'example': 'GET /api/inputengineeringscale?1'
+                    'example': 'GET /api/v1/inputengineeringscale?1'
                 }
             },
             'Input Channel Settings (Get/Set)': {
@@ -123,9 +123,9 @@ def get_documentation():
                     },
                     'returns': 'bool - Success status',
                     'examples': [
-                        'GET /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
-                        'POST /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
-                        'POST /api/inputcalibration (with JSON body)'
+                        'GET /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
+                        'POST /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024',
+                        'POST /api/v1/inputcalibration (with JSON body)'
                     ]
                 },
                 'GET|POST /inputconfigurationfile': {
@@ -136,9 +136,9 @@ def get_documentation():
                     },
                     'returns': 'str|bool - Current config name (GET) or success status (POST)',
                     'examples': [
-                        'GET /api/inputconfigurationfile',
-                        'POST /api/inputconfigurationfile?configName=10mv per G.vic',
-                        'POST /api/inputconfigurationfile?10mv per G.vic'
+                        'GET /api/v1/inputconfigurationfile',
+                        'POST /api/v1/inputconfigurationfile?configName=10mv per G.vic',
+                        'POST /api/v1/inputconfigurationfile?10mv per G.vic'
                     ]
                 },
                 'PUT /inputconfigurationfile': {
@@ -152,7 +152,7 @@ def get_documentation():
                     },
                     'body': 'Binary file content',
                     'returns': 'dict - Success status and file info',
-                    'example': 'PUT /api/openinputconfigurationfile?10mv per G.vic (with binary file in body)'
+                    'example': 'PUT /api/v1/openinputconfigurationfile?10mv per G.vic (with binary file in body)'
                 }
             },
             'Transducer Database': {
@@ -163,7 +163,7 @@ def get_documentation():
                         'channel': 'int - Input channel number'
                     },
                     'returns': 'bool - True if channel differs from database',
-                    'example': 'GET /api/ischanneldifferentdatabase?1'
+                    'example': 'GET /api/v1/ischanneldifferentdatabase?1'
                 },
                 'GET /channeldatabaseids': {
                     'description': 'Get database IDs for a channel',
@@ -172,7 +172,7 @@ def get_documentation():
                         'channel': 'int - Input channel number'
                     },
                     'returns': 'list - Database IDs',
-                    'example': 'GET /api/channeldatabaseids?1'
+                    'example': 'GET /api/v1/channeldatabaseids?1'
                 },
                 'POST /updatechannelconfigfromdatabase': {
                     'description': 'Update channel configuration from transducer database',
@@ -181,7 +181,7 @@ def get_documentation():
                         'channel': 'int - Input channel number'
                     },
                     'returns': 'bool - Success status',
-                    'example': 'POST /api/updatechannelconfigfromdatabase?1'
+                    'example': 'POST /api/v1/updatechannelconfigfromdatabase?1'
                 },
                 'GET /transducerdatabaserecord': {
                     'description': 'Get transducer database record by GUID',
@@ -190,7 +190,7 @@ def get_documentation():
                         'guid': 'str - Transducer GUID'
                     },
                     'returns': 'list - Database record fields',
-                    'example': 'GET /api/transducerdatabaserecord?guid={guid-string}'
+                    'example': 'GET /api/v1/transducerdatabaserecord?guid={guid-string}'
                 }
             }
         },
@@ -217,7 +217,7 @@ def input_cal_date(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/inputcaldate?1
+    Example: GET /api/v1/inputcaldate?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -252,7 +252,7 @@ def input_serial_number(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/inputserialnumber?1
+    Example: GET /api/v1/inputserialnumber?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -287,7 +287,7 @@ def input_sensitivity(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/inputsensitivity?1
+    Example: GET /api/v1/inputsensitivity?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -322,7 +322,7 @@ def input_engineering_scale(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/inputengineeringscale?1
+    Example: GET /api/v1/inputengineeringscale?1
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -357,12 +357,12 @@ def input_capacitor_coupled(vv_instance):
     
     GET Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/inputcapacitorcoupled?1
+        Example: GET /api/v1/inputcapacitorcoupled?1
     
     POST Query Parameters for setting:
         channel: Input channel number (1-based) - first positional parameter
         value: Coupling setting (true/false) - second positional parameter
-        Example: POST /api/inputcapacitorcoupled?1&true
+        Example: POST /api/v1/inputcapacitorcoupled?1&true
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -411,12 +411,12 @@ def input_accel_power_source(vv_instance):
     
     GET Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/inputaccelpowersource?1
+        Example: GET /api/v1/inputaccelpowersource?1
     
     POST Query Parameters for setting:
         channel: Input channel number (1-based) - first positional parameter
         value: Power source setting (true/false) - second positional parameter
-        Example: POST /api/inputaccelpowersource?1&true
+        Example: POST /api/v1/inputaccelpowersource?1&true
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -465,12 +465,12 @@ def input_differential(vv_instance):
     
     GET Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/inputdifferential?1
+        Example: GET /api/v1/inputdifferential?1
     
     POST Query Parameters for setting:
         channel: Input channel number (1-based) - first positional parameter
         value: Differential setting (true/false) - second positional parameter
-        Example: POST /api/inputdifferential?1&true
+        Example: POST /api/v1/inputdifferential?1&true
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -582,8 +582,8 @@ def input_calibration(vv_instance):
         caldate: Calibration date
 
     Examples:
-        GET /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
-        POST /api/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
+        GET /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
+        POST /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
     """
     # Try query parameters first, then JSON body
     if request.args:
@@ -655,9 +655,9 @@ def input_configuration_file(vv_instance):
     POST: Sets configuration file by name from URL parameter
 
     Examples:
-        GET /api/inputconfigurationfile
-        POST /api/inputconfigurationfile?configName=10mv per G.vic
-        POST /api/inputconfigurationfile?10mv per G.vic
+        GET /api/v1/inputconfigurationfile
+        POST /api/v1/inputconfigurationfile?configName=10mv per G.vic
+        POST /api/v1/inputconfigurationfile?10mv per G.vic
     """
     if request.method == "GET":
         # GET - return current configuration file
@@ -709,7 +709,7 @@ def upload_input_configuration_file(vv_instance):
     Body:
         Binary file content
 
-    Example: PUT /api/inputconfigurationfile?filename=10mv per G.vic (with binary body)
+    Example: PUT /api/v1/inputconfigurationfile?filename=10mv per G.vic (with binary body)
     """
     # Get filename from parameters
     filename = request.args.get("filename")
@@ -778,7 +778,7 @@ def is_channel_different_database(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: GET /api/ischanneldifferentdatabase?1
+    Example: GET /api/v1/ischanneldifferentdatabase?1
     """
     query_args = list(request.args.keys())
     if not query_args:
@@ -813,7 +813,7 @@ def channel_database_ids(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: GET /api/channeldatabaseids?1
+    Example: GET /api/v1/channeldatabaseids?1
     """
     query_args = list(request.args.keys())
     if not query_args:
@@ -848,7 +848,7 @@ def update_channel_config_from_database(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: POST /api/updatechannelconfigfromdatabase?1
+    Example: POST /api/v1/updatechannelconfigfromdatabase?1
     """
     query_args = list(request.args.keys())
     if not query_args:
@@ -883,7 +883,7 @@ def transducer_database_record(vv_instance):
     Query Parameters:
         guid: Transducer GUID (named parameter)
 
-    Example: GET /api/transducerdatabaserecord?guid={guid-string}
+    Example: GET /api/v1/transducerdatabaserecord?guid={guid-string}
     """
     guid = request.args.get('guid')
     if not guid:

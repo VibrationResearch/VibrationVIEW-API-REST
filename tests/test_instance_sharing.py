@@ -43,7 +43,7 @@ class TestInstanceSharing:
         mock_vibrationview.clear_method_calls()
         
         # Make a request that should use this instance
-        response = client.get('/api/demandmultiplier')
+        response = client.get('/api/v1/demandmultiplier')
         
         if response.status_code == 404:
             pytest.skip("Route not found - test the mock instance sharing directly")
@@ -122,7 +122,7 @@ class TestInstanceSharing:
     
     def test_multiple_route_calls_share_state(self, client, mock_vibrationview):
         """Test that multiple route calls share the same mock state"""
-        if client.get('/api/demandmultiplier').status_code == 404:
+        if client.get('/api/v1/demandmultiplier').status_code == 404:
             pytest.skip("Route not available for testing")
         
         # Set initial value
@@ -130,7 +130,7 @@ class TestInstanceSharing:
         mock_vibrationview._demand_multiplier = initial_value
         
         # First call - should return initial value
-        response1 = client.get('/api/demandmultiplier')
+        response1 = client.get('/api/v1/demandmultiplier')
         if response1.status_code == 200:
             data1 = response1.get_json()
             value1 = data1['data']['result']
@@ -142,7 +142,7 @@ class TestInstanceSharing:
         mock_vibrationview._demand_multiplier = new_value
         
         # Second call - should return new value
-        response2 = client.get('/api/demandmultiplier')
+        response2 = client.get('/api/v1/demandmultiplier')
         if response2.status_code == 200:
             data2 = response2.get_json()
             value2 = data2['data']['result']

@@ -36,7 +36,7 @@ def get_documentation():
                     'field': 'string - Query parameter with report field name (optional - if missing, uses first query parameter)'
                 },
                 'returns': 'string - Report field value',
-                'examples': ['GET /api/reportfield?field=TestName', 'GET /api/reportfield?TestName=']
+                'examples': ['GET /api/v1/reportfield?field=TestName', 'GET /api/v1/reportfield?TestName=']
             },
             'GET|POST /reportfields': {
                 'description': 'Get multiple report field values in one call',
@@ -46,12 +46,12 @@ def get_documentation():
                 },
                 'returns': 'array - Report field values in the same order as requested fields',
                 'examples': [
-                    'GET /api/reportfields?fields=TestName,StartTime,Duration',
-                    'GET /api/reportfields?TestName,StartTime,Duration (single param assumed as fields)',
-                    'GET /api/reportfields?ChAccelRMS*|,ChDisplacement*|',
-                    'POST /api/reportfields with body: {"fields": "TestName,StartTime,Duration"}',
-                    'POST /api/reportfields with body: {"fields": ["TestName", "StartTime"]}',
-                    'POST /api/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}'
+                    'GET /api/v1/reportfields?fields=TestName,StartTime,Duration',
+                    'GET /api/v1/reportfields?TestName,StartTime,Duration (single param assumed as fields)',
+                    'GET /api/v1/reportfields?ChAccelRMS*|,ChDisplacement*|',
+                    'POST /api/v1/reportfields with body: {"fields": "TestName,StartTime,Duration"}',
+                    'POST /api/v1/reportfields with body: {"fields": ["TestName", "StartTime"]}',
+                    'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}'
                 ]
             },
             'GET /reportvector': {
@@ -61,7 +61,7 @@ def get_documentation():
                     'vectors': 'str - Vector names to retrieve'
                 },
                 'returns': 'list - Vector data',
-                'example': 'GET /api/reportvector?vectors=Frequency'
+                'example': 'GET /api/v1/reportvector?vectors=Frequency'
             },
             'GET /reportvectorheader': {
                 'description': 'Get report vector header information',
@@ -70,7 +70,7 @@ def get_documentation():
                     'vectors': 'str - Vector names to retrieve headers for'
                 },
                 'returns': 'list - Vector header data',
-                'example': 'GET /api/reportvectorheader?vectors=Frequency'
+                'example': 'GET /api/v1/reportvectorheader?vectors=Frequency'
             }
         },
         'notes': [
@@ -102,8 +102,8 @@ def report_field(vv_instance):
         field: Report field name to retrieve (optional - if missing, uses first query parameter)
     
     Examples: 
-        GET /api/reportfield?field=TestName
-        GET /api/reportfield?TestName
+        GET /api/v1/reportfield?field=TestName
+        GET /api/v1/reportfield?TestName
     """
     # Get field name from query string, use first parameter if 'field' is missing
     field_name = request.args.get('field')
@@ -158,17 +158,17 @@ def report_fields(vv_instance):
         fields_string: The comma-delimited string sent to COM
 
     Examples:
-        GET /api/reportfields?fields=TestName,StartTime,Duration
-        GET /api/reportfields?TestName,StartTime,Duration
-        GET /api/reportfields?ChAccelRMS*|,ChDisplacement*|
+        GET /api/v1/reportfields?fields=TestName,StartTime,Duration
+        GET /api/v1/reportfields?TestName,StartTime,Duration
+        GET /api/v1/reportfields?ChAccelRMS*|,ChDisplacement*|
 
-        POST /api/reportfields
+        POST /api/v1/reportfields
         Body: {"fields": "TestName,StartTime,Duration"}
 
-        POST /api/reportfields
+        POST /api/v1/reportfields
         Body: {"fields": ["TestName", "StartTime", "Duration"]}
 
-        POST /api/reportfields
+        POST /api/v1/reportfields
         Body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}
     """
     fields = None
@@ -266,7 +266,7 @@ def report_vector(vv_instance):
     Query Parameters:
         vectors: Vector names to retrieve (named parameter)
 
-    Example: GET /api/reportvector?vectors=Frequency
+    Example: GET /api/v1/reportvector?vectors=Frequency
     """
     vectors = request.args.get('vectors')
     if not vectors:
@@ -296,7 +296,7 @@ def report_vector_header(vv_instance):
     Query Parameters:
         vectors: Vector names to retrieve headers for (named parameter)
 
-    Example: GET /api/reportvectorheader?vectors=Frequency
+    Example: GET /api/v1/reportvectorheader?vectors=Frequency
     """
     vectors = request.args.get('vectors')
     if not vectors:

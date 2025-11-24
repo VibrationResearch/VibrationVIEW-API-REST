@@ -34,21 +34,21 @@ def get_documentation():
                 'com_method': 'RecordStart()',
                 'parameters': 'None',
                 'returns': 'Result from RecordStart()',
-                'example': 'GET /api/recordstart or POST /api/recordstart'
+                'example': 'GET /api/v1/recordstart or POST /api/v1/recordstart'
             },
             'GET|POST /recordstop': {
                 'description': 'Stop recording data',
                 'com_method': 'RecordStop()',
                 'parameters': 'None',
                 'returns': 'Result from RecordStop()',
-                'example': 'GET /api/recordstop or POST /api/recordstop'
+                'example': 'GET /api/v1/recordstop or POST /api/v1/recordstop'
             },
             'GET|POST /recordpause': {
                 'description': 'Pause recording data',
                 'com_method': 'RecordPause()',
                 'parameters': 'None',
                 'returns': 'Result from RecordPause()',
-                'example': 'GET /api/recordpause or POST /api/recordpause'
+                'example': 'GET /api/v1/recordpause or POST /api/v1/recordpause'
             },
             'GET /recordgetfilename': {
                 'description': 'Get the last recording filename',

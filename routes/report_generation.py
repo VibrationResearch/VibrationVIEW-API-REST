@@ -52,8 +52,8 @@ def get_documentation():
                 'returns': 'object - Success status, path to generated report file, and file content (text or base64-encoded binary)',
                 'note': 'Returns file content directly in response. Text files (HTML, TXT, CSV) returned as text, binary files (PDF, DOC) returned as base64',
                 'examples': {
-                    'upload': 'POST /api/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)',
-                    'filepath': 'POST /api/generatereport with JSON body: {"file_path": "test.vrd", "template_name": "Standard Report", "output_name": "report.pdf"} or query params'
+                    'upload': 'POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)',
+                    'filepath': 'POST /api/v1/generatereport with JSON body: {"file_path": "test.vrd", "template_name": "Standard Report", "output_name": "report.pdf"} or query params'
                 }
             },
             'POST /generatetxt': {
@@ -75,8 +75,8 @@ def get_documentation():
                 'returns': 'object - Success status, paths to all generated text files (basename-1.txt, basename-2.txt, etc.), and combined file contents',
                 'note': 'Creates multiple files with pattern basename-N.txt where N corresponds to each plot in the VibrationVIEW data file',
                 'examples': {
-                    'upload': 'POST /api/generatetxt?output_name=data.txt (with .vrd file in body)',
-                    'filepath': 'POST /api/generatetxt with JSON body: {"file_path": "test.vrd", "output_name": "data.txt"} or query params'
+                    'upload': 'POST /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)',
+                    'filepath': 'POST /api/v1/generatetxt with JSON body: {"file_path": "test.vrd", "output_name": "data.txt"} or query params'
                 }
             },
             'POST /generateuff': {
@@ -98,8 +98,8 @@ def get_documentation():
                 'returns': 'object - Success status, paths to all generated UFF files (basename-1.uff, basename-2.uff, etc.), and combined file contents',
                 'note': 'Creates multiple files with pattern basename-N.uff where N corresponds to each plot in the VibrationVIEW data file',
                 'examples': {
-                    'upload': 'POST /api/generateuff?output_name=data.uff (with .vrd file in body)',
-                    'filepath': 'POST /api/generateuff with JSON body: {"file_path": "test.vrd", "output_name": "data.uff"} or query params'
+                    'upload': 'POST /api/v1/generateuff?output_name=data.uff (with .vrd file in body)',
+                    'filepath': 'POST /api/v1/generateuff with JSON body: {"file_path": "test.vrd", "output_name": "data.uff"} or query params'
                 }
             },
             'PUT /generatetxt': {
@@ -113,7 +113,7 @@ def get_documentation():
                     'Content-Length': 'required - File size in bytes'
                 },
                 'returns': 'object - Success status, path to generated text file, and file content',
-                'example': 'PUT /api/generatetxt?output_name=data.txt (with .vrd file in body)'
+                'example': 'PUT /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)'
             },
         },
         'notes': [
@@ -163,12 +163,12 @@ def generate_report(vv_instance):
             template_name: string - Name of the report template to use (optional - uses default template if not specified)
             output_name: string - Desired name of the generated report file (optional - auto-generated if not specified)
 
-    Example Upload Mode: POST /api/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)
-    Example File Path Mode: POST /api/generatereport
+    Example Upload Mode: POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)
+    Example File Path Mode: POST /api/v1/generatereport
              Body: {"file_path": "test.vrd", "template_name": "Standard Report", "output_name": "report.pdf"}
              Or:   {"template_name": "Standard Report", "output_name": "report.pdf"} (uses last data file)
-             Or:   POST /api/generatereport (uses last data file, default template, and auto-generated filename)
-             Or:   POST /api/generatereport?template_name=Standard%20Report&output_name=report.pdf (query parameters)
+             Or:   POST /api/v1/generatereport (uses last data file, default template, and auto-generated filename)
+             Or:   POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (query parameters)
     """
     content_length = request.content_length
     content_type = request.content_type or ''
@@ -441,12 +441,12 @@ def generate_txt(vv_instance):
           where each file corresponds to a plot in the VibrationVIEW data file.
           Returns file content directly in response as text (TXT files are text-based).
 
-    Example Upload Mode: POST /api/generatetxt?output_name=data.txt (with .vrd file in body)
-    Example File Path Mode: POST /api/generatetxt
+    Example Upload Mode: POST /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)
+    Example File Path Mode: POST /api/v1/generatetxt
              Body: {"file_path": "test.vrd", "output_name": "data.txt"}
              Or:   {"output_name": "data.txt"} (uses last data file)
-             Or:   POST /api/generatetxt (uses last data file and auto-generated filename)
-             Or:   POST /api/generatetxt?output_name=data.txt (query parameters)
+             Or:   POST /api/v1/generatetxt (uses last data file and auto-generated filename)
+             Or:   POST /api/v1/generatetxt?output_name=data.txt (query parameters)
     """
     return _generate_files_common(vv_instance, 'TXT', GenerateTXTFromVV, 'text')
 
@@ -483,12 +483,12 @@ def generate_uff(vv_instance):
           where each file corresponds to a plot in the VibrationVIEW data file.
           Returns file content directly in response as text (UFF files are text-based).
 
-    Example Upload Mode: POST /api/generateuff?output_name=data.uff (with .vrd file in body)
-    Example File Path Mode: POST /api/generateuff
+    Example Upload Mode: POST /api/v1/generateuff?output_name=data.uff (with .vrd file in body)
+    Example File Path Mode: POST /api/v1/generateuff
              Body: {"file_path": "test.vrd", "output_name": "data.uff"}
              Or:   {"output_name": "data.uff"} (uses last data file)
-             Or:   POST /api/generateuff (uses last data file and auto-generated filename)
-             Or:   POST /api/generateuff?output_name=data.uff (query parameters)
+             Or:   POST /api/v1/generateuff (uses last data file and auto-generated filename)
+             Or:   POST /api/v1/generateuff?output_name=data.uff (query parameters)
     """
     return _generate_files_common(vv_instance, 'UFF', GenerateUFFFromVV, 'UFF')
 

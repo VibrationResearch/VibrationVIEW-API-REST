@@ -35,9 +35,9 @@ python app.py --host 0.0.0.0 --port 5000
 ```
 
 ### 4. Access Documentation
-- **Main API Docs**: `http://localhost:5000/api/docs`
-- **Health Check**: `http://localhost:5000/api/health`
-- **Module-Specific Docs**: `http://localhost:5000/api/docs/{module_name}`
+- **Main API Docs**: `http://localhost:5000/api/v1/docs`
+- **Health Check**: `http://localhost:5000/api/v1/health`
+- **Module-Specific Docs**: `http://localhost:5000/api/v1/docs/{module_name}`
 
 ## Architecture
 
@@ -64,16 +64,16 @@ The API is organized into functional modules with consistent patterns:
 ### Basic Test Control
 ```bash
 # Start a test (existing file)
-curl -X POST "http://localhost:5000/api/runtest?testname=my_test.vsp"
+curl -X POST "http://localhost:5000/api/v1/runtest?testname=my_test.vsp"
 
 # Stop a test
-curl -X POST "http://localhost:5000/api/stoptest"
+curl -X POST "http://localhost:5000/api/v1/stoptest"
 
 # Check if running
-curl "http://localhost:5000/api/isrunning"
+curl "http://localhost:5000/api/v1/isrunning"
 
 # Upload and run test file
-curl -X PUT "http://localhost:5000/api/runtest?filename=test.vsp" \
+curl -X PUT "http://localhost:5000/api/v1/runtest?filename=test.vsp" \
   -H "Content-Type: application/octet-stream" \
   --data-binary @test.vsp
 ```
@@ -81,76 +81,76 @@ curl -X PUT "http://localhost:5000/api/runtest?filename=test.vsp" \
 ### Status Monitoring
 ```bash
 # Get comprehensive status
-curl "http://localhost:5000/api/status"
+curl "http://localhost:5000/api/v1/status"
 
 # Check hardware readiness
-curl "http://localhost:5000/api/isready"
+curl "http://localhost:5000/api/v1/isready"
 
 # Get all status flags at once
-curl "http://localhost:5000/api/allstatus"
+curl "http://localhost:5000/api/v1/allstatus"
 ```
 
 ### Real-Time Data Access
 ```bash
 # Get channel data
-curl "http://localhost:5000/api/channel"
+curl "http://localhost:5000/api/v1/channel"
 
 # Get control values
-curl "http://localhost:5000/api/control"
+curl "http://localhost:5000/api/v1/control"
 
 # Get demand values  
-curl "http://localhost:5000/api/demand"
+curl "http://localhost:5000/api/v1/demand"
 
 # Get output values
-curl "http://localhost:5000/api/output"
+curl "http://localhost:5000/api/v1/output"
 ```
 
 ### Parameter Control
 ```bash
 # Get sine frequency
-curl "http://localhost:5000/api/sinefrequency"
+curl "http://localhost:5000/api/v1/sinefrequency"
 
 # Set sine frequency
-curl -X POST "http://localhost:5000/api/sinefrequency" \
+curl -X POST "http://localhost:5000/api/v1/sinefrequency" \
   -H "Content-Type: application/json" \
   -d '{"value": 100.0}'
 
 # Get demand multiplier
-curl "http://localhost:5000/api/demandmultiplier"
+curl "http://localhost:5000/api/v1/demandmultiplier"
 ```
 
 ### Hardware Configuration
 ```bash
 # Get hardware info
-curl "http://localhost:5000/api/gethardwareinputchannels"
-curl "http://localhost:5000/api/getsoftwareversion"
+curl "http://localhost:5000/api/v1/gethardwareinputchannels"
+curl "http://localhost:5000/api/v1/getsoftwareversion"
 
 # Get channel sensitivity
-curl "http://localhost:5000/api/inputsensitivity?1"
+curl "http://localhost:5000/api/v1/inputsensitivity?1"
 
 # Check hardware capabilities
-curl "http://localhost:5000/api/hardwaresupportscapacitorcoupled?0"
+curl "http://localhost:5000/api/v1/hardwaresupportscapacitorcoupled?0"
 ```
 
 ### GUI Control
 ```bash
 # Window management
-curl "http://localhost:5000/api/minimize"
-curl "http://localhost:5000/api/maximize"
-curl "http://localhost:5000/api/activate"
+curl "http://localhost:5000/api/v1/minimize"
+curl "http://localhost:5000/api/v1/maximize"
+curl "http://localhost:5000/api/v1/activate"
 
 # Test editing
-curl "http://localhost:5000/api/edittest?testname=test.vsp"
-curl "http://localhost:5000/api/abortedit"
+curl "http://localhost:5000/api/v1/edittest?testname=test.vsp"
+curl "http://localhost:5000/api/v1/abortedit"
 ```
 
 ### Reporting (Advanced)
 ```bash
 # Get single report field
-curl "http://localhost:5000/api/reportfield?field=TestName"
+curl "http://localhost:5000/api/v1/reportfield?field=TestName"
 
 # Get multiple fields with channel/loop support
-curl -X POST "http://localhost:5000/api/reportfields?channel=all&loop=1" \
+curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all&loop=1" \
   -H "Content-Type: application/json" \
   -d '{"fields": ["MaxLevel", "RMS", "TestResult"]}'
 
@@ -168,11 +168,11 @@ curl -X POST "http://localhost:5000/api/reportfields?channel=all&loop=1" \
 ### Utility Operations
 ```bash
 # Get enum references
-curl "http://localhost:5000/api/enums/all"
-curl "http://localhost:5000/api/enums/vvvector"
+curl "http://localhost:5000/api/v1/enums/all"
+curl "http://localhost:5000/api/v1/enums/vvvector"
 
 # Connection diagnostics
-curl "http://localhost:5000/api/debug/connectioninfo"
+curl "http://localhost:5000/api/v1/debug/connectioninfo"
 ```
 
 ## Request Patterns
@@ -181,28 +181,28 @@ curl "http://localhost:5000/api/debug/connectioninfo"
 Most endpoints use GET requests with URL parameters:
 ```bash
 # Single parameter
-curl "http://localhost:5000/api/reportfield?field=TestName"
+curl "http://localhost:5000/api/v1/reportfield?field=TestName"
 
 # Multiple parameters  
-curl "http://localhost:5000/api/inputsensitivity?1"
+curl "http://localhost:5000/api/v1/inputsensitivity?1"
 
 # Boolean parameters
-curl "http://localhost:5000/api/inputcapacitorcoupled?1&true"
+curl "http://localhost:5000/api/v1/inputcapacitorcoupled?1&true"
 ```
 
 ### POST Requests
 Used for operations that modify state or require complex parameters:
 ```bash
 # Simple operations
-curl -X POST "http://localhost:5000/api/starttest"
+curl -X POST "http://localhost:5000/api/v1/starttest"
 
 # With JSON body
-curl -X POST "http://localhost:5000/api/demandmultiplier" \
+curl -X POST "http://localhost:5000/api/v1/demandmultiplier" \
   -H "Content-Type: application/json" \
   -d '{"value": 6.0}'
 
 # Bulk operations
-curl -X POST "http://localhost:5000/api/reportfields" \
+curl -X POST "http://localhost:5000/api/v1/reportfields" \
   -H "Content-Type: application/json" \
   -d '{"fields": ["TestName", "Duration", "MaxLevel"]}'
 ```
@@ -309,15 +309,15 @@ pytest --cov=routes tests/
 
 ### Bulk Operations
 Efficient operations that combine multiple COM calls:
-- `POST /api/reportfields` - Multiple report fields with channel/loop support
-- `GET /api/allstatus` - All status flags in single request
-- `GET /api/enums/all` - All enumeration constants
+- `POST /api/v1/reportfields` - Multiple report fields with channel/loop support
+- `GET /api/v1/allstatus` - All status flags in single request
+- `GET /api/v1/enums/all` - All enumeration constants
 
 ### Channel/Loop Support
 Advanced reporting with automatic field name formatting:
 ```bash
 # Get MaxLevel for all channels
-curl -X POST "http://localhost:5000/api/reportfields?channel=all" \
+curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all" \
   -d '{"fields": ["MaxLevel"]}'
 
 # Results in COM calls: MaxLevel1:, MaxLevel2:, MaxLevel3:, etc.
@@ -326,7 +326,7 @@ curl -X POST "http://localhost:5000/api/reportfields?channel=all" \
 ### File Upload Support
 Binary file uploads for test profiles:
 ```bash
-curl -X PUT "http://localhost:5000/api/runtest?filename=test.vsp" \
+curl -X PUT "http://localhost:5000/api/v1/runtest?filename=test.vsp" \
   -H "Content-Length: $(stat -c%s test.vsp)" \
   --data-binary @test.vsp
 ```
@@ -362,28 +362,28 @@ REPORT_FOLDER=C:\VibrationVIEW\Reports
 1. **COM Connection Failures**
    ```bash
    # Test basic connectivity
-   curl "http://localhost:5000/api/testcom"
+   curl "http://localhost:5000/api/v1/testcom"
    
    # Check hardware status
-   curl "http://localhost:5000/api/isready"
+   curl "http://localhost:5000/api/v1/isready"
    ```
 
 2. **Module-Specific Diagnostics**
    ```bash
    # Test specific modules
-   curl "http://localhost:5000/api/allstatus"
-   curl "http://localhost:5000/api/testreporting" 
-   curl "http://localhost:5000/api/testrecording"
+   curl "http://localhost:5000/api/v1/allstatus"
+   curl "http://localhost:5000/api/v1/testreporting" 
+   curl "http://localhost:5000/api/v1/testrecording"
    ```
 
 3. **Get Available Endpoints**
    ```bash
    # Main documentation
-   curl "http://localhost:5000/api/docs"
+   curl "http://localhost:5000/api/v1/docs"
    
    # Module documentation  
-   curl "http://localhost:5000/api/docs/basic_control"
-   curl "http://localhost:5000/api/docs/reporting"
+   curl "http://localhost:5000/api/v1/docs/basic_control"
+   curl "http://localhost:5000/api/v1/docs/reporting"
    ```
 
 ## License

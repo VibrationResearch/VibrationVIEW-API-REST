@@ -86,7 +86,7 @@ class TestReportGeneration:
 
                 # Make the request
                 response = client.post(
-                    f'/api/generatereport?template_name={template_name}&output_name={output_name}',
+                    f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
                     data=vrd_content,
                     headers={
                         'Content-Length': str(file_size),
@@ -150,7 +150,7 @@ class TestReportGeneration:
             vrd_content = f.read()
 
         response = client.post(
-            '/api/generatereport?output_name=test_report.pdf',  # Missing template_name
+            '/api/v1/generatereport?output_name=test_report.pdf',  # Missing template_name
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -174,7 +174,7 @@ class TestReportGeneration:
             vrd_content = f.read()
 
         response = client.post(
-            '/api/generatereport?template_name=Test Report.vvtemplate',  # Missing output_name
+            '/api/v1/generatereport?template_name=Test Report.vvtemplate',  # Missing output_name
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -195,7 +195,7 @@ class TestReportGeneration:
         mock_vv.ReportField.return_value = None
 
         response = client.post(
-            '/api/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+            '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
             data=b'',  # Empty content
             headers={
                 'Content-Length': '0',
@@ -217,7 +217,7 @@ class TestReportGeneration:
         large_content = b'x' * (101 * 1024 * 1024)  # 101MB
 
         response = client.post(
-            '/api/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+            '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
             data=large_content,
             headers={
                 'Content-Length': str(len(large_content)),
@@ -244,7 +244,7 @@ class TestReportGeneration:
             mock_generate.side_effect = Exception("Report generation failed")
 
             response = client.post(
-                '/api/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+                '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(len(vrd_content)),
@@ -271,7 +271,7 @@ class TestReportGeneration:
         malicious_output = "..\\..\\Windows\\System32\\evil.exe"
 
         response = client.post(
-            f'/api/generatereport?template_name=Test Report.vvtemplate&output_name={malicious_output}',
+            f'/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name={malicious_output}',
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -322,7 +322,7 @@ class TestReportGeneration:
                     mock_open.return_value.__enter__.return_value = mock_file
 
                     response = client.post(
-                        f'/api/generatereport?template_name={template_name}&output_name=output.pdf',
+                        f'/api/v1/generatereport?template_name={template_name}&output_name=output.pdf',
                         data=vrd_content,
                         headers={
                             'Content-Length': str(len(vrd_content)),
@@ -400,7 +400,7 @@ class TestReportGeneration:
                 mock_open.return_value.__enter__.return_value = mock_file
 
                 response = client.post(
-                    f'/api/generatereport?template_name={template_name}&output_name={output_name}',
+                    f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
                     data=vrd_content,
                     headers={
                         'Content-Length': str(len(vrd_content)),

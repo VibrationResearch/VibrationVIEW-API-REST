@@ -108,23 +108,23 @@ def get_vector_enumerations():
         },
         'usage_examples': {
             'waveform_data': {
-                'channel_1_waveform': 'GET /api/vector?vectorenum=1',
-                'channel_10_waveform': 'GET /api/vector?vectorenum=10',
-                'waveform_time_axis': 'GET /api/vector?vectorenum=0',
-                'demand_waveform': 'GET /api/vector?vectorenum=90',
-                'control_waveform': 'GET /api/vector?vectorenum=91'
+                'channel_1_waveform': 'GET /api/v1/vector?vectorenum=1',
+                'channel_10_waveform': 'GET /api/v1/vector?vectorenum=10',
+                'waveform_time_axis': 'GET /api/v1/vector?vectorenum=0',
+                'demand_waveform': 'GET /api/v1/vector?vectorenum=90',
+                'control_waveform': 'GET /api/v1/vector?vectorenum=91'
             },
             'frequency_data': {
-                'channel_1_frequency': 'GET /api/vector?vectorenum=101',
-                'channel_20_frequency': 'GET /api/vector?vectorenum=120',
-                'frequency_axis': 'GET /api/vector?vectorenum=100',
-                'drive_frequency': 'GET /api/vector?vectorenum=180',
-                'response_frequency': 'GET /api/vector?vectorenum=181'
+                'channel_1_frequency': 'GET /api/v1/vector?vectorenum=101',
+                'channel_20_frequency': 'GET /api/v1/vector?vectorenum=120',
+                'frequency_axis': 'GET /api/v1/vector?vectorenum=100',
+                'drive_frequency': 'GET /api/v1/vector?vectorenum=180',
+                'response_frequency': 'GET /api/v1/vector?vectorenum=181'
             },
             'time_history_data': {
-                'rear_input_1_history': 'GET /api/vector?vectorenum=301',
-                'rear_input_32_history': 'GET /api/vector?vectorenum=332',
-                'time_history_axis': 'GET /api/vector?vectorenum=200'
+                'rear_input_1_history': 'GET /api/v1/vector?vectorenum=301',
+                'rear_input_32_history': 'GET /api/v1/vector?vectorenum=332',
+                'time_history_axis': 'GET /api/v1/vector?vectorenum=200'
             }
         },
         'notes': [
@@ -184,8 +184,8 @@ def get_documentation():
                     },
                     'returns': 'List[List[float]] - Raw data vector array',
                     'examples': [
-                        'GET /api/vector?vectorenum=1',
-                        'GET /api/vector?vectorenum=2&columns=4'
+                        'GET /api/v1/vector?vectorenum=1',
+                        'GET /api/v1/vector?vectorenum=2&columns=4'
                     ]
                 }
             },
@@ -195,21 +195,21 @@ def get_documentation():
                     'com_method': 'VectorUnit(vectorenum)',
                     'parameters': {'vectorenum': 'integer - Vector enumeration identifier (query parameter)'},
                     'returns': 'str - Units for the vector',
-                    'example': 'GET /api/vectorunit?vectorenum=1'
+                    'example': 'GET /api/v1/vectorunit?vectorenum=1'
                 },
                 'GET /vectorlabel': {
                     'description': 'Get vector label',
                     'com_method': 'VectorLabel(vectorenum)',
                     'parameters': {'vectorenum': 'integer - Vector enumeration identifier (query parameter)'},
                     'returns': 'str - Label for the vector',
-                    'example': 'GET /api/vectorlabel?vectorenum=2'
+                    'example': 'GET /api/v1/vectorlabel?vectorenum=2'
                 },
                 'GET /vectorlength': {
                     'description': 'Get vector array length',
                     'com_method': 'VectorLength(vectorenum)',
                     'parameters': {'vectorenum': 'integer - Vector enumeration identifier (query parameter)'},
                     'returns': 'int - Required array length for the vector',
-                    'example': 'GET /api/vectorlength?vectorenum=3'
+                    'example': 'GET /api/v1/vectorlength?vectorenum=3'
                 }
             },
             'Channel Metadata (1-based indexing)': {
@@ -218,14 +218,14 @@ def get_documentation():
                     'com_method': 'ChannelUnit(channelnum - 1)',
                     'parameters': {'channelnum': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
                     'returns': 'str - Units for the channel',
-                    'example': 'GET /api/channelunit?channelnum=3'
+                    'example': 'GET /api/v1/channelunit?channelnum=3'
                 },
                 'GET /channellabel': {
                     'description': 'Get channel label',
                     'com_method': 'ChannelLabel(channelnum - 1)',
                     'parameters': {'channelnum': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
                     'returns': 'str - Label for the channel',
-                    'example': 'GET /api/channellabel?channelnum=1'
+                    'example': 'GET /api/v1/channellabel?channelnum=1'
                 }
             },
             'Control Metadata (1-based indexing)': {
@@ -236,7 +236,7 @@ def get_documentation():
                         'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Units for the control loop',
-                    'example': 'GET /api/controlunit (defaults to loop 1) or GET /api/controlunit?loopnum=2'
+                    'example': 'GET /api/v1/controlunit (defaults to loop 1) or GET /api/v1/controlunit?loopnum=2'
                 },
                 'GET /controllabel': {
                     'description': 'Get control loop label',
@@ -245,7 +245,7 @@ def get_documentation():
                         'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Label for the control loop',
-                    'example': 'GET /api/controllabel (defaults to loop 1) or GET /api/controllabel?loopnum=2'
+                    'example': 'GET /api/v1/controllabel (defaults to loop 1) or GET /api/v1/controllabel?loopnum=2'
                 }
             }
         },
@@ -363,8 +363,8 @@ def vector(vv_instance):
         columns: Number of columns (optional, default: 1)
     
     Examples:
-        GET /api/vector?vectorenum=1
-        GET /api/vector?vectorenum=2&columns=4
+        GET /api/v1/vector?vectorenum=1
+        GET /api/v1/vector?vectorenum=2&columns=4
     """
     vectorenum = request.args.get('vectorenum', type=int)
     if vectorenum is None:
@@ -419,7 +419,7 @@ def vector_unit(vv_instance):
         vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorunit?1
+        GET /api/v1/vectorunit?1
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
@@ -463,7 +463,7 @@ def vector_label(vv_instance):
         vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorlabel?2
+        GET /api/v1/vectorlabel?2
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
@@ -507,7 +507,7 @@ def vector_length(vv_instance):
         vectorenum (no parameter name required)
     
     Example:
-        GET /api/vectorlength?3
+        GET /api/v1/vectorlength?3
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
@@ -555,7 +555,7 @@ def channel_unit(vv_instance):
         channelnum (no parameter name required)
     
     Example:
-        GET /api/channelunit?3
+        GET /api/v1/channelunit?3
     """
     # Get channelnum from query parameters (first parameter)
     if not request.args:
@@ -609,7 +609,7 @@ def channel_label(vv_instance):
         channelnum (no parameter name required)
     
     Example:
-        GET /api/channellabel?1
+        GET /api/v1/channellabel?1
     """
     # Get channelnum from query parameters (first parameter)
     if not request.args:
@@ -667,9 +667,9 @@ def control_unit(vv_instance):
         loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
     
     Examples:
-        GET /api/controlunit (defaults to loop 1)
-        GET /api/controlunit?loopnum=2
-        GET /api/controlunit?2
+        GET /api/v1/controlunit (defaults to loop 1)
+        GET /api/v1/controlunit?loopnum=2
+        GET /api/v1/controlunit?2
     """
     # Determine loop number - default to 1 if no parameters
     if not request.args:
@@ -717,9 +717,9 @@ def control_label(vv_instance):
         loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
     
     Examples:
-        GET /api/controllabel (defaults to loop 1)
-        GET /api/controllabel?loopnum=2
-        GET /api/controllabel?2
+        GET /api/v1/controllabel (defaults to loop 1)
+        GET /api/v1/controllabel?loopnum=2
+        GET /api/v1/controllabel?2
     """
     # Determine loop number - default to 1 if no parameters
     if not request.args:
@@ -775,9 +775,9 @@ def get_data_file(vv_instance):
     Note: Returns the raw .vrd file as binary data, not JSON.
           Use Content-Type: application/octet-stream for binary download.
 
-    Example: GET /api/getdatafile (uses last data file)
-             GET /api/getdatafile?file_path=specific_file.vrd
-             POST /api/getdatafile with JSON body: {"file_path": "specific_file.vrd"}
+    Example: GET /api/v1/getdatafile (uses last data file)
+             GET /api/v1/getdatafile?file_path=specific_file.vrd
+             POST /api/v1/getdatafile with JSON body: {"file_path": "specific_file.vrd"}
     """
     # Get parameters from JSON body (optional) or query parameters
     try:

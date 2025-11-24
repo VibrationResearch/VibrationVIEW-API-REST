@@ -42,7 +42,7 @@ def get_documentation():
                         'channel': 'int - Input channel number (1-based, first query parameter)'
                     },
                     'returns': 'object - TEDS information for specified channel',
-                    'example': 'GET /api/inputtedschannel?3 (channel 3, 1-based)'
+                    'example': 'GET /api/v1/inputtedschannel?3 (channel 3, 1-based)'
                 },
                 'GET /teds': {
                     'description': 'Get formatted TEDS information for specific channel or all channels',
@@ -52,8 +52,8 @@ def get_documentation():
                     },
                     'returns': 'object - Structured transducer data for specific channel or transducers/errors arrays for all channels',
                     'examples': [
-                        'GET /api/teds (all channels - transducers/errors arrays)',
-                        'GET /api/teds?3 (channel 3, 1-based - single transducer object)'
+                        'GET /api/v1/teds (all channels - transducers/errors arrays)',
+                        'GET /api/v1/teds?3 (channel 3, 1-based - single transducer object)'
                     ]
                 },
                 'GET|POST /tedsreadandapply': {
@@ -61,7 +61,7 @@ def get_documentation():
                     'com_method': 'TedsReadAndApply()',
                     'parameters': 'None',
                     'returns': 'object - Success status and operation result',
-                    'example': 'GET /api/tedsreadandapply or POST /api/tedsreadandapply'
+                    'example': 'GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply'
                 },
                 'POST /tedsverifyandapply': {
                     'description': 'Verify and apply TEDS information for specified URNs',
@@ -70,14 +70,14 @@ def get_documentation():
                         'urns': 'array - List of URN strings to verify and apply TEDS for'
                     },
                     'returns': 'object - Success status and operation result',
-                    'example': 'POST /api/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}'
+                    'example': 'POST /api/v1/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}'
                 },
                 'GET|POST /tedsread': {
                     'description': 'Read TEDS information from hardware',
                     'com_method': 'TedsRead()',
                     'parameters': 'None',
                     'returns': 'object - Success status and operation result',
-                    'example': 'GET /api/tedsread or POST /api/tedsread'
+                    'example': 'GET /api/v1/tedsread or POST /api/v1/tedsread'
                 },
                 'GET /tedsfromurn': {
                     'description': 'Lookup formatted TEDS transducer by Unique Registration Number (URN)',
@@ -86,7 +86,7 @@ def get_documentation():
                         'urn': 'string - Unique Registration Number (first query parameter)'
                     },
                     'returns': 'object - Formatted transducer data for the specified URN',
-                    'example': 'GET /api/tedsfromurn?urn123456'
+                    'example': 'GET /api/v1/tedsfromurn?urn123456'
                 }
             }
         },
@@ -203,7 +203,7 @@ def get_input_teds_channel(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/inputtedschannel?3 (gets channel 3, 1-based)
+    Example: GET /api/v1/inputtedschannel?3 (gets channel 3, 1-based)
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -272,8 +272,8 @@ def teds(vv_instance):
         channel: Optional input channel number (1-based) - first positional parameter
     
     Examples: 
-        GET /api/teds (all channels)
-        GET /api/teds?3 (channel 3, 1-based)
+        GET /api/v1/teds (all channels)
+        GET /api/v1/teds?3 (channel 3, 1-based)
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
@@ -376,7 +376,7 @@ def teds_read_and_apply(vv_instance):
 
     No parameters required.
 
-    Example: GET /api/tedsreadandapply or POST /api/tedsreadandapply
+    Example: GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply
     """
     result =  vv_instance.TedsReadAndApply()
 
@@ -402,7 +402,7 @@ def teds_verify_and_apply(vv_instance):
     Request Body (JSON):
         urns: array - List of URN strings to verify and apply TEDS for
 
-    Example: POST /api/tedsverifyandapply
+    Example: POST /api/v1/tedsverifyandapply
              Body: {"urns": ["urn1", "urn2", "urn3"]}
     """
     request_data = request.get_json()
@@ -465,7 +465,7 @@ def teds_read(vv_instance):
 
     No parameters required.
 
-    Example: GET /api/tedsread or POST /api/tedsread
+    Example: GET /api/v1/tedsread or POST /api/v1/tedsread
     """
     result = vv_instance.TedsRead()
 
@@ -491,7 +491,7 @@ def teds_from_urn(vv_instance):
     Query Parameters:
         urn: Unique Registration Number string (first positional parameter)
 
-    Example: GET /api/tedsfromurn?urn123456
+    Example: GET /api/v1/tedsfromurn?urn123456
     """
     # Get URN from query parameters (first parameter after ?)
     query_args = list(request.args.keys())

@@ -77,7 +77,7 @@ def get_documentation():
                         )
                     },
                     "returns": "float - Current multiplier value",
-                    "example": "POST /api/demandmultiplier?value=6.0 or /api/demandmultiplier?6.0",
+                    "example": "POST /api/v1/demandmultiplier?value=6.0 or /api/v1/demandmultiplier?6.0",
                 },
                 "GET|POST /sweepmultiplier": {
                     "description": "Get/Set sine sweep multiplier (linear)",
@@ -86,7 +86,7 @@ def get_documentation():
                         "value": "float - Multiplier value (POST URL parameter only)"
                     },
                     "returns": "float - Current multiplier value",
-                    "example": "POST /api/sweepmultiplier?value=1.5 or /api/sweepmultiplier?1.5",
+                    "example": "POST /api/v1/sweepmultiplier?value=1.5 or /api/v1/sweepmultiplier?1.5",
                 },
                 "GET|POST /sinefrequency": {
                     "description": "Get/Set sine frequency",
@@ -95,7 +95,7 @@ def get_documentation():
                         "value": "float - Frequency value (POST URL parameter only)"
                     },
                     "returns": "float - Current frequency",
-                    "example": "POST /api/sinefrequency?value=100.0 or /api/sinefrequency?30",
+                    "example": "POST /api/v1/sinefrequency?value=100.0 or /api/v1/sinefrequency?30",
                 },
             },
         },
@@ -254,7 +254,7 @@ def demand_multiplier(vv_instance):
     GET: Returns current multiplier value
     POST: Sets multiplier value from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/demandmultiplier?value=6.0 or POST /api/demandmultiplier?6.0
+    Example: POST /api/v1/demandmultiplier?value=6.0 or POST /api/v1/demandmultiplier?6.0
     """
     if request.method == "GET":
         result = vv_instance.DemandMultiplier()
@@ -307,7 +307,7 @@ def sweep_multiplier(vv_instance):
     GET: Returns current multiplier value
     POST: Sets multiplier value from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/sweepmultiplier?value=1.5 or POST /api/sweepmultiplier?1.5
+    Example: POST /api/v1/sweepmultiplier?value=1.5 or POST /api/v1/sweepmultiplier?1.5
     """
     if request.method == "GET":
         result = vv_instance.SweepMultiplier()
@@ -358,7 +358,7 @@ def sine_frequency(vv_instance):
     GET: Returns current frequency
     POST: Sets frequency from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/sinefrequency?value=100.0 or POST /api/sinefrequency?30
+    Example: POST /api/v1/sinefrequency?value=100.0 or POST /api/v1/sinefrequency?30
     """
     if request.method == "GET":
         result = vv_instance.SineFrequency()

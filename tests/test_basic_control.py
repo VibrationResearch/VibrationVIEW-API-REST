@@ -60,7 +60,7 @@ class TestBasicControl:
 
             # Make the request
             response = client.put(
-                f"/api/opentest?filename={filename}",
+                f"/api/v1/opentest?filename={filename}",
                 data=file_content,
                 headers={"Content-Length": str(len(file_content))},
             )
@@ -115,7 +115,7 @@ class TestBasicControl:
 
             # Make the request
             response = client.put(
-                f"/api/opentest?filename={filename}",
+                f"/api/v1/opentest?filename={filename}",
                 data=file_content,
                 headers={"Content-Length": str(len(file_content))},
             )
@@ -172,7 +172,7 @@ class TestBasicControl:
 
             # Make the request
             response = client.put(
-                f"/api/opentest?filename={filename}",
+                f"/api/v1/opentest?filename={filename}",
                 data=file_content,
                 headers={"Content-Length": str(len(file_content))},
             )
@@ -210,7 +210,7 @@ class TestBasicControl:
 
             # Make the request
             response = client.put(
-                f"/api/opentest?filename={filename}",
+                f"/api/v1/opentest?filename={filename}",
                 data=file_content,
                 headers={"Content-Length": str(len(file_content))},
             )
@@ -252,7 +252,7 @@ class TestBasicControl:
         file_content = b"dummy content"
 
         response = client.put(
-            "/api/opentest",  # No filename parameter
+            "/api/v1/opentest",  # No filename parameter
             data=file_content,
             headers={"Content-Length": str(len(file_content))},
         )
@@ -276,7 +276,7 @@ class TestBasicControl:
             )
 
             response = client.put(
-                f"/api/opentest?filename={filename}",
+                f"/api/v1/opentest?filename={filename}",
                 data=file_content,
                 headers={"Content-Length": str(len(file_content))},
             )
@@ -292,7 +292,7 @@ class TestBasicControl:
         # Configure mock to return success
         self.mock_instance.CloseTest.return_value = True
 
-        response = client.get(f"/api/closetest?profilename={profile_name}")
+        response = client.get(f"/api/v1/closetest?profilename={profile_name}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -311,7 +311,7 @@ class TestBasicControl:
         # Configure mock to return success
         self.mock_instance.CloseTest.return_value = True
 
-        response = client.post(f"/api/closetest?profilename={profile_name}")
+        response = client.post(f"/api/v1/closetest?profilename={profile_name}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -330,7 +330,7 @@ class TestBasicControl:
         self.mock_instance.CloseTest.return_value = True
 
         # Use unnamed parameter (query string without '=')
-        response = client.get(f"/api/closetest?{profile_name}")
+        response = client.get(f"/api/v1/closetest?{profile_name}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -344,7 +344,7 @@ class TestBasicControl:
         # Configure mock to return False (profile not closed)
         self.mock_instance.CloseTest.return_value = False
 
-        response = client.get(f"/api/closetest?profilename={profile_name}")
+        response = client.get(f"/api/v1/closetest?profilename={profile_name}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -353,7 +353,7 @@ class TestBasicControl:
 
     def test_closetest_missing_parameter(self, client):
         """Test /closetest without required profile name parameter"""
-        response = client.get("/api/closetest")
+        response = client.get("/api/v1/closetest")
 
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -367,7 +367,7 @@ class TestBasicControl:
         # Configure mock to return success
         self.mock_instance.CloseTab.return_value = True
 
-        response = client.get(f"/api/closetab?tabindex={tab_index}")
+        response = client.get(f"/api/v1/closetab?tabindex={tab_index}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -386,7 +386,7 @@ class TestBasicControl:
         # Configure mock to return success
         self.mock_instance.CloseTab.return_value = True
 
-        response = client.post(f"/api/closetab?tabindex={tab_index}")
+        response = client.post(f"/api/v1/closetab?tabindex={tab_index}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -405,7 +405,7 @@ class TestBasicControl:
         self.mock_instance.CloseTab.return_value = True
 
         # Use unnamed parameter (query string without '=')
-        response = client.get(f"/api/closetab?{tab_index}")
+        response = client.get(f"/api/v1/closetab?{tab_index}")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -420,7 +420,7 @@ class TestBasicControl:
         # Configure mock to return False (tab not closed)
         self.mock_instance.CloseTab.return_value = False
 
-        response = client.get(f"/api/closetab?tabindex={tab_index}")
+        response = client.get(f"/api/v1/closetab?tabindex={tab_index}")
 
         assert response.status_code == 405
         data = json.loads(response.data)
@@ -430,7 +430,7 @@ class TestBasicControl:
 
     def test_closetab_missing_parameter(self, client):
         """Test /closetab without required tab index parameter"""
-        response = client.get("/api/closetab")
+        response = client.get("/api/v1/closetab")
 
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -440,7 +440,7 @@ class TestBasicControl:
 
     def test_closetab_invalid_parameter(self, client):
         """Test /closetab with invalid (non-integer) tab index"""
-        response = client.get("/api/closetab?tabindex=invalid")
+        response = client.get("/api/v1/closetab?tabindex=invalid")
 
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -459,7 +459,7 @@ class TestBasicControl:
         # Configure mock to return list of open tests (2D array)
         self.mock_instance.ListOpenTests.return_value = tuple(open_tests)
 
-        response = client.get("/api/listopentests")
+        response = client.get("/api/v1/listopentests")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -478,7 +478,7 @@ class TestBasicControl:
         # Configure mock to return empty tuple
         self.mock_instance.ListOpenTests.return_value = tuple()
 
-        response = client.get("/api/listopentests")
+        response = client.get("/api/v1/listopentests")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -494,7 +494,7 @@ class TestBasicControl:
         # Configure mock to return None (edge case)
         self.mock_instance.ListOpenTests.return_value = None
 
-        response = client.get("/api/listopentests")
+        response = client.get("/api/v1/listopentests")
 
         assert response.status_code == 200
         data = json.loads(response.data)

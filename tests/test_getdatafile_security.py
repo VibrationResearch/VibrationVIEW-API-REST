@@ -70,7 +70,7 @@ class TestGetDataFileSecurity:
                 mock_auth.return_value = True
                 mock_send.return_value = "mock file response"
 
-                response = client.get(f'/api/getdatafile?file_path={data_folder_path}')
+                response = client.get(f'/api/v1/getdatafile?file_path={data_folder_path}')
 
                 assert response.status_code == 200
                 mock_send.assert_called_once()
@@ -86,7 +86,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile rejects paths outside authorized directories"""
         malicious_path = "C:\\Windows\\System32\\evil.exe"
 
-        response = client.get(f'/api/getdatafile?file_path={malicious_path}')
+        response = client.get(f'/api/v1/getdatafile?file_path={malicious_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -98,7 +98,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile prevents path traversal attacks"""
         traversal_path = "C:\\VibrationVIEW\\Data\\..\\..\\Windows\\System32\\cmd.exe"
 
-        response = client.get(f'/api/getdatafile?file_path={traversal_path}')
+        response = client.get(f'/api/v1/getdatafile?file_path={traversal_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -110,7 +110,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile rejects relative path attacks"""
         relative_path = "../../../etc/passwd"
 
-        response = client.get(f'/api/getdatafile?file_path={relative_path}')
+        response = client.get(f'/api/v1/getdatafile?file_path={relative_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -123,7 +123,7 @@ class TestGetDataFileSecurity:
         # Setup mock to return no last data file
         mock_vv.ReportField.return_value = None
 
-        response = client.get('/api/getdatafile?file_path=')
+        response = client.get('/api/v1/getdatafile?file_path=')
 
         # Should try to get last data file, which returns None
         assert response.status_code == 400
@@ -148,7 +148,7 @@ class TestGetDataFileSecurity:
             mock_auth.return_value = True
             mock_send.return_value = "mock file response"
 
-            response = client.get('/api/getdatafile')
+            response = client.get('/api/v1/getdatafile')
 
             assert response.status_code == 200
             mock_send.assert_called_once()
@@ -161,7 +161,7 @@ class TestGetDataFileSecurity:
         last_data_file = "C:\\Temp\\unauthorized.vrd"
         mock_vv.ReportField.return_value = last_data_file
 
-        response = client.get('/api/getdatafile')
+        response = client.get('/api/v1/getdatafile')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -183,7 +183,7 @@ class TestGetDataFileSecurity:
             mock_auth.return_value = True
             mock_send.return_value = "mock file response"
 
-            response = client.post('/api/getdatafile',
+            response = client.post('/api/v1/getdatafile',
                                  json={'file_path': data_folder_path},
                                  content_type='application/json')
 
@@ -194,7 +194,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile POST method rejects malicious paths in JSON"""
         malicious_path = "C:\\Windows\\System32\\evil.exe"
 
-        response = client.post('/api/getdatafile',
+        response = client.post('/api/v1/getdatafile',
                              json={'file_path': malicious_path},
                              content_type='application/json')
 
@@ -212,7 +212,7 @@ class TestGetDataFileSecurity:
         with patch('utils.path_validator.is_path_within_authorized_directories') as mock_auth:
             mock_auth.return_value = True
 
-            response = client.get(f'/api/getdatafile?file_path={valid_but_missing_path}')
+            response = client.get(f'/api/v1/getdatafile?file_path={valid_but_missing_path}')
 
             assert response.status_code == 404
             data = json.loads(response.data)

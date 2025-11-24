@@ -34,7 +34,7 @@ def get_docs():
                 "description": "Get current system check frequency",
                 "com_method": "SystemCheckFrequency()",
                 "returns": "float - Current frequency",
-                "example": "GET /api/systemcheckfrequency",
+                "example": "GET /api/v1/systemcheckfrequency",
             },
             "GET|POST /systemcheckfrequency": {
                 "description": "Get/Set system check frequency",
@@ -43,13 +43,13 @@ def get_docs():
                     "value": "float - Frequency value (POST URL parameter only)"
                 },
                 "returns": "float - Current frequency",
-                "example": "POST /api/systemcheckfrequency?value=120.0 or /api/systemcheckfrequency?120.0",
+                "example": "POST /api/v1/systemcheckfrequency?value=120.0 or /api/v1/systemcheckfrequency?120.0",
             },
             "GET /systemcheckoutputvoltage": {
                 "description": "Get current system check output voltage",
                 "com_method": "SystemCheckOutputVoltage()",
                 "returns": "float - Current voltage",
-                "example": "GET /api/systemcheckoutputvoltage",
+                "example": "GET /api/v1/systemcheckoutputvoltage",
             },
             "GET|POST /systemcheckoutputvoltage": {
                 "description": "Get/Set system check output voltage",
@@ -58,7 +58,7 @@ def get_docs():
                     "value": "float - Voltage value (POST URL parameter only)"
                 },
                 "returns": "float - Current voltage",
-                "example": "POST /api/systemcheckoutputvoltage?value=5.0 or /api/systemcheckoutputvoltage?5.0",
+                "example": "POST /api/v1/systemcheckoutputvoltage?value=5.0 or /api/v1/systemcheckoutputvoltage?5.0",
             },
         },
         "notes": [
@@ -83,7 +83,7 @@ def system_check_frequency(vv_instance):
     GET: Returns current frequency
     POST: Sets frequency from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/systemcheckfrequency?value=120.0 or POST /api/systemcheckfrequency?120.0
+    Example: POST /api/v1/systemcheckfrequency?value=120.0 or POST /api/v1/systemcheckfrequency?120.0
     """
     if request.method == "GET" and not request.args:
         # GET without parameters - return current value
@@ -137,7 +137,7 @@ def system_check_output_voltage(vv_instance):
     GET: Returns current voltage
     POST: Sets voltage from URL parameter 'value' or unnamed parameter
 
-    Example: POST /api/systemcheckoutputvoltage?value=5.0 or POST /api/systemcheckoutputvoltage?5.0
+    Example: POST /api/v1/systemcheckoutputvoltage?value=5.0 or POST /api/v1/systemcheckoutputvoltage?5.0
     """
     if request.method == "GET" and not request.args:
         # GET without parameters - return current value

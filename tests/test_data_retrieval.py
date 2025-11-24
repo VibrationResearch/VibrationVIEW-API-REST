@@ -52,7 +52,7 @@ class TestDataRetrieval:
             for rule in current_app.url_map.iter_rules():
                 route_info = f"{list(rule.methods)} {rule.rule}"
                 all_routes.append(route_info)
-                if '/api/' in rule.rule and any(endpoint in rule.rule for endpoint in 
+                if '/api/v1/' in rule.rule and any(endpoint in rule.rule for endpoint in 
                     ['demand', 'control', 'channel', 'output', 'vector', 'channelunit', 'controllabel']):
                     data_retrieval_routes.append(route_info)
                     print(f"DATA RETRIEVAL: {route_info}")
@@ -65,7 +65,7 @@ class TestDataRetrieval:
         print(f"Root route status: {response.status_code}")
 
         # Try to access data retrieval docs
-        response = client.get('/api/docs/data_retrieval')
+        response = client.get('/api/v1/docs/data_retrieval')
         print(f"Data retrieval docs route status: {response.status_code}")
         if response.status_code == 200:
             print("✓ Data retrieval blueprint is registered!")
@@ -89,7 +89,7 @@ class TestDataRetrieval:
         self.mock_vv.ChannelUnit.reset_mock()
         
         # Test the route with GET request
-        response = client.get('/api/channelunit?channelnum=1')
+        response = client.get('/api/v1/channelunit?channelnum=1')
         
         print(f"Response status: {response.status_code}")
         if response.status_code == 200:
@@ -114,10 +114,10 @@ class TestDataRetrieval:
         self.mock_vv.Demand.return_value = [1.5, 2.0, 2.5]
         self.mock_vv.Demand.reset_mock()
         
-        response = client.get('/api/demand')
+        response = client.get('/api/v1/demand')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/demand not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/demand not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -139,10 +139,10 @@ class TestDataRetrieval:
         self.mock_vv.Control.return_value = [0.8, 1.2, 1.0]
         self.mock_vv.Control.reset_mock()
         
-        response = client.get('/api/control')
+        response = client.get('/api/v1/control')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/control not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/control not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -164,10 +164,10 @@ class TestDataRetrieval:
         self.mock_vv.Channel.return_value = [1.0, 2.0, 3.0, 4.0]
         self.mock_vv.Channel.reset_mock()
         
-        response = client.get('/api/channel')
+        response = client.get('/api/v1/channel')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/channel not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/channel not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -189,10 +189,10 @@ class TestDataRetrieval:
         self.mock_vv.Output.return_value = [2.5, 3.0]
         self.mock_vv.Output.reset_mock()
         
-        response = client.get('/api/output')
+        response = client.get('/api/v1/output')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/output not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/output not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -219,10 +219,10 @@ class TestDataRetrieval:
         self.mock_vv.Vector.return_value = mock_vector_data
         self.mock_vv.Vector.reset_mock()
         
-        response = client.get('/api/vector?vectorenum=1')
+        response = client.get('/api/v1/vector?vectorenum=1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vector not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vector not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -248,10 +248,10 @@ class TestDataRetrieval:
         self.mock_vv.Vector.return_value = mock_vector_data
         self.mock_vv.Vector.reset_mock()
         
-        response = client.get('/api/vector?vectorenum=2&columns=2')
+        response = client.get('/api/v1/vector?vectorenum=2&columns=2')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vector not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vector not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -272,10 +272,10 @@ class TestDataRetrieval:
     
     def test_vector_missing_vectorenum(self, client):
         """Test vector endpoint with missing vectorenum parameter"""
-        response = client.get('/api/vector')
+        response = client.get('/api/v1/vector')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vector not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vector not found - blueprint may not be registered")
         
         assert response.status_code == 400
 
@@ -288,10 +288,10 @@ class TestDataRetrieval:
     
     def test_vector_invalid_columns(self, client):
         """Test vector endpoint with invalid columns parameter"""
-        response = client.get('/api/vector?vectorenum=1&columns=0')
+        response = client.get('/api/v1/vector?vectorenum=1&columns=0')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vector not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vector not found - blueprint may not be registered")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -311,10 +311,10 @@ class TestDataRetrieval:
         self.mock_vv.VectorUnit.return_value = "g"
         self.mock_vv.VectorUnit.reset_mock()
         
-        response = client.get('/api/vectorunit?vectorenum=1')
+        response = client.get('/api/v1/vectorunit?vectorenum=1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vectorunit not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vectorunit not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -337,10 +337,10 @@ class TestDataRetrieval:
         self.mock_vv.VectorLabel.return_value = "Acceleration"
         self.mock_vv.VectorLabel.reset_mock()
         
-        response = client.get('/api/vectorlabel?vectorenum=2')
+        response = client.get('/api/v1/vectorlabel?vectorenum=2')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vectorlabel not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vectorlabel not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -363,10 +363,10 @@ class TestDataRetrieval:
         self.mock_vv.VectorLength.return_value = 1024
         self.mock_vv.VectorLength.reset_mock()
         
-        response = client.get('/api/vectorlength?vectorenum=3')
+        response = client.get('/api/v1/vectorlength?vectorenum=3')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/vectorlength not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/vectorlength not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -387,7 +387,7 @@ class TestDataRetrieval:
         """Test vector properties with missing vectorenum parameter"""
 
         # Define all the endpoints to check
-        endpoints = ['/api/vectorunit', '/api/vectorlabel', '/api/vectorlength']
+        endpoints = ['/api/v1/vectorunit', '/api/v1/vectorlabel', '/api/v1/vectorlength']
 
         for endpoint in endpoints:
             response = client.get(endpoint)
@@ -413,10 +413,10 @@ class TestDataRetrieval:
         channel_1based = 3
         expected_channel_0based = 2  # 3-1=2
         
-        response = client.get(f'/api/channelunit?channelnum={channel_1based}')
+        response = client.get(f'/api/v1/channelunit?channelnum={channel_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/channelunit not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/channelunit not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -438,7 +438,7 @@ class TestDataRetrieval:
     def test_channel_unit_invalid_channel(self, client):
         """Test that channel 0 or negative channels are rejected"""
 
-        endpoint = '/api/channelunit'
+        endpoint = '/api/v1/channelunit'
 
         # Check if route is registered
         response = client.get(f'{endpoint}?channelnum=0')
@@ -467,10 +467,10 @@ class TestDataRetrieval:
         channel_1based = 1
         expected_channel_0based = 0  # 1-1=0
         
-        response = client.get(f'/api/channellabel?channelnum={channel_1based}')
+        response = client.get(f'/api/v1/channellabel?channelnum={channel_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/channellabel not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/channellabel not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -491,7 +491,7 @@ class TestDataRetrieval:
     def test_channel_missing_parameters(self, client):
         """Test channel endpoints with missing channelnum parameter"""
 
-        endpoints = ['/api/channelunit', '/api/channellabel']
+        endpoints = ['/api/v1/channelunit', '/api/v1/channellabel']
 
         for endpoint in endpoints:
             response = client.get(endpoint)
@@ -516,10 +516,10 @@ class TestDataRetrieval:
         loop_1based = 4
         expected_loop_0based = 3  # 4-1=3
         
-        response = client.get(f'/api/controllabel?loopnum={loop_1based}')
+        response = client.get(f'/api/v1/controllabel?loopnum={loop_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/controllabel not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/controllabel not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -541,8 +541,8 @@ class TestDataRetrieval:
         """Test control endpoints with invalid loopnum parameters"""
 
         test_cases = [
-            ('/api/controlunit', 0),
-            ('/api/controllabel', -1),
+            ('/api/v1/controlunit', 0),
+            ('/api/v1/controllabel', -1),
         ]
 
         for endpoint, loopnum in test_cases:
@@ -561,10 +561,10 @@ class TestDataRetrieval:
     
     def test_docs_data_retrieval(self, client):
         """Test the data retrieval documentation endpoint"""
-        response = client.get('/api/docs/data_retrieval')
+        response = client.get('/api/v1/docs/data_retrieval')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/docs/data_retrieval not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/docs/data_retrieval not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -582,10 +582,10 @@ class TestDataRetrieval:
     
     def test_docs_vector_enums(self, client):
         """Test the vector enumerations documentation endpoint"""
-        response = client.get('/api/docs/vector_enums')
+        response = client.get('/api/v1/docs/vector_enums')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/docs/vector_enums not found - blueprint may not be registered")
+            pytest.skip("Route /api/v1/docs/vector_enums not found - blueprint may not be registered")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -606,7 +606,7 @@ class TestDataRetrieval:
     def test_end_to_end_workflow(self, client):
         """Test a complete workflow using multiple endpoints"""
         # Skip if any route is not available
-        test_routes = ['/api/demand', '/api/vector?vectorenum=1', '/api/channelunit?channelnum=1']
+        test_routes = ['/api/v1/demand', '/api/v1/vector?vectorenum=1', '/api/v1/channelunit?channelnum=1']
         
         for route in test_routes:
             response = client.get(route)
@@ -626,19 +626,19 @@ class TestDataRetrieval:
         # Test workflow: Get demand -> Get vector data -> Get channel info
         
         # Step 1: Get current demand values
-        response1 = client.get('/api/demand')
+        response1 = client.get('/api/v1/demand')
         assert response1.status_code == 200
         demand_data = json.loads(response1.data)
         assert demand_data['success'] is True
         
         # Step 2: Get vector data for channel 1
-        response2 = client.get('/api/vector?vectorenum=1')
+        response2 = client.get('/api/v1/vector?vectorenum=1')
         assert response2.status_code == 200
         vector_data = json.loads(response2.data)
         assert vector_data['success'] is True
         
         # Step 3: Get channel unit information
-        response3 = client.get('/api/channelunit?channelnum=1')
+        response3 = client.get('/api/v1/channelunit?channelnum=1')
         assert response3.status_code == 200
         channel_data = json.loads(response3.data)
         assert channel_data['success'] is True
@@ -669,10 +669,10 @@ class TestDataRetrieval:
 
         # Vector endpoints - missing parameters
         vector_endpoints = [
-            ('/api/vector', 'vectorenum'),
-            ('/api/vectorunit', 'vectorenum'),
-            ('/api/vectorlabel', 'vectorenum'),
-            ('/api/vectorlength', 'vectorenum'),
+            ('/api/v1/vector', 'vectorenum'),
+            ('/api/v1/vectorunit', 'vectorenum'),
+            ('/api/v1/vectorlabel', 'vectorenum'),
+            ('/api/v1/vectorlength', 'vectorenum'),
         ]
 
         for endpoint, param in vector_endpoints:
@@ -685,8 +685,8 @@ class TestDataRetrieval:
 
         # Channel endpoints - missing parameters
         channel_endpoints = [
-            ('/api/channelunit', 'channelnum'),
-            ('/api/channellabel', 'channelnum'),
+            ('/api/v1/channelunit', 'channelnum'),
+            ('/api/v1/channellabel', 'channelnum'),
         ]
 
         for endpoint, param in channel_endpoints:
@@ -699,11 +699,11 @@ class TestDataRetrieval:
 
         # Test invalid values
         invalid_tests = [
-            ('/api/vector?vectorenum=1&columns=0', 'columns must be >= 1'),
-            ('/api/channelunit?channelnum=0', 'must be >= 1'),
-            ('/api/channelunit?channelnum=-1', 'must be >= 1'),
-            ('/api/controllabel?loopnum=0', 'must be >= 1'),
-            ('/api/controllabel?loopnum=-5', 'must be >= 1'),
+            ('/api/v1/vector?vectorenum=1&columns=0', 'columns must be >= 1'),
+            ('/api/v1/channelunit?channelnum=0', 'must be >= 1'),
+            ('/api/v1/channelunit?channelnum=-1', 'must be >= 1'),
+            ('/api/v1/controllabel?loopnum=0', 'must be >= 1'),
+            ('/api/v1/controllabel?loopnum=-5', 'must be >= 1'),
         ]
 
         for endpoint, expected_error in invalid_tests:
@@ -727,7 +727,7 @@ class TestDataRetrieval:
         self.mock_vv.VectorUnit.return_value = "Hz"
         self.mock_vv.VectorUnit.reset_mock()
         
-        response = client.get('/api/vectorunit?vectorenum=999999')
+        response = client.get('/api/v1/vectorunit?vectorenum=999999')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
@@ -737,7 +737,7 @@ class TestDataRetrieval:
         self.mock_vv.ChannelUnit.return_value = "m/s²"
         self.mock_vv.ChannelUnit.reset_mock()
         
-        response = client.get('/api/channelunit?channelnum=1000')
+        response = client.get('/api/v1/channelunit?channelnum=1000')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
@@ -758,7 +758,7 @@ class TestDataRetrieval:
         self.mock_vv.ChannelLabel.return_value = "Channel 1"
         self.mock_vv.ChannelLabel.reset_mock()
         
-        response = client.get('/api/channellabel?channelnum=1')
+        response = client.get('/api/v1/channellabel?channelnum=1')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
@@ -773,7 +773,7 @@ class TestDataRetrieval:
         self.mock_vv.ControlLabel.return_value = "Loop 1"
         self.mock_vv.ControlLabel.reset_mock()
         
-        response = client.get('/api/controllabel?loopnum=1')
+        response = client.get('/api/v1/controllabel?loopnum=1')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
@@ -792,7 +792,7 @@ class TestDataRetrieval:
         # Configure mock to raise an exception
         self.mock_vv.Vector.side_effect = Exception("Mock VibrationVIEW error")
 
-        response = client.get('/api/vector?vectorenum=1')
+        response = client.get('/api/v1/vector?vectorenum=1')
         if response.status_code != 404:
             assert response.status_code == 500, f"Expected 500 status, got {response.status_code}"
             data = json.loads(response.data)
@@ -819,7 +819,7 @@ class TestDataRetrieval:
         responses = []
         for i in range(10):
             self.mock_vv.Demand.reset_mock()
-            response = client.get('/api/demand')
+            response = client.get('/api/v1/demand')
             responses.append(response)
         
         # Check that all requests succeeded (if route exists)
@@ -847,10 +847,10 @@ class TestDataRetrieval:
         
         # Make mixed requests
         test_requests = [
-            ('/api/channel', None),
-            ('/api/vectorlabel?vectorenum=5', None),
-            ('/api/controlunit?loopnum=2', None),
-            ('/api/channel', None),  # Repeat to test consistency
+            ('/api/v1/channel', None),
+            ('/api/v1/vectorlabel?vectorenum=5', None),
+            ('/api/v1/controlunit?loopnum=2', None),
+            ('/api/v1/channel', None),  # Repeat to test consistency
         ]
         
         for endpoint, expected in test_requests:
@@ -909,18 +909,18 @@ class TestDataRetrieval:
         
         # Test all endpoints
         endpoint_tests = [
-            ('GET', '/api/demand', None, 'Demand'),
-            ('GET', '/api/control', None, 'Control'),
-            ('GET', '/api/channel', None, 'Channel'),
-            ('GET', '/api/output', None, 'Output'),
-            ('GET', '/api/vector?vectorenum=1', {'vectorenum': 1, 'columns': 1}, 'Vector'),
-            ('GET', '/api/vectorunit?vectorenum=2', {'vectorenum': 2}, 'VectorUnit'),
-            ('GET', '/api/vectorlabel?vectorenum=3', {'vectorenum': 3}, 'VectorLabel'),
-            ('GET', '/api/vectorlength?vectorenum=4', {'vectorenum': 4}, 'VectorLength'),
-            ('GET', '/api/channelunit?channelnum=5', {'channelnum': 5, 'internal_channelnum': 4}, 'ChannelUnit'),
-            ('GET', '/api/channellabel?channelnum=6', {'channelnum': 6, 'internal_channelnum': 5}, 'ChannelLabel'),
-            ('GET', '/api/controlunit?loopnum=7', {'loopnum': 7, 'internal_loopnum': 6}, 'ControlUnit'),
-            ('GET', '/api/controllabel?loopnum=8', {'loopnum': 8, 'internal_loopnum': 7}, 'ControlLabel'),
+            ('GET', '/api/v1/demand', None, 'Demand'),
+            ('GET', '/api/v1/control', None, 'Control'),
+            ('GET', '/api/v1/channel', None, 'Channel'),
+            ('GET', '/api/v1/output', None, 'Output'),
+            ('GET', '/api/v1/vector?vectorenum=1', {'vectorenum': 1, 'columns': 1}, 'Vector'),
+            ('GET', '/api/v1/vectorunit?vectorenum=2', {'vectorenum': 2}, 'VectorUnit'),
+            ('GET', '/api/v1/vectorlabel?vectorenum=3', {'vectorenum': 3}, 'VectorLabel'),
+            ('GET', '/api/v1/vectorlength?vectorenum=4', {'vectorenum': 4}, 'VectorLength'),
+            ('GET', '/api/v1/channelunit?channelnum=5', {'channelnum': 5, 'internal_channelnum': 4}, 'ChannelUnit'),
+            ('GET', '/api/v1/channellabel?channelnum=6', {'channelnum': 6, 'internal_channelnum': 5}, 'ChannelLabel'),
+            ('GET', '/api/v1/controlunit?loopnum=7', {'loopnum': 7, 'internal_loopnum': 6}, 'ControlUnit'),
+            ('GET', '/api/v1/controllabel?loopnum=8', {'loopnum': 8, 'internal_loopnum': 7}, 'ControlLabel'),
         ]
         
         results = {}

@@ -46,10 +46,10 @@ class TestTEDSRoutes:
         mock_vv.Teds.return_value = mock_all_teds
         mock_vv.clear_method_calls()
 
-        response = client.get('/api/teds')
+        response = client.get('/api/v1/teds')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         print(f"Response status: {response.status_code}")
         if response.status_code != 200:
@@ -90,10 +90,10 @@ class TestTEDSRoutes:
         channel_1based = 3
         expected_channel_0based = 2
         
-        response = client.get(f'/api/teds?{channel_1based}')
+        response = client.get(f'/api/v1/teds?{channel_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -112,10 +112,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_zero(self, client, mock_vv):
         """Test GET /Teds with invalid channel 0 (1-based should be >= 1)"""
-        response = client.get('/api/teds?0')
+        response = client.get('/api/v1/teds?0')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -128,10 +128,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_negative(self, client, mock_vv):
         """Test GET /Teds with negative channel"""
-        response = client.get('/api/teds?-1')
+        response = client.get('/api/v1/teds?-1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -148,10 +148,10 @@ class TestTEDSRoutes:
         mock_vv.GetHardwareInputChannels.return_value = 4
         
         # Try to access channel 5 (1-based) - should be out of range
-        response = client.get('/api/teds?5')
+        response = client.get('/api/v1/teds?5')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -164,10 +164,10 @@ class TestTEDSRoutes:
     
     def test_teds_invalid_channel_string(self, client, mock_vv):
         """Test GET /Teds with non-numeric channel parameter"""
-        response = client.get('/api/teds?abc')
+        response = client.get('/api/v1/teds?abc')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -190,10 +190,10 @@ class TestTEDSRoutes:
         channel_1based = 3
         expected_channel_0based = 2
         
-        response = client.get(f'/api/inputtedschannel?{channel_1based}')
+        response = client.get(f'/api/v1/inputtedschannel?{channel_1based}')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/inputtedschannel not found")
+            pytest.skip("Route /api/v1/inputtedschannel not found")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -211,10 +211,10 @@ class TestTEDSRoutes:
     
     def test_inputtedschannel_invalid_channel_zero(self, client, mock_vv):
         """Test GET /inputtedschannel with invalid channel 0 (now 1-based)"""
-        response = client.get('/api/inputtedschannel?0')
+        response = client.get('/api/v1/inputtedschannel?0')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/inputtedschannel not found")
+            pytest.skip("Route /api/v1/inputtedschannel not found")
         
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -240,10 +240,10 @@ class TestTEDSRoutes:
         mock_vv.GetHardwareInputChannels.return_value = 2
         mock_vv.clear_method_calls()
         
-        response = client.get('/api/inputteds')
+        response = client.get('/api/v1/inputteds')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/inputteds not found")
+            pytest.skip("Route /api/v1/inputteds not found")
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -275,10 +275,10 @@ class TestTEDSRoutes:
         mock_vv.GetHardwareInputChannels.return_value = 4
         
         # Test specific channel error
-        response = client.get('/api/teds?1')
+        response = client.get('/api/v1/teds?1')
         
         if response.status_code == 404:
-            pytest.skip("Route /api/teds not found")
+            pytest.skip("Route /api/v1/teds not found")
         
         assert response.status_code == 500
         data = json.loads(response.data)
@@ -288,7 +288,7 @@ class TestTEDSRoutes:
         assert data['error']['code'] == 'TEDS_READ_ERROR'
         
         # Test all channels error
-        response = client.get('/api/teds')
+        response = client.get('/api/v1/teds')
         
         assert response.status_code == 500
         data = json.loads(response.data)
@@ -300,7 +300,7 @@ class TestTEDSRoutes:
     
     def test_teds_documentation(self, client):
         """Test TEDS documentation endpoint"""
-        response = client.get('/api/docs/teds')
+        response = client.get('/api/v1/docs/teds')
         
         if response.status_code == 404:
             pytest.skip("TEDS documentation not found")
@@ -331,10 +331,10 @@ class TestTEDSRoutes:
         mock_vv.clear_method_calls()
 
         urn = "test_urn_123456"
-        response = client.get(f'/api/tedsfromurn?{urn}')
+        response = client.get(f'/api/v1/tedsfromurn?{urn}')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/tedsfromurn not found")
+            pytest.skip("Route /api/v1/tedsfromurn not found")
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -353,10 +353,10 @@ class TestTEDSRoutes:
 
     def test_tedsfromurn_missing_urn(self, client, mock_vv):
         """Test GET /tedsfromurn without URN parameter"""
-        response = client.get('/api/tedsfromurn')
+        response = client.get('/api/v1/tedsfromurn')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/tedsfromurn not found")
+            pytest.skip("Route /api/v1/tedsfromurn not found")
 
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -369,10 +369,10 @@ class TestTEDSRoutes:
 
     def test_tedsfromurn_empty_urn(self, client, mock_vv):
         """Test GET /tedsfromurn with empty URN parameter"""
-        response = client.get('/api/tedsfromurn?')
+        response = client.get('/api/v1/tedsfromurn?')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/tedsfromurn not found")
+            pytest.skip("Route /api/v1/tedsfromurn not found")
 
         assert response.status_code == 400
         data = json.loads(response.data)
@@ -390,10 +390,10 @@ class TestTEDSRoutes:
         mock_vv.TedsFromURN.side_effect = Exception("URN not found in database")
 
         urn = "invalid_urn_999"
-        response = client.get(f'/api/tedsfromurn?{urn}')
+        response = client.get(f'/api/v1/tedsfromurn?{urn}')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/tedsfromurn not found")
+            pytest.skip("Route /api/v1/tedsfromurn not found")
 
         assert response.status_code == 500
         data = json.loads(response.data)
@@ -412,10 +412,10 @@ class TestTEDSRoutes:
         mock_vv.clear_method_calls()
 
         urn = "urn-with-dashes_and_underscores.123"
-        response = client.get(f'/api/tedsfromurn?{urn}')
+        response = client.get(f'/api/v1/tedsfromurn?{urn}')
 
         if response.status_code == 404:
-            pytest.skip("Route /api/tedsfromurn not found")
+            pytest.skip("Route /api/v1/tedsfromurn not found")
 
         assert response.status_code == 200
         data = json.loads(response.data)

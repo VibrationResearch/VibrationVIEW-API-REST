@@ -35,7 +35,7 @@ def get_documentation():
                         "value": "int - Test type value (POST URL parameter only)"
                     },
                     "returns": "int - Current test type",
-                    "example": "POST /api/testtype?value=1",
+                    "example": "POST /api/v1/testtype?value=1",
                 },
             }
         },
@@ -63,7 +63,7 @@ def test_type(vv_instance):
     GET: Returns current test type
     POST: Sets test type from URL parameter 'value'
 
-    Example: POST /api/testtype?value=1
+    Example: POST /api/v1/testtype?value=1
     """
     if request.method == "GET":
         result = vv_instance.TestType()

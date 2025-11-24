@@ -93,7 +93,7 @@ def create_app(config_class=Config):
     
     # Initialize CORS
     CORS(app, resources={
-        r"/api/*": {
+        r"/api/v1/*": {
             "origins": app.config.get('CORS_ORIGINS', '*'),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]
@@ -113,29 +113,29 @@ def create_app(config_class=Config):
         ]
     )
     
-    # Register blueprint modules directly under /api/ (no module prefixes)
-    app.register_blueprint(basic_control_bp, url_prefix='/api')
-    app.register_blueprint(status_properties_bp, url_prefix='/api')
-    app.register_blueprint(data_retrieval_bp, url_prefix='/api')
-    app.register_blueprint(advanced_control_bp, url_prefix='/api')
-    app.register_blueprint(advanced_control_sine_bp, url_prefix='/api')
-    app.register_blueprint(advanced_control_system_check_bp, url_prefix='/api')
-    app.register_blueprint(hardware_config_bp, url_prefix='/api')
-    app.register_blueprint(input_config_bp, url_prefix='/api')
-    app.register_blueprint(teds_bp, url_prefix='/api')
-    app.register_blueprint(recording_bp, url_prefix='/api')
-    app.register_blueprint(reporting_bp, url_prefix='/api')
-    app.register_blueprint(auxinputs_bp, url_prefix='/api')
-    app.register_blueprint(gui_control_bp, url_prefix='/api')
-    app.register_blueprint(report_generation_bp, url_prefix='/api')
+    # Register blueprint modules directly under /api/v1/ (no module prefixes)
+    app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
+    app.register_blueprint(status_properties_bp, url_prefix='/api/v1')
+    app.register_blueprint(data_retrieval_bp, url_prefix='/api/v1')
+    app.register_blueprint(advanced_control_bp, url_prefix='/api/v1')
+    app.register_blueprint(advanced_control_sine_bp, url_prefix='/api/v1')
+    app.register_blueprint(advanced_control_system_check_bp, url_prefix='/api/v1')
+    app.register_blueprint(hardware_config_bp, url_prefix='/api/v1')
+    app.register_blueprint(input_config_bp, url_prefix='/api/v1')
+    app.register_blueprint(teds_bp, url_prefix='/api/v1')
+    app.register_blueprint(recording_bp, url_prefix='/api/v1')
+    app.register_blueprint(reporting_bp, url_prefix='/api/v1')
+    app.register_blueprint(auxinputs_bp, url_prefix='/api/v1')
+    app.register_blueprint(gui_control_bp, url_prefix='/api/v1')
+    app.register_blueprint(report_generation_bp, url_prefix='/api/v1')
 
     # Health check endpoint
-    @app.route('/api/health', methods=['GET'])
+    @app.route('/api/v1/health', methods=['GET'])
     def health_check():
         """Health check endpoint"""
         vv = get_vv_instance()
         vv_status = "connected" if vv is not None else "disconnected"
-        
+
         return jsonify({
             'success': True,
             'message': 'VibrationVIEW API is running',
@@ -144,7 +144,7 @@ def create_app(config_class=Config):
             'vibrationview_status': vv_status,
             'modules': [
                 'basic_control',
-                'status_properties', 
+                'status_properties',
                 'data_retrieval',
                 'advanced_control',
                 'advanced_control_sine',
@@ -158,17 +158,17 @@ def create_app(config_class=Config):
                 'gui_control'
             ],
             'endpoints': [
-                'POST /api/starttest',
-                'POST /api/runtest', 
-                'POST /api/stoptest',
-                'POST /api/pausetest',
-                'POST /api/resumetest',
-                'POST /api/opentest'
+                'POST /api/v1/starttest',
+                'POST /api/v1/runtest',
+                'POST /api/v1/stoptest',
+                'POST /api/v1/pausetest',
+                'POST /api/v1/resumetest',
+                'POST /api/v1/opentest'
             ]
         })
-    
+
     # Testing helper endpoint (only in debug mode)
-    @app.route('/api/test/reset-instance', methods=['POST'])
+    @app.route('/api/v1/test/reset-instance', methods=['POST'])
     def reset_instance():
         """Reset VibrationVIEW instance - for testing only"""
         if not app.debug:
@@ -176,15 +176,15 @@ def create_app(config_class=Config):
                 'success': False,
                 'error': 'Not available in production mode'
             }), 403
-            
+
         reset_vv_instance()
         return jsonify({
             'success': True,
             'message': 'VibrationVIEW instance reset'
         })
-    
+
     # Main API documentation endpoint
-    @app.route('/api/docs', methods=['GET'])
+    @app.route('/api/v1/docs', methods=['GET'])
     def api_documentation():
         """Get comprehensive API documentation"""
         from flask import request
@@ -193,7 +193,7 @@ def create_app(config_class=Config):
             'title': 'VibrationVIEW REST API - Modular 1:1 Automation Interface',
             'version': app.config.get('API_VERSION', '1.0.0'),
             'description': 'Exact 1:1 REST interface for VibrationVIEW COM automation methods',
-            'base_url': request.host_url + 'api',
+            'base_url': request.host_url + 'api/v1',
             'architecture': 'Modular design with functional separation and singleton VibrationVIEW instance',
             'modules': {
                 'basic_control': 'Core test control operations (StartTest, StopTest, etc.)',
@@ -211,19 +211,19 @@ def create_app(config_class=Config):
                 'gui_control': 'GUI and window management operations'
             },
             'module_docs': {
-                'basic_control': request.host_url + 'api/docs/basic_control',
-                'status_properties': request.host_url + 'api/docs/status_properties',
-                'data_retrieval': request.host_url + 'api/docs/data_retrieval',
-                'advanced_control': request.host_url + 'api/docs/advanced_control',
-                'advanced_control_sine': request.host_url + 'api/docs/advanced_control_sine',
-                'advanced_control_system_check': request.host_url + 'api/docs/advanced_control_system_check',
-                'hardware_config': request.host_url + 'api/docs/hardware_config',
-                'input_config': request.host_url + 'api/docs/input_config',
-                'teds': request.host_url + 'api/docs/teds', 
-                'recording': request.host_url + 'api/docs/recording', 
-                'reporting': request.host_url + 'api/docs/reporting', 
-                'auxinputs': request.host_url + 'api/docs/auxinputs',
-                'gui_control': request.host_url + 'api/docs/gui_control'
+                'basic_control': request.host_url + 'api/v1/docs/basic_control',
+                'status_properties': request.host_url + 'api/v1/docs/status_properties',
+                'data_retrieval': request.host_url + 'api/v1/docs/data_retrieval',
+                'advanced_control': request.host_url + 'api/v1/docs/advanced_control',
+                'advanced_control_sine': request.host_url + 'api/v1/docs/advanced_control_sine',
+                'advanced_control_system_check': request.host_url + 'api/v1/docs/advanced_control_system_check',
+                'hardware_config': request.host_url + 'api/v1/docs/hardware_config',
+                'input_config': request.host_url + 'api/v1/docs/input_config',
+                'teds': request.host_url + 'api/v1/docs/teds',
+                'recording': request.host_url + 'api/v1/docs/recording',
+                'reporting': request.host_url + 'api/v1/docs/reporting',
+                'auxinputs': request.host_url + 'api/v1/docs/auxinputs',
+                'gui_control': request.host_url + 'api/v1/docs/gui_control'
             }
         }
         
@@ -236,7 +236,7 @@ def create_app(config_class=Config):
             'success': False,
             'error': 'Endpoint not found',
             'message': 'The requested API endpoint does not exist',
-            'available_docs': '/api/docs'
+            'available_docs': '/api/v1/docs'
         }), 404
 
     @app.errorhandler(405)
@@ -291,8 +291,8 @@ if __name__ == '__main__':
 
     logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
     logger.info(f"Configuration: {args.config}")
-    logger.info(f"API documentation: http://{args.host}:{args.port}/api/docs")
-    logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/docs/basic_control")
+    logger.info(f"API documentation: http://{args.host}:{args.port}/api/v1/docs")
+    logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/v1/docs/basic_control")
     
     try:
         app.run(host=args.host, port=args.port, debug=args.debug, threaded=False)
