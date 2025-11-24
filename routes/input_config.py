@@ -154,6 +154,44 @@ def get_documentation():
                     'returns': 'dict - Success status and file info',
                     'example': 'PUT /api/openinputconfigurationfile?10mv per G.vic (with binary file in body)'
                 }
+            },
+            'Transducer Database': {
+                'GET /ischanneldifferentdatabase': {
+                    'description': 'Check if channel config differs from database',
+                    'com_method': 'IsChannelDifferentThanDatabase(channel)',
+                    'parameters': {
+                        'channel': 'int - Input channel number'
+                    },
+                    'returns': 'bool - True if channel differs from database',
+                    'example': 'GET /api/ischanneldifferentdatabase?1'
+                },
+                'GET /channeldatabaseids': {
+                    'description': 'Get database IDs for a channel',
+                    'com_method': 'ChannelDatabaseIDs(channel)',
+                    'parameters': {
+                        'channel': 'int - Input channel number'
+                    },
+                    'returns': 'list - Database IDs',
+                    'example': 'GET /api/channeldatabaseids?1'
+                },
+                'POST /updatechannelconfigfromdatabase': {
+                    'description': 'Update channel configuration from transducer database',
+                    'com_method': 'UpdateChannelConfigFromDatabase(channel)',
+                    'parameters': {
+                        'channel': 'int - Input channel number'
+                    },
+                    'returns': 'bool - Success status',
+                    'example': 'POST /api/updatechannelconfigfromdatabase?1'
+                },
+                'GET /transducerdatabaserecord': {
+                    'description': 'Get transducer database record by GUID',
+                    'com_method': 'TransducerDatabaseRecord(guid)',
+                    'parameters': {
+                        'guid': 'str - Transducer GUID'
+                    },
+                    'returns': 'list - Database record fields',
+                    'example': 'GET /api/transducerdatabaserecord?guid={guid-string}'
+                }
             }
         },
         'notes': [
@@ -723,4 +761,140 @@ def upload_input_configuration_file(vv_instance):
             'uploaded': True
         },
         f"Input configuration file '{filename}' uploaded and loaded successfully"
+    ))
+
+
+# Transducer Database Operations
+@input_config_bp.route('/ischanneldifferentdatabase', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def is_channel_different_database(vv_instance):
+    """
+    Check if Channel Configuration Differs from Database
+
+    COM Method: IsChannelDifferentThanDatabase(channel)
+    Returns true if the channel configuration differs from the transducer database.
+
+    Query Parameters:
+        channel: Input channel number (1-based) - first positional parameter
+
+    Example: GET /api/ischanneldifferentdatabase?1
+    """
+    query_args = list(request.args.keys())
+    if not query_args:
+        return jsonify(error_response(
+            'Missing required query parameter: channel',
+            'MISSING_PARAMETER'
+        )), 400
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    if error_resp:
+        return jsonify(error_resp), status_code
+
+    channel_user = int(query_args[0])
+    result = vv_instance.IsChannelDifferentThanDatabase(channel_com)
+
+    return jsonify(success_response(
+        {'result': result, 'channel': channel_user},
+        f"Channel {channel_user} {'differs' if result else 'matches'} database configuration"
+    ))
+
+
+@input_config_bp.route('/channeldatabaseids', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def channel_database_ids(vv_instance):
+    """
+    Get Channel Database IDs
+
+    COM Method: ChannelDatabaseIDs(channel)
+    Returns the database IDs associated with the specified channel.
+
+    Query Parameters:
+        channel: Input channel number (1-based) - first positional parameter
+
+    Example: GET /api/channeldatabaseids?1
+    """
+    query_args = list(request.args.keys())
+    if not query_args:
+        return jsonify(error_response(
+            'Missing required query parameter: channel',
+            'MISSING_PARAMETER'
+        )), 400
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    if error_resp:
+        return jsonify(error_resp), status_code
+
+    channel_user = int(query_args[0])
+    result = vv_instance.ChannelDatabaseIDs(channel_com)
+
+    return jsonify(success_response(
+        {'result': result, 'channel': channel_user},
+        f"Channel {channel_user} database IDs retrieved"
+    ))
+
+
+@input_config_bp.route('/updatechannelconfigfromdatabase', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def update_channel_config_from_database(vv_instance):
+    """
+    Update Channel Configuration from Database
+
+    COM Method: UpdateChannelConfigFromDatabase(channel)
+    Updates the channel configuration from the transducer database.
+
+    Query Parameters:
+        channel: Input channel number (1-based) - first positional parameter
+
+    Example: POST /api/updatechannelconfigfromdatabase?1
+    """
+    query_args = list(request.args.keys())
+    if not query_args:
+        return jsonify(error_response(
+            'Missing required query parameter: channel',
+            'MISSING_PARAMETER'
+        )), 400
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    if error_resp:
+        return jsonify(error_resp), status_code
+
+    channel_user = int(query_args[0])
+    result = vv_instance.UpdateChannelConfigFromDatabase(channel_com)
+
+    return jsonify(success_response(
+        {'result': result, 'channel': channel_user},
+        f"Channel {channel_user} configuration {'updated' if result else 'update failed'} from database"
+    ))
+
+
+@input_config_bp.route('/transducerdatabaserecord', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def transducer_database_record(vv_instance):
+    """
+    Get Transducer Database Record
+
+    COM Method: TransducerDatabaseRecord(guid)
+    Returns the transducer database record for the specified GUID.
+
+    Query Parameters:
+        guid: Transducer GUID (named parameter)
+
+    Example: GET /api/transducerdatabaserecord?guid={guid-string}
+    """
+    guid = request.args.get('guid')
+    if not guid:
+        return jsonify(error_response(
+            'Missing required query parameter: guid',
+            'MISSING_PARAMETER'
+        )), 400
+
+    result = vv_instance.TransducerDatabaseRecord(guid)
+
+    return jsonify(success_response(
+        {'result': result, 'guid': guid},
+        f"Transducer database record retrieved for GUID: {guid}"
     ))
