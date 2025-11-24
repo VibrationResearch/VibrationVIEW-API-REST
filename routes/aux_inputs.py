@@ -24,6 +24,9 @@ def auxinputs_docs():
         'description': 'Auxiliary input properties and metadata methods',
         'note': 'Channel parameters use 1-based indexing (user-friendly) and are converted to 0-based for VibrationVIEW COM interface',
         'endpoints': {
+            'Rear Input Data': {
+                'GET /rearinput': 'RearInput() -> List[float] - Get rear input values for all channels'
+            },
             'Rear Input Metadata': {
                 'GET /rearinputunit?channel=<int>': 'RearInputUnit(channel: int) -> str - Get rear input units (1-based)',
                 'GET /rearinputunit?<int>': 'RearInputUnit(channel: int) -> str - Get rear input units using unnamed parameter (1-based)',
@@ -38,6 +41,23 @@ def auxinputs_docs():
         }
     }
     return jsonify(docs)
+
+@auxinputs_bp.route('/rearinput', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def rear_input(vv_instance):
+    """
+    Get Rear Input Values for All Channels
+
+    COM Method: RearInput()
+    Returns the rear input values for all auxiliary input channels.
+    Array returned in order: [channel1, channel2, channel3, ...] (1-based channel numbering for reference)
+    """
+    result = vv_instance.RearInput()
+
+    return jsonify(success_response({
+        'result': result
+    }, f"Retrieved {len(result)} rear input values"))
 
 @auxinputs_bp.route('/rearinputunit', methods=['GET'])
 @handle_errors
