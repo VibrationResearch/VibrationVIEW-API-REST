@@ -152,7 +152,7 @@ def get_documentation():
                     },
                     'body': 'Binary file content',
                     'returns': 'dict - Success status and file info',
-                    'example': 'PUT /api/v1/openinputconfigurationfile?10mv per G.vic (with binary file in body)'
+                    'example': 'PUT /api/v1/inputconfigurationfile?10mv per G.vic (with binary file in body)'
                 }
             },
             'Transducer Database': {
