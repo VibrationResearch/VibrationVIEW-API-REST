@@ -1,5 +1,5 @@
 # ============================================================================
-# FILE: routes/basic_control.py (Basic Control Routes) - v35
+# FILE: routes/basic_control.py (Basic Control Routes) - v36
 # ============================================================================
 
 """
@@ -13,9 +13,12 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.utils import handle_binary_upload, extract_com_error_info, is_template_file, get_new_test_defaults_path, is_default_template_filename
+from utils.path_validator import validate_file_path, PathValidationError
 
 import logging
+import os
 from datetime import datetime
+import config
 
 # Create blueprint
 basic_control_bp = Blueprint('basic_control', __name__)
@@ -143,6 +146,18 @@ def get_documentation():
                     'Column 3: Test name (displayed on tabs)'
                 ],
                 'example': 'GET /api/listopentests'
+            },
+            'GET|POST /savedata': {
+                'description': 'Save current test data to file',
+                'com_method': 'SaveData(filename)',
+                'parameters': {
+                    'filename': 'string - Filename or full path to save data to (named parameter). If only filename is provided, DATA_FOLDER is used as default path.'
+                },
+                'returns': 'Success status with saved file path',
+                'examples': [
+                    'POST /api/savedata?filename=savefile.vsd (saves to DATA_FOLDER)',
+                    'POST /api/savedata?filename=C:\\Custom\\Path\\savefile.vsd (saves to custom path)'
+                ]
             }
         },
         'notes': [
@@ -637,6 +652,55 @@ def list_open_tests(vv_instance):
             'count': len(open_tests_list)
         },
         f"ListOpenTests command executed: {len(open_tests_list)} test(s) open"
+    ))
+
+@basic_control_bp.route('/savedata', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def save_data(vv_instance):
+    """
+    Save Current Test Data
+
+    COM Method: SaveData(filename)
+    Saves the current test data to the specified filename.
+    If only a filename is provided (no path), DATA_FOLDER is used as the default path.
+    Raises VVIEW_E_FAILEDTOSAVE on failure.
+
+    Query Parameters:
+        filename: Filename or full path to save data to (named parameter)
+
+    Examples:
+        POST /api/savedata?filename=savefile.vsd (saves to DATA_FOLDER/savefile.vsd)
+        POST /api/savedata?filename=C:\Custom\Path\savefile.vsd (saves to specified path)
+    """
+    filename = request.args.get('filename')
+    if not filename:
+        return jsonify(error_response(
+            'Missing required query parameter: filename',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # If filename has no path separators, prepend DATA_FOLDER
+    if not os.path.dirname(filename):
+        file_path = os.path.join(config.Config.DATA_FOLDER, filename)
+    else:
+        file_path = filename
+
+    # Validate file path security
+    try:
+        validated_file_path = validate_file_path(file_path, "save data")
+    except PathValidationError as e:
+        return jsonify(error_response(
+            str(e),
+            'PATH_VALIDATION_ERROR'
+        )), 403
+
+    # SaveData has no return value, raises exception on failure
+    vv_instance.SaveData(validated_file_path)
+
+    return jsonify(success_response(
+        {'filename': filename, 'path': validated_file_path},
+        f"Data saved successfully to: {validated_file_path}"
     ))
 
 @basic_control_bp.route('/testcom', methods=['GET'])
