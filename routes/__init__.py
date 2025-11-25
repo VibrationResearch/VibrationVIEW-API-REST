@@ -25,6 +25,7 @@ from .reporting import reporting_bp
 from .aux_inputs import auxinputs_bp
 from .gui_control import gui_control_bp
 from .report_generation import report_generation_bp
+from .virtual_channels import virtual_channels_bp
 
 __all__ = [
     'basic_control_bp',
@@ -40,5 +41,6 @@ __all__ = [
     'reporting_bp',
     'auxinputs_bp',
     'gui_control_bp',
-    'report_generation_bp'
+    'report_generation_bp',
+    'virtual_channels_bp'
 ]

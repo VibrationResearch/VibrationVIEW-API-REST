@@ -19,7 +19,7 @@ import threading
 logger = logging.getLogger(__name__)
 
 # Import route modules - clean imports using __init__.py
-from routes import ( 
+from routes import (
     basic_control_bp,
     status_properties_bp,
     data_retrieval_bp,
@@ -33,7 +33,8 @@ from routes import (
     reporting_bp,
     auxinputs_bp,
     gui_control_bp,
-    report_generation_bp
+    report_generation_bp,
+    virtual_channels_bp
 )
 
 # Import configuration
@@ -128,6 +129,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auxinputs_bp, url_prefix='/api/v1')
     app.register_blueprint(gui_control_bp, url_prefix='/api/v1')
     app.register_blueprint(report_generation_bp, url_prefix='/api/v1')
+    app.register_blueprint(virtual_channels_bp, url_prefix='/api/v1')
 
     # Health check endpoint
     @app.route('/api/v1/health', methods=['GET'])
@@ -155,7 +157,8 @@ def create_app(config_class=Config):
                 'recording',
                 'reporting',
                 'auxinputs',
-                'gui_control'
+                'gui_control',
+                'virtual_channels'
             ],
             'endpoints': [
                 'POST /api/v1/starttest',
@@ -208,7 +211,8 @@ def create_app(config_class=Config):
                 'recording': 'Recorder Control',
                 'reporting': 'Reporting parameters',
                 'auxinputs': 'Aux Inputs parameters',
-                'gui_control': 'GUI and window management operations'
+                'gui_control': 'GUI and window management operations',
+                'virtual_channels': 'Virtual channel management (import, remove)'
             },
             'module_docs': {
                 'basic_control': request.host_url + 'api/v1/docs/basic_control',
@@ -223,7 +227,8 @@ def create_app(config_class=Config):
                 'recording': request.host_url + 'api/v1/docs/recording',
                 'reporting': request.host_url + 'api/v1/docs/reporting',
                 'auxinputs': request.host_url + 'api/v1/docs/auxinputs',
-                'gui_control': request.host_url + 'api/v1/docs/gui_control'
+                'gui_control': request.host_url + 'api/v1/docs/gui_control',
+                'virtual_channels': request.host_url + 'api/v1/docs/virtual_channels'
             }
         }
         
