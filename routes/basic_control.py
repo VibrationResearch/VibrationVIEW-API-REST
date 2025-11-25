@@ -473,9 +473,15 @@ def upload_and_open_test(vv_instance):
 
         # close any existing test with the same name to avoid conflicts
         existing_tests = vv_instance.ListOpenTests()
-        if existing_tests and filename in existing_tests:
-            vv_instance.CloseTest(filename)
+        if existing_tests:
+            basename_lower = os.path.splitext(os.path.basename(filename))[0].lower()
             
+            for test in existing_tests:
+                test_name = test[3].lower() if test[3] else ''
+                
+                if basename_lower == test_name:
+                    vv_instance.CloseTest(int(test[0]))
+
         # Open the uploaded test file
         result = vv_instance.OpenTest(file_path)
 
