@@ -47,7 +47,7 @@ class TestReportGeneration:
         return os.path.join(project_root, "data", "2025Sep22-1633-0002.vrd")
 
     def test_generatereport_upload_with_template(self, client, mock_vv, sample_vrd_path):
-        """Test PUT /generatereport with VRD file upload and Test Report.vvtemplate"""
+        """Test POST /generatereport with VRD file upload and Test Report.vvtemplate"""
 
         # Check if the sample VRD file exists
         if not os.path.exists(sample_vrd_path):
@@ -64,81 +64,40 @@ class TestReportGeneration:
         # Mock the GenerateReportFromVV function to return a success response
         mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_output.pdf"
 
-        with patch('routes.report_generation.GenerateReportFromVV') as mock_generate:
+        with patch('routes.report_generation.GenerateReportFromVV') as mock_generate, \
+             patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.send_file') as mock_send_file:
+
             mock_generate.return_value = mock_generated_path
+            mock_exists.return_value = True
+            mock_send_file.return_value = MagicMock()
 
-            # Mock file operations and provide mock file content
-            mock_file_content = b"Mock PDF content for testing"
-            import base64
-            mock_base64_content = base64.b64encode(mock_file_content).decode('utf-8')
+            # Make the request
+            response = client.post(
+                f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
+                data=vrd_content,
+                headers={
+                    'Content-Length': str(file_size),
+                    'Content-Type': 'application/octet-stream'
+                }
+            )
 
-            with patch('os.path.exists') as mock_exists, \
-                 patch('os.path.getsize') as mock_getsize, \
-                 patch('builtins.open', create=True) as mock_open:
+            # Verify send_file was called with correct parameters
+            mock_send_file.assert_called_once()
+            call_args = mock_send_file.call_args
+            assert call_args[0][0] == mock_generated_path
+            assert call_args.kwargs['as_attachment'] is True
+            assert call_args.kwargs['download_name'] == output_name
 
-                mock_exists.return_value = True
-                mock_getsize.return_value = len(mock_file_content)
+            # Verify GenerateReportFromVV was called correctly
+            mock_generate.assert_called_once()
+            gen_call_args = mock_generate.call_args[0]
 
-                # Mock file reading to return our test content
-                mock_file = MagicMock()
-                mock_file.read.return_value = mock_file_content
-                mock_open.return_value.__enter__.return_value = mock_file
-
-                # Make the request
-                response = client.post(
-                    f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
-                    data=vrd_content,
-                    headers={
-                        'Content-Length': str(file_size),
-                        'Content-Type': 'application/octet-stream'
-                    }
-                )
-
-                # Verify the response
-                assert response.status_code == 200
-
-                data = response.get_json()
-                assert data['success'] is True
-                assert data['data']['generated_file_path'] == mock_generated_path
-                assert data['data']['template_name'] == template_name
-                assert data['data']['output_name'] == output_name
-                assert data['data']['used_upload'] is True  # Verify upload mode was used
-                assert data['data']['file_exists'] is True
-                assert data['data']['file_size'] == len(mock_file_content)
-
-                # Verify file content is included
-                assert 'content' in data['data']
-                assert data['data']['content'] == mock_base64_content
-                assert data['data']['is_binary'] is True
-
-                # Save the generated file content to logs folder
-                try:
-                    # Get project root (two levels up from test file)
-                    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    logs_dir = os.path.join(project_root, "logs")
-                    os.makedirs(logs_dir, exist_ok=True)
-
-                    # Save the mock file content
-                    saved_filename = f"test_output_{template_name.replace(' ', '_').replace('.', '_')}.pdf"
-                    saved_path = os.path.join(logs_dir, saved_filename)
-
-                    with open(saved_path, 'wb') as f:
-                        f.write(mock_file_content)
-
-                    print(f"Saved test output to: {saved_path} ({len(mock_file_content)} bytes)")
-
-                except Exception as e:
-                    print(f"Failed to save test output to logs: {e}")
-
-                # Verify GenerateReportFromVV was called correctly
-                mock_generate.assert_called_once()
-                call_args = mock_generate.call_args[0]
-
-                # Check that a temporary file path was used
-                temp_file_path = call_args[0]
-                assert temp_file_path.endswith('.vrd')
-                assert call_args[1] == template_name  # template_name
-                assert call_args[2] == output_name    # output_name
+            # Check that a temporary file path was used
+            temp_file_path = gen_call_args[0]
+            assert temp_file_path.endswith('.vrd')
+            assert gen_call_args[1] == template_name  # template_name
+            assert gen_call_args[2] == output_name    # output_name
 
     def test_generatereport_missing_template_name(self, client, mock_vv, sample_vrd_path):
         """Test PUT /generatereport with missing template_name parameter"""
@@ -300,69 +259,31 @@ class TestReportGeneration:
         ]
 
         for template_name in templates_to_test:
-            with patch('routes.report_generation.GenerateReportFromVV') as mock_generate:
+            with patch('routes.report_generation.GenerateReportFromVV') as mock_generate, \
+                 patch('routes.report_generation.os.path.exists') as mock_exists, \
+                 patch('routes.report_generation.send_file') as mock_send_file:
+
                 mock_generated_path = f"C:\\VibrationVIEW\\Reports\\output_{template_name.replace(' ', '_')}.pdf"
                 mock_generate.return_value = mock_generated_path
+                mock_exists.return_value = True
+                mock_send_file.return_value = MagicMock()
 
-                # Mock file content for this template
-                mock_file_content = f"Mock PDF content for {template_name}".encode('utf-8')
-                import base64
-                mock_base64_content = base64.b64encode(mock_file_content).decode('utf-8')
+                response = client.post(
+                    f'/api/v1/generatereport?template_name={template_name}&output_name=output.pdf',
+                    data=vrd_content,
+                    headers={
+                        'Content-Length': str(len(vrd_content)),
+                        'Content-Type': 'application/octet-stream'
+                    }
+                )
 
-                with patch('os.path.exists') as mock_exists, \
-                     patch('os.path.getsize') as mock_getsize, \
-                     patch('builtins.open', create=True) as mock_open:
+                # Verify send_file was called
+                mock_send_file.assert_called_once()
 
-                    mock_exists.return_value = True
-                    mock_getsize.return_value = len(mock_file_content)
-
-                    # Mock file reading
-                    mock_file = MagicMock()
-                    mock_file.read.return_value = mock_file_content
-                    mock_open.return_value.__enter__.return_value = mock_file
-
-                    response = client.post(
-                        f'/api/v1/generatereport?template_name={template_name}&output_name=output.pdf',
-                        data=vrd_content,
-                        headers={
-                            'Content-Length': str(len(vrd_content)),
-                            'Content-Type': 'application/octet-stream'
-                        }
-                    )
-
-                    assert response.status_code == 200
-                    data = response.get_json()
-                    assert data['success'] is True
-                    assert data['data']['template_name'] == template_name
-
-                    # Verify file content is included
-                    assert 'content' in data['data']
-                    assert data['data']['content'] == mock_base64_content
-
-                    # Save the generated file content to logs folder
-                    try:
-                        # Get project root (two levels up from test file)
-                        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                        logs_dir = os.path.join(project_root, "logs")
-                        os.makedirs(logs_dir, exist_ok=True)
-
-                        # Save the mock file content
-                        safe_template_name = template_name.replace(' ', '_').replace('.', '_')
-                        saved_filename = f"test_output_multiple_{safe_template_name}.pdf"
-                        saved_path = os.path.join(logs_dir, saved_filename)
-
-                        with open(saved_path, 'wb') as f:
-                            f.write(mock_file_content)
-
-                        print(f"Saved test output for {template_name} to: {saved_path} ({len(mock_file_content)} bytes)")
-
-                    except Exception as e:
-                        print(f"Failed to save test output for {template_name} to logs: {e}")
-
-                    # Verify the correct template was used in the call
-                    mock_generate.assert_called_once()
-                    call_args = mock_generate.call_args[0]
-                    assert call_args[1] == template_name  # template_name parameter
+                # Verify the correct template was used in the call
+                mock_generate.assert_called_once()
+                call_args = mock_generate.call_args[0]
+                assert call_args[1] == template_name  # template_name parameter
 
 
 
@@ -378,61 +299,472 @@ class TestReportGeneration:
         template_name = "Test Report (v2.1).vvtemplate"
         output_name = "test_report_2025-09-22_final.pdf"
 
-        with patch('routes.report_generation.GenerateReportFromVV') as mock_generate:
+        with patch('routes.report_generation.GenerateReportFromVV') as mock_generate, \
+             patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.send_file') as mock_send_file:
+
             mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_2025-09-22_final.pdf"
             mock_generate.return_value = mock_generated_path
+            mock_exists.return_value = True
+            mock_send_file.return_value = MagicMock()
 
-            # Mock file content with special characters
-            mock_file_content = f"Mock PDF content for special chars test: {template_name} -> {output_name}".encode('utf-8')
-            import base64
-            mock_base64_content = base64.b64encode(mock_file_content).decode('utf-8')
+            response = client.post(
+                f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
+                data=vrd_content,
+                headers={
+                    'Content-Length': str(len(vrd_content)),
+                    'Content-Type': 'application/octet-stream'
+                }
+            )
 
-            with patch('os.path.exists') as mock_exists, \
-                 patch('os.path.getsize') as mock_getsize, \
-                 patch('builtins.open', create=True) as mock_open:
+            # Verify send_file was called with correct parameters
+            mock_send_file.assert_called_once()
+            call_args = mock_send_file.call_args
+            assert call_args[0][0] == mock_generated_path
+            assert call_args.kwargs['as_attachment'] is True
+            assert call_args.kwargs['download_name'] == output_name
 
-                mock_exists.return_value = True
-                mock_getsize.return_value = len(mock_file_content)
+            # Verify GenerateReportFromVV was called with correct template
+            mock_generate.assert_called_once()
+            gen_call_args = mock_generate.call_args[0]
+            assert gen_call_args[1] == template_name
+            assert gen_call_args[2] == output_name
 
-                # Mock file reading
-                mock_file = MagicMock()
-                mock_file.read.return_value = mock_file_content
-                mock_open.return_value.__enter__.return_value = mock_file
 
-                response = client.post(
-                    f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
-                    data=vrd_content,
-                    headers={
-                        'Content-Length': str(len(vrd_content)),
-                        'Content-Type': 'application/octet-stream'
-                    }
-                )
+class TestDatafileRoute:
+    """Test datafile endpoint path validation security"""
 
-                assert response.status_code == 200
-                data = response.get_json()
-                assert data['success'] is True
-                assert data['data']['template_name'] == template_name
-                assert data['data']['output_name'] == output_name
+    @pytest.fixture
+    def app(self):
+        """Create test app"""
+        app = create_app()
+        app.config['TESTING'] = True
+        return app
 
-                # Verify file content is included
-                assert 'content' in data['data']
-                assert data['data']['content'] == mock_base64_content
+    @pytest.fixture
+    def client(self, app):
+        """Create test client"""
+        return app.test_client()
 
-                # Save the generated file content to logs folder
-                try:
-                    # Get project root (two levels up from test file)
-                    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    logs_dir = os.path.join(project_root, "logs")
-                    os.makedirs(logs_dir, exist_ok=True)
+    @pytest.fixture
+    def mock_vv(self):
+        """Create and set mock VibrationVIEW instance"""
+        reset_vv_instance()
+        mock_instance = MockVibrationVIEW()
+        set_vv_instance(mock_instance)
+        yield mock_instance
+        reset_vv_instance()
 
-                    # Save the mock file content with safe filename
-                    safe_filename = f"test_output_special_chars_{output_name.replace('-', '_').replace('.', '_')}.pdf"
-                    saved_path = os.path.join(logs_dir, safe_filename)
+    def test_datafile_rejects_path_traversal_dotdot(self, client, mock_vv):
+        """Test that datafile rejects path traversal with .."""
+        response = client.get('/api/v1/datafile?file_path=..\\..\\Windows\\System32\\config\\sam')
 
-                    with open(saved_path, 'wb') as f:
-                        f.write(mock_file_content)
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'Path traversal detected' in data['error']['message']
 
-                    print(f"Saved test output for special chars test to: {saved_path} ({len(mock_file_content)} bytes)")
+    def test_datafile_rejects_absolute_path_outside_authorized(self, client, mock_vv):
+        """Test that datafile rejects absolute paths outside authorized directories"""
+        response = client.get('/api/v1/datafile?file_path=C:\\Windows\\System32\\cmd.exe')
 
-                except Exception as e:
-                    print(f"Failed to save test output for special chars test to logs: {e}")
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'not within authorized directories' in data['error']['message']
+
+    def test_datafile_rejects_unix_path_traversal(self, client, mock_vv):
+        """Test that datafile rejects Unix-style path traversal"""
+        response = client.get('/api/v1/datafile?file_path=/../../../etc/passwd')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_datafile_rejects_encoded_path_traversal(self, client, mock_vv):
+        """Test that datafile rejects encoded path traversal attempts"""
+        # URL encoded ..
+        response = client.get('/api/v1/datafile?file_path=%2e%2e%5c%2e%2e%5cWindows%5cSystem32%5ccmd.exe')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_datafile_rejects_multiple_colons(self, client, mock_vv):
+        """Test that datafile rejects paths with multiple colons (potential ADS or injection)"""
+        response = client.get('/api/v1/datafile?file_path=C:\\data\\file.vrd:hidden:$DATA')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'Path traversal detected' in data['error']['message']
+
+    def test_datafile_allows_authorized_path(self, client, mock_vv):
+        """Test that datafile allows paths within authorized directories"""
+        from config import Config
+
+        # Get an authorized directory
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        test_file_path = os.path.join(authorized_dir, 'test_file.vrd')
+
+        with patch('os.path.exists') as mock_exists:
+            mock_exists.return_value = False  # File doesn't exist but path should be validated
+
+            response = client.get(f'/api/v1/datafile?file_path={test_file_path}')
+
+            # Should pass path validation but fail on file not found
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data['error']['code'] == 'FILE_NOT_FOUND'
+
+    def test_datafile_uses_last_datafile_when_no_path(self, client, mock_vv):
+        """Test that datafile uses LastDataFile from VibrationVIEW when no path provided"""
+        from config import Config
+
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        last_data_file = os.path.join(authorized_dir, 'last_test.vrd')
+        mock_vv.ReportField.return_value = last_data_file
+
+        with patch('os.path.exists') as mock_exists:
+            mock_exists.return_value = False
+
+            response = client.get('/api/v1/datafile')
+
+            # Should try to use LastDataFile and fail on file not found
+            assert response.status_code == 404
+            mock_vv.ReportField.assert_called_with('LastDataFile')
+
+    def test_datafile_post_rejects_path_traversal(self, client, mock_vv):
+        """Test that datafile POST also rejects path traversal"""
+        response = client.post(
+            '/api/v1/datafile',
+            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+        )
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_datafile_returns_file_when_valid(self, client, mock_vv):
+        """Test that datafile returns file content when path is valid and file exists"""
+        from config import Config
+
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        test_file_path = os.path.join(authorized_dir, 'test_file.vrd')
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.send_file') as mock_send_file:
+
+            mock_exists.return_value = True
+            mock_send_file.return_value = MagicMock()
+
+            response = client.get(f'/api/v1/datafile?file_path={test_file_path}')
+
+            # send_file should have been called with the validated path
+            mock_send_file.assert_called_once()
+            call_args = mock_send_file.call_args
+            assert 'as_attachment' in call_args.kwargs
+            assert call_args.kwargs['as_attachment'] is True
+
+
+class TestGenerateReportPathValidation:
+    """Test generatereport endpoint path validation security"""
+
+    @pytest.fixture
+    def app(self):
+        """Create test app"""
+        app = create_app()
+        app.config['TESTING'] = True
+        return app
+
+    @pytest.fixture
+    def client(self, app):
+        """Create test client"""
+        return app.test_client()
+
+    @pytest.fixture
+    def mock_vv(self):
+        """Create and set mock VibrationVIEW instance"""
+        reset_vv_instance()
+        mock_instance = MockVibrationVIEW()
+        set_vv_instance(mock_instance)
+        yield mock_instance
+        reset_vv_instance()
+
+    def test_generatereport_rejects_path_traversal_dotdot(self, client, mock_vv):
+        """Test that generatereport rejects path traversal with .."""
+        response = client.get('/api/v1/generatereport?file_path=..\\..\\Windows\\System32\\config\\sam')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'Path traversal detected' in data['error']['message']
+
+    def test_generatereport_rejects_absolute_path_outside_authorized(self, client, mock_vv):
+        """Test that generatereport rejects absolute paths outside authorized directories"""
+        response = client.get('/api/v1/generatereport?file_path=C:\\Windows\\System32\\cmd.exe')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'not within authorized directories' in data['error']['message']
+
+    def test_generatereport_rejects_unix_path_traversal(self, client, mock_vv):
+        """Test that generatereport rejects Unix-style path traversal"""
+        response = client.get('/api/v1/generatereport?file_path=/../../../etc/passwd')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatereport_rejects_multiple_colons(self, client, mock_vv):
+        """Test that generatereport rejects paths with multiple colons"""
+        response = client.get('/api/v1/generatereport?file_path=C:\\data\\file.vrd:hidden:$DATA')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatereport_post_rejects_path_traversal(self, client, mock_vv):
+        """Test that generatereport POST also rejects path traversal"""
+        response = client.post(
+            '/api/v1/generatereport',
+            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+        )
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatereport_rejects_malicious_output_path(self, client, mock_vv):
+        """Test that generatereport rejects malicious output paths"""
+        from config import Config
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, 'test.vrd')
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists:
+            mock_exists.return_value = True  # File exists, so we get to output validation
+
+            response = client.get(
+                f'/api/v1/generatereport?file_path={valid_input}&output_name=..\\..\\Windows\\evil.exe'
+            )
+
+            assert response.status_code == 403
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'OUTPUT_PATH_VALIDATION_ERROR'
+
+
+class TestGenerateTxtPathValidation:
+    """Test generatetxt endpoint path validation security"""
+
+    @pytest.fixture
+    def app(self):
+        """Create test app"""
+        app = create_app()
+        app.config['TESTING'] = True
+        return app
+
+    @pytest.fixture
+    def client(self, app):
+        """Create test client"""
+        return app.test_client()
+
+    @pytest.fixture
+    def mock_vv(self):
+        """Create and set mock VibrationVIEW instance"""
+        reset_vv_instance()
+        mock_instance = MockVibrationVIEW()
+        set_vv_instance(mock_instance)
+        yield mock_instance
+        reset_vv_instance()
+
+    def test_generatetxt_rejects_path_traversal_dotdot(self, client, mock_vv):
+        """Test that generatetxt rejects path traversal with .."""
+        response = client.get('/api/v1/generatetxt?file_path=..\\..\\Windows\\System32\\config\\sam')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'Path traversal detected' in data['error']['message']
+
+    def test_generatetxt_rejects_absolute_path_outside_authorized(self, client, mock_vv):
+        """Test that generatetxt rejects absolute paths outside authorized directories"""
+        response = client.get('/api/v1/generatetxt?file_path=C:\\Windows\\System32\\cmd.exe')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'not within authorized directories' in data['error']['message']
+
+    def test_generatetxt_rejects_unix_path_traversal(self, client, mock_vv):
+        """Test that generatetxt rejects Unix-style path traversal"""
+        response = client.get('/api/v1/generatetxt?file_path=/../../../etc/passwd')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatetxt_rejects_multiple_colons(self, client, mock_vv):
+        """Test that generatetxt rejects paths with multiple colons"""
+        response = client.get('/api/v1/generatetxt?file_path=C:\\data\\file.vrd:hidden:$DATA')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatetxt_post_rejects_path_traversal(self, client, mock_vv):
+        """Test that generatetxt POST also rejects path traversal"""
+        response = client.post(
+            '/api/v1/generatetxt',
+            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+        )
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generatetxt_rejects_malicious_output_path(self, client, mock_vv):
+        """Test that generatetxt rejects malicious output paths"""
+        from config import Config
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, 'test.vrd')
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists:
+            mock_exists.return_value = True  # File exists, so we get to output validation
+
+            response = client.get(
+                f'/api/v1/generatetxt?file_path={valid_input}&output_name=..\\..\\Windows\\evil.txt'
+            )
+
+            assert response.status_code == 403
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'OUTPUT_PATH_VALIDATION_ERROR'
+
+
+class TestGenerateUffPathValidation:
+    """Test generateuff endpoint path validation security"""
+
+    @pytest.fixture
+    def app(self):
+        """Create test app"""
+        app = create_app()
+        app.config['TESTING'] = True
+        return app
+
+    @pytest.fixture
+    def client(self, app):
+        """Create test client"""
+        return app.test_client()
+
+    @pytest.fixture
+    def mock_vv(self):
+        """Create and set mock VibrationVIEW instance"""
+        reset_vv_instance()
+        mock_instance = MockVibrationVIEW()
+        set_vv_instance(mock_instance)
+        yield mock_instance
+        reset_vv_instance()
+
+    def test_generateuff_rejects_path_traversal_dotdot(self, client, mock_vv):
+        """Test that generateuff rejects path traversal with .."""
+        response = client.get('/api/v1/generateuff?file_path=..\\..\\Windows\\System32\\config\\sam')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'Path traversal detected' in data['error']['message']
+
+    def test_generateuff_rejects_absolute_path_outside_authorized(self, client, mock_vv):
+        """Test that generateuff rejects absolute paths outside authorized directories"""
+        response = client.get('/api/v1/generateuff?file_path=C:\\Windows\\System32\\cmd.exe')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+        assert 'not within authorized directories' in data['error']['message']
+
+    def test_generateuff_rejects_unix_path_traversal(self, client, mock_vv):
+        """Test that generateuff rejects Unix-style path traversal"""
+        response = client.get('/api/v1/generateuff?file_path=/../../../etc/passwd')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generateuff_rejects_multiple_colons(self, client, mock_vv):
+        """Test that generateuff rejects paths with multiple colons"""
+        response = client.get('/api/v1/generateuff?file_path=C:\\data\\file.vrd:hidden:$DATA')
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generateuff_post_rejects_path_traversal(self, client, mock_vv):
+        """Test that generateuff POST also rejects path traversal"""
+        response = client.post(
+            '/api/v1/generateuff',
+            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+        )
+
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'PATH_VALIDATION_ERROR'
+
+    def test_generateuff_rejects_malicious_output_path(self, client, mock_vv):
+        """Test that generateuff rejects malicious output paths"""
+        from config import Config
+        authorized_dir = getattr(Config, 'DATA_FOLDER', None) or getattr(Config, 'REPORT_FOLDER', None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, 'test.vrd')
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists:
+            mock_exists.return_value = True  # File exists, so we get to output validation
+
+            response = client.get(
+                f'/api/v1/generateuff?file_path={valid_input}&output_name=..\\..\\Windows\\evil.uff'
+            )
+
+            assert response.status_code == 403
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'OUTPUT_PATH_VALIDATION_ERROR'
