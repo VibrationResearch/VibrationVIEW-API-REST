@@ -230,16 +230,16 @@ def report_fields(vv_instance):
                 parsed_item = []
                 for elem in item:
                     if isinstance(elem, str) and ('\t' in elem or '\r\n' in elem):
-                        # Split by tab and/or newline to create array
-                        values = [v.strip() for v in elem.replace('\r\n', '\t').split('\t') if v.strip()]
-                        parsed_item.append(values)
+                        # Split by newline to get rows, remove single trailing tab from each row
+                        rows = [(row[:-1] if row.endswith('\t') else row).split('\t') for row in elem.split('\r\n') if row]
+                        parsed_item.append(rows)
                     else:
                         parsed_item.append(elem)
                 results_list.append(parsed_item)
             elif isinstance(item, str) and ('\t' in item or '\r\n' in item):
-                # Split delimited string into array
-                values = [v.strip() for v in item.replace('\r\n', '\t').split('\t') if v.strip()]
-                results_list.append(values)
+                # Split by newline to get rows, remove single trailing tab from each row
+                rows = [(row[:-1] if row.endswith('\t') else row).split('\t') for row in item.split('\r\n') if row]
+                results_list.append(rows)
             else:
                 results_list.append(item)
 
