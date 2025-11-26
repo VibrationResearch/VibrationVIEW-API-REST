@@ -1,0 +1,1 @@
+[VECTOR:Header,Frequency,FreqDemand,FreqControl,FreqDrive,FreqPlusTol,FreqMinusTol,FreqPlusAbort,FreqMinusAbort,FreqSystemResponse,FreqFilter,FreqChannel*,FreqDrive*,FFTChannel*]
