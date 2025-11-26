@@ -546,7 +546,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
             try:
                 # Generate text file using the temporary file
-                primary_file_path = GenerateTXTFromVV(temp_file_path, output_name)
+                primary_file_path = generate_func(temp_file_path, output_name)
                 file_path = temp_file_path  # For response data
                 used_upload = True
 
@@ -623,8 +623,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
             )), 403
 
         try:
-            # Generate text files (may create multiple files)
-            primary_file_path = GenerateTXTFromVV(file_path, output_name)
+            primary_file_path = generate_func(file_path, output_name)
 
         except Exception as e:
             return jsonify(error_response(
