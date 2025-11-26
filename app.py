@@ -34,7 +34,8 @@ from routes import (
     auxinputs_bp,
     gui_control_bp,
     report_generation_bp,
-    virtual_channels_bp
+    virtual_channels_bp,
+    log_bp
 )
 
 # Import configuration
@@ -130,6 +131,7 @@ def create_app(config_class=Config):
     app.register_blueprint(gui_control_bp, url_prefix='/api/v1')
     app.register_blueprint(report_generation_bp, url_prefix='/api/v1')
     app.register_blueprint(virtual_channels_bp, url_prefix='/api/v1')
+    app.register_blueprint(log_bp, url_prefix='/api/v1')
 
     # Health check endpoint
     @app.route('/api/v1/health', methods=['GET'])
@@ -158,7 +160,8 @@ def create_app(config_class=Config):
                 'reporting',
                 'auxinputs',
                 'gui_control',
-                'virtual_channels'
+                'virtual_channels',
+                'log'
             ],
             'endpoints': [
                 'POST /api/v1/starttest',
@@ -212,7 +215,8 @@ def create_app(config_class=Config):
                 'reporting': 'Reporting parameters',
                 'auxinputs': 'Aux Inputs parameters',
                 'gui_control': 'GUI and window management operations',
-                'virtual_channels': 'Virtual channel management (import, remove)'
+                'virtual_channels': 'Virtual channel management (import, remove)',
+                'log': 'Event log retrieval'
             },
             'module_docs': {
                 'basic_control': request.host_url + 'api/v1/docs/basic_control',
@@ -228,7 +232,8 @@ def create_app(config_class=Config):
                 'reporting': request.host_url + 'api/v1/docs/reporting',
                 'auxinputs': request.host_url + 'api/v1/docs/auxinputs',
                 'gui_control': request.host_url + 'api/v1/docs/gui_control',
-                'virtual_channels': request.host_url + 'api/v1/docs/virtual_channels'
+                'virtual_channels': request.host_url + 'api/v1/docs/virtual_channels',
+                'log': request.host_url + 'api/v1/docs/log'
             }
         }
         
