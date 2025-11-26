@@ -7,7 +7,7 @@ Report Generation Routes - VibrationVIEW Command Line Operations
 File generation operations using VibrationVIEW command line interface
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.utils import handle_binary_upload
@@ -323,90 +323,13 @@ def generate_report(vv_instance):
             )), 500
 
     # Check if file was actually created
-    file_exists = os.path.exists(generated_file_path)
-    file_size = os.path.getsize(generated_file_path) if file_exists else 0
+    if not os.path.exists(generated_file_path):
+        return jsonify(error_response(
+            f'Generated file does not exist at path: {generated_file_path}',
+            'FILE_NOT_FOUND'
+        )), 404
 
-    # Read the generated report file content (if it's a readable format)
-    file_content = ""
-    content_error = None
-    content_type = "unknown"
-    is_binary = False
-
-    if file_exists:
-        if file_size > 0:
-            # Determine file type from extension
-            file_ext = os.path.splitext(generated_file_path)[1].lower()
-
-            if file_ext in ['.txt', '.html', '.htm', '.xml', '.csv']:
-                # Text-based formats - read as text
-                content_type = "text"
-                try:
-                    with open(generated_file_path, 'r', encoding='utf-8') as f:
-                        file_content = f.read()
-                except UnicodeDecodeError:
-                    try:
-                        with open(generated_file_path, 'r', encoding='latin-1') as f:
-                            file_content = f.read()
-                    except Exception as e:
-                        content_error = f"Failed to read text file: {str(e)}"
-                except Exception as e:
-                    content_error = f"Failed to read file: {str(e)}"
-
-            elif file_ext in ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']:
-                # Binary formats - read as base64
-                content_type = "binary"
-                is_binary = True
-                try:
-                    import base64
-                    with open(generated_file_path, 'rb') as f:
-                        binary_data = f.read()
-                        file_content = base64.b64encode(binary_data).decode('utf-8')
-                except Exception as e:
-                    content_error = f"Failed to read binary file: {str(e)}"
-
-            else:
-                # Unknown format - try as text first, then binary
-                try:
-                    with open(generated_file_path, 'r', encoding='utf-8') as f:
-                        file_content = f.read()
-                        content_type = "text"
-                except:
-                    try:
-                        import base64
-                        with open(generated_file_path, 'rb') as f:
-                            binary_data = f.read()
-                            file_content = base64.b64encode(binary_data).decode('utf-8')
-                            content_type = "binary"
-                            is_binary = True
-                    except Exception as e:
-                        content_error = f"Failed to read file as text or binary: {str(e)}"
-        else:
-            content_error = "Generated file is empty (0 bytes)"
-    else:
-        content_error = f"Generated file does not exist at path: {generated_file_path}"
-
-    response_data = {
-        'generated_file_path': generated_file_path,
-        'file_path': file_path,
-        'template_name': template_name,
-        'output_name': output_name,
-        'used_upload': used_upload,
-        'used_last_data_file': not used_upload and ('file_path' not in (request_data if not used_upload else {})),
-        'file_exists': file_exists,
-        'file_size': file_size,
-        'content_type': content_type,
-        'is_binary': is_binary,
-        'content': file_content
-    }
-
-    # Add content error info if there was an issue
-    if content_error:
-        response_data['content_error'] = content_error
-
-    return jsonify(success_response(
-        response_data,
-        f"Report generated: {generated_file_path}" + (f" (Warning: {content_error})" if content_error else "")
-    ))
+    return send_file(generated_file_path, as_attachment=True, download_name=os.path.basename(generated_file_path))
 
 
 @report_generation_bp.route('/generatetxt', methods=['POST'])
@@ -506,6 +429,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
     Returns:
         Flask response with file generation results
     """
+    extension = f'.{file_type.lower()}'
     content_length = request.content_length
     content_type = request.content_type or ''
 
@@ -598,9 +522,8 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
         # Use default output_name if not provided - base it on the data file name
         if not output_name:
-            # Extract base filename from file_path and change extension to .txt
             base_name = os.path.splitext(os.path.basename(file_path))[0]
-            output_name = f"{base_name}.txt"
+            output_name = f"{base_name}{extension}"
 
         # Validate file_path security and existence
         try:
@@ -640,115 +563,23 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
                 'TXT_GENERATION_ERROR'
             )), 500
 
-    # Find all generated files matching the pattern outputfilename-n.ext (n=1-9)
-    base_name = os.path.splitext(output_name)[0]  # Remove extension
-    extension = '.uff' if file_type == 'UFF' else '.txt'
+    # Find the first generated file (pattern: basename-1.ext)
+    base_name = os.path.splitext(output_name)[0]
     directory = os.path.dirname(primary_file_path) if os.path.dirname(primary_file_path) else os.path.dirname(os.path.abspath(primary_file_path))
 
-    generated_files = []
-    all_content = ""
+    # Check for first file with pattern: basename-1.ext
+    first_file = os.path.join(directory, f"{base_name}-1{extension}")
+    if os.path.exists(first_file):
+        return send_file(first_file, as_attachment=True)
 
-    # Check for files with pattern: basename-1.ext, basename-2.ext, etc.
-    for i in range(1, 10):  # Check files 1-9
-        pattern_file = os.path.join(directory, f"{base_name}-{i}{extension}")
-        if os.path.exists(pattern_file):
-            file_size = os.path.getsize(pattern_file)
-            file_content = ""
+    # Fallback to primary file path if pattern file not found
+    if os.path.exists(primary_file_path):
+        return send_file(primary_file_path, as_attachment=True)
 
-            # Read file content
-            if file_size > 0:
-                try:
-                    with open(pattern_file, 'r', encoding='utf-8') as f:
-                        file_content = f.read()
-                except UnicodeDecodeError:
-                    try:
-                        with open(pattern_file, 'r', encoding='latin-1') as f:
-                            file_content = f.read()
-                    except Exception as e:
-                        file_content = f"[Error reading file: {str(e)}]"
-                except Exception as e:
-                    file_content = f"[Error reading file: {str(e)}]"
-
-            generated_files.append({
-                'file_path': pattern_file,
-                'file_name': f"{base_name}-{i}{extension}",
-                'file_size': file_size,
-                'content': file_content
-            })
-
-            # Append to combined content with separator
-            if all_content:
-                all_content += f"\n\n--- File {i}: {base_name}-{i}{extension} ---\n\n"
-            else:
-                all_content += f"--- File {i}: {base_name}-{i}{extension} ---\n\n"
-            all_content += file_content
-
-    # If no pattern files found, check the original file path
-    if not generated_files and os.path.exists(primary_file_path):
-        file_size = os.path.getsize(primary_file_path)
-        file_content = ""
-
-        if file_size > 0:
-            try:
-                with open(primary_file_path, 'r', encoding='utf-8') as f:
-                    file_content = f.read()
-            except UnicodeDecodeError:
-                try:
-                    with open(primary_file_path, 'r', encoding='latin-1') as f:
-                        file_content = f.read()
-                except Exception as e:
-                    file_content = f"[Error reading file: {str(e)}]"
-            except Exception as e:
-                file_content = f"[Error reading file: {str(e)}]"
-
-        generated_files.append({
-            'file_path': primary_file_path,
-            'file_name': output_name,
-            'file_size': file_size,
-            'content': file_content
-        })
-        all_content = file_content
-
-    # Create files_content array similar to generatereport pattern
-    files_content = []
-    for file_info in generated_files:
-        files_content.append({
-            'filename': file_info['file_name'],
-            'content': file_info['content'],
-            'is_binary': False,  # Both UFF and TXT files are text-based
-            'content_type': 'text/plain'
-        })
-
-    # Determine primary content info (for single file compatibility)
-    primary_content = ""
-    primary_content_type = "text/plain"
-    primary_is_binary = False
-
-    if generated_files:
-        # Use the first file as primary content
-        primary_content = generated_files[0]['content']
-
-    response_data = {
-        'primary_file_path': primary_file_path,
-        'file_path': file_path,
-        'output_name': output_name,
-        'used_upload': used_upload,
-        'used_last_data_file': not used_upload and ('file_path' not in (request_data if not used_upload else {})),
-        'files_found': len(generated_files),
-        'generated_files': generated_files,
-        'files_content': files_content,  # New field for compatibility with integration tests
-        'combined_content': all_content,
-        'total_size': sum(f['file_size'] for f in generated_files),
-        # Add generatereport-style fields for primary file
-        'content': primary_content,
-        'content_type': primary_content_type,
-        'is_binary': primary_is_binary
-    }
-
-    return jsonify(success_response(
-        response_data,
-        f"{file_type} file(s) generated successfully. Found {len(generated_files)} file(s)."
-    ))
+    return jsonify(error_response(
+        f'Generated file not found',
+        'FILE_NOT_FOUND'
+    )), 404
 
 
 # Constants for upload endpoints
