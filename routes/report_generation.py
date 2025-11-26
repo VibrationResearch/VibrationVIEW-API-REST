@@ -142,7 +142,7 @@ def get_documentation():
     return jsonify(docs)
 
 
-@report_generation_bp.route('/generatereport', methods=['POST'])
+@report_generation_bp.route('/generatereport', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def generate_report(vv_instance):
@@ -443,7 +443,7 @@ def generate_txt(vv_instance):
     return _generate_files_common(vv_instance, 'TXT', GenerateTXTFromVV, 'text')
 
 
-@report_generation_bp.route('/generateuff', methods=['POST'])
+@report_generation_bp.route('/generateuff', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def generate_uff(vv_instance):
