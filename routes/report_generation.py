@@ -102,6 +102,15 @@ def get_documentation():
                     'filepath': 'POST /api/v1/generateuff with JSON body: {"file_path": "test.vrd", "output_name": "data.uff"} or query params'
                 }
             },
+            'GET /datafile': {
+                'description': 'Get the raw VibrationVIEW data file (.vrd) content without any processing',
+                'parameters': {
+                    'file_path': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)'
+                },
+                'returns': 'binary - Raw .vrd file content as binary data',
+                'note': 'Returns the unprocessed data file directly as binary. Useful for downloading or transferring raw test data.',
+                'example': 'GET /api/v1/datafile or GET /api/v1/datafile?file_path=test.vrd'
+            },
             'PUT /generatetxt': {
                 'description': 'Upload VibrationVIEW data file and generate a text file',
                 'function': 'GenerateTXTFromVV(filePath, outputName)',
@@ -332,7 +341,67 @@ def generate_report(vv_instance):
     return send_file(generated_file_path, as_attachment=True, download_name=os.path.basename(generated_file_path))
 
 
-@report_generation_bp.route('/generatetxt', methods=['POST'])
+@report_generation_bp.route('/datafile', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def get_datafile(vv_instance):
+    """
+    Get Raw VibrationVIEW Data File
+
+    Returns the unprocessed VibrationVIEW data file (.vrd) content.
+    No report generation or format conversion is performed.
+
+    Query Parameters:
+        file_path: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
+
+    Returns:
+        Binary .vrd file content as base64-encoded data
+
+    Example: GET /api/v1/datafile
+             GET /api/v1/datafile?file_path=test.vrd
+             POST /api/v1/datafile with JSON body: {"file_path": "test.vrd"}
+    """
+    try:
+        request_data = request.get_json() or {}
+    except Exception:
+        request_data = {}
+
+    file_path = request_data.get('file_path') or request.args.get('file_path')
+
+    # If file_path is not provided, use the last data file from VibrationVIEW
+    if not file_path:
+        try:
+            file_path = vv_instance.ReportField('LastDataFile')
+            if not file_path:
+                return jsonify(error_response(
+                    'No file_path provided and no last data file available in VibrationVIEW',
+                    'NO_DATA_FILE_AVAILABLE'
+                )), 400
+        except Exception as e:
+            return jsonify(error_response(
+                f'Failed to get last data file from VibrationVIEW: {str(e)}',
+                'LAST_DATA_FILE_ERROR'
+            )), 500
+
+    # Validate file_path security and existence
+    try:
+        validated_file_path = validate_file_path(file_path, "datafile retrieval")
+    except PathValidationError as e:
+        return jsonify(error_response(
+            str(e),
+            'PATH_VALIDATION_ERROR'
+        )), 403
+
+    if not os.path.exists(validated_file_path):
+        return jsonify(error_response(
+            f'File not found: {validated_file_path}',
+            'FILE_NOT_FOUND'
+        )), 404
+
+    return send_file(validated_file_path, as_attachment=True, download_name=os.path.basename(validated_file_path))
+
+
+@report_generation_bp.route('/generatetxt', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def generate_txt(vv_instance):
