@@ -10,7 +10,7 @@ Usage:
 
 This test verifies that the file generation endpoints work correctly with real
 VibrationVIEW AUTOMATION objects and actual VRD file uploads:
-- /generatereport - Generate PDF reports from VRD files using templates
+- /generatereport - Generate reports from VRD files using templates
 - /generateuff - Generate UFF files from VRD files
 - /generatetxt - Generate TXT files from VRD files
 
