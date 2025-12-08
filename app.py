@@ -105,7 +105,9 @@ def create_app(config_class=Config):
     # Configure logging
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    
+
+    # Clear any existing handlers to ensure basicConfig takes effect
+    logging.root.handlers = []
     logging.basicConfig(
         level=getattr(logging, app.config.get('LOG_LEVEL', 'INFO')),
         format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
