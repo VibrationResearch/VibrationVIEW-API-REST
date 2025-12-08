@@ -459,7 +459,7 @@ def upload_and_open_test(vv_instance):
                 test_name = test[3].lower() if test[3] else ''
                 
                 if basename_lower == test_name:
-                    vv_instance.CloseTest(int(test[0]))
+                    vv_instance.CloseTab(int(test[0]))
 
         # Open the uploaded test file
         result = vv_instance.OpenTest(file_path)
