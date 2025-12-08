@@ -17,6 +17,8 @@ from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUF
 import logging
 import os
 import tempfile
+import zipfile
+import io
 from datetime import datetime
 
 # Create blueprint
@@ -110,6 +112,13 @@ def get_documentation():
                 'returns': 'binary - Raw .vrd file content as binary data',
                 'note': 'Returns the unprocessed data file directly as binary. Useful for downloading or transferring raw test data.',
                 'example': 'GET /api/v1/datafile or GET /api/v1/datafile?file_path=test.vrd'
+            },
+            'GET /datafiles': {
+                'description': 'Get all data files generated during the completed test as a zip archive',
+                'parameters': {},
+                'returns': 'binary - Zip file containing all data files from the completed test',
+                'note': 'Returns a zip archive of all .vrd data files generated during the completed test. Useful for bulk download of test data.',
+                'example': 'GET /api/v1/datafiles'
             },
             'PUT /generatetxt': {
                 'description': 'Upload VibrationVIEW data file and generate a text file',
@@ -399,6 +408,95 @@ def get_datafile(vv_instance):
         )), 404
 
     return send_file(validated_file_path, as_attachment=True, download_name=os.path.basename(validated_file_path))
+
+
+@report_generation_bp.route('/datafiles', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def get_datafiles(vv_instance):
+    """
+    Get All Data Files from most recently run test as Zip Archive
+
+    Returns a zip file containing all data files from VibrationVIEW history
+    using the ReportFieldsHistory method to get the list of files from most recent test.
+
+    Returns:
+        Zip archive containing all data files from history
+
+    Example: GET /api/v1/datafiles
+    """
+    # Get the list of data files from VibrationVIEW history using ReportFieldsHistory
+    try:
+        # ReportFieldsHistory returns a 2D array: (parameter, value1, value2, ...)
+        # Using 'LastData' to get the history of data files
+        # if more than one data file, an additional row with LastData is always added to the top
+        # when only one data file, it returns just fields without additional row
+        fields_history = vv_instance.ReportFieldsHistory('LastData,StopCode,RunTime,Time')
+        if not fields_history or len(fields_history) == 0:
+            return jsonify(error_response(
+                'No data files found in VibrationVIEW history',
+                'NO_DATA_FILES'
+            )), 404
+
+        # Extract file paths from the history (skip first element which is the field name)
+        # fields_history format: [['LastDataFile', 'file1.vrd', 'file2.vrd', ...]]
+        file_paths = []
+        for row in fields_history:
+            # Skip the first element (field name) and collect file paths
+            for file_path in row[1:]:
+                if file_path and os.path.exists(file_path):
+                    file_paths.append(file_path)
+
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to get data files from VibrationVIEW history: {str(e)}',
+            'HISTORY_RETRIEVAL_ERROR'
+        )), 500
+
+    if not file_paths:
+        return jsonify(error_response(
+            'No valid data files found in VibrationVIEW history',
+            'NO_FILES_FOUND'
+        )), 404
+
+    # Create zip file in memory
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        file_count = 0
+        added_filenames = set()  # Track added filenames to avoid duplicates
+        for file_path in file_paths:
+            if os.path.isfile(file_path):
+                filename = os.path.basename(file_path)
+                # Handle duplicate filenames by adding a suffix
+                original_filename = filename
+                suffix = 1
+                while filename in added_filenames:
+                    name, ext = os.path.splitext(original_filename)
+                    filename = f"{name}_{suffix}{ext}"
+                    suffix += 1
+                zip_file.write(file_path, filename)
+                added_filenames.add(filename)
+                file_count += 1
+
+    if file_count == 0:
+        return jsonify(error_response(
+            'No files could be added to the archive',
+            'NO_FILES_ADDED'
+        )), 404
+
+    zip_buffer.seek(0)
+
+    # Generate zip filename based on first file's name (without path and extension)
+    first_file_base = os.path.splitext(os.path.basename(file_paths[0]))[0]
+    zip_filename = f'{first_file_base}.zip'
+
+    return send_file(
+        zip_buffer,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=zip_filename
+    )
 
 
 @report_generation_bp.route('/generatetxt', methods=['GET', 'POST'])

@@ -482,6 +482,141 @@ class TestDatafileRoute:
             assert call_args.kwargs['as_attachment'] is True
 
 
+class TestDatafilesRoute:
+    """Test datafiles endpoint that returns zip of all files in OutDir"""
+
+    @pytest.fixture
+    def app(self):
+        """Create test app"""
+        app = create_app()
+        app.config['TESTING'] = True
+        return app
+
+    @pytest.fixture
+    def client(self, app):
+        """Create test client"""
+        return app.test_client()
+
+    @pytest.fixture
+    def mock_vv(self):
+        """Create and set mock VibrationVIEW instance"""
+        reset_vv_instance()
+        mock_instance = MockVibrationVIEW()
+        set_vv_instance(mock_instance)
+        yield mock_instance
+        reset_vv_instance()
+
+    def test_datafiles_returns_zip_when_files_exist(self, client, mock_vv):
+        """Test that datafiles returns a zip file when OutDir has files"""
+        mock_out_dir = 'C:\\VibrationVIEW\\Data'
+        mock_vv.ReportField.return_value = mock_out_dir
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.os.path.isdir') as mock_isdir, \
+             patch('routes.report_generation.os.listdir') as mock_listdir, \
+             patch('routes.report_generation.os.path.isfile') as mock_isfile, \
+             patch('routes.report_generation.zipfile.ZipFile') as mock_zipfile, \
+             patch('routes.report_generation.send_file') as mock_send_file:
+
+            mock_exists.return_value = True
+            mock_isdir.return_value = True
+            mock_listdir.return_value = ['file1.vrd', 'file2.vrd', 'file3.txt']
+            mock_isfile.return_value = True
+            mock_send_file.return_value = MagicMock()
+
+            # Mock the ZipFile context manager
+            mock_zip_instance = MagicMock()
+            mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
+
+            response = client.get('/api/v1/datafiles')
+
+            # Verify ReportField was called with OutDir
+            mock_vv.ReportField.assert_called_with('OutDir')
+
+            # Verify send_file was called
+            mock_send_file.assert_called_once()
+            call_args = mock_send_file.call_args
+            assert call_args.kwargs['mimetype'] == 'application/zip'
+            assert call_args.kwargs['as_attachment'] is True
+            assert call_args.kwargs['download_name'].startswith('datafiles_')
+            assert call_args.kwargs['download_name'].endswith('.zip')
+
+    def test_datafiles_returns_error_when_no_outdir(self, client, mock_vv):
+        """Test that datafiles returns error when OutDir is not configured"""
+        mock_vv.ReportField.return_value = None
+
+        response = client.get('/api/v1/datafiles')
+
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'NO_OUTPUT_DIRECTORY'
+
+    def test_datafiles_returns_error_when_directory_not_found(self, client, mock_vv):
+        """Test that datafiles returns error when OutDir doesn't exist"""
+        mock_out_dir = 'C:\\NonExistent\\Directory'
+        mock_vv.ReportField.return_value = mock_out_dir
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists:
+            mock_exists.return_value = False
+
+            response = client.get('/api/v1/datafiles')
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'DIRECTORY_NOT_FOUND'
+
+    def test_datafiles_returns_error_when_path_not_directory(self, client, mock_vv):
+        """Test that datafiles returns error when OutDir is not a directory"""
+        mock_out_dir = 'C:\\VibrationVIEW\\somefile.txt'
+        mock_vv.ReportField.return_value = mock_out_dir
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.os.path.isdir') as mock_isdir:
+
+            mock_exists.return_value = True
+            mock_isdir.return_value = False
+
+            response = client.get('/api/v1/datafiles')
+
+            assert response.status_code == 400
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'NOT_A_DIRECTORY'
+
+    def test_datafiles_returns_error_when_no_files(self, client, mock_vv):
+        """Test that datafiles returns error when OutDir has no files"""
+        mock_out_dir = 'C:\\VibrationVIEW\\Data'
+        mock_vv.ReportField.return_value = mock_out_dir
+
+        with patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.os.path.isdir') as mock_isdir, \
+             patch('routes.report_generation.os.listdir') as mock_listdir:
+
+            mock_exists.return_value = True
+            mock_isdir.return_value = True
+            mock_listdir.return_value = []  # Empty directory
+
+            response = client.get('/api/v1/datafiles')
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data['success'] is False
+            assert data['error']['code'] == 'NO_FILES_FOUND'
+
+    def test_datafiles_returns_error_when_reportfield_fails(self, client, mock_vv):
+        """Test that datafiles returns error when ReportField raises exception"""
+        mock_vv.ReportField.side_effect = Exception("COM error")
+
+        response = client.get('/api/v1/datafiles')
+
+        assert response.status_code == 500
+        data = response.get_json()
+        assert data['success'] is False
+        assert data['error']['code'] == 'OUTPUT_DIRECTORY_ERROR'
+
+
 class TestGenerateReportPathValidation:
     """Test generatereport endpoint path validation security"""
 
