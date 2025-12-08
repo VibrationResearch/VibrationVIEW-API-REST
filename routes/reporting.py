@@ -54,6 +54,20 @@ def get_documentation():
                     'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}'
                 ]
             },
+            'GET|POST /reportfieldshistory': {
+                'description': 'Get report field values for all data files from the most recent test',
+                'com_method': 'ReportFieldsHistory(fields)',
+                'parameters': {
+                    'fields': 'string or array - Comma-delimited field names or array of field names. Use *| suffix for all channels wildcard. For GET, if only one parameter is provided, it is assumed to be the fields value.'
+                },
+                'returns': 'array - 2D array where each row contains [filename, field1_value, field2_value, ...]',
+                'examples': [
+                    'GET /api/v1/reportfieldshistory?fields=StopCode,RunTime,Time',
+                    'GET /api/v1/reportfieldshistory?StopCode,RunTime,Time (single param assumed as fields)',
+                    'POST /api/v1/reportfieldshistory with body: {"fields": "StopCode,RunTime,Time"}',
+                    'POST /api/v1/reportfieldshistory with body: {"fields": ["StopCode", "RunTime", "Time"]}'
+                ]
+            },
             'GET /reportvector': {
                 'description': 'Get report vector data',
                 'com_method': 'ReportVector(vectors, array_out)',
@@ -251,7 +265,115 @@ def report_fields(vv_instance):
 
     message = f"ReportFields executed successfully"
 
-    return jsonify(success_response(response_data, message)) 
+    return jsonify(success_response(response_data, message))
+
+
+@reporting_bp.route('/reportfieldshistory', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def report_fields_history(vv_instance):
+    """
+    Get Report Field Values for All Data Files from Most Recent Test
+
+    COM Method: ReportFieldsHistory(fields)
+    Gets report field values for all data files generated during the most recent test.
+
+    GET Query Parameters:
+        fields: Comma-delimited field names (e.g., ?fields=StopCode,RunTime,Time)
+        OR use any parameter name if it's the only parameter (e.g., ?StopCode,RunTime,Time)
+
+    POST JSON Body:
+        fields: String or array of report field names
+                - String: Comma-delimited field names (e.g., "StopCode,RunTime,Time")
+                - Array: Will be joined with commas automatically
+
+    Wildcard Support:
+        Use *| suffix to get values for all channels
+        Example: "ChAccelRMS*|" returns all channel accelerometer RMS values
+
+    Returns:
+        results: 2D array where each row contains [filename, field1_value, field2_value, ...]
+        fields_string: The comma-delimited string sent to COM
+
+    Examples:
+        GET /api/v1/reportfieldshistory?fields=StopCode,RunTime,Time
+        GET /api/v1/reportfieldshistory?StopCode,RunTime,Time
+
+        POST /api/v1/reportfieldshistory
+        Body: {"fields": "StopCode,RunTime,Time"}
+
+        POST /api/v1/reportfieldshistory
+        Body: {"fields": ["StopCode", "RunTime", "Time"]}
+    """
+    fields = None
+
+    # Handle GET request
+    if request.method == 'GET':
+        # Try to get 'fields' parameter
+        fields = request.args.get('fields')
+
+        # If no 'fields' parameter, use the first query parameter
+        if not fields and request.args:
+            # Get the first query parameter key as the fields value
+            fields = list(request.args.keys())[0]
+
+    # Handle POST request
+    else:
+        data = request.get_json()
+        if data and 'fields' in data:
+            fields = data['fields']
+
+    # Validate we have fields
+    if not fields:
+        return jsonify(error_response(
+            'Missing required parameter: fields',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # Accept both string and array formats
+    if isinstance(fields, list):
+        if not fields:
+            return jsonify(error_response(
+                'Parameter "fields" cannot be empty',
+                'EMPTY_PARAMETER'
+            )), 400
+        # Join array with commas
+        fields_string = ','.join(fields)
+    elif isinstance(fields, str):
+        if not fields.strip():
+            return jsonify(error_response(
+                'Parameter "fields" cannot be empty',
+                'EMPTY_PARAMETER'
+            )), 400
+        fields_string = fields
+    else:
+        return jsonify(error_response(
+            'Parameter "fields" must be a string or array',
+            'INVALID_PARAMETER_TYPE'
+        )), 400
+
+    # Call ReportFieldsHistory with the comma-delimited string
+    results = vv_instance.ReportFieldsHistory(fields_string)
+
+    # Convert results to list for JSON serialization
+    results_list = []
+    if results is not None:
+        for row in results:
+            if isinstance(row, (list, tuple)):
+                results_list.append(list(row))
+            else:
+                results_list.append(row)
+
+    response_data = {
+        'results': results_list,
+        'fields_string': fields_string,
+        'executed': True
+    }
+
+    message = f"ReportFieldsHistory executed successfully"
+
+    return jsonify(success_response(response_data, message))
+
 
 @reporting_bp.route('/reportvector', methods=['GET'])
 @handle_errors
