@@ -47,16 +47,21 @@ The API is organized into functional modules with consistent patterns:
 - **basic_control**: Test execution, file operations, and core control
 - **status_properties**: System status monitoring and state checking
 - **data_retrieval**: Real-time data access (channels, demand, control, output)
-- **test_control**: Advanced test control (sweeps, parameters, multipliers)
-- **hardware_config**: Hardware configuration and input setup
+- **advanced_control**: Advanced test control (test type)
+- **advanced_control_sine**: Sine-specific controls (sweeps, parameters, multipliers)
+- **hardware_config**: Hardware configuration
+- **input_config**: Input channel configuration, calibration, and transducer database
 - **gui_control**: Window management and test editing operations
 
-### Data & Metadata Modules  
+### Data & Metadata Modules
 - **recording**: Data recording operations and file management
 - **reporting**: Report field access with bulk operations and channel/loop support
+- **report_generation**: Report generation, data export (CSV, TXT, UFF), and data file retrieval
 - **auxinputs**: Auxiliary input properties and rear input metadata
 - **teds**: TEDS (Transducer Electronic Data Sheet) information
 - **vector_properties**: Vector metadata, units, and properties
+- **virtual_channels**: Virtual channel management (import, remove all)
+- **log**: Event log retrieval in structured JSON format
 - **utility**: Enum references and bulk data operations
 
 ## API Usage Examples
@@ -111,9 +116,7 @@ curl "http://localhost:5000/api/v1/output"
 curl "http://localhost:5000/api/v1/sinefrequency"
 
 # Set sine frequency
-curl -X POST "http://localhost:5000/api/v1/sinefrequency" \
-  -H "Content-Type: application/json" \
-  -d '{"value": 100.0}'
+curl -X POST "http://localhost:5000/api/v1/sinefrequency?value=100.0"
 
 # Get demand multiplier
 curl "http://localhost:5000/api/v1/demandmultiplier"
@@ -165,14 +168,73 @@ curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all&loop=1" \
 # }
 ```
 
+### Report Generation & Data Export
+```bash
+# Generate a report from VibrationVIEW data
+curl -X POST "http://localhost:5000/api/v1/generatereport" \
+  -H "Content-Type: application/json" \
+  -d '{"template_name": "Test Report.rtf", "output_name": "report.rtf"}'
+
+# Generate text file from data (one file per plot)
+curl -X POST "http://localhost:5000/api/v1/generatetxt" \
+  -H "Content-Type: application/json" \
+  -d '{"output_name": "data.txt"}'
+
+# Generate UFF (Universal File Format) from data
+curl -X POST "http://localhost:5000/api/v1/generateuff" \
+  -H "Content-Type: application/json" \
+  -d '{"output_name": "data.uff"}'
+
+# Get raw data file (.vrd)
+curl "http://localhost:5000/api/v1/datafile" --output data.vrd
+
+# Get all data files from last test as zip
+curl "http://localhost:5000/api/v1/datafiles" --output test_data.zip
+
+# Upload and generate report in one operation
+curl -X POST "http://localhost:5000/api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @test.vrd
+```
+
+### Virtual Channels
+```bash
+# Import virtual channels from file
+curl -X POST "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc"
+
+# Upload and import virtual channels
+curl -X PUT "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @channels.vvc
+
+# Remove all virtual channels
+curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
+```
+
+### Event Log
+```bash
+# Get event log as structured JSON
+curl "http://localhost:5000/api/v1/log"
+```
+
+### Report Fields History
+```bash
+# Get report fields for all data files from last test
+curl "http://localhost:5000/api/v1/reportfieldshistory?fields=StopCode,RunTime,Time"
+
+# With POST
+curl -X POST "http://localhost:5000/api/v1/reportfieldshistory" \
+  -H "Content-Type: application/json" \
+  -d '{"fields": ["StopCode", "RunTime", "Time"]}'
+```
+
 ### Utility Operations
 ```bash
-# Get enum references
-curl "http://localhost:5000/api/v1/enums/all"
-curl "http://localhost:5000/api/v1/enums/vvvector"
+# Vector enumeration reference (for use with /vector endpoint)
+curl "http://localhost:5000/api/v1/docs/vector_enums"
 
 # Connection diagnostics
-curl "http://localhost:5000/api/v1/debug/connectioninfo"
+curl "http://localhost:5000/api/v1/testcom"
 ```
 
 ## Request Patterns
@@ -196,10 +258,8 @@ Used for operations that modify state or require complex parameters:
 # Simple operations
 curl -X POST "http://localhost:5000/api/v1/starttest"
 
-# With JSON body
-curl -X POST "http://localhost:5000/api/v1/demandmultiplier" \
-  -H "Content-Type: application/json" \
-  -d '{"value": 6.0}'
+# With URL parameter
+curl -X POST "http://localhost:5000/api/v1/demandmultiplier?value=6.0"
 
 # Bulk operations
 curl -X POST "http://localhost:5000/api/v1/reportfields" \
@@ -247,11 +307,16 @@ vibrationview_api/
 │   ├── basic_control.py     # Core test operations
 │   ├── status_properties.py # Status monitoring
 │   ├── data_retrieval.py    # Real-time data access
-│   ├── test_control.py      # Advanced test control
+│   ├── advanced_control.py  # Advanced test control
+│   ├── advanced_control_sine.py # Sine-specific advanced control
 │   ├── hardware_config.py   # Hardware configuration
+│   ├── input_config.py      # Input channel configuration
 │   ├── gui_control.py       # Window management
 │   ├── recording.py         # Data recording
 │   ├── reporting.py         # Report field access
+│   ├── report_generation.py # Report/data file generation
+│   ├── virtual_channels.py  # Virtual channel management
+│   ├── log.py               # Event log retrieval
 │   ├── auxinputs.py         # Auxiliary inputs
 │   ├── teds.py              # TEDS information
 │   ├── vector_properties.py # Vector metadata
@@ -310,8 +375,11 @@ pytest --cov=routes tests/
 ### Bulk Operations
 Efficient operations that combine multiple COM calls:
 - `POST /api/v1/reportfields` - Multiple report fields with channel/loop support
+- `POST /api/v1/reportfieldshistory` - Report fields for all data files from last test
 - `GET /api/v1/allstatus` - All status flags in single request
-- `GET /api/v1/enums/all` - All enumeration constants
+- `GET /api/v1/docs/vector_enums` - Vector enumeration reference
+- `GET /api/v1/datafiles` - All data files from last test as zip archive
+- `GET /api/v1/log` - Event log as structured JSON array
 
 ### Channel/Loop Support
 Advanced reporting with automatic field name formatting:
@@ -329,6 +397,23 @@ Binary file uploads for test profiles:
 curl -X PUT "http://localhost:5000/api/v1/runtest?filename=test.vsp" \
   -H "Content-Length: $(stat -c%s test.vsp)" \
   --data-binary @test.vsp
+```
+
+### Data Export Support
+Export test data in multiple formats:
+- **Reports**: Generate formatted reports using templates (RTF, PDF, HTML, etc.)
+- **Text Files**: Export plot data as CSV-style text files (one file per plot)
+- **UFF Files**: Export in Universal File Format for analysis tools
+- **Raw Data**: Download .vrd files directly or as zip archives
+
+### Virtual Channel Management
+Import and manage virtual channels programmatically:
+```bash
+# Import virtual channels configuration
+curl -X POST "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc"
+
+# Remove all virtual channels
+curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
 ```
 
 ## Configuration
