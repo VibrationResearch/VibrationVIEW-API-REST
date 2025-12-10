@@ -101,16 +101,21 @@ def get_documentation():
                 }
             },
             'Input Configuration': {
-                'POST /inputmode': {
+                'GET|POST /inputmode': {
                     'description': 'Set input mode for a channel',
                     'com_method': 'InputMode(channel, powerSource, capCoupled, differential)',
                     'parameters': {
-                        'channel': 'int - Input channel number',
-                        'powersource': 'bool - Power source setting',
-                        'capcoupled': 'bool - Capacitor coupled setting',
-                        'differential': 'bool - Differential setting'
+                        'channel': 'int - Input channel number (query param or JSON)',
+                        'powersource': 'bool - Power source setting (query param or JSON)',
+                        'capcoupled': 'bool - Capacitor coupled setting (query param or JSON)',
+                        'differential': 'bool - Differential setting (query param or JSON)'
                     },
-                    'returns': 'bool - Success status'
+                    'returns': 'bool - Success status',
+                    'examples': [
+                        'GET /api/v1/inputmode?channel=1&powersource=true&capcoupled=false&differential=false',
+                        'POST /api/v1/inputmode?channel=1&powersource=true&capcoupled=false&differential=false',
+                        'POST /api/v1/inputmode (with JSON body)'
+                    ]
                 },
                 'GET|POST /inputcalibration': {
                     'description': 'Set input calibration for a channel',
@@ -508,51 +513,73 @@ def input_differential(vv_instance):
         ))
 
 # Input Configuration
-@input_config_bp.route('/inputmode', methods=['POST'])
+@input_config_bp.route('/inputmode', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def input_mode(vv_instance):
     """
     Set Input Mode
-    
+
     COM Method: InputMode(channel, powerSource, capCoupled, differential)
     Sets the input mode configuration for the specified channel.
-    
-    JSON Parameters:
+
+    Parameters (query params or JSON body):
         channel: Input channel number (1-based)
-        powersource: Power source setting
-        capcoupled: Capacitor coupled setting
-        differential: Differential setting
+        powersource: Power source setting (true/false)
+        capcoupled: Capacitor coupled setting (true/false)
+        differential: Differential setting (true/false)
+
+    Examples:
+        GET /api/v1/inputmode?channel=1&powersource=true&capcoupled=false&differential=false
+        POST /api/v1/inputmode?channel=1&powersource=true&capcoupled=false&differential=false
+        POST /api/v1/inputmode (with JSON body)
     """
-    data = request.get_json()
     required_params = ['channel', 'powersource', 'capcoupled', 'differential']
+
+    # Try query parameters first, then JSON body
+    if request.args:
+        data = {
+            'channel': request.args.get('channel'),
+            'powersource': request.args.get('powersource'),
+            'capcoupled': request.args.get('capcoupled'),
+            'differential': request.args.get('differential')
+        }
+        # Convert string booleans to actual booleans
+        for key in ['powersource', 'capcoupled', 'differential']:
+            if data[key] is not None:
+                data[key] = data[key].lower() == 'true'
+    else:
+        try:
+            data = request.get_json()
+        except Exception:
+            data = None
 
     if not data:
         return jsonify(error_response(
-            'Missing JSON body',
-            'MISSING_BODY'
+            'Missing parameters (provide query params or JSON body)',
+            'MISSING_PARAMETERS'
         )), 400
-    
-    missing_params = [param for param in required_params if param not in data]
+
+    missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
         return jsonify(error_response(
             f'Missing required parameters: {", ".join(missing_params)}',
             'MISSING_PARAMETER'
         )), 400
-    
+
     channel_com, error_resp, status_code = convert_channel_to_com_index(data['channel'])
     if error_resp:
         return jsonify(error_resp), status_code
-    
+
     channel_user = int(data['channel'])  # Keep original for response
-    
+
     vv_instance.InputMode(
         channel_com,
         data['powersource'],
         data['capcoupled'],
         data['differential']
     )
-    
+
     result = True
     return jsonify(success_response(
         {

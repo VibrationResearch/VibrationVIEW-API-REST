@@ -82,6 +82,17 @@ class MockVibrationVIEW:
         self.VectorLabel = MagicMock()
         self.VectorLength = MagicMock()
 
+        # Add input configuration methods
+        self.InputMode = MagicMock(return_value=None)
+        self.InputCalibration = MagicMock(return_value=True)
+        self.InputCalDate = MagicMock(return_value="2024-01-01")
+        self.InputSerialNumber = MagicMock(return_value="SN12345")
+        self.InputSensitivity = MagicMock(return_value=10.0)
+        self.InputEngineeringScale = MagicMock(return_value=1.0)
+        self.InputCapacitorCoupled = MagicMock(return_value=False)
+        self.InputAccelPowerSource = MagicMock(return_value=True)
+        self.InputDifferential = MagicMock(return_value=False)
+
     def _log_call(self, method_name: str, *args, **kwargs):
         self.method_calls.append({
             'method': method_name,
