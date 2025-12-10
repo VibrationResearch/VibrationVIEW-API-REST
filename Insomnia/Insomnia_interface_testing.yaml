@@ -1,451 +1,27 @@
 type: collection.insomnia.rest/5.0
 name: VibrationVIEW API
 meta:
-  id: wrk_a85fb4ee6e154fea9a0a4ca72b9fb402
-  created: 1763750655671
-  modified: 1763750655671
+  id: wrk_3095697a52034b209f3773ed248942cd
+  created: 1765309442159
+  modified: 1765309442159
 collection:
   - name: Core Endpoints
     meta:
-      id: fld_2867c4e3587d4316bd507b3528c1e978
-      created: 1690628400000
-      modified: 1753974251556
+      id: fld_db371e9cffa04eab9620273eaba11d26
+      created: 1765309442165
+      modified: 1765378906940
       sortKey: -1753972452424
       description: Health check and documentation
     children:
-      - name: Advanced Test Control (System Check)
-        meta:
-          id: fld_1db3dc21847c4d04adc988877a691cac
-          created: 1753985088147
-          modified: 1755548012691
-          sortKey: -1690628398950
-        children:
-          - url: "{{ _.base_url }}/systemcheckfrequency"
-            name: systemcheckfrequency
-            meta:
-              id: req_1d4632c737f44f479e6161c1fc2432fc
-              created: 1753985048668
-              modified: 1753985099899
-              isPrivate: false
-              sortKey: -1753985099790
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/systemcheckfrequency?22"
-            name: set systemcheckfrequency
-            meta:
-              id: req_fa89118ee03c44eba4b35e4636e8b56a
-              created: 1753985137370
-              modified: 1757622712377
-              isPrivate: false
-              sortKey: -1753985094018.5
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/systemcheckoutputvoltage?0.14"
-            name: systemcheckoutputvoltage
-            meta:
-              id: req_bb9ad4417e5b4892b05dbd6b5092764f
-              created: 1753986069825
-              modified: 1757622529338
-              isPrivate: false
-              sortKey: -1753985091132.75
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/systemcheckoutputvoltage"
-            name: systemcheckoutputvoltage
-            meta:
-              id: req_2670b4a1bccb469fa17b05ba852268b1
-              created: 1753986110511
-              modified: 1753986135569
-              isPrivate: false
-              sortKey: -1753985092575.625
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/docs/advanced_control_system_check"
-            name: Systemcheck Test Control Docs
-            meta:
-              id: req_360d63b40eee4fa087036ba1e6cd7b7c
-              created: 1755548098604
-              modified: 1755548140779
-              isPrivate: false
-              description: Get test control documentation
-              sortKey: -1753985099890
-            method: GET
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-      - name: Advanced Test Control (Sine)
-        meta:
-          id: fld_1063d293e700496f9b1cfa69c89a4329
-          created: 1753985609684
-          modified: 1755545912985
-          sortKey: -1690628398900
-        children:
-          - url: "{{ _.base_url }}/sweepup"
-            name: sweepup
-            meta:
-              id: req_c115e8658cc04932a658f04c949651b4
-              created: 1690628400000
-              modified: 1753986427665
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239776.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepdown"
-            name: sweepdown
-            meta:
-              id: req_e554828d07194c2f9190e299f7de04f6
-              created: 1753818672365
-              modified: 1753986503228
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239826.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweephold"
-            name: Sweephold Control
-            meta:
-              id: req_391935825327420dbec9cb290ce0aecc
-              created: 1753818974227
-              modified: 1753986168306
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239801.25
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/demandmultiplier"
-            name: demandmultiplier
-            meta:
-              id: req_e046903fcca84d61bc4eb93eb4917f5c
-              created: 1753984951569
-              modified: 1753985660459
-              isPrivate: false
-              sortKey: -1753985660335
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sinefrequency"
-            name: sinefrequency
-            meta:
-              id: req_e5638a71709146429be5f5f71700e616
-              created: 1753984998949
-              modified: 1753985931973
-              isPrivate: false
-              sortKey: -1753985660435
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepmultiplier"
-            name: sweepmultiplier
-            meta:
-              id: req_b69fb03e61944d619c6df1eb2eb73999
-              created: 1753985024760
-              modified: 1753985988139
-              isPrivate: false
-              sortKey: -1753985379962.5
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/demandmultiplier?value=0.5"
-            name: demandmultiplier
-            meta:
-              id: req_8686da2edcde4f79affc9099350ff158
-              created: 1753985687779
-              modified: 1753985702816
-              isPrivate: false
-              sortKey: -1753985380062.5
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sinefrequency?30"
-            name: sinefrequency
-            meta:
-              id: req_a6c9b14dd2284b498b3cf220e81a76d2
-              created: 1753985941121
-              modified: 1757622045349
-              isPrivate: false
-              sortKey: -1753985660385
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepmultiplier?1.2"
-            name: sweepmultiplier
-            meta:
-              id: req_b633eae34ccc4efc98c06ea71b3e25ea
-              created: 1753985995575
-              modified: 1757622613271
-              isPrivate: false
-              sortKey: -1753985239876.25
-            method: POST
-            headers:
-              - name: User-Agent
-                value: insomnia/11.0.2
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepresonancehold"
-            name: sweepresonancehold
-            meta:
-              id: req_37c8b59426d244e3a48b61396aa0032c
-              created: 1753986284147
-              modified: 1753986286276
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239788.75
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepstepdown"
-            name: sweepstepdown
-            meta:
-              id: req_ee436e0202fe4dd3a98ebcb69b212411
-              created: 1753986340274
-              modified: 1753986344100
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985239813.75
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/sweepstepup"
-            name: sweepstepup
-            meta:
-              id: req_299385f6859041e9a60404d4b57559a8
-              created: 1753986396552
-              modified: 1753986403461
-              isPrivate: false
-              description: Control sweep parameters
-              sortKey: -1753985169783.125
-            method: POST
-            body:
-              mimeType: application/json
-              text: |-
-                {
-                  "start_frequency": 10.0,
-                  "end_frequency": 2000.0,
-                  "sweep_rate": 1.0
-                }
-            headers:
-              - name: Content-Type
-                value: application/json
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.base_url }}/docs/advanced_control_sine"
-            name: Sine Test Control Docs
-            meta:
-              id: req_bfbfca76474d4b69a0eb7233e026a36d
-              created: 1755545936420
-              modified: 1755545962359
-              isPrivate: false
-              description: Get test control documentation
-              sortKey: -1753985660535
-            method: GET
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
       - url: "{{ _.base_url }}/docs"
         name: API Documentation
         meta:
-          id: req_655ac105195e4a0d8fd379bdfcb819e5
-          created: 1690628400000
-          modified: 1763750682420
+          id: req_9d842ec290974a1f9f9dda3334c8ae12
+          created: 1765309442167
+          modified: 1765309442167
           isPrivate: false
           description: Get API documentation
-          sortKey: -1690628399000
+          sortKey: -1763755667825
         method: GET
         settings:
           renderRequestBody: true
@@ -458,9 +34,9 @@ collection:
       - url: "{{ _.base_url }}/health"
         name: Health Check
         meta:
-          id: req_6966a87cf3054272975f1d4fb5dbc3e5
-          created: 1690628400000
-          modified: 1753803925054
+          id: req_eaf64f1f626b4e62b9544e52fe4491b3
+          created: 1765309442168
+          modified: 1765309442168
           isPrivate: false
           description: Check API health and status
           sortKey: -1690628400000
@@ -473,20 +49,40 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |+
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
+
+
+
   - name: Hardware Config
     meta:
-      id: fld_4507dc18999a4b949e8f5bd7a1687629
-      created: 1690628400000
-      modified: 1753984713981
+      id: fld_de609bd57bb243c6a7162523617efc32
+      created: 1765309442169
+      modified: 1765379712558
       sortKey: -1753972452330.25
       description: Hardware configuration
     children:
       - url: "{{ _.base_url }}/docs/hardware_config"
         name: Hardware Config Docs
         meta:
-          id: req_200c3b5287124f179df848158a4905b3
-          created: 1690628400000
-          modified: 1690628400000
+          id: req_0fea0a751dcb4d408e1bfedf3d3b4a3f
+          created: 1765309442170
+          modified: 1765309442170
           isPrivate: false
           description: Get hardware config documentation
           sortKey: -1690628377000
@@ -502,9 +98,9 @@ collection:
       - url: "{{ _.base_url }}/gethardwareinputchannels"
         name: gethardwareinputchannels
         meta:
-          id: req_2087c936dc4e4051acba10de410a712b
-          created: 1690628400000
-          modified: 1753819303571
+          id: req_3050abdcfc2749f5b6827cd96f6d6de2
+          created: 1765309442171
+          modified: 1765309442171
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1690628376000
@@ -520,9 +116,9 @@ collection:
       - url: "{{ _.base_url }}/gethardwareoutputchannels"
         name: gethardwareoutputchannels
         meta:
-          id: req_17432579a233427ea39df923b930aaf6
-          created: 1753819319277
-          modified: 1753819321167
+          id: req_cffa0724a213435ebed0c4ec02f27d2f
+          created: 1765309442171
+          modified: 1765309442171
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1690628375500
@@ -538,9 +134,9 @@ collection:
       - url: "{{ _.base_url }}/gethardwareserialnumber"
         name: gethardwareserialnumber
         meta:
-          id: req_da1c0f01b00a403793c974dfa44fbfc5
-          created: 1753819336742
-          modified: 1753819342367
+          id: req_c6e1f2b27b764083b581a5bcacb4ee10
+          created: 1765309442172
+          modified: 1765309442172
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1690628375250
@@ -556,9 +152,9 @@ collection:
       - url: "{{ _.base_url }}/getsoftwareversion"
         name: getsoftwareversion
         meta:
-          id: req_30fa8ac90aa747b8b58bdbc60b306fe3
-          created: 1753819359553
-          modified: 1753819360987
+          id: req_7a1efc38803845ea8635249ffcdd876b
+          created: 1765309442173
+          modified: 1765309442173
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1690628375125
@@ -574,9 +170,9 @@ collection:
       - url: "{{ _.base_url }}/hardwaresupportsaccelpowersource?1"
         name: hardwaresupportsaccelpowersource
         meta:
-          id: req_0a7ddb3ac45b4b6098bec46bcc1effb5
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_a57068a925924ee78c13fdc5d09822d4
+          created: 1765309442174
+          modified: 1765309442174
           isPrivate: false
           description: Check accel power source support
           sortKey: -1690628373500
@@ -592,9 +188,9 @@ collection:
       - url: "{{ _.base_url }}/hardwaresupportsdifferential?1"
         name: hardwaresupportsdifferential
         meta:
-          id: req_21e10c770aa648aba098c0bffc462840
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_d23a64d5e76142018604112ae6ce26e7
+          created: 1765309442175
+          modified: 1765309442175
           isPrivate: false
           description: Check differential support
           sortKey: -1690628373000
@@ -610,9 +206,9 @@ collection:
       - url: "{{ _.base_url }}/hardwaresupportscapacitorcoupled?1"
         name: hardwaresupportscapacitorcoupled
         meta:
-          id: req_5521a506c0224fe2aeaf58c59c3c4bed
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_37a9db3b4fce4505967e2f3ec785280d
+          created: 1765309442176
+          modified: 1765309442176
           isPrivate: false
           description: Check capacitor coupled support
           sortKey: -1690628374000
@@ -625,20 +221,36 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Advanced Test Control
     meta:
-      id: fld_8994aa3afd9f404282d968fd737fcf92
-      created: 1690628400000
-      modified: 1753994102264
+      id: fld_a43a2a7da43c427c9eaecd29251a1c8f
+      created: 1765309442177
+      modified: 1765379016370
       sortKey: -1753972452399
       description: Advanced test control
     children:
       - url: "{{ _.base_url }}/docs/advanced_control"
         name: Test Control Docs
         meta:
-          id: req_5f1128a376044c7a8c58759f24d946ac
-          created: 1690628400000
-          modified: 1753994134388
+          id: req_73da54b28c7a4eadb930bfd4b1bec30e
+          created: 1765309442178
+          modified: 1765309442178
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088247
@@ -654,9 +266,9 @@ collection:
       - url: "{{ _.base_url }}/testtype"
         name: testtype
         meta:
-          id: req_3a09edc5c1cc4c679c6b2148ad713ba2
-          created: 1753986189981
-          modified: 1753986254822
+          id: req_ec5b87f183b44df98c2219bae5a068a8
+          created: 1765309442179
+          modified: 1765309442179
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088240.75
@@ -669,30 +281,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=1"
-        name: testtype - sine
-        meta:
-          id: req_3b8d9d5e5ab345f9b031b937f2c76ae9
-          created: 1753986206706
-          modified: 1755524284215
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088237.625
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/testtype?value=2"
         name: testtype - random
         meta:
-          id: req_d391d221d60240ac8a0c9601e8a99da4
-          created: 1755524291227
-          modified: 1755524298730
+          id: req_ca5e27685cc6453f85f64832b58c5da7
+          created: 1765309442180
+          modified: 1765309442180
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088229.8125
@@ -705,30 +299,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=0"
-        name: testtype - systemcheck
-        meta:
-          id: req_de5ad656d3f540c594c8a9063cd82383
-          created: 1755524315095
-          modified: 1755524434436
-          isPrivate: false
-          description: Get test control documentation
-          sortKey: -1753985088239.1875
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=5"
+      - url: "{{ _.base_url }}/testtype?value=4"
         name: testtype - shock
         meta:
-          id: req_bb9aa1f003ca4962a1e9aff0ee4a4ad4
-          created: 1755524901910
-          modified: 1755723716229
+          id: req_20b9bfad826d49758f70eacd86c337d2
+          created: 1765309442182
+          modified: 1765312054072
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088225.9062
@@ -741,12 +317,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/testtype?value=9"
+      - url: "{{ _.base_url }}/testtype?value=5"
         name: testtype - transient capture
         meta:
-          id: req_33dd9d5d68e741fd95f726008ac52923
-          created: 1755525059596
-          modified: 1755723746937
+          id: req_b757a75a9e104d2ba061039a98f5fa0b
+          created: 1765309442182
+          modified: 1765312000440
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088223.9531
@@ -762,9 +338,9 @@ collection:
       - url: "{{ _.base_url }}/testtype?value=6"
         name: testtype - datareplay
         meta:
-          id: req_e1d150d86ae243f681150ca4832031e2
-          created: 1755525092053
-          modified: 1755525098861
+          id: req_b025160c57ef4c6186199ea90cc5e073
+          created: 1765309442183
+          modified: 1765309442183
           isPrivate: false
           description: Get test control documentation
           sortKey: -1753985088222.9766
@@ -777,24 +353,82 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=0"
+        name: testtype - systemcheck
+        meta:
+          id: req_d4a7feca9b11497d826362183316a0cd
+          created: 1765379344890
+          modified: 1765379344890
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088238.4062
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/testtype?value=1"
+        name: testtype - sine
+        meta:
+          id: req_189b5cdb00f3420eacfa752f5ed8ad51
+          created: 1765379360323
+          modified: 1765379360323
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985088233.7188
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |+
+        
+
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
+
+
+
   - name: Basic Control
     meta:
-      id: fld_aa10650085c746129b9ddb614b5502be
-      created: 1690628400000
-      modified: 1753973192874
+      id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
+      created: 1765309442184
+      modified: 1765379670043
       sortKey: -1753972452349
       description: Core test control operations
     children:
       - url: "{{ _.base_url }}/resumetest"
         name: resumetest
         meta:
-          id: req_1f8b1ccf11af4ef6a81be7569db8a301
-          created: 1690628400000
-          modified: 1753885432233
+          id: req_a5e757c4929c4b92aef6f450c3aa4ca6
+          created: 1765309442185
+          modified: 1765309442185
           isPrivate: false
           description: Resume paused test execution
           sortKey: -1690628393000
-        method: POST
+        method: PUT
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -806,9 +440,9 @@ collection:
       - url: "{{ _.base_url }}/runtest?C:\\VibrationVIEW\\Profiles\\random.vrp"
         name: runtest
         meta:
-          id: req_4c7a1b3957a74347a08545d6bccf6a0c
-          created: 1690628400000
-          modified: 1757623116690
+          id: req_76a3082df4c248e8a8d051b1409191fb
+          created: 1765309442186
+          modified: 1765309442186
           isPrivate: false
           description: Execute a complete test run
           sortKey: -1690628397000
@@ -832,13 +466,13 @@ collection:
       - url: "{{ _.base_url }}/starttest"
         name: starttest
         meta:
-          id: req_5b6bc0b5316f49efb5a32a3386dcc64f
-          created: 1690628400000
-          modified: 1753885415684
+          id: req_7c0e42a192cd4855a95cf41d52794437
+          created: 1765309442187
+          modified: 1765309442187
           isPrivate: false
           description: Start test execution
           sortKey: -1690628396000
-        method: POST
+        method: PUT
         body:
           mimeType: application/json
           text: |-
@@ -859,9 +493,9 @@ collection:
       - url: "{{ _.base_url }}/stoptest"
         name: stoptest
         meta:
-          id: req_5d95b87adca04b29bc28aa9154ea1c94
-          created: 1690628400000
-          modified: 1753885423172
+          id: req_ece15e6413d641428ada51194aed2623
+          created: 1765309442187
+          modified: 1765309442187
           isPrivate: false
           description: Stop test execution
           sortKey: -1690628395000
@@ -874,30 +508,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/docs/basic_control"
-        name: Basic Control Docs
-        meta:
-          id: req_e48629cc1ea344b0a9264569b30c7775
-          created: 1690628400000
-          modified: 1753803942814
-          isPrivate: false
-          description: Get basic control documentation
-          sortKey: -1690628398000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/testcom"
         name: testcom
         meta:
-          id: req_e577f6f990534f2db74c13e46c2e4f2f
-          created: 1690628400000
-          modified: 1755778123807
+          id: req_21970b30352945f684af79b2a6946e9c
+          created: 1765309442188
+          modified: 1765309442188
           isPrivate: false
           description: Test COM connection (diagnostic)
           sortKey: -1690628397500
@@ -910,12 +526,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/docs/basic_control"
+        name: Basic Control Docs
+        meta:
+          id: req_dd7d775186c94b4facca3a062aeb52c8
+          created: 1765309442188
+          modified: 1765309442188
+          isPrivate: false
+          description: Get basic control documentation
+          sortKey: -1690628398000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/opentest?C:\\VibrationVIEW\\Profiles\\random.vrp"
         name: opentest
         meta:
-          id: req_24c31d5bec0e4d4b9a0917d5782d4bc0
-          created: 1753811551540
-          modified: 1757619331241
+          id: req_fbf9424661ec4f5e87b32571a6909994
+          created: 1765309442189
+          modified: 1765309442189
           isPrivate: false
           description: Execute a complete test run
           sortKey: -1690628396500
@@ -939,9 +573,9 @@ collection:
       - url: "{{ _.base_url }}/opentest"
         name: opentest (with file)
         meta:
-          id: req_7638fda43f57475a97852418a82bf893
-          created: 1753882734116
-          modified: 1757611325704
+          id: req_9310fc3486c14e849b026db1f0f4b46c
+          created: 1765309442190
+          modified: 1765309442190
           isPrivate: false
           sortKey: -1690628396250
         method: PUT
@@ -960,15 +594,15 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/runtest?gingerman_Test 1.vrp"
+      - url: "{{ _.base_url }}/runtest?c:\\vibrationview\\profiles\\sine1.vsp"
         name: runtest (with file)
         meta:
-          id: req_09d754968a424fe8a204d4a6df5bfebe
-          created: 1753890454660
-          modified: 1757623175527
+          id: req_ff14d14150a04e4d8359164eb7d6ce29
+          created: 1765309442190
+          modified: 1765313694003
           isPrivate: false
           sortKey: -1690628396750
-        method: PUT
+        method: POST
         body:
           mimeType: application/octet-stream
           fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
@@ -989,9 +623,9 @@ collection:
       - url: "{{ _.base_url }}/opentest?random.vrandomt"
         name: opentest (with template file)
         meta:
-          id: req_6b58515a71754a4e82aa9678dff91d86
-          created: 1757610952942
-          modified: 1757623224771
+          id: req_11ded79fa7f4404eb4aed10b2dd1a724
+          created: 1765309442191
+          modified: 1765309442191
           isPrivate: false
           sortKey: -1690628396125
         method: PUT
@@ -1009,20 +643,179 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/savedata"
+        name: savedata
+        meta:
+          id: req_1f71b0c85af3417794b25af0374ae6f3
+          created: 1765309442191
+          modified: 1765309442191
+          isPrivate: false
+          sortKey: -1690628392900
+        method: POST
+        parameters:
+          - id: pair_a911269da965496599f701c8f2f3f40a
+            name: filename
+            value: testdata.csv
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest?Random_Profile.vrpj"
+        name: opentest (with json file)
+        meta:
+          id: req_1dd5d328a8e24539859a97558c4c26a4
+          created: 1765309442192
+          modified: 1765309442192
+          isPrivate: false
+          sortKey: -1690628396187.5
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
+        parameters:
+          - id: pair_9dae525464284a9ca3840a8acfdcadd2
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/runtest?Random_Profile.vrpj"
+        name: runtest (with json file)
+        meta:
+          id: req_96b7a4b332c34a469eccfbbd4d915658
+          created: 1765309442192
+          modified: 1765309442192
+          isPrivate: false
+          sortKey: -1690628396625
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
+        parameters:
+          - id: pair_9dae525464284a9ca3840a8acfdcadd2
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: "stoptest "
+        meta:
+          id: req_a063f7172dbd48c9a402c1d797166865
+          created: 1765379110121
+          modified: 1765379160159
+          isPrivate: false
+          description: Stop test execution
+          sortKey: -1690628396875
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: stoptest
+        meta:
+          id: req_b50260acee684970b4745eb95cbe8570
+          created: 1765379143831
+          modified: 1765379163686
+          isPrivate: false
+          description: Stop test execution
+          sortKey: -1690628396687.5
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: stoptest
+        meta:
+          id: req_678d1fa275694af1bad836ed43655828
+          created: 1765379168546
+          modified: 1765379172427
+          isPrivate: false
+          description: Stop test execution
+          sortKey: -1690628396562.5
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: stoptest
+        meta:
+          id: req_ea97f3df947d4001aa2e8459fa346951
+          created: 1765379183352
+          modified: 1765379186705
+          isPrivate: false
+          description: Stop test execution
+          sortKey: -1690628392800
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Recording
     meta:
-      id: fld_ba4168c6391046758db2ac9d7e03c978
-      created: 1690628400000
-      modified: 1690628400000
-      sortKey: -1690628373000
+      id: fld_7f06b2ea447042d384573d37e62c05d4
+      created: 1765309442193
+      modified: 1765379916949
+      sortKey: -1690628377500
       description: Data recording control
     children:
       - url: "{{ _.base_url }}/docs/recording"
         name: Recording Docs
         meta:
-          id: req_3675b57ad569414b8432d69cbc09253a
-          created: 1690628400000
-          modified: 1690628400000
+          id: req_4ecc0cff91be47d0b4f689fc449962b3
+          created: 1765309442193
+          modified: 1765309442193
           isPrivate: false
           description: Get recording documentation
           sortKey: -1690628373000
@@ -1035,12 +828,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/testrecording"
+        name: testrecording
+        meta:
+          id: req_1c522a1a3691409aac1dad04fed4b3b3
+          created: 1765309442194
+          modified: 1765309442194
+          isPrivate: false
+          description: Test recording methods (diagnostic)
+          sortKey: -1690628371100
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/recordstop"
         name: recordstop
         meta:
-          id: req_78f54edb2e7748a78720e3d6c238875a
-          created: 1690628400000
-          modified: 1753885635178
+          id: req_50718647092a42a7a8f26d2352feb826
+          created: 1765309442194
+          modified: 1765309442194
           isPrivate: false
           description: Stop data recording
           sortKey: -1690628371000
@@ -1056,9 +867,9 @@ collection:
       - url: "{{ _.base_url }}/recordstart"
         name: recordstart
         meta:
-          id: req_f68d7b9ffe8045c9b2219a1c1b6216f8
-          created: 1690628400000
-          modified: 1753885627265
+          id: req_e2f4cb302e3148e58018bcaa270721d3
+          created: 1765309442194
+          modified: 1765309442194
           isPrivate: false
           description: Start data recording
           sortKey: -1690628372000
@@ -1081,30 +892,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/testrecording"
-        name: testrecording
-        meta:
-          id: req_5c6713d775704d95baf6badc39a5ae74
-          created: 1754400000000
-          modified: 1754400000000
-          isPrivate: false
-          description: Test recording methods (diagnostic)
-          sortKey: -1690628371100
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/recordgetfilename"
         name: recordgetfilename
         meta:
-          id: req_ae2be2dfe91549159094293b2bc550ba
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_13854366d88844828f1c8d3a8e4be133
+          created: 1765309442195
+          modified: 1765309442195
           isPrivate: false
           description: Get last recording filename
           sortKey: -1690628371250
@@ -1120,9 +913,9 @@ collection:
       - url: "{{ _.base_url }}/recordpause"
         name: recordpause
         meta:
-          id: req_f0c59a05f5fb404ca361ca6e8cc69181
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_ad5fa9f9c2704af4a567d158216a94e3
+          created: 1765309442195
+          modified: 1765309442195
           isPrivate: false
           description: Pause data recording
           sortKey: -1690628371500
@@ -1135,20 +928,36 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Status Properties
     meta:
-      id: fld_be01b001e157492d83542d65dcf7b46c
-      created: 1690628400000
-      modified: 1690628400000
+      id: fld_77bd9bb1fc0e400680d698d7db88d5e8
+      created: 1765309442196
+      modified: 1765379879864
       sortKey: -1690628392000
       description: System status and state checking
     children:
       - url: "{{ _.base_url }}/isrunning"
         name: isrunning
         meta:
-          id: req_5c0cc1bb7963467398e6fae121cc6e63
-          created: 1690628400000
-          modified: 1753891103017
+          id: req_026d57042350406fa51c173b18591ae0
+          created: 1765309442196
+          modified: 1765309442196
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628391000
@@ -1161,30 +970,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/docs/status_properties"
-        name: Status Properties Docs
-        meta:
-          id: req_98449a3ac74e48eeb484a9e6dff71e26
-          created: 1690628400000
-          modified: 1753815164941
-          isPrivate: false
-          description: Get status properties documentation
-          sortKey: -1690628392000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/status"
         name: status
         meta:
-          id: req_edbe0ba29dc947a09c49f69aaf0463d6
-          created: 1753815232433
-          modified: 1753885443715
+          id: req_aee7659c9b2b48599afdfb8def3b7eda
+          created: 1765309442197
+          modified: 1765309442197
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628391500
@@ -1197,12 +988,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/docs/status_properties"
+        name: Status Properties Docs
+        meta:
+          id: req_c45fe28a93514bef84d53eca5a0007cf
+          created: 1765309442197
+          modified: 1765309442197
+          isPrivate: false
+          description: Get status properties documentation
+          sortKey: -1690628392000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/isready"
         name: isready
         meta:
-          id: req_5b4df714dc1e4256b9eb4074e54cffca
-          created: 1753815308105
-          modified: 1753891097653
+          id: req_a3f5bc5d6f1f4c33875ebf17f41a609f
+          created: 1765309442198
+          modified: 1765309442198
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628391250
@@ -1215,30 +1024,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/isstarting"
-        name: isstarting
-        meta:
-          id: req_869feb64665749f48ab69ffd9ec40fa6
-          created: 1753815354769
-          modified: 1753891108484
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628390000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/ischanginglevel"
         name: ischanginglevel
         meta:
-          id: req_613272e99f534fbe81f059674ffb95e2
-          created: 1753815387406
-          modified: 1753891089680
+          id: req_b88877c474474915988638d0d7dadb0d
+          created: 1765309442199
+          modified: 1765309442199
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628389875
@@ -1251,12 +1042,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/isstarting"
+        name: isstarting
+        meta:
+          id: req_e7fd9e91b8a84235967405d30509b9af
+          created: 1765309442199
+          modified: 1765309442199
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628390000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/isholdlevel"
         name: isholdlevel
         meta:
-          id: req_97504ee06d0943a3a2346ef719bc236f
-          created: 1753815483661
-          modified: 1753885537050
+          id: req_996711cb268940e08689a2f91f4b4e81
+          created: 1765309442200
+          modified: 1765309442200
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628389750
@@ -1272,9 +1081,9 @@ collection:
       - url: "{{ _.base_url }}/isopenloop"
         name: isopenloop
         meta:
-          id: req_c1c87648c1a2492a96492c61fc50ccce
-          created: 1753815518582
-          modified: 1753885548764
+          id: req_80bf042a16d243479df5f7f09fffc1c0
+          created: 1765309442201
+          modified: 1765309442201
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628389250
@@ -1287,30 +1096,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/isaborted"
-        name: " isaborted"
-        meta:
-          id: req_08b5ffff579348ec82ecae9d2d4a6139
-          created: 1753815542496
-          modified: 1753885555183
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628389125
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/canresumetest"
         name: canresumetest
         meta:
-          id: req_0ea92da208884821b3e680e39669a470
-          created: 1753815570367
-          modified: 1753885562538
+          id: req_f1fba4a24142441f8983d3320ab6b6be
+          created: 1765309442201
+          modified: 1765309442201
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628389062.5
@@ -1323,12 +1114,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/isaborted"
+        name: " isaborted"
+        meta:
+          id: req_f73b331a7a424f25a5521bd181c64c29
+          created: 1765309442201
+          modified: 1765309442201
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628389125
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/allstatus"
         name: allstatus
         meta:
-          id: req_74d87957b5334e368612dd5ca04e1444
-          created: 1753891206769
-          modified: 1753974451281
+          id: req_a3b36425fe71456bb54289b2f5b520f1
+          created: 1765309442202
+          modified: 1765309442202
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628388531.25
@@ -1341,20 +1150,36 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Data Retrieval
     meta:
-      id: fld_ff18525e965440ecab11e15aca9de69e
-      created: 1690628400000
-      modified: 1754054677291
+      id: fld_f0d17cda28824f27a96d2bba709f4a50
+      created: 1765309442202
+      modified: 1765379655842
       sortKey: -1753972452336.5
       description: Real-time data access
     children:
       - url: "{{ _.base_url }}/demand"
         name: demand
         meta:
-          id: req_294779f1e730480da44c28897032e9a3
-          created: 1690628400000
-          modified: 1753885473215
+          id: req_ea9aaf25a14a4a07be05a3941807dba9
+          created: 1765309442203
+          modified: 1765309442203
           isPrivate: false
           description: Get current demand values
           sortKey: -1690628386000
@@ -1367,48 +1192,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/channel"
-        name: channel
-        meta:
-          id: req_483135addc294f2c8df93b4b83f266e6
-          created: 1690628400000
-          modified: 1753885465952
-          isPrivate: false
-          description: Get channel data (change channel ID in URL)
-          sortKey: -1690628387000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/docs/data_retrieval"
-        name: Data Retrieval Docs
-        meta:
-          id: req_5281fdb801684fc9b677b35c069b8a81
-          created: 1690628400000
-          modified: 1754054995454
-          isPrivate: false
-          description: Get data retrieval documentation
-          sortKey: -1690628388000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/control"
         name: control
         meta:
-          id: req_e9703a68a00f4ccbbf4c1ba5b783fb55
-          created: 1690628400000
-          modified: 1753885480789
+          id: req_1d297963566c40f293d4047bc329c2a6
+          created: 1765309442204
+          modified: 1765309442204
           isPrivate: false
           description: Get current response values
           sortKey: -1690628385000
@@ -1421,12 +1210,48 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/docs/data_retrieval"
+        name: Data Retrieval Docs
+        meta:
+          id: req_3b38de5d5795475694529d7cceb3064e
+          created: 1765309442204
+          modified: 1765309442204
+          isPrivate: false
+          description: Get data retrieval documentation
+          sortKey: -1690628388000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/channel"
+        name: channel
+        meta:
+          id: req_ff76017a460b461e9254ca1e9fa01807
+          created: 1765309442204
+          modified: 1765309442204
+          isPrivate: false
+          description: Get channel data (change channel ID in URL)
+          sortKey: -1690628387000
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/output"
         name: output
         meta:
-          id: req_336ae29e64de4cfc9fa33aa597620f4d
-          created: 1753817499973
-          modified: 1753885488780
+          id: req_4bd1ea66834a458eab1ff1b0f8d6ef2a
+          created: 1765309442205
+          modified: 1765309442205
           isPrivate: false
           description: Get current response values
           sortKey: -1690628384500
@@ -1442,31 +1267,11 @@ collection:
       - url: "{{ _.base_url }}/vector?vectorenum=0&columns=5"
         name: vector
         meta:
-          id: req_b5d773d9e8f3464ab6b4fcb548e1c3d7
-          created: 1754053763716
-          modified: 1754054641904
+          id: req_2d55a01814674b1abf9eb3646d55a65c
+          created: 1765309442206
+          modified: 1765309442206
           isPrivate: false
           sortKey: -1690628384400
-        method: GET
-        headers:
-          - name: User-Agent
-            value: insomnia/11.0.2
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/vector?vectorenum=100"
-        name: vector (Frequency Axis)
-        meta:
-          id: req_717bd5d17ee8457aa97abcd88d81a385
-          created: 1754054838304
-          modified: 1754054903994
-          isPrivate: false
-          sortKey: -1690628380700
         method: GET
         headers:
           - name: User-Agent
@@ -1482,9 +1287,9 @@ collection:
       - url: "{{ _.base_url }}/docs/vector_enums"
         name: Data Retrieval Vector ENUMS
         meta:
-          id: req_03cfb8b03aee47eaa3f887910747dd0f
-          created: 1754054965624
-          modified: 1754054965624
+          id: req_5599e9862339448d86453ef008aa7e5e
+          created: 1765309442206
+          modified: 1765309442206
           isPrivate: false
           description: Get data retrieval documentation
           sortKey: -1690628387500
@@ -1497,12 +1302,32 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/vector?vectorenum=100"
+        name: vector (Frequency Axis)
+        meta:
+          id: req_bb6b95132aa64747b0a9d3a7155bd373
+          created: 1765309442206
+          modified: 1765309442206
+          isPrivate: false
+          sortKey: -1690628380700
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/vector?vectorenum=190&columns=2"
         name: vector (Frequency Demand,Control)
         meta:
-          id: req_672e7bb42e4144c4b76fe45b4ff856ba
-          created: 1754055027417
-          modified: 1754055144072
+          id: req_83d238c01e9b4974bb2a3fb15e893201
+          created: 1765309442207
+          modified: 1765309442207
           isPrivate: false
           sortKey: -1690628378850
         method: GET
@@ -1520,9 +1345,9 @@ collection:
       - url: "{{ _.base_url }}/channellabel?2"
         name: channellabel
         meta:
-          id: req_e61af38cf213481d8090f2690780fa8b
-          created: 1754077111330
-          modified: 1757623281054
+          id: req_32c3a1941427406ea193e0d0795b9a7c
+          created: 1765309442208
+          modified: 1765309442208
           isPrivate: false
           description: Get channel data (change channel ID in URL)
           sortKey: -1690628386500
@@ -1538,9 +1363,9 @@ collection:
       - url: "{{ _.base_url }}/channelunit?1"
         name: channelunit
         meta:
-          id: req_60ede7cc589d4489ad4729e290659cce
-          created: 1754077145804
-          modified: 1757623292686
+          id: req_e7448cadb1c24b989cf087c2a77ac239
+          created: 1765309442208
+          modified: 1765309442208
           isPrivate: false
           description: Get channel data (change channel ID in URL)
           sortKey: -1690628386250
@@ -1553,30 +1378,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/controlunit"
-        name: controlunit
-        meta:
-          id: req_d50abd5ada7d49d98ebcc8f9e6cc8cbb
-          created: 1754077729137
-          modified: 1757687591254
-          isPrivate: false
-          description: Get current demand values
-          sortKey: -1690628384750
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/controllabel"
         name: controllabel
         meta:
-          id: req_cd2a2f865d644b8a8cba25cabff7f486
-          created: 1754077821757
-          modified: 1757686580917
+          id: req_a3720a36255943aba1a05ce2c846dee3
+          created: 1765309442209
+          modified: 1765309442209
           isPrivate: false
           description: Get current demand values
           sortKey: -1690628384625
@@ -1589,14 +1396,32 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vectorlabel?0"
-        name: vectorlabel
+      - url: "{{ _.base_url }}/controlunit"
+        name: controlunit
         meta:
-          id: req_55235073ef8843269223aecfef11aadd
-          created: 1754077879141
-          modified: 1757623400201
+          id: req_f95bfd4a881a4f918ea7ae5520ea003a
+          created: 1765309442209
+          modified: 1765309442209
           isPrivate: false
-          sortKey: -1690628382550
+          description: Get current demand values
+          sortKey: -1690628384750
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/vectorunit?0"
+        name: vectorunit
+        meta:
+          id: req_3083836053be43028932435071640917
+          created: 1765309442210
+          modified: 1765309442210
+          isPrivate: false
+          sortKey: -1690628381625
         method: GET
         headers:
           - name: User-Agent
@@ -1609,14 +1434,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vectorunit?0"
-        name: vectorunit
+      - url: "{{ _.base_url }}/vectorlabel?0"
+        name: vectorlabel
         meta:
-          id: req_970bac3f425d427fa536281cc80fe5dc
-          created: 1754077899554
-          modified: 1757623425592
+          id: req_f78b5e542a1046ee80820acbd0a863ae
+          created: 1765309442210
+          modified: 1765309442210
           isPrivate: false
-          sortKey: -1690628381625
+          sortKey: -1690628382550
         method: GET
         headers:
           - name: User-Agent
@@ -1632,9 +1457,9 @@ collection:
       - url: "{{ _.base_url }}/vectorlength?0"
         name: vectorlength
         meta:
-          id: req_300ff364bea54d928b7f3b4397bcbd6b
-          created: 1754077967194
-          modified: 1757623338248
+          id: req_1c10427939df43dbbe1b2bcc7ffa5619
+          created: 1765309442211
+          modified: 1765309442211
           isPrivate: false
           sortKey: -1690628381162.5
         method: GET
@@ -1649,19 +1474,35 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: TEDS
     meta:
-      id: fld_c3a0628d776f481bbadf58f760b1fd32
-      created: 1753822803418
-      modified: 1753822831643
+      id: fld_2fdd04ad219c4ba8a164a375917f6cda
+      created: 1765309442211
+      modified: 1765379898892
       sortKey: -1690628379000
     children:
       - url: "{{ _.base_url }}/docs/teds"
         name: TEDS Config Docs
         meta:
-          id: req_a2d77e394b5a40478da68b1d3632450e
-          created: 1753822873573
-          modified: 1753822893317
+          id: req_a819f2afc156405193c6dcf1168f70f8
+          created: 1765309442212
+          modified: 1765309442212
           isPrivate: false
           description: Get hardware config documentation
           sortKey: -1753822876402
@@ -1674,12 +1515,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputteds"
-        name: inputteds
+      - url: "{{ _.base_url }}/teds"
+        name: teds
         meta:
-          id: req_de2defd8c2f64bbebfa0899f63c50f0f
-          created: 1753822964934
-          modified: 1753823007537
+          id: req_ffce15734ec44c118243a06478e39cbb
+          created: 1765309442212
+          modified: 1765309442212
           isPrivate: false
           sortKey: -1753822876302
         method: GET
@@ -1694,20 +1535,16 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputtedschannel?0"
+      - url: "{{ _.base_url }}/inputtedschannel?1"
         name: inputtedschannel
         meta:
-          id: req_fd8afcb27bc2456da79f16ec0f4c22fb
-          created: 1753823031644
-          modified: 1753877085145
+          id: req_023daa6da0db4e25a7134fd9a76dc3d4
+          created: 1765309442213
+          modified: 1765309442213
           isPrivate: false
-          sortKey: -1753477448818
+          sortKey: -1753822876352
         method: GET
         parameters:
-          - name: Channel
-            value: "1"
-            disabled: false
-            id: pair_126ece0bfb374794aa79ea0af2b7c35c
           - disabled: false
             id: pair_03c8984b17a446b2a0b70fb477ca1391
         headers:
@@ -1721,12 +1558,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/Teds?1"
-        name: Teds (specific channel)
+      - url: "{{ _.base_url }}/teds?1"
+        name: teds (specific channel)
         meta:
-          id: req_bc79d8c8a7cf4d72a0e7fd3b15f66da6
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_a5ac1ad17764460f9b2e7ffba9f68d03
+          created: 1765309442213
+          modified: 1765309442213
           isPrivate: false
           description: Get TEDS for specific channel
           sortKey: -1753822876250
@@ -1742,15 +1579,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/Teds"
-        name: Teds (all channels)
+      - url: "{{ _.base_url }}/tedsread"
+        name: tedsread
         meta:
-          id: req_dfcfbcb4209a429492f887b9c5c5f75e
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_2b810c1128374820a52c8eb5179ede65
+          created: 1765309442214
+          modified: 1765309442214
           isPrivate: false
-          description: Get TEDS for all channels
-          sortKey: -1753822876200
+          sortKey: -1753650162534
         method: GET
         headers:
           - name: User-Agent
@@ -1763,19 +1599,75 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/tedsfromurn?3C00000186B96114"
+        name: tedsfromurn
+        meta:
+          id: req_d06fd5d52fb94becb46ac2bd789c2b58
+          created: 1765309442215
+          modified: 1765309442215
+          isPrivate: false
+          sortKey: -1753563805676
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/tedsreadandapply"
+        name: tedsreadandapply
+        meta:
+          id: req_ff85f2933f45459dad72c2d0e30e872f
+          created: 1765309442215
+          modified: 1765309442215
+          isPrivate: false
+          sortKey: -1722052924409
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Reporting
     meta:
-      id: fld_bbd5a33b44f2438a8142654c0b27c538
-      created: 1753885060661
-      modified: 1753885060661
+      id: fld_f19e611571bf4448b339c6efb3058f47
+      created: 1765309442216
+      modified: 1765379858321
       sortKey: -1753885060661
     children:
       - url: "{{ _.base_url }}/docs/reporting"
         name: reporting docs
         meta:
-          id: req_6352da99a26d4b789c64f183fae1355b
-          created: 1753885085511
-          modified: 1753973176648
+          id: req_afbbcddd92fc48c0998f7e022d2427be
+          created: 1765309442216
+          modified: 1765309442216
           isPrivate: false
           description: Get status properties documentation
           sortKey: -1753885096948
@@ -1791,9 +1683,9 @@ collection:
       - url: "{{ _.base_url }}/reportfield?Filename"
         name: reportfield
         meta:
-          id: req_24ae4f6dfe924c1c9f53dd1cfea7c810
-          created: 1753885135839
-          modified: 1757617916469
+          id: req_95529b18e2cd4ade99cfdbccc7e46145
+          created: 1765309442217
+          modified: 1765309442217
           isPrivate: false
           sortKey: -1753885096848
         method: GET
@@ -1808,15 +1700,17 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfields"
+      - url: "{{ _.base_url
+          }}/reportfields?ChName*|,ChStatus*|,ChStatusTeds*|,mVg*|,ChManufactur\
+          er*|,ChModel*|,ChSerialNumber*|"
         name: reportfields
         meta:
-          id: req_c2c553f015714e08bd79e2b3b8fc2439
-          created: 1753975003220
-          modified: 1753975798970
+          id: req_bee3c3f2cca8414d81993c7385f2d24f
+          created: 1765309442217
+          modified: 1765309442217
           isPrivate: false
           sortKey: -1753885096748
-        method: POST
+        method: GET
         body:
           mimeType: application/json
           text: |-
@@ -1840,33 +1734,15 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfields?channel=1"
-        name: reportfields with channels
+      - url: "{{ _.base_url }}/reportfields?TestName,StartTime,Duration"
+        name: reportfields
         meta:
-          id: req_df19066fcf284175b7b18160afd7e314
-          created: 1753975808266
-          modified: 1753976071685
+          id: req_2fb6bc91c34c4f4783fdc2ccd1b9ce9f
+          created: 1765309442218
+          modified: 1765309442218
           isPrivate: false
-          sortKey: -1753853986575
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {     
-            	"fields": 
-            	[       
-            		"ChCoup",
-            		"ChDCInput",
-            		"ChDiff",
-            		"ChLoopback",
-            		"ChSensitivity",
-            		"AccelSensitivity",
-            		"CondSensitivity"
-            	]   
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
+          sortKey: -1753830653945.25
+        method: GET
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1875,27 +1751,35 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfields?loop=all"
-        name: reportfields with all loops
+      - url: "{{ _.base_url }}/reportfields?ChAccelRMS*|,ChDisplacement*|"
+        name: reportfields with channels
         meta:
-          id: req_6a0a298753824e1b9e39a2dce5c101db
-          created: 1753977139063
-          modified: 1753977322609
+          id: req_3029aa5d67a74a32be5c410859266944
+          created: 1765309442218
+          modified: 1765309442218
           isPrivate: false
-          sortKey: -1753830653945.25
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {     
-            	"fields": 
-            	[       
-            		"Loop"
-            	]   
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
+          sortKey: -1753853986575
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportfield?Events"
+        name: reportfield Events
+        meta:
+          id: req_7003d818e79143968c9009b51a3237c1
+          created: 1765309442219
+          modified: 1765309442219
+          isPrivate: false
+          sortKey: -1753885096798
+        method: GET
+        parameters:
+          - disabled: false
+            id: pair_04edeb37043b464a8ccdad29cab38883
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1907,9 +1791,9 @@ collection:
       - url: "{{ _.base_url }}/testreporting"
         name: testreporting
         meta:
-          id: req_04f8a566f56e43e28c053d9436565ade
-          created: 1754400000000
-          modified: 1754400000000
+          id: req_85bc0598084744b7af8caf2cb751f6b3
+          created: 1765309442219
+          modified: 1765309442219
           isPrivate: false
           description: Test reporting methods (diagnostic)
           sortKey: -1753885096648
@@ -1922,14 +1806,52 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfield?ChName*|ChStatus*|chstatusTEDS*"
+      - url: "{{ _.base_url
+          }}/reportfields?ChName*|ChStatus*|chstatusTEDS*|AccelSensitivity*|ChM\
+          anufacturer*|ChModel*|ChSerialNumber*|"
         name: "reportfields Check System Health and Status "
         meta:
-          id: req_39c503851a834260a43de157e4cd7649
-          created: 1757616460409
-          modified: 1757618166240
+          id: req_a962fa43d140436aafdda9adbcc46f4c
+          created: 1765309442219
+          modified: 1765309442219
           isPrivate: false
           sortKey: -1753830653845.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvector?vectors=Frequency,FreqDrive,FreqChannel*"
+        name: reportvector
+        meta:
+          id: req_80363be314ba438cadd700376511b194
+          created: 1765309442220
+          modified: 1765309442220
+          isPrivate: false
+          sortKey: -1753830653857.75
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url
+          }}/reportfieldshistory?reportfieldshistory?LastData,StopCode,RunTime,\
+          Time"
+        name: reportfieldshistory
+        meta:
+          id: req_f2853afbac894251b8943d21a887d25b
+          created: 1765309442220
+          modified: 1765316398094
+          isPrivate: false
+          sortKey: -1753885096698
         method: GET
         body:
           mimeType: application/json
@@ -1937,7 +1859,10 @@ collection:
             {     
             	"fields": 
             	[       
-            		"ChStatus*|chstatusTEDS*",
+            		"Template",
+            		"TestPath",
+            		"TestTitle",
+            		"TestType"
             	]   
             }
         headers:
@@ -1951,19 +1876,70 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url
+          }}/reportvectorheader?vectors=Frequency,FreqDrive,FreqChannel*"
+        name: reportvectorheader
+        meta:
+          id: req_53507393f9e0463e98269ecb17137f10
+          created: 1765309442221
+          modified: 1765309442221
+          isPrivate: false
+          sortKey: -1753830653870.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
   - name: Aux Inputs
     meta:
-      id: fld_4d2cf34f66474dc7bf72f62e715ae44e
-      created: 1753904322263
-      modified: 1757686139544
-      sortKey: -1753972452374
+      id: fld_0ff3f4dec7d04d3b9c68e0b66522e80a
+      created: 1765309442221
+      modified: 1765378971214
+      sortKey: -1753972452408.375
     children:
+      - url: "{{ _.base_url }}/docs/auxinputs"
+        name: auxinputs docs
+        meta:
+          id: req_02d796b0e9874b20bdb953b214390149
+          created: 1765309442222
+          modified: 1765309442222
+          isPrivate: false
+          sortKey: -1753906951682
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/rearinputlabel?1"
         name: rearinputlabel
         meta:
-          id: req_733867e8a69f4acb8b46e5827ee206c5
-          created: 1753817533002
-          modified: 1757623523471
+          id: req_27a679f8587b43769bc2409fbd8558c7
+          created: 1765309442222
+          modified: 1765309442222
           isPrivate: false
           description: Get current response values
           sortKey: -1753904348688
@@ -1979,29 +1955,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/docs/auxinputs"
-        name: auxinputs docs
-        meta:
-          id: req_e24543f80fdd483c9a5442bacd79e06d
-          created: 1753906951682
-          modified: 1753907416497
-          isPrivate: false
-          sortKey: -1753906951682
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/rearinputunit?1"
         name: rearinputunit
         meta:
-          id: req_2776b6a3553d4c37ac74a2e717f7770c
-          created: 1753907659102
-          modified: 1757623536714
+          id: req_72f7ea794d8e4c5d8fd465554d24556f
+          created: 1765309442222
+          modified: 1765309442222
           isPrivate: false
           description: Get current response values
           sortKey: -1753894722818
@@ -2020,9 +1979,9 @@ collection:
       - url: "{{ _.base_url }}/reportfield?AuxLabel*|AuxInput*%g|AuxUnit*"
         name: Aux Input Report Fields
         meta:
-          id: req_cf12d0d5ca4c4ca29ac140699e6007de
-          created: 1757618589634
-          modified: 1757618918384
+          id: req_0cf04dfcdd4a44d796846b4874fcaf05
+          created: 1765309442223
+          modified: 1765309442223
           isPrivate: false
           sortKey: -1753894722718
         method: GET
@@ -2037,21 +1996,63 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/rearinput"
+        name: rearinput
+        meta:
+          id: req_f3135021cfc645058a8790743e04932c
+          created: 1765309442223
+          modified: 1765310321216
+          isPrivate: false
+          sortKey: -1753905650185
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |+
+        
+
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
+
+
+
   - name: GUI Control
     meta:
-      id: fld_dfde6315735848b8b95a78e7bd55711d
-      created: 1753972452324
-      modified: 1753984719567
+      id: fld_e700855f406e4ed69592dda7240b7b3b
+      created: 1765309442224
+      modified: 1765379694402
       sortKey: -1753972452333.375
     children:
       - url: "{{ _.base_url }}/docs/gui_control"
         name: gui_control docs
         meta:
-          id: req_b82f9bc20ad04bbe861584b9c3303aeb
-          created: 1753972468585
-          modified: 1753972519557
+          id: req_1a84fda70a12475db0f6cc2f8554a6b8
+          created: 1765309442225
+          modified: 1765314778427
           isPrivate: false
-          sortKey: -1753972472015
+          sortKey: -1753972933787
         method: GET
         settings:
           renderRequestBody: true
@@ -2064,9 +2065,9 @@ collection:
       - url: "{{ _.base_url }}/abortedit"
         name: abortedit
         meta:
-          id: req_2fcdf35247624c0fac4d9f43b18c8f82
-          created: 1753972540949
-          modified: 1753972560922
+          id: req_7c52dee321c24ec497fa340098649eec
+          created: 1765309442225
+          modified: 1765309442225
           isPrivate: false
           description: Get current response values
           sortKey: -1753972471915
@@ -2084,13 +2085,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/minimize"
+        name: minimize
+        meta:
+          id: req_3e016ea155024d638e3097a0d1ccebee
+          created: 1765309442226
+          modified: 1765309442226
+          isPrivate: false
+          sortKey: -1753972933687
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url
           }}/edittest?testname=C:\\VibrationVIEW\\Profiles\\random1.vrp"
         name: edittest
         meta:
-          id: req_d6f7ebc8960b49cfa088a7ce5a52a920
-          created: 1753972582247
-          modified: 1753972856247
+          id: req_f009e2dfe69c4dfeae3dc60cfaabf650
+          created: 1765309442226
+          modified: 1765309442226
           isPrivate: false
           description: Get current response values
           sortKey: -1753972471965
@@ -2112,29 +2130,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/minimize"
-        name: minimize
-        meta:
-          id: req_dd49b28743014346a7ad13dd8e54be99
-          created: 1753972933687
-          modified: 1753972993717
-          isPrivate: false
-          sortKey: -1753972933687
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/maximize"
         name: maximize
         meta:
-          id: req_dd17e6acb55344758e241fa5d90ad55e
-          created: 1753973016012
-          modified: 1753973021347
+          id: req_0c5f4408bdf84310b3cdfe5ebb814bc8
+          created: 1765309442227
+          modified: 1765309442227
           isPrivate: false
           sortKey: -1753972702851
         method: GET
@@ -2149,9 +2150,9 @@ collection:
       - url: "{{ _.base_url }}/restore"
         name: restore
         meta:
-          id: req_ae6e5549c5484df5b917624ace2c2273
-          created: 1753973051870
-          modified: 1753973054489
+          id: req_b524fb6e1c604a64a6eb72afd6ba2059
+          created: 1765309442227
+          modified: 1765309442227
           isPrivate: false
           sortKey: -1753972587433
         method: GET
@@ -2166,9 +2167,9 @@ collection:
       - url: "{{ _.base_url }}/activate"
         name: activate
         meta:
-          id: req_0122e9eb407c432f8381105dfa1cb2a7
-          created: 1753973075417
-          modified: 1753973082971
+          id: req_29fb9086ef314b6ba7049f3be008dc2d
+          created: 1765309442228
+          modified: 1765309442228
           isPrivate: false
           sortKey: -1753972529724
         method: GET
@@ -2180,19 +2181,537 @@ collection:
             send: true
             store: true
           rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+  - name: Advanced Test Control (System Check)
+    meta:
+      id: fld_b2288d7fae234b4191be5478ede9a108
+      created: 1765309442228
+      modified: 1765379403130
+      sortKey: -1753972452411.5
+    children:
+      - url: "{{ _.base_url }}/testtype?value=0"
+        name: testtype - systemcheck
+        meta:
+          id: req_d490362abf034753be5a2aab1a1de543
+          created: 1765309442181
+          modified: 1765379353414
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1763755089631
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/systemcheckfrequency"
+        name: systemcheckfrequency
+        meta:
+          id: req_c3a6a1789a894b6d8ec4c5ff7a69b720
+          created: 1765309442229
+          modified: 1765309442229
+          isPrivate: false
+          sortKey: -1753985099790
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/systemcheckoutputvoltage?0.14"
+        name: systemcheckoutputvoltage
+        meta:
+          id: req_2c175e146ef3456a9ef2512e7f454062
+          created: 1765309442230
+          modified: 1765309442230
+          isPrivate: false
+          sortKey: -1753985091132.75
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/systemcheckfrequency?22"
+        name: set systemcheckfrequency
+        meta:
+          id: req_2fa7188aae2e40548b4f316462cddda4
+          created: 1765309442230
+          modified: 1765309442230
+          isPrivate: false
+          sortKey: -1753985094018.5
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/systemcheckoutputvoltage"
+        name: systemcheckoutputvoltage
+        meta:
+          id: req_d3bc8cc1e5f947d18fdfc4f481fe028c
+          created: 1765309442231
+          modified: 1765309442231
+          isPrivate: false
+          sortKey: -1753985092575.625
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/docs/advanced_control_system_check"
+        name: Systemcheck Test Control Docs
+        meta:
+          id: req_fea30d231c704c7a8378ebf04ff3e6df
+          created: 1765309442231
+          modified: 1765379417115
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1763755089731
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |+
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
+
+
+
+  - name: Advanced Test Control (Sine)
+    meta:
+      id: fld_4e01da444f5a4daabb7d4eee26fd9bae
+      created: 1765309442232
+      modified: 1765379388600
+      sortKey: -1753972452414.625
+    children:
+      - url: "{{ _.base_url }}/testtype?value=1"
+        name: testtype - sine
+        meta:
+          id: req_aa3558d066994626bb93656da1148787
+          created: 1765309442180
+          modified: 1765379367851
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985660485
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepup"
+        name: sweepup
+        meta:
+          id: req_124703596f0d4cf2b4def2b234ecfac6
+          created: 1765309442233
+          modified: 1765309442233
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985239776.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepdown"
+        name: sweepdown
+        meta:
+          id: req_1dc4dc9a88224d0cbd2ee506a871da64
+          created: 1765309442233
+          modified: 1765309442233
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985239826.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/demandmultiplier"
+        name: demandmultiplier
+        meta:
+          id: req_38c914bbe9aa4796afdda0adc84d5d38
+          created: 1765309442234
+          modified: 1765309442234
+          isPrivate: false
+          sortKey: -1753985660335
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweephold"
+        name: "sweephold "
+        meta:
+          id: req_9636e10df87845189049fcd8cea33286
+          created: 1765309442234
+          modified: 1765378290189
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985239801.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepmultiplier"
+        name: sweepmultiplier
+        meta:
+          id: req_c437cf65adf9428c85c0eef0d6d57075
+          created: 1765309442235
+          modified: 1765309442235
+          isPrivate: false
+          sortKey: -1753985379962.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sinefrequency"
+        name: sinefrequency
+        meta:
+          id: req_ec9479247615461ba72ff83b623e3ca0
+          created: 1765309442235
+          modified: 1765309442235
+          isPrivate: false
+          sortKey: -1753985660435
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/demandmultiplier?value=0.5"
+        name: demandmultiplier
+        meta:
+          id: req_2f45bd8f41384ca8b244673738153553
+          created: 1765309442236
+          modified: 1765309442236
+          isPrivate: false
+          sortKey: -1753985380062.5
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sinefrequency?30"
+        name: sinefrequency
+        meta:
+          id: req_615c98113fb940e38b615889886217a1
+          created: 1765309442236
+          modified: 1765309442236
+          isPrivate: false
+          sortKey: -1753985660385
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepmultiplier?1.2"
+        name: sweepmultiplier
+        meta:
+          id: req_2ecd76b75df04cac802710b756fd19fa
+          created: 1765309442237
+          modified: 1765309442237
+          isPrivate: false
+          sortKey: -1753985239876.25
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepresonancehold"
+        name: sweepresonancehold
+        meta:
+          id: req_e197759eb9b24f789e53b0e73593cc73
+          created: 1765309442237
+          modified: 1765309442237
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985239788.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepstepup"
+        name: sweepstepup
+        meta:
+          id: req_cab33e187bfc4c2aa79dc31034b289ee
+          created: 1765309442238
+          modified: 1765309442238
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985169783.125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/sweepstepdown"
+        name: sweepstepdown
+        meta:
+          id: req_dc1575c8ff9947969069b839575c3eea
+          created: 1765309442238
+          modified: 1765309442238
+          isPrivate: false
+          description: Control sweep parameters
+          sortKey: -1753985239813.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "start_frequency": 10.0,
+              "end_frequency": 2000.0,
+              "sweep_rate": 1.0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/docs/advanced_control_sine"
+        name: Sine Test Control Docs
+        meta:
+          id: req_5e6030c65bb7471693862b6a7932e68f
+          created: 1765309442239
+          modified: 1765309442239
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1753985660535
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |+
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
+
+
+
   - name: Input Configuration
     meta:
-      id: fld_924a5d6821734797824f4be0a7cba838
-      created: 1754315936055
-      modified: 1757624448143
-      sortKey: -1753928756495.625
+      id: fld_c47ff10d237e4f398ba8297e8b4b656f
+      created: 1765309442240
+      modified: 1765379767093
+      sortKey: -1753961528371.5938
     children:
       - url: "{{ _.base_url }}/inputmode"
         name: inputmode
         meta:
-          id: req_575ec091429340a1ae55c0a50e0e4ae5
-          created: 1690628400000
-          modified: 1757683741561
+          id: req_6c890bbac27f45229fa2d70151535634
+          created: 1765309442241
+          modified: 1765309442241
           isPrivate: false
           description: Update input channel configuration
           sortKey: -1754315963932
@@ -2230,9 +2749,9 @@ collection:
       - url: "{{ _.base_url }}/inputcaldate?1"
         name: inputcaldate
         meta:
-          id: req_bfc9f64b5b674f0582700ae3fbb084d9
-          created: 1753819374523
-          modified: 1754316066406
+          id: req_c438558cee15430590806604a22e5659
+          created: 1765309442241
+          modified: 1765309442241
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315964307
@@ -2245,30 +2764,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputserialnumber?1"
-        name: inputserialnumber
-        meta:
-          id: req_1329ea6d2d6c43cd8e5bf0d203595c36
-          created: 1753819903710
-          modified: 1757683362696
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1754315964288.25
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/inputsensitivity?1"
         name: inputsensitivity
         meta:
-          id: req_1264b0feed8a44f9a5005148c68dc6fd
-          created: 1753819939643
-          modified: 1754316086925
+          id: req_32076f6095d3410e87d4abbe070f21c2
+          created: 1765309442242
+          modified: 1765309442242
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315964294.5
@@ -2281,12 +2782,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/inputserialnumber?1"
+        name: inputserialnumber
+        meta:
+          id: req_69caa68574e645f1b58d29c6364a12b5
+          created: 1765309442242
+          modified: 1765309442242
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1754315964288.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/inputengineeringscale?1"
         name: inputengineeringscale
         meta:
-          id: req_ff5f7e0388d34643a8611c1669641f5c
-          created: 1753819973918
-          modified: 1754316124376
+          id: req_0f434591a22045a0b5eb8b5332b782cd
+          created: 1765309442243
+          modified: 1765309442243
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315964300.75
@@ -2302,9 +2821,9 @@ collection:
       - url: "{{ _.base_url }}/inputcapacitorcoupled?1"
         name: inputcapacitorcoupled (READ)
         meta:
-          id: req_2d25b566338c45ca9db03318b2343d11
-          created: 1753820002470
-          modified: 1754315992736
+          id: req_8bfd5c9139434349b5745f5894b8dcef
+          created: 1765309442243
+          modified: 1765309442243
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315963832
@@ -2320,9 +2839,9 @@ collection:
       - url: "{{ _.base_url }}/inputcapacitorcoupled?1&false"
         name: inputcapacitorcoupled (WRITE)
         meta:
-          id: req_1bb2b7792bfd4f27af5d763d13f896b0
-          created: 1753820388129
-          modified: 1757683484703
+          id: req_1645263761b042ff95e6b055ebf81456
+          created: 1765309442244
+          modified: 1765309442244
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315963732
@@ -2335,30 +2854,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputaccelpowersource?1"
-        name: inputaccelpowersource (READ)
-        meta:
-          id: req_4e00bd371ddf4878b4246e19f5b58776
-          created: 1753820509675
-          modified: 1754316000963
-          isPrivate: false
-          description: Get hardware configuration
-          sortKey: -1754315964232
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/inputaccelpowersource?1&false"
         name: inputaccelpowersource (WRITE)
         meta:
-          id: req_0168fc60586f48afa6e2faf4b9f3d308
-          created: 1753820521621
-          modified: 1757683402816
+          id: req_e60fe3c4ada7431d8691ab2998ffe966
+          created: 1765309442245
+          modified: 1765309442245
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315964182
@@ -2371,16 +2872,16 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputdifferential?1&false"
-        name: inputdifferential (WRITE)
+      - url: "{{ _.base_url }}/inputaccelpowersource?1"
+        name: inputaccelpowersource (READ)
         meta:
-          id: req_0c1cc432d5854280ad97301bd743e7a8
-          created: 1753820601904
-          modified: 1757683437863
+          id: req_f1778e1e69c648b4a65ba909e0b2d37d
+          created: 1765309442245
+          modified: 1765309442245
           isPrivate: false
           description: Get hardware configuration
-          sortKey: -1754315963982
-        method: POST
+          sortKey: -1754315964232
+        method: GET
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2392,9 +2893,9 @@ collection:
       - url: "{{ _.base_url }}/inputdifferential?1"
         name: inputdifferential (READ)
         meta:
-          id: req_453c1569e6e542d6b134e2c24ecc61bd
-          created: 1753820606789
-          modified: 1754315997079
+          id: req_2a0809f8f6be4aba9580a3221abb7a1e
+          created: 1765309442246
+          modified: 1765309442246
           isPrivate: false
           description: Get hardware configuration
           sortKey: -1754315964032
@@ -2407,12 +2908,30 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/inputdifferential?1&false"
+        name: inputdifferential (WRITE)
+        meta:
+          id: req_c08b4c89126746da89ebfd51617a0df9
+          created: 1765309442246
+          modified: 1765309442246
+          isPrivate: false
+          description: Get hardware configuration
+          sortKey: -1754315963982
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
       - url: "{{ _.base_url }}/docs/input_config"
         name: Input Config Docs
         meta:
-          id: req_0fc05df5f8aa4d03be5f9632d12c095b
-          created: 1754316012030
-          modified: 1754341960954
+          id: req_c961d82a946745bf83d9f0c4a7712db4
+          created: 1765309442247
+          modified: 1765309442247
           isPrivate: false
           description: Get hardware config documentation
           sortKey: -1754315964450
@@ -2428,9 +2947,9 @@ collection:
       - url: "{{ _.base_url }}/inputcalibration"
         name: inputcalibration
         meta:
-          id: req_07e04f3f232f45fdba06d6dccb9f76b9
-          created: 1754400000000
-          modified: 1757681419162
+          id: req_d702d2ad08ba4c5f91eed3b7647c1b40
+          created: 1765309442247
+          modified: 1765309442247
           isPrivate: false
           description: Set input calibration
           sortKey: -1754315964350
@@ -2473,25 +2992,16 @@ collection:
       - url: "{{ _.base_url }}/inputconfigurationfile?10mv per G.vic"
         name: inputconfigurationfile
         meta:
-          id: req_995aa333fbde4cc28e1094f033b3af75
-          created: 1754400000000
-          modified: 1763751303045
+          id: req_473751d5f0c74c20a29233bb6c966440
+          created: 1765309442248
+          modified: 1765309442248
           isPrivate: false
           description: Load input configuration file
           sortKey: -1754315964340
         method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "filename": "config.inp"
-            }
         parameters:
           - disabled: false
             id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
-        headers:
-          - name: Content-Type
-            value: application/json
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2500,18 +3010,369 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/inputconfigurationfile?6-channels-TEDS.vic"
+        name: inputconfigurationfile (put file)
+        meta:
+          id: req_878346f0d38048959a7dbfa68cbe3bfb
+          created: 1765309442248
+          modified: 1765379755423
+          isPrivate: false
+          description: Load input configuration file
+          sortKey: -1754315964345
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+        parameters:
+          - disabled: false
+            id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
+        headers:
+          - name: Content-Type
+            value: application/octet-stream
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+  - name: Virtual Channels
+    meta:
+      id: fld_612af819c8ea481482d065bb9c0b48b1
+      created: 1765309442249
+      modified: 1765379928703
+      sortKey: -1690628376000
+    children:
+      - url: "{{ _.base_url }}/docs/virtual_channels"
+        name: Virtual Channels Docs
+        meta:
+          id: req_f83af1830429492eac2f4415f23dd6a6
+          created: 1765309442249
+          modified: 1765309442249
+          isPrivate: false
+          description: Get recording documentation
+          sortKey: -1764076147863
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url
+          }}/importvirtualchannels?C:\\VibrationVIEW\\InputConfig\\virtual
+          channels.vchan"
+        name: importvirtualchannels
+        meta:
+          id: req_aa039c8d449e4d6ea3ff40a3437602bd
+          created: 1765309442250
+          modified: 1765309442250
+          isPrivate: false
+          sortKey: -1764076147763
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/removeallvirtualchannels"
+        name: removeallvirtualchannels
+        meta:
+          id: req_70b215cb515648009447870a9869956f
+          created: 1765309442251
+          modified: 1765309442251
+          isPrivate: false
+          sortKey: -1764076147813
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/importvirtualchannels?virtual channels.vchan"
+        name: importvirtualchannels (with file)
+        meta:
+          id: req_cc4b332786c84f09808218f2c387ed09
+          created: 1765309442251
+          modified: 1765309442251
+          isPrivate: false
+          sortKey: -1764076147750.5
+        method: PUT
+        body:
+          mimeType: application/octet-stream
+          fileName: C:\VibrationVIEW\InputConfig\virtual channels.vchan
+        parameters:
+          - id: pair_9dae525464284a9ca3840a8acfdcadd2
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+  - name: Logs
+    meta:
+      id: fld_0e15f068d0594ca590de0940ce270496
+      created: 1765309442252
+      modified: 1765379038265
+      sortKey: -1753972452386.5
+    children:
+      - url: "{{ _.base_url }}/docs/log"
+        name: Logs Docs
+        meta:
+          id: req_b6e21b2789fc491cad63afe10ed255ab
+          created: 1765309442252
+          modified: 1765312082610
+          isPrivate: false
+          description: Get basic control documentation
+          sortKey: -1764102491747
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/log"
+        name: log
+        meta:
+          id: req_036d87ba88e4484b86e93429721e5a02
+          created: 1765309442253
+          modified: 1765309442253
+          isPrivate: false
+          sortKey: -1764102491647
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+  - name: Report Generation
+    meta:
+      id: fld_4e3b05d7a98446ee88c10ca0462d2584
+      created: 1765309442253
+      modified: 1765379809162
+      sortKey: -1753950604412.9375
+    children:
+      - url: "{{ _.base_url }}/docs/report_generation"
+        name: Report Generation Docs
+        meta:
+          id: req_85951c5eb4534ebcbae7e460d8dca5d7
+          created: 1765309442254
+          modified: 1765309442254
+          isPrivate: false
+          description: Get test control documentation
+          sortKey: -1764102238121
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generatereport?template_name=Frequency.csv"
+        name: Generate Report
+        meta:
+          id: req_9758a16976aa4f50acd72397d3ba7517
+          created: 1765309442254
+          modified: 1765309442254
+          isPrivate: false
+          sortKey: -1764102238021
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generatetxt"
+        name: generatetxt
+        meta:
+          id: req_0ef80842552c4401ae497d1d23feed38
+          created: 1765309442255
+          modified: 1765309442255
+          isPrivate: false
+          sortKey: -1764082670402.5
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/datafile"
+        name: Get Datafile
+        meta:
+          id: req_63bfdd590c99448388e5dd9e9ae3c548
+          created: 1765309442255
+          modified: 1765309442255
+          isPrivate: false
+          sortKey: -1764089192942
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/datafiles"
+        name: Get Datafiles
+        meta:
+          id: req_050af29ffbbe42b1a3e05727470900b4
+          created: 1765309442256
+          modified: 1765309442256
+          isPrivate: false
+          sortKey: -1764085931672.25
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generateuff"
+        name: generateuff
+        meta:
+          id: req_60f9d0d1ca3d4b53a85f556105db3bd1
+          created: 1765309442256
+          modified: 1765315324342
+          isPrivate: false
+          sortKey: -1764079409132.75
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
 cookieJar:
   name: Default Jar
   meta:
-    id: jar_ad3047b8de094a00814b37c5f72f6d2c
-    created: 1753798870788
-    modified: 1753798870788
+    id: jar_9165719148884b3baf22808209056286
+    created: 1765309442163
+    modified: 1765379928701
 environments:
   name: Base Environment
   meta:
-    id: env_d2f03c6e69a643459175347780cd639c
-    created: 1690628400000
-    modified: 1763751256055
+    id: env_bde5e190f164482fb3889ff56776882f
+    created: 1765309442160
+    modified: 1765379928702
     isPrivate: false
   data:
-    base_url: http://127.0.0.1:5000/api
+    base_url: http://127.0.0.1:5000/api/v1
