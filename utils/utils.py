@@ -1,6 +1,7 @@
 import os
 import subprocess
 import uuid
+import math
 
 import logging
 from vibrationviewapi import ExtractComErrorInfo
@@ -256,11 +257,30 @@ def is_default_template_filename(filename):
     """
     Check if filename matches one of the default VibrationVIEW template files
     that should be copied but not opened with automation command
-    
+
     Args:
         filename: The filename to check
-        
+
     Returns:
         bool: True if filename matches a default template, False otherwise
     """
     return filename.lower() in DEFAULT_TEMPLATE_FILENAMES
+
+
+def sanitize_nan(value):
+    """
+    Replace NaN and Inf float values with None for JSON serialization.
+
+    Args:
+        value: A value that may be a float NaN/Inf, list, tuple, or other type
+
+    Returns:
+        The value with NaN/Inf replaced by None, recursively for lists/tuples
+    """
+    if isinstance(value, float):
+        if math.isnan(value) or math.isinf(value):
+            return None
+        return value
+    elif isinstance(value, (list, tuple)):
+        return [sanitize_nan(v) for v in value]
+    return value
