@@ -348,43 +348,74 @@ def output(vv_instance):
 # VECTOR DATA
 # ============================================================================
 
-@data_retrieval_bp.route('/vector', methods=['GET'])
+@data_retrieval_bp.route('/vector', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def vector(vv_instance):
     """
     Get raw data vector
-    
+
     COM Method: Vector(vectorenum, columns)
     Returns raw data vector array for the specified vector enumeration.
-    
-    Query Parameters:
+
+    GET Query Parameters:
+        vectorenum: Vector enumeration identifier (required, or use as first query param)
+        columns: Number of columns (optional, default: 1)
+
+    POST JSON Body:
         vectorenum: Vector enumeration identifier (required)
         columns: Number of columns (optional, default: 1)
-    
+
     Examples:
         GET /api/v1/vector?vectorenum=1
         GET /api/v1/vector?vectorenum=2&columns=4
+        GET /api/v1/vector?1
+        GET /api/v1/vector?2&columns=4
+
+        POST /api/v1/vector
+        Body: {"vectorenum": 1}
+
+        POST /api/v1/vector
+        Body: {"vectorenum": 2, "columns": 4}
     """
-    vectorenum = request.args.get('vectorenum', type=int)
+    vectorenum = None
+    columns = 1
+
+    # Handle GET request
+    if request.method == 'GET':
+        vectorenum = request.args.get('vectorenum', type=int)
+        # If no 'vectorenum' parameter, use the first query parameter key as the value
+        if vectorenum is None and request.args:
+            first_key = list(request.args.keys())[0]
+            try:
+                vectorenum = int(first_key)
+            except ValueError:
+                pass
+        columns = request.args.get('columns', type=int, default=1)
+
+    # Handle POST request
+    else:
+        data = request.get_json(silent=True)
+        if data:
+            vectorenum = data.get('vectorenum')
+            columns = data.get('columns', 1)
+
     if vectorenum is None:
         return jsonify(error_response(
-            'Missing required query parameter: vectorenum',
+            'Missing required parameter: vectorenum',
             'MISSING_PARAMETER'
         )), 400
-    
-    columns = request.args.get('columns', type=int, default=1)
-    
+
     # Validate columns parameter
     if columns < 1:
         return jsonify(error_response(
             f'columns must be >= 1, got {columns}',
             'INVALID_PARAMETER'
         )), 400
-    
+
     try:
         result = vv_instance.Vector(vectorenum, columns)
-        
+
         return jsonify(success_response(
             {
                 'result': result,
@@ -394,7 +425,7 @@ def vector(vv_instance):
             },
             f"Retrieved vector data for vectorenum {vectorenum} with {columns} columns"
         ))
-        
+
     except Exception as e:
         return jsonify(error_response(
             f'Failed to retrieve vector data: {str(e)}',
