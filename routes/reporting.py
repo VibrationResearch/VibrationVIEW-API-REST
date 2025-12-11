@@ -448,3 +448,84 @@ def report_vector_header(vv_instance):
     ))
 
 
+@reporting_bp.route('/reportvectorhistory', methods=['GET', 'POST'])
+@handle_errors
+@with_vibrationview
+def report_vector_history(vv_instance):
+    """
+    Get Report Vector Data for All Data Files from Most Recent Test
+
+    COM Method: ReportVectorHistory(vectors, array_out)
+    Gets vector data for all data files generated during the most recent test.
+
+    GET Query Parameters:
+        vectors: Vector names to retrieve (e.g., ?vectors=Frequency,Amplitude)
+        OR use any parameter name if it's the only parameter (e.g., ?Frequency&Amplitude)
+
+    POST JSON Body:
+        vectors: String or array of vector names
+                - String: Comma-delimited vector names (e.g., "Frequency,Amplitude")
+                - Array: Will be joined with commas automatically
+
+    Returns:
+        results: 2D array where each row contains vector data for a data file
+        vectors_string: The comma-delimited string sent to COM
+
+    Examples:
+        GET /api/v1/reportvectorhistory?vectors=Frequency,Amplitude
+        GET /api/v1/reportvectorhistory?Frequency&Amplitude
+
+        POST /api/v1/reportvectorhistory
+        Body: {"vectors": "Frequency,Amplitude"}
+
+        POST /api/v1/reportvectorhistory
+        Body: {"vectors": ["Frequency", "Amplitude"]}
+    """
+    vectors_string = None
+
+    # Handle GET request
+    if request.method == 'GET':
+        vectors_string = request.args.get('vectors')
+        # If no 'vectors' parameter, join all query parameter keys with commas
+        if not vectors_string and request.args:
+            vectors_string = ','.join(request.args.keys())
+
+    # Handle POST request
+    else:
+        data = request.get_json(silent=True)
+        if data and 'vectors' in data:
+            vectors = data['vectors']
+            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+
+    # Validate we have vectors
+    if not vectors_string or not vectors_string.strip():
+        return jsonify(error_response(
+            'Missing required parameter: vectors',
+            'MISSING_PARAMETER'
+        )), 400
+
+    # Call ReportVectorHistory with the comma-delimited string
+    results = vv_instance.ReportVectorHistory(vectors_string)
+    results = sanitize_nan(results)
+
+    # Convert results to list for JSON serialization
+    results_list = []
+    if results is not None:
+        for row in results:
+            if isinstance(row, (list, tuple)):
+                results_list.append(list(row))
+            else:
+                results_list.append(row)
+
+    response_data = {
+        'results': results_list[0] if len(results_list) > 0 else [],
+        'headers': results_list[1] if len(results_list) > 1 else [],
+        'vectors_string': vectors_string,
+        'executed': True
+    }
+
+    message = f"ReportVectorHistory executed successfully"
+
+    return jsonify(success_response(response_data, message))
+
+
