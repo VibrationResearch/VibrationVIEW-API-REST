@@ -126,7 +126,10 @@ def report_field(vv_instance):
         # Use the first query parameter if 'field' is missing
         if request.args:
             field_name = list(request.args.keys())[0]
-        
+            # Strip everything up to and including '?' if present
+            if '?' in field_name:
+                field_name = field_name.split('?', 1)[1]
+
         if not field_name:
             return jsonify(error_response(
                 'Missing query parameter: either "field" or provide any query parameter',
@@ -185,51 +188,30 @@ def report_fields(vv_instance):
         POST /api/v1/reportfields
         Body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}
     """
-    fields = None
+    fields_string = None
 
     # Handle GET request
     if request.method == 'GET':
-        # Try to get 'fields' parameter
-        fields = request.args.get('fields')
-
+        fields_string = request.args.get('fields')
         # If no 'fields' parameter, use the first query parameter
-        if not fields and request.args:
-            # Get the first query parameter key as the fields value
-            fields = list(request.args.keys())[0]
+        if not fields_string and request.args:
+            fields_string = list(request.args.keys())[0]
+            # Strip everything up to and including '?' if present
+            if '?' in fields_string:
+                fields_string = fields_string.split('?', 1)[1]
 
     # Handle POST request
     else:
         data = request.get_json()
         if data and 'fields' in data:
             fields = data['fields']
+            fields_string = ','.join(fields) if isinstance(fields, list) else fields
 
     # Validate we have fields
-    if not fields:
+    if not fields_string or not fields_string.strip():
         return jsonify(error_response(
             'Missing required parameter: fields',
             'MISSING_PARAMETER'
-        )), 400
-
-    # Accept both string and array formats
-    if isinstance(fields, list):
-        if not fields:
-            return jsonify(error_response(
-                'Parameter "fields" cannot be empty',
-                'EMPTY_PARAMETER'
-            )), 400
-        # Join array with commas
-        fields_string = ','.join(fields)
-    elif isinstance(fields, str):
-        if not fields.strip():
-            return jsonify(error_response(
-                'Parameter "fields" cannot be empty',
-                'EMPTY_PARAMETER'
-            )), 400
-        fields_string = fields
-    else:
-        return jsonify(error_response(
-            'Parameter "fields" must be a string or array',
-            'INVALID_PARAMETER_TYPE'
         )), 400
 
     # Call ReportFields with the comma-delimited string
@@ -305,51 +287,30 @@ def report_fields_history(vv_instance):
         POST /api/v1/reportfieldshistory
         Body: {"fields": ["StopCode", "RunTime", "Time"]}
     """
-    fields = None
+    fields_string = None
 
     # Handle GET request
     if request.method == 'GET':
-        # Try to get 'fields' parameter
-        fields = request.args.get('fields')
-
+        fields_string = request.args.get('fields')
         # If no 'fields' parameter, use the first query parameter
-        if not fields and request.args:
-            # Get the first query parameter key as the fields value
-            fields = list(request.args.keys())[0]
+        if not fields_string and request.args:
+            fields_string = list(request.args.keys())[0]
+            # Strip everything up to and including '?' if present
+            if '?' in fields_string:
+                fields_string = fields_string.split('?', 1)[1]
 
     # Handle POST request
     else:
         data = request.get_json()
         if data and 'fields' in data:
             fields = data['fields']
+            fields_string = ','.join(fields) if isinstance(fields, list) else fields
 
     # Validate we have fields
-    if not fields:
+    if not fields_string or not fields_string.strip():
         return jsonify(error_response(
             'Missing required parameter: fields',
             'MISSING_PARAMETER'
-        )), 400
-
-    # Accept both string and array formats
-    if isinstance(fields, list):
-        if not fields:
-            return jsonify(error_response(
-                'Parameter "fields" cannot be empty',
-                'EMPTY_PARAMETER'
-            )), 400
-        # Join array with commas
-        fields_string = ','.join(fields)
-    elif isinstance(fields, str):
-        if not fields.strip():
-            return jsonify(error_response(
-                'Parameter "fields" cannot be empty',
-                'EMPTY_PARAMETER'
-            )), 400
-        fields_string = fields
-    else:
-        return jsonify(error_response(
-            'Parameter "fields" must be a string or array',
-            'INVALID_PARAMETER_TYPE'
         )), 400
 
     # Call ReportFieldsHistory with the comma-delimited string
