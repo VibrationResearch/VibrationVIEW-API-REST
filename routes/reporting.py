@@ -126,9 +126,6 @@ def report_field(vv_instance):
         # Use the first query parameter if 'field' is missing
         if request.args:
             field_name = list(request.args.keys())[0]
-            # Strip everything up to and including '?' if present
-            if '?' in field_name:
-                field_name = field_name.split('?', 1)[1]
 
         if not field_name:
             return jsonify(error_response(
@@ -193,12 +190,9 @@ def report_fields(vv_instance):
     # Handle GET request
     if request.method == 'GET':
         fields_string = request.args.get('fields')
-        # If no 'fields' parameter, use the first query parameter
+        # If no 'fields' parameter, join all query parameter keys with commas
         if not fields_string and request.args:
-            fields_string = list(request.args.keys())[0]
-            # Strip everything up to and including '?' if present
-            if '?' in fields_string:
-                fields_string = fields_string.split('?', 1)[1]
+            fields_string = ','.join(request.args.keys())
 
     # Handle POST request
     else:
@@ -292,12 +286,9 @@ def report_fields_history(vv_instance):
     # Handle GET request
     if request.method == 'GET':
         fields_string = request.args.get('fields')
-        # If no 'fields' parameter, use the first query parameter
+        # If no 'fields' parameter, join all query parameter keys with commas
         if not fields_string and request.args:
-            fields_string = list(request.args.keys())[0]
-            # Strip everything up to and including '?' if present
-            if '?' in fields_string:
-                fields_string = fields_string.split('?', 1)[1]
+            fields_string = ','.join(request.args.keys())
 
     # Handle POST request
     else:
@@ -370,12 +361,9 @@ def report_vector(vv_instance):
     # Handle GET request
     if request.method == 'GET':
         vectors_string = request.args.get('vectors')
-        # If no 'vectors' parameter, use the first query parameter
+        # If no 'vectors' parameter, join all query parameter keys with commas
         if not vectors_string and request.args:
-            vectors_string = list(request.args.keys())[0]
-            # Strip everything up to and including '?' if present
-            if '?' in vectors_string:
-                vectors_string = vectors_string.split('?', 1)[1]
+            vectors_string = ','.join(request.args.keys())
 
     # Handle POST request
     else:
@@ -434,12 +422,9 @@ def report_vector_header(vv_instance):
     # Handle GET request
     if request.method == 'GET':
         vectors_string = request.args.get('vectors')
-        # If no 'vectors' parameter, use the first query parameter
+        # If no 'vectors' parameter, join all query parameter keys with commas
         if not vectors_string and request.args:
-            vectors_string = list(request.args.keys())[0]
-            # Strip everything up to and including '?' if present
-            if '?' in vectors_string:
-                vectors_string = vectors_string.split('?', 1)[1]
+            vectors_string = ','.join(request.args.keys())
 
     # Handle POST request
     else:
