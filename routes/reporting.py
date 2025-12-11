@@ -11,7 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import extract_com_error_info
+from utils.utils import extract_com_error_info, sanitize_nan
 
 import logging
 from datetime import datetime
@@ -392,6 +392,7 @@ def report_vector(vv_instance):
         )), 400
 
     result = vv_instance.ReportVector(vectors_string)
+    result = sanitize_nan(result)
 
     return jsonify(success_response(
         {'result': result, 'vectors': vectors_string},

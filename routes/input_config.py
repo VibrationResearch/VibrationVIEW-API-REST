@@ -549,10 +549,7 @@ def input_mode(vv_instance):
             if data[key] is not None:
                 data[key] = data[key].lower() == 'true'
     else:
-        try:
-            data = request.get_json()
-        except Exception:
-            data = None
+        data = request.get_json(silent=True)
 
     if not data:
         return jsonify(error_response(
@@ -621,7 +618,7 @@ def input_calibration(vv_instance):
             'caldate': request.args.get('caldate')
         }
     else:
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             return jsonify(error_response(
                 'Missing parameters (provide query params or JSON body)',

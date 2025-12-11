@@ -405,7 +405,7 @@ def teds_verify_and_apply(vv_instance):
     Example: POST /api/v1/tedsverifyandapply
              Body: {"urns": ["urn1", "urn2", "urn3"]}
     """
-    request_data = request.get_json()
+    request_data = request.get_json(silent=True)
     if not request_data:
         return jsonify(error_response(
             'Missing request body - JSON required',
