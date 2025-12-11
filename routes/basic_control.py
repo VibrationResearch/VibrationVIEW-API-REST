@@ -710,13 +710,13 @@ def test_com_connection(vv_instance):
         hardware_outputs = vv_instance.GetHardwareOutputChannels()
         serial_number = vv_instance.GetHardwareSerialNumber()
         is_ready = vv_instance.IsReady()
-        
+
         results['connection'] = {
             'success': True,
             'version': version,
             'hardware_inputs': hardware_inputs,
             'hardware_outputs': hardware_outputs,
-            'serial_number': serial_number,
+            'serial_number': hex(serial_number) if isinstance(serial_number, int) else serial_number,
             'is_ready': is_ready
         }
     except Exception as e:
