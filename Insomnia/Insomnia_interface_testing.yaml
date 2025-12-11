@@ -241,7 +241,7 @@ collection:
     meta:
       id: fld_a43a2a7da43c427c9eaecd29251a1c8f
       created: 1765309442177
-      modified: 1765379016370
+      modified: 1765481469005
       sortKey: -1753972452399
       description: Advanced test control
     children:
@@ -415,7 +415,7 @@ collection:
     meta:
       id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
       created: 1765309442184
-      modified: 1765379670043
+      modified: 1765481758117
       sortKey: -1753972452349
       description: Core test control operations
     children:
@@ -1170,7 +1170,7 @@ collection:
     meta:
       id: fld_f0d17cda28824f27a96d2bba709f4a50
       created: 1765309442202
-      modified: 1765379655842
+      modified: 1765482276236
       sortKey: -1753972452336.5
       description: Real-time data access
     children:
@@ -1264,15 +1264,24 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vector?vectorenum=0&columns=5"
+      - url: "{{ _.base_url }}/vector"
         name: vector
         meta:
           id: req_2d55a01814674b1abf9eb3646d55a65c
           created: 1765309442206
-          modified: 1765309442206
+          modified: 1765482011015
           isPrivate: false
           sortKey: -1690628384400
         method: GET
+        parameters:
+          - id: pair_e99c8d90eb0b4f5fac46068f7a91f293
+            name: vectorenum
+            value: "0"
+            disabled: false
+          - id: pair_aa61e315186847f9b1781fa4bc5df620
+            name: columns
+            value: "5"
+            disabled: false
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1302,15 +1311,20 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vector?vectorenum=100"
+      - url: "{{ _.base_url }}/vector"
         name: vector (Frequency Axis)
         meta:
           id: req_bb6b95132aa64747b0a9d3a7155bd373
           created: 1765309442206
-          modified: 1765309442206
+          modified: 1765482065697
           isPrivate: false
           sortKey: -1690628380700
         method: GET
+        parameters:
+          - id: pair_ec4c9adf9db542ad9e5bbf5aef265733
+            name: vectorenum
+            value: "100"
+            disabled: false
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1322,15 +1336,24 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vector?vectorenum=190&columns=2"
+      - url: "{{ _.base_url }}/vector"
         name: vector (Frequency Demand,Control)
         meta:
           id: req_83d238c01e9b4974bb2a3fb15e893201
           created: 1765309442207
-          modified: 1765309442207
+          modified: 1765482167783
           isPrivate: false
           sortKey: -1690628378850
         method: GET
+        parameters:
+          - id: pair_75091fbfb71b4102846e02324e43996a
+            name: vectorenum
+            value: "190"
+            disabled: false
+          - id: pair_4eb43f7bd0f2475db0f874f8dbe8108b
+            name: columns
+            value: "2"
+            disabled: false
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1414,15 +1437,20 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vectorunit?0"
+      - url: "{{ _.base_url }}/vectorunit"
         name: vectorunit
         meta:
           id: req_3083836053be43028932435071640917
           created: 1765309442210
-          modified: 1765309442210
+          modified: 1765482274823
           isPrivate: false
           sortKey: -1690628381625
         method: GET
+        parameters:
+          - id: pair_b9fa26e700744dfd95a901add82bbd98
+            name: vectorenum
+            value: "0"
+            disabled: false
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1454,16 +1482,46 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/vectorlength?0"
+      - url: "{{ _.base_url }}/vectorlength"
         name: vectorlength
         meta:
           id: req_1c10427939df43dbbe1b2bcc7ffa5619
           created: 1765309442211
-          modified: 1765309442211
+          modified: 1765482195340
           isPrivate: false
           sortKey: -1690628381162.5
         method: GET
+        parameters:
+          - id: pair_e993bb97335b4403ab3c23b195fd884e
+            name: vectorenum
+            value: "0"
+            disabled: false
         headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/vector?vectorenum=0&columns=5"
+        name: vector
+        meta:
+          id: req_870e199143a14c599d64090efb36d746
+          created: 1765481804532
+          modified: 1765481984366
+          isPrivate: false
+          sortKey: -1690628383475
+        method: POST
+        body:
+          mimeType: application/json
+          text: '{"vectorenum": 1, "columns": 5}'
+        headers:
+          - name: Content-Type
+            value: application/json
           - name: User-Agent
             value: insomnia/11.0.2
         settings:
@@ -1494,7 +1552,7 @@ collection:
     meta:
       id: fld_2fdd04ad219c4ba8a164a375917f6cda
       created: 1765309442211
-      modified: 1765379898892
+      modified: 1765471800706
       sortKey: -1690628379000
     children:
       - url: "{{ _.base_url }}/docs/teds"
@@ -1639,6 +1697,55 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/tedsverifyandapply"
+        name: tedsverifyandapply
+        meta:
+          id: req_e451dc5db43c47478082b06846f58c36
+          created: 1765471299891
+          modified: 1765471692034
+          isPrivate: false
+          sortKey: -1706340662204.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {     
+            	"urns": 
+            	[       
+            			"3C00000186B96114",
+            			"8200000C7A09F42D",
+            			"010203040506072D",
+            			"020203040506072D",
+            			"030203040506072D",
+            			"040203040506072D",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled",
+            			"Disabled"
+            	]   
+            }
+        parameters:
+          - id: pair_94d1790250fa412ba7bfc6df2c61910d
+            disabled: false
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
     scripts:
       afterResponse: |
         
@@ -1659,7 +1766,7 @@ collection:
     meta:
       id: fld_f19e611571bf4448b339c6efb3058f47
       created: 1765309442216
-      modified: 1765379858321
+      modified: 1765480741135
       sortKey: -1753885060661
     children:
       - url: "{{ _.base_url }}/docs/reporting"
@@ -1707,22 +1814,12 @@ collection:
         meta:
           id: req_bee3c3f2cca8414d81993c7385f2d24f
           created: 1765309442217
-          modified: 1765309442217
+          modified: 1765468525035
           isPrivate: false
           sortKey: -1753885096748
         method: GET
         body:
           mimeType: application/json
-          text: |-
-            {     
-            	"fields": 
-            	[       
-            		"Template",
-            		"TestPath",
-            		"TestTitle",
-            		"TestType"
-            	]   
-            }
         headers:
           - name: Content-Type
             value: application/json
@@ -1742,23 +1839,6 @@ collection:
           modified: 1765309442218
           isPrivate: false
           sortKey: -1753830653945.25
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/reportfields?ChAccelRMS*|,ChDisplacement*|"
-        name: reportfields with channels
-        meta:
-          id: req_3029aa5d67a74a32be5c410859266944
-          created: 1765309442218
-          modified: 1765309442218
-          isPrivate: false
-          sortKey: -1753853986575
         method: GET
         settings:
           renderRequestBody: true
@@ -1788,24 +1868,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/testreporting"
-        name: testreporting
-        meta:
-          id: req_85bc0598084744b7af8caf2cb751f6b3
-          created: 1765309442219
-          modified: 1765309442219
-          isPrivate: false
-          description: Test reporting methods (diagnostic)
-          sortKey: -1753885096648
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url
           }}/reportfields?ChName*|ChStatus*|chstatusTEDS*|AccelSensitivity*|ChM\
           anufacturer*|ChModel*|ChSerialNumber*|"
@@ -1825,12 +1887,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportvector?vectors=Frequency,FreqDrive,FreqChannel*"
+      - url: "{{ _.base_url }}/reportvector?Frequency&FreqDrive&FreqChannel*"
         name: reportvector
         meta:
           id: req_80363be314ba438cadd700376511b194
           created: 1765309442220
-          modified: 1765309442220
+          modified: 1765478610560
           isPrivate: false
           sortKey: -1753830653857.75
         method: GET
@@ -1849,20 +1911,59 @@ collection:
         meta:
           id: req_f2853afbac894251b8943d21a887d25b
           created: 1765309442220
-          modified: 1765316398094
+          modified: 1765466545893
           isPrivate: false
           sortKey: -1753885096698
         method: GET
         body:
           mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvectorheader?Frequency,FreqDrive,FreqChannel*"
+        name: reportvectorheader - RANDOM
+        meta:
+          id: req_53507393f9e0463e98269ecb17137f10
+          created: 1765309442221
+          modified: 1765471891873
+          isPrivate: false
+          sortKey: -1753830653870.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportfieldshistory"
+        name: reportfieldshistory (POST)
+        meta:
+          id: req_e226c541ec2b4533be8f0b885dbde248
+          created: 1765466467743
+          modified: 1765466552139
+          isPrivate: false
+          sortKey: -1753885096673
+        method: POST
+        body:
+          mimeType: application/json
           text: |-
             {     
             	"fields": 
-            	[       
-            		"Template",
-            		"TestPath",
-            		"TestTitle",
-            		"TestType"
+            	[
+            		"LastData",
+            		"StopCode",
+            		"RunTime",
+            		"Time"
             	]   
             }
         headers:
@@ -1877,15 +1978,162 @@ collection:
             store: true
           rebuildPath: true
       - url: "{{ _.base_url
-          }}/reportvectorheader?vectors=Frequency,FreqDrive,FreqChannel*"
-        name: reportvectorheader
+          }}/reportfields?ChName*|,ChStatus*|,ChStatusTeds*|,mVg*|,ChManufactur\
+          er*|,ChModel*|,ChSerialNumber*|"
+        name: reportfields
         meta:
-          id: req_53507393f9e0463e98269ecb17137f10
-          created: 1765309442221
-          modified: 1765309442221
+          id: req_e8e7679c5504459db6d9fa55e0ba6d6e
+          created: 1765468432974
+          modified: 1765468504489
           isPrivate: false
-          sortKey: -1753830653870.25
+          sortKey: -1753885096723
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {     
+            	"fields": 
+            	[       
+            		"ChName*|",
+            		"ChStatus*|",
+            		"ChStatusTeds*|",
+            		"mVg*|",
+            		"ChManufacturer*|",
+            		"ChModel*|",
+            		"ChSerialNumber*|"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportfields"
+        name: "reportfields "
+        meta:
+          id: req_4ae18cbb1c2a4bf8a92bf4cb0152e4ea
+          created: 1765468600575
+          modified: 1765468633751
+          isPrivate: false
+          sortKey: -1753830653907.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {     
+            	"fields": 
+            	[       
+            		"ChName*|",
+            		"ChStatus*|",
+            		"ChStatusTeds*|",
+            		"mVg*|",
+            		"ChManufacturer*|",
+            		"ChModel*|",
+            		"ChSerialNumber*|"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvectorheader"
+        name: reportvectorheader - RANDOM
+        meta:
+          id: req_a96eb25096fa47d38c6afa68d2b14ffa
+          created: 1765468651546
+          modified: 1765469848025
+          isPrivate: false
+          sortKey: -1753830653864
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {     
+            	"vectors": 
+            	[       
+            		"Frequency",
+            		"FreqDrive",
+            		"FreqChannel*"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvector?vectors=Frequency,FreqDrive,FreqChannel*"
+        name: reportvector
+        meta:
+          id: req_4ef101e3817444df9925d1410116ce8c
+          created: 1765469864952
+          modified: 1765469882652
+          isPrivate: false
+          sortKey: -1753830653851.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {     
+            	"vectors": 
+            	[       
+            		"Frequency",
+            		"FreqDrive",
+            		"FreqChannel*"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvectorhistory?Frequency&Drive&Channel*"
+        name: reportvectorhistory
+        meta:
+          id: req_18267c8d652e4c0f9042e7d31fd2456e
+          created: 1765479581889
+          modified: 1765480344540
+          isPrivate: false
+          sortKey: -1753830653848.375
         method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {     
+            	"vectors": 
+            	[       
+            		"Frequency",
+            		"FreqDrive",
+            		"FreqChannel*"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1914,7 +2162,7 @@ collection:
     meta:
       id: fld_0ff3f4dec7d04d3b9c68e0b66522e80a
       created: 1765309442221
-      modified: 1765378971214
+      modified: 1765481342100
       sortKey: -1753972452408.375
     children:
       - url: "{{ _.base_url }}/docs/auxinputs"
@@ -1976,12 +2224,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfield?AuxLabel*|AuxInput*%g|AuxUnit*"
+      - url: "{{ _.base_url }}/reportfields?AuxLabel*|&AuxInput*%g|&AuxUnit*|"
         name: Aux Input Report Fields
         meta:
           id: req_0cf04dfcdd4a44d796846b4874fcaf05
           created: 1765309442223
-          modified: 1765309442223
+          modified: 1765481340610
           isPrivate: false
           sortKey: -1753894722718
         method: GET
@@ -2703,7 +2951,7 @@ collection:
     meta:
       id: fld_c47ff10d237e4f398ba8297e8b4b656f
       created: 1765309442240
-      modified: 1765379767093
+      modified: 1765471167830
       sortKey: -1753961528371.5938
     children:
       - url: "{{ _.base_url }}/inputmode"
@@ -3037,6 +3285,46 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/inputmode"
+        name: inputmode
+        meta:
+          id: req_faaf477a1e2e4deeb7466493ce7fcf34
+          created: 1765471110728
+          modified: 1765471166069
+          isPrivate: false
+          description: Update input channel configuration
+          sortKey: -1754315963957
+        method: GET
+        body:
+          mimeType: application/json
+        parameters:
+          - name: channel
+            value: "1"
+            disabled: false
+            id: pair_b9eb83b1d355484d9160b66b363e1c4b
+          - name: powersource
+            value: "true"
+            disabled: false
+            id: pair_66367ac6247c4ba2864db95a74f8d706
+          - name: capcoupled
+            value: "false"
+            disabled: false
+            id: pair_9dd7cc8f34f640ae9d626025be8ca69e
+          - name: differential
+            value: "false"
+            disabled: false
+            id: pair_bf53e9c8a0044bf5b07ebda784dfc0f0
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
     scripts:
       afterResponse: |
         
@@ -3224,7 +3512,7 @@ collection:
     meta:
       id: fld_4e3b05d7a98446ee88c10ca0462d2584
       created: 1765309442253
-      modified: 1765379809162
+      modified: 1765471061885
       sortKey: -1753950604412.9375
     children:
       - url: "{{ _.base_url }}/docs/report_generation"
@@ -3366,13 +3654,13 @@ cookieJar:
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1765379928701
+    modified: 1765482276234
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1765379928702
+    modified: 1765482276236
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1
