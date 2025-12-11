@@ -202,7 +202,7 @@ def report_fields(vv_instance):
 
     # Handle POST request
     else:
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if data and 'fields' in data:
             fields = data['fields']
             fields_string = ','.join(fields) if isinstance(fields, list) else fields
@@ -301,7 +301,7 @@ def report_fields_history(vv_instance):
 
     # Handle POST request
     else:
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if data and 'fields' in data:
             fields = data['fields']
             fields_string = ','.join(fields) if isinstance(fields, list) else fields
