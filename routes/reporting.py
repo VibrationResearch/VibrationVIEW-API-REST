@@ -336,7 +336,7 @@ def report_fields_history(vv_instance):
     return jsonify(success_response(response_data, message))
 
 
-@reporting_bp.route('/reportvector', methods=['GET'])
+@reporting_bp.route('/reportvector', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def report_vector(vv_instance):
@@ -346,27 +346,60 @@ def report_vector(vv_instance):
     COM Method: ReportVector(vectors, array_out)
     Retrieves vector data from the report system.
 
-    Query Parameters:
-        vectors: Vector names to retrieve (named parameter)
+    GET Query Parameters:
+        vectors: Vector names to retrieve (e.g., ?vectors=Frequency,Amplitude)
+        OR use any parameter name if it's the only parameter (e.g., ?Frequency,Amplitude)
 
-    Example: GET /api/v1/reportvector?vectors=Frequency
+    POST JSON Body:
+        vectors: String or array of vector names
+                - String: Comma-delimited vector names (e.g., "Frequency,Amplitude")
+                - Array: Will be joined with commas automatically
+
+    Examples:
+        GET /api/v1/reportvector?vectors=Frequency,Amplitude
+        GET /api/v1/reportvector?Frequency,Amplitude
+
+        POST /api/v1/reportvector
+        Body: {"vectors": "Frequency,Amplitude"}
+
+        POST /api/v1/reportvector
+        Body: {"vectors": ["Frequency", "Amplitude"]}
     """
-    vectors = request.args.get('vectors')
-    if not vectors:
+    vectors_string = None
+
+    # Handle GET request
+    if request.method == 'GET':
+        vectors_string = request.args.get('vectors')
+        # If no 'vectors' parameter, use the first query parameter
+        if not vectors_string and request.args:
+            vectors_string = list(request.args.keys())[0]
+            # Strip everything up to and including '?' if present
+            if '?' in vectors_string:
+                vectors_string = vectors_string.split('?', 1)[1]
+
+    # Handle POST request
+    else:
+        data = request.get_json(silent=True)
+        if data and 'vectors' in data:
+            vectors = data['vectors']
+            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+
+    # Validate we have vectors
+    if not vectors_string or not vectors_string.strip():
         return jsonify(error_response(
-            'Missing required query parameter: vectors',
+            'Missing required parameter: vectors',
             'MISSING_PARAMETER'
         )), 400
 
-    result = vv_instance.ReportVector(vectors)
+    result = vv_instance.ReportVector(vectors_string)
 
     return jsonify(success_response(
-        {'result': result, 'vectors': vectors},
-        f"ReportVector executed for: {vectors}"
+        {'result': result, 'vectors': vectors_string},
+        f"ReportVector executed for: {vectors_string}"
     ))
 
 
-@reporting_bp.route('/reportvectorheader', methods=['GET'])
+@reporting_bp.route('/reportvectorheader', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def report_vector_header(vv_instance):
@@ -376,21 +409,56 @@ def report_vector_header(vv_instance):
     COM Method: ReportVectorHeader(vectors, array_out)
     Retrieves vector header information from the report system.
 
-    Query Parameters:
-        vectors: Vector names to retrieve headers for (named parameter)
+    GET Query Parameters:
+        vectors: Vector names to retrieve headers for (e.g., ?vectors=Frequency,Amplitude)
+        OR use any parameter name if it's the only parameter (e.g., ?Frequency,Amplitude)
 
-    Example: GET /api/v1/reportvectorheader?vectors=Frequency
+    POST JSON Body:
+        vectors: String or array of vector names
+                - String: Comma-delimited vector names (e.g., "Frequency,Amplitude")
+                - Array: Will be joined with commas automatically
+
+    Examples:
+        GET /api/v1/reportvectorheader?vectors=Frequency,Amplitude
+        GET /api/v1/reportvectorheader?Frequency,Amplitude
+
+        POST /api/v1/reportvectorheader
+        Body: {"vectors": "Frequency,Amplitude"}
+
+        POST /api/v1/reportvectorheader
+        Body: {"vectors": ["Frequency", "Amplitude"]}
     """
-    vectors = request.args.get('vectors')
-    if not vectors:
+    vectors_string = None
+
+    # Handle GET request
+    if request.method == 'GET':
+        vectors_string = request.args.get('vectors')
+        # If no 'vectors' parameter, use the first query parameter
+        if not vectors_string and request.args:
+            vectors_string = list(request.args.keys())[0]
+            # Strip everything up to and including '?' if present
+            if '?' in vectors_string:
+                vectors_string = vectors_string.split('?', 1)[1]
+
+    # Handle POST request
+    else:
+        data = request.get_json(silent=True)
+        if data and 'vectors' in data:
+            vectors = data['vectors']
+            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+
+    # Validate we have vectors
+    if not vectors_string or not vectors_string.strip():
         return jsonify(error_response(
-            'Missing required query parameter: vectors',
+            'Missing required parameter: vectors',
             'MISSING_PARAMETER'
         )), 400
 
-    result = vv_instance.ReportVectorHeader(vectors)
+    result = vv_instance.ReportVectorHeader(vectors_string)
 
     return jsonify(success_response(
-        {'result': result, 'vectors': vectors},
-        f"ReportVectorHeader executed for: {vectors}"
+        {'result': result, 'vectors': vectors_string},
+        f"ReportVectorHeader executed for: {vectors_string}"
     ))
+
+
