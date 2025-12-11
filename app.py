@@ -35,7 +35,8 @@ from routes import (
     gui_control_bp,
     report_generation_bp,
     virtual_channels_bp,
-    log_bp
+    log_bp,
+    vectors_legacy_bp
 )
 
 # Import configuration
@@ -134,6 +135,7 @@ def create_app(config_class=Config):
     app.register_blueprint(report_generation_bp, url_prefix='/api/v1')
     app.register_blueprint(virtual_channels_bp, url_prefix='/api/v1')
     app.register_blueprint(log_bp, url_prefix='/api/v1')
+    app.register_blueprint(vectors_legacy_bp, url_prefix='/api/v1')
 
     # Health check endpoint
     @app.route('/api/v1/health', methods=['GET'])
