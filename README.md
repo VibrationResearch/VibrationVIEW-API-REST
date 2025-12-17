@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ### 2. Configure Environment
 ```bash
-cp .env.example .env
+copy .env.example .env
 # Edit .env with your VibrationVIEW settings
 ```
 
