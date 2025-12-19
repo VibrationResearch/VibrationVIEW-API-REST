@@ -1,5 +1,5 @@
 # ============================================================================
-# FILE: routes/basic_control.py (Basic Control Routes) - v36
+# FILE: routes/basic_control.py (Basic Control Routes) - v39
 # ============================================================================
 
 """
@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, extract_com_error_info, is_template_file, get_new_test_defaults_path, is_default_template_filename
+from utils.utils import handle_binary_upload, extract_com_error_info, is_template_file, get_new_test_defaults_path, is_default_template_filename, detect_file_upload, get_filename_from_request
 from utils.path_validator import validate_file_path, PathValidationError
 
 import logging
@@ -25,8 +25,6 @@ basic_control_bp = Blueprint('basic_control', __name__)
 
 logger = logging.getLogger(__name__)
 
-# Constants
-MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB limit
 
 @basic_control_bp.route('/docs/basic_control', methods=['GET'])
 def get_documentation():
@@ -43,29 +41,35 @@ def get_documentation():
                 'returns': 'Result from StartTest()',
                 'example': 'GET /api/v1/starttest or POST /api/v1/starttest or PUT /api/v1/starttest'
             },
-            'GET|POST /runtest': {
-                'description': 'Open and run a complete test (combines OpenTest + StartTest)',
+            'GET /runtest': {
+                'description': 'Run existing test by path (combines OpenTest + StartTest)',
                 'com_method': 'RunTest(filepath)',
                 'parameters': {
-                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
+                    'filename': 'string - Query parameter with VibrationVIEW profile filename',
                     'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
-                'returns': 'boolean - Test running status verified by IsRunning()',
-                'example': 'GET /api/v1/runtest (status) or GET /api/v1/runtest?testname=test1.vsp or POST /api/v1/runtest?testname=test1.vsp'
+                'returns': 'boolean - Test running status',
+                'example': 'GET /api/v1/runtest?filename=test1.vsp'
             },
-            'PUT /runtest': {
-                'description': 'Upload and run a complete test (combines upload + OpenTest + StartTest)',
-                'com_method': 'OpenTest(filepath) + StartTest()',
-                'parameters': {
-                    'filename': 'string - Query parameter with desired filename (named parameter)',
-                    'OR unnamed parameter': 'string - Test filename as first URL parameter',
-                    'body': 'binary - File content in request body'
+            'POST|PUT /runtest': {
+                'description': 'Upload and run a test file, OR run existing test by path',
+                'com_method': 'RunTest(filepath)',
+                'modes': {
+                    'With file content (upload mode)': {
+                        'Option 1 (multipart/form-data)': 'any file field (filename auto-detected)',
+                        'Option 2 (raw binary)': 'filename query param + binary body'
+                    },
+                    'Without file content': {
+                        'filename': 'string - Query parameter with test filename',
+                        'OR unnamed parameter': 'string - Test filename as first URL parameter'
+                    }
                 },
-                'headers': {
-                    'Content-Length': 'required - File size in bytes (max 10MB)'
-                },
-                'returns': 'object - Status, test running verification, file path, and size information',
-                'example': 'PUT /api/v1/runtest?filename=test1.vsp or PUT /api/v1/runtest?test1.vsp (with binary file in body)'
+                'returns': 'object - Status, test running verification, file path',
+                'examples': [
+                    'POST /api/v1/runtest with multipart/form-data (upload + run)',
+                    'POST /api/v1/runtest?filename=test.vsp with raw binary body (upload + run)',
+                    'POST /api/v1/runtest?filename=test.vsp (run existing file)'
+                ]
             },
             'GET|POST|PUT /stoptest': {
                 'description': 'Stop currently running test',
@@ -81,29 +85,35 @@ def get_documentation():
                 'returns': 'Result from ResumeTest()',
                 'example': 'GET /api/v1/resumetest or POST /api/v1/resumetest or PUT /api/v1/resumetest'
             },
-            'GET|POST /opentest': {
-                'description': 'Open test profile file by filename',
+            'GET /opentest': {
+                'description': 'Open existing test profile file by path',
                 'com_method': 'OpenTest(filepath)',
                 'parameters': {
-                    'testname': 'string - Query parameter with VibrationVIEW profile filename (named parameter)',
+                    'filename': 'string - Query parameter with VibrationVIEW profile filename',
                     'OR unnamed parameter': 'string - Test filename as first URL parameter'
                 },
                 'returns': 'Result from OpenTest()',
-                'example': 'GET /api/v1/opentest?testname=test1.vsp or POST /api/v1/opentest?test1.vsp'
+                'example': 'GET /api/v1/opentest?filename=test1.vsp'
             },
-            'PUT /opentest': {
-                'description': 'Upload and open test profile file',
+            'POST|PUT /opentest': {
+                'description': 'Upload and open a test file, OR open existing test by path',
                 'com_method': 'OpenTest(filepath)',
-                'parameters': {
-                    'filename': 'string - Query parameter with desired filename (named parameter)',
-                    'OR unnamed parameter': 'string - Test filename as first URL parameter',
-                    'body': 'binary - File content in request body'
+                'modes': {
+                    'With file content (upload mode)': {
+                        'Option 1 (multipart/form-data)': 'any file field (filename auto-detected)',
+                        'Option 2 (raw binary)': 'filename query param + binary body'
+                    },
+                    'Without file content': {
+                        'filename': 'string - Query parameter with test filename',
+                        'OR unnamed parameter': 'string - Test filename as first URL parameter'
+                    }
                 },
-                'headers': {
-                    'Content-Length': 'required - File size in bytes (max 10MB)'
-                },
-                'returns': 'object - Status, color, file path, and size information',
-                'example': 'PUT /api/v1/opentest?filename=test1.vsp or PUT /api/v1/opentest?test1.vsp (with binary file in body)'
+                'returns': 'object - Status, file path',
+                'examples': [
+                    'POST /api/v1/opentest with multipart/form-data (upload + open)',
+                    'POST /api/v1/opentest?filename=test.vsp with raw binary body (upload + open)',
+                    'POST /api/v1/opentest?filename=test.vsp (open existing file)'
+                ]
             },
             'GET|POST /closetest': {
                 'description': 'Close test profile by name',
@@ -205,88 +215,90 @@ def run_test(vv_instance):
     COM Method: RunTest(filepath)
     Opens a VibrationVIEW profile file and starts execution in one operation.
 
-    GET/POST: Run existing file by path
-        Query Parameters:
-            testname: string - Test filename (named parameter)
-            OR unnamed parameter: string - Test filename as first URL parameter
-        Example: GET /api/v1/runtest?testname=test1.vsp or POST /api/v1/runtest?test1.vsp
-
-    PUT: Upload file and run
+    GET: Run existing file by path
         Query Parameters:
             filename: string - Test filename (named parameter)
             OR unnamed parameter: string - Test filename as first URL parameter
-        Headers:
-            Content-Length: Required - File size in bytes (max 10MB)
-        Body:
-            Binary file content
-        Example: PUT /api/v1/runtest?filename=test1.vsp (with binary file in body)
+        Example: GET /api/v1/runtest?filename=test1.vsp
+
+    POST/PUT: Upload file and run, OR run existing file by path
+        If request includes file content:
+            Option 1 - multipart/form-data (recommended):
+                Form Field: any - The test file (original filename auto-detected)
+                Example: POST /api/v1/runtest with Content-Type: multipart/form-data
+
+            Option 2 - Raw binary body:
+                Query Parameters: filename (required for raw binary)
+                Body: Binary file content
+                Example: POST /api/v1/runtest?filename=test1.vsp (with binary body)
+
+        If no file content:
+            Query Parameters:
+                filename: string - Test filename (named parameter)
+                OR unnamed parameter: string - Test filename as first URL parameter
+            Example: POST /api/v1/runtest?filename=test1.vsp
     """
-    if request.method == 'PUT':
-        # Upload mode - handle binary file upload
-        filename = request.args.get("filename")
+    # Check for file upload (PUT/POST only)
+    if request.method in ('PUT', 'POST'):
+        upload_result = detect_file_upload()
+        filename, binary_data, content_length = upload_result
 
-        if filename is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                filename = unquote(query_string)
+        # Check if detect_file_upload returned an error
+        if isinstance(filename, dict):
+            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
 
-        content_length = request.content_length
+        if filename is not None:
+            # File upload detected - save and run
+            result, error, status_code = handle_binary_upload(filename, binary_data)
+            if error:
+                return jsonify(error), status_code
 
-        if not filename:
-            return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
+            file_path = result['FilePath']
+            try:
+                vv_instance.RunTest(file_path)
+                success = vv_instance.IsRunning()
+            except Exception as e:
+                return jsonify(error_response(
+                    f'File uploaded but failed to run test "{filename}": {str(e)}',
+                    'RUN_TEST_ERROR',
+                    f"RunTest command failed: {filename}"
+                )), 500
 
-        if content_length is None:
-            return jsonify({'Error': 'Missing Content-Length header'}), 411
+            return jsonify(success_response(
+                {
+                    'result': success,
+                    'filepath': filename,
+                    'file_uploaded': True,
+                    'test_started': success
+                },
+                f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
+            ))
 
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify({'Error': 'File too large (max 10MB)'}), 413
+    # No file upload - run existing file by path
+    filename = get_filename_from_request()
 
-        binary_data = request.get_data()
-        result, error, status_code = handle_binary_upload(filename, binary_data)
-        if error:
-            return jsonify(error), status_code
+    if not filename:
+        return jsonify(error_response(
+            'Missing required query parameter: filename',
+            'MISSING_PARAMETER'
+        )), 400
 
-        file_path = result['FilePath']
-        vv_instance.RunTest(file_path)
-        success = vv_instance.IsRunning()
+    try:
+        result = vv_instance.RunTest(filename)
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to run test "{filename}": {str(e)}',
+            'RUN_TEST_ERROR',
+            f"RunTest command failed: {filename}"
+        )), 500
 
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filename,
-                'file_uploaded': True,
-                'test_opened': True,
-                'test_started': success,
-                'executed': True
-            },
-            f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
-        ))
-
-    else:
-        # GET/POST mode - run existing file by path
-        test_name = request.args.get("testname")
-
-        if test_name is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                test_name = unquote(query_string)
-
-        if not test_name:
-            return jsonify(error_response(
-                'Missing required query parameter: testname (or unnamed test filename parameter)',
-                'MISSING_PARAMETER'
-            )), 400
-
-        filepath = test_name
-        result = vv_instance.RunTest(filepath)
-
-        return jsonify(success_response(
-            {
-                'result': result,
-                'filepath': filepath
-            },
-            f"RunTest command executed: {test_name}"
-        ))
+    return jsonify(success_response(
+        {
+            'result': result,
+            'filepath': filename
+        },
+        f"RunTest command executed: {filename}"
+    ))
 
 @basic_control_bp.route('/stoptest', methods=['GET', 'POST', 'PUT'])
 @handle_errors
@@ -327,157 +339,131 @@ def resume_test(vv_instance):
         "ResumeTest command executed"
     ))
 
-@basic_control_bp.route('/opentest', methods=['GET', 'POST'])
+@basic_control_bp.route('/opentest', methods=['GET', 'POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def open_test(vv_instance):
     """
-    Open Test Profile File by Filename
+    Open Test Profile File
 
     COM Method: OpenTest(filepath)
     Opens a VibrationVIEW profile file for execution.
     The test can then be started with StartTest.
 
-    Query Parameters:
-        testname: string - Test filename (named parameter)
-        OR unnamed parameter: string - Test filename as first URL parameter
+    GET: Open existing file by path
+        Query Parameters:
+            filename: string - Test filename (named parameter)
+            OR unnamed parameter: string - Test filename as first URL parameter
+        Example: GET /api/v1/opentest?filename=test1.vsp
 
-    Example: GET /api/v1/opentest?testname=test1.vsp or POST /api/v1/opentest?test1.vsp
+    POST/PUT: Upload file and open, OR open existing file by path
+        If request includes file content:
+            Option 1 - multipart/form-data (recommended):
+                Form Field: any - The test file (original filename auto-detected)
+                Example: POST /api/v1/opentest with Content-Type: multipart/form-data
+
+            Option 2 - Raw binary body:
+                Query Parameters: filename (required for raw binary)
+                Body: Binary file content
+                Example: POST /api/v1/opentest?filename=test1.vsp (with binary body)
+
+        If no file content:
+            Query Parameters:
+                filename: string - Test filename (named parameter)
+                OR unnamed parameter: string - Test filename as first URL parameter
+            Example: POST /api/v1/opentest?filename=test1.vsp
     """
-    # Get test name from parameters - check named parameter first, then unnamed
-    test_name = request.args.get("testname")
+    # Check for file upload (PUT/POST only)
+    if request.method in ('PUT', 'POST'):
+        upload_result = detect_file_upload()
+        filename, binary_data, content_length = upload_result
 
-    # If no 'testname' parameter, try to get the first unnamed parameter
-    if test_name is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            # URL decode the query string to handle special characters like : and \
-            test_name = unquote(query_string)
+        # Check if detect_file_upload returned an error
+        if isinstance(filename, dict):
+            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
 
-    if not test_name:
-        return jsonify(error_response(
-            'Missing required query parameter: testname (or unnamed test filename parameter)',
-            'MISSING_PARAMETER'
-        )), 400
-
-    # Use test_name as provided
-    filepath = test_name
-
-    result = vv_instance.OpenTest(filepath)
-
-    return jsonify(success_response(
-        {
-            'result': result,
-            'filepath': filepath
-        },
-        f"OpenTest command executed: {test_name}"
-    ))
-
-@basic_control_bp.route('/opentest', methods=['PUT'])
-@with_vibrationview
-def upload_and_open_test(vv_instance):
-    """
-    Upload and Open Test Profile File
-    
-    COM Method: OpenTest(filepath)
-    Uploads a VibrationVIEW profile file and opens it for execution.
-    The test can then be started with StartTest.
-    
-    Query Parameters:
-        filename: string - Test filename (named parameter)
-        OR unnamed parameter: string - Test filename as first URL parameter
-    
-    Headers:
-        Content-Length: Required - File size in bytes (max 10MB)
-    
-    Body:
-        Binary file content
-    
-    Example: PUT /api/v1/opentest?filename=test1.vsp or PUT /api/v1/opentest?test1.vsp (with binary file in body)
-    """
-    try:
-        # Get filename from parameters - check named parameter first, then unnamed
-        filename = request.args.get("filename")
-        
-        # If no 'filename' parameter, try to get the first unnamed parameter
-        if filename is None:
-            query_string = request.query_string.decode('utf-8')
-            if query_string:
-                # URL decode the query string to handle special characters
-                filename = unquote(query_string)
-        
-        content_length = request.content_length
-
-        if not filename:
-            return jsonify({'Error': 'Missing required query parameter: filename (or unnamed filename parameter)'}), 400
-
-        if content_length is None:
-            return jsonify({'Error': 'Missing Content-Length header'}), 411  # Length Required
-        
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify({'Error': 'File too large (max 10MB)'}), 413  # Payload Too Large
-        
-        binary_data = request.get_data()
-        
-        # Check if this is a template file and handle accordingly
-        if is_template_file(filename):
-            # Get the New Test Defaults path from registry
-            defaults_path = get_new_test_defaults_path()
-            if defaults_path:
-                # Use the New Test Defaults folder for template files
-                result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=defaults_path, usetemporaryfile=False)
+        if filename is not None:
+            # File upload detected - save and open
+            # Check if this is a template file and handle accordingly
+            if is_template_file(filename):
+                defaults_path = get_new_test_defaults_path()
+                if defaults_path:
+                    result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=defaults_path, usetemporaryfile=False)
+                else:
+                    result, error, status_code = handle_binary_upload(filename, binary_data)
             else:
-                # Fallback to regular Uploads folder if registry path not found
                 result, error, status_code = handle_binary_upload(filename, binary_data)
-        else:
-            # Regular file handling
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-        
-        if error:
-            return jsonify(error), status_code
 
-        file_path = result['FilePath']
+            if error:
+                return jsonify(error), status_code
 
-        # Check if this is a default template filename that should only be copied
-        if is_default_template_filename(filename):
+            file_path = result['FilePath']
+
+            # Check if this is a default template filename that should only be copied
+            if is_default_template_filename(filename):
+                return jsonify(success_response(
+                    {
+                        'result': True,
+                        'filepath': filename,
+                        'file_uploaded': True,
+                        'copied_only': True
+                    },
+                    f"Default template file uploaded and copied only: {filename}"
+                ))
+
+            # Close any existing test with the same name to avoid conflicts
+            existing_tests = vv_instance.ListOpenTests()
+            if existing_tests:
+                basename_lower = os.path.splitext(os.path.basename(filename))[0].lower()
+                for test in existing_tests:
+                    test_name = test[3].lower() if test[3] else ''
+                    if basename_lower == test_name:
+                        vv_instance.CloseTab(int(test[0]))
+
+            # Open the uploaded test file
+            try:
+                vv_instance.OpenTest(file_path)
+            except Exception as e:
+                return jsonify(error_response(
+                    f'File uploaded but failed to open test "{filename}": {str(e)}',
+                    'OPEN_TEST_ERROR',
+                    f"OpenTest command failed: {filename}"
+                )), 500
+
             return jsonify(success_response(
                 {
                     'result': True,
                     'filepath': filename,
-                    'executed': False,
-                    'copied_only': True
+                    'file_uploaded': True
                 },
-                f"Default template file uploaded and copied only (OpenTest automation not run on default filename): {filename}"
+                f"Upload and OpenTest command executed: {filename}"
             ))
 
-        # close any existing test with the same name to avoid conflicts
-        existing_tests = vv_instance.ListOpenTests()
-        if existing_tests:
-            basename_lower = os.path.splitext(os.path.basename(filename))[0].lower()
-            
-            for test in existing_tests:
-                test_name = test[3].lower() if test[3] else ''
-                
-                if basename_lower == test_name:
-                    vv_instance.CloseTab(int(test[0]))
+    # No file upload - open existing file by path
+    filename = get_filename_from_request()
 
-        # Open the uploaded test file
-        result = vv_instance.OpenTest(file_path)
+    if not filename:
+        return jsonify(error_response(
+            'Missing required query parameter: filename',
+            'MISSING_PARAMETER'
+        )), 400
 
-        # Handle None return - assume success if no exception was raised
-        success = True  # True if result is None or True
-        
-        return jsonify(success_response(
-            {
-                'result': success,
-                'filepath': filename,
-                'executed': True
-            },
-            f"OpenTest command {'executed successfully' if success else 'failed'}: {filename}"
-        ))
-
+    try:
+        result = vv_instance.OpenTest(filename)
     except Exception as e:
-        return jsonify(extract_com_error_info(e)), 500
+        return jsonify(error_response(
+            f'Failed to open test "{filename}": {str(e)}',
+            'OPEN_TEST_ERROR',
+            f"OpenTest command failed: {filename}"
+        )), 500
+
+    return jsonify(success_response(
+        {
+            'result': result,
+            'filepath': filename
+        },
+        f"OpenTest command executed: {filename}"
+    ))
 
 @basic_control_bp.route('/closetest', methods=['GET', 'POST'])
 @handle_errors
@@ -656,7 +642,7 @@ def save_data(vv_instance):
 
     Examples:
         POST /api/v1/savedata?filename=savefile.vsd (saves to DATA_FOLDER/savefile.vsd)
-        POST /api/v1/savedata?filename=C:\Custom\Path\savefile.vsd (saves to specified path)
+        POST /api/v1/savedata?filename=C:\\Custom\\Path\\savefile.vsd (saves to specified path)
     """
     filename = request.args.get('filename')
     if not filename:

@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import convert_channel_to_com_index, handle_binary_upload, extract_com_error_info
+from utils.utils import convert_channel_to_com_index, handle_binary_upload, extract_com_error_info, detect_file_upload, get_filename_from_request
 import logging
 from datetime import datetime
 import config
@@ -714,7 +714,7 @@ def input_configuration_file(vv_instance):
         ))
 
 
-@input_config_bp.route('/inputconfigurationfile', methods=['PUT'])
+@input_config_bp.route('/inputconfigurationfile', methods=['POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def upload_input_configuration_file(vv_instance):
@@ -724,47 +724,30 @@ def upload_input_configuration_file(vv_instance):
     COM Method: SetInputConfigurationFile(filepath)
     Uploads an input configuration file (.vic) and loads it.
 
-    Query Parameters:
-        filename: string - Configuration filename (URL parameter)
+    POST/PUT: Upload file
+        If request includes file content:
+            Option 1 - multipart/form-data (recommended):
+                Form Field: any - The config file (original filename auto-detected)
+                Example: POST /api/v1/inputconfigurationfile with Content-Type: multipart/form-data
 
-    Headers:
-        Content-Length: Required - File size in bytes (max 10MB)
-
-    Body:
-        Binary file content
-
-    Example: PUT /api/v1/inputconfigurationfile?filename=10mv per G.vic (with binary body)
+            Option 2 - Raw binary body:
+                Query Parameters: filename (required for raw binary)
+                Body: Binary file content
+                Example: PUT /api/v1/inputconfigurationfile?filename=10mv per G.vic (with binary body)
     """
-    # Get filename from parameters
-    filename = request.args.get("filename")
+    # Detect file upload (multipart or raw binary)
+    upload_result = detect_file_upload()
+    filename, binary_data, content_length = upload_result
 
-    # If no 'filename' parameter, try unnamed parameter
+    # Check if detect_file_upload returned an error
+    if isinstance(filename, dict):
+        return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
+
     if filename is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            filename = unquote(query_string)
-
-    if not filename:
         return jsonify(error_response(
-            'Missing required query parameter: filename (or unnamed filename parameter)',
-            'MISSING_PARAMETER'
+            'Missing file: provide via multipart/form-data or raw binary with filename parameter',
+            'MISSING_FILE'
         )), 400
-
-    content_length = request.content_length
-
-    if content_length is None:
-        return jsonify(error_response(
-            'Missing Content-Length header',
-            'MISSING_HEADER'
-        )), 411  # Length Required
-
-    if content_length > MAX_CONTENT_LENGTH:
-        return jsonify(error_response(
-            'File too large (max 10MB)',
-            'FILE_TOO_LARGE'
-        )), 413
-
-    binary_data = request.get_data()
 
     # Handle file upload
     uploads_folder = os.path.join(config.Config.INPUTCONFIG_FOLDER, 'Uploads')
@@ -776,13 +759,19 @@ def upload_input_configuration_file(vv_instance):
     file_path = result['FilePath']
 
     # Load the uploaded configuration file
-    vv_instance.SetInputConfigurationFile(file_path)
+    try:
+        vv_instance.SetInputConfigurationFile(file_path)
+    except Exception as e:
+        return jsonify(error_response(
+            f'File uploaded but failed to load configuration "{filename}": {str(e)}',
+            'LOAD_CONFIG_ERROR'
+        )), 500
 
     return jsonify(success_response(
         {
             'result': True,
             'filepath': filename,
-            'uploaded': True
+            'file_uploaded': True
         },
         f"Input configuration file '{filename}' uploaded and loaded successfully"
     ))

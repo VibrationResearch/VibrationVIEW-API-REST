@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload
+from utils.utils import handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
 import config
 import os
@@ -146,7 +146,7 @@ def import_virtual_channels(vv_instance):
     ))
 
 
-@virtual_channels_bp.route('/importvirtualchannels', methods=['PUT'])
+@virtual_channels_bp.route('/importvirtualchannels', methods=['POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def upload_and_import_virtual_channels(vv_instance):
@@ -156,49 +156,30 @@ def upload_and_import_virtual_channels(vv_instance):
     COM Method: ImportVirtualChannels(filepath)
     Uploads a virtual channels configuration file and imports it.
 
-    Query Parameters:
-        filename: string - Configuration filename (URL parameter)
-        OR unnamed parameter: string - Filename as first URL parameter
+    POST/PUT: Upload file
+        If request includes file content:
+            Option 1 - multipart/form-data (recommended):
+                Form Field: any - The config file (original filename auto-detected)
+                Example: POST /api/v1/importvirtualchannels with Content-Type: multipart/form-data
 
-    Headers:
-        Content-Length: Required - File size in bytes (max 10MB)
-
-    Body:
-        Binary file content
-
-    Example: PUT /api/v1/importvirtualchannels?filename=channels.vvc (with binary file in body)
+            Option 2 - Raw binary body:
+                Query Parameters: filename (required for raw binary)
+                Body: Binary file content
+                Example: PUT /api/v1/importvirtualchannels?filename=channels.vvc (with binary body)
     """
-    # Get filename from parameters - check named parameter first, then unnamed
-    filename = request.args.get("filename")
+    # Detect file upload (multipart or raw binary)
+    upload_result = detect_file_upload()
+    filename, binary_data, content_length = upload_result
 
-    # If no 'filename' parameter, try to get the first unnamed parameter
+    # Check if detect_file_upload returned an error
+    if isinstance(filename, dict):
+        return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
+
     if filename is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            # URL decode the query string to handle special characters
-            filename = unquote(query_string)
-
-    if not filename:
         return jsonify(error_response(
-            'Missing required query parameter: filename (or unnamed filename parameter)',
-            'MISSING_PARAMETER'
+            'Missing file: provide via multipart/form-data or raw binary with filename parameter',
+            'MISSING_FILE'
         )), 400
-
-    content_length = request.content_length
-
-    if content_length is None:
-        return jsonify(error_response(
-            'Missing Content-Length header',
-            'MISSING_HEADER'
-        )), 411  # Length Required
-
-    if content_length > MAX_CONTENT_LENGTH:
-        return jsonify(error_response(
-            'File too large (max 10MB)',
-            'FILE_TOO_LARGE'
-        )), 413
-
-    binary_data = request.get_data()
 
     # Handle file upload
     result, error, status_code = handle_binary_upload(filename, binary_data)
@@ -209,13 +190,19 @@ def upload_and_import_virtual_channels(vv_instance):
     file_path = result['FilePath']
 
     # Import the uploaded virtual channels file
-    import_result = vv_instance.ImportVirtualChannels(file_path)
+    try:
+        import_result = vv_instance.ImportVirtualChannels(file_path)
+    except Exception as e:
+        return jsonify(error_response(
+            f'File uploaded but failed to import virtual channels "{filename}": {str(e)}',
+            'IMPORT_ERROR'
+        )), 500
 
     return jsonify(success_response(
         {
             'result': import_result,
             'filepath': filename,
-            'uploaded': True
+            'file_uploaded': True
         },
         f"Virtual channels file '{filename}' uploaded and imported successfully"
     ))

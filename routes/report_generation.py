@@ -10,7 +10,7 @@ File generation operations using VibrationVIEW command line interface
 from flask import Blueprint, request, jsonify, send_file
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload
+from utils.utils import handle_binary_upload, detect_file_upload
 from utils.vv_manager import with_vibrationview
 from utils.path_validator import validate_file_path, validate_output_path, PathValidationError
 from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUFFFromVV
@@ -188,15 +188,17 @@ def generate_report(vv_instance):
              Or:   POST /api/v1/generatereport (uses last data file, default template, and auto-generated filename)
              Or:   POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (query parameters)
     """
-    content_length = request.content_length
     content_type = request.content_type or ''
 
-    # Determine mode based on Content-Length and Content-Type
-    is_upload_mode = (content_length is not None and
-                     content_length > 0 and
-                     ('octet-stream' in content_type.lower() or
-                      content_type == '' or
-                      not content_type.startswith('application/json')))
+    # Check for file upload (multipart or raw binary)
+    has_multipart_file = len(request.files) > 0
+    has_binary_content = (
+        request.content_length and request.content_length > 0 and
+        not has_multipart_file and
+        'application/json' not in content_type and
+        'application/x-www-form-urlencoded' not in content_type
+    )
+    is_upload_mode = has_multipart_file or has_binary_content
 
     if is_upload_mode:
         # Upload Mode: Handle file upload with query parameters
@@ -215,6 +217,16 @@ def generate_report(vv_instance):
                 'MISSING_PARAMETER'
             )), 400
 
+        # Get file data from multipart or raw binary
+        if has_multipart_file:
+            file_field = next(iter(request.files))
+            uploaded_file = request.files[file_field]
+            binary_data = uploaded_file.read()
+            content_length = len(binary_data)
+        else:
+            content_length = request.content_length
+            binary_data = request.get_data()
+
         if content_length > MAX_CONTENT_LENGTH:
             return jsonify(error_response(
                 'File too large (max 100MB)',
@@ -232,8 +244,6 @@ def generate_report(vv_instance):
             )), 403
 
         try:
-            # Get the uploaded file data
-            binary_data = request.get_data()
 
             # Create a temporary file for the uploaded .vrd data
             with tempfile.NamedTemporaryFile(suffix='.vrd', delete=False) as temp_file:
@@ -597,15 +607,17 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
         Flask response with file generation results
     """
     extension = f'.{file_type.lower()}'
-    content_length = request.content_length
     content_type = request.content_type or ''
 
-    # Determine mode based on Content-Length and Content-Type
-    is_upload_mode = (content_length is not None and
-                     content_length > 0 and
-                     ('octet-stream' in content_type.lower() or
-                      content_type == '' or
-                      not content_type.startswith('application/json')))
+    # Check for file upload (multipart or raw binary)
+    has_multipart_file = len(request.files) > 0
+    has_binary_content = (
+        request.content_length and request.content_length > 0 and
+        not has_multipart_file and
+        'application/json' not in content_type and
+        'application/x-www-form-urlencoded' not in content_type
+    )
+    is_upload_mode = has_multipart_file or has_binary_content
 
     if is_upload_mode:
         # Upload Mode: Handle file upload with query parameters
@@ -616,6 +628,16 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
                 'Upload mode requires output_name query parameter',
                 'MISSING_PARAMETER'
             )), 400
+
+        # Get file data from multipart or raw binary
+        if has_multipart_file:
+            file_field = next(iter(request.files))
+            uploaded_file = request.files[file_field]
+            binary_data = uploaded_file.read()
+            content_length = len(binary_data)
+        else:
+            content_length = request.content_length
+            binary_data = request.get_data()
 
         if content_length > MAX_CONTENT_LENGTH:
             return jsonify(error_response(
@@ -634,8 +656,6 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
             )), 403
 
         try:
-            # Get the uploaded file data
-            binary_data = request.get_data()
 
             # Create a temporary file for the uploaded .vrd data
             with tempfile.NamedTemporaryFile(suffix='.vrd', delete=False) as temp_file:

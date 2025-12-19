@@ -4,6 +4,8 @@ import uuid
 import math
 
 import logging
+from flask import request
+from urllib.parse import unquote
 from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
@@ -284,3 +286,97 @@ def sanitize_nan(value):
     elif isinstance(value, (list, tuple)):
         return [sanitize_nan(v) for v in value]
     return value
+
+
+# Maximum file upload size (10 MB)
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+
+
+def detect_file_upload():
+    """
+    Detect if the current request contains a file upload.
+
+    Returns:
+        tuple: (filename, binary_data, content_length) if file upload detected
+        tuple: (None, None, None) if no file upload
+        tuple: (error_response, status_code, None) if error occurred
+
+    Supports:
+        - multipart/form-data with any file field name
+        - Raw binary body with filename in query parameter
+    """
+    content_type = request.content_type or ''
+
+    logging.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
+                  f"content_length={request.content_length}, files={list(request.files.keys())}")
+
+    # Check for multipart file upload (any field name)
+    has_multipart_file = len(request.files) > 0
+
+    # Check for raw binary upload (exclude json, form, multipart)
+    is_binary_content_type = (
+        request.content_length and request.content_length > 0 and
+        not has_multipart_file and
+        'multipart' not in content_type and
+        'application/json' not in content_type and
+        'application/x-www-form-urlencoded' not in content_type
+    )
+
+    if has_multipart_file:
+        # Multipart/form-data mode - get first file from any field name
+        file_field = next(iter(request.files))
+        uploaded_file = request.files[file_field]
+        filename = uploaded_file.filename
+        binary_data = uploaded_file.read()
+        content_length = len(binary_data)
+        logging.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
+
+        if not filename:
+            return ({'Error': 'Multipart file field has no filename'}, 400, None)
+
+        if content_length > MAX_UPLOAD_SIZE:
+            return ({'Error': 'File too large (max 10MB)'}, 413, None)
+
+        return (filename, binary_data, content_length)
+
+    elif is_binary_content_type:
+        # Raw binary mode - get filename from query parameter
+        filename = request.args.get("filename")
+
+        if filename is None:
+            query_string = request.query_string.decode('utf-8')
+            if query_string:
+                filename = unquote(query_string)
+
+        if not filename:
+            return ({'Error': 'Missing filename: provide via multipart/form-data file field or query parameter'}, 400, None)
+
+        content_length = request.content_length
+
+        if content_length > MAX_UPLOAD_SIZE:
+            return ({'Error': 'File too large (max 10MB)'}, 413, None)
+
+        binary_data = request.get_data()
+        logging.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
+
+        return (filename, binary_data, content_length)
+
+    # No file upload detected
+    return (None, None, None)
+
+
+def get_filename_from_request():
+    """
+    Extract filename from request query parameters.
+
+    Returns:
+        str: The filename, or None if not found
+    """
+    filename = request.args.get("filename")
+
+    if filename is None:
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            filename = unquote(query_string)
+
+    return filename
