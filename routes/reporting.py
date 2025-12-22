@@ -12,7 +12,7 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.utils import extract_com_error_info, sanitize_nan
-from utils.vv_error_codes import VVIEW_E_NO_DATA, is_vview_error
+from utils.vv_error_codes import VVIEW_E_NO_DATA, VVIEW_E_ALREADY_RUNNING, is_vview_error
 
 import logging
 from datetime import datetime
@@ -326,7 +326,22 @@ def report_fields_history(vv_instance):
         )), 400
 
     # Call ReportFieldsHistory with the comma-delimited string
-    results = vv_instance.ReportFieldsHistory(fields_string)
+    try:
+        results = vv_instance.ReportFieldsHistory(fields_string)
+    except Exception as e:
+        # Handle VVIEW_E_NO_DATA - return empty results with descriptive message
+        if is_vview_error(e, VVIEW_E_NO_DATA):
+            return jsonify(success_response(
+                {'results': [], 'fields_string': fields_string, 'executed': True},
+                "No saved data files available"
+            ))
+        # Handle VVIEW_E_ALREADY_RUNNING - history not available during test
+        if is_vview_error(e, VVIEW_E_ALREADY_RUNNING):
+            return jsonify(success_response(
+                {'results': [], 'fields_string': fields_string, 'executed': True},
+                "History not available while test is running"
+            ))
+        raise
 
     # Convert results to list for JSON serialization
     results_list = []
@@ -526,7 +541,22 @@ def report_vector_history(vv_instance):
         )), 400
 
     # Call ReportVectorHistory with the comma-delimited string
-    results = vv_instance.ReportVectorHistory(vectors_string)
+    try:
+        results = vv_instance.ReportVectorHistory(vectors_string)
+    except Exception as e:
+        # Handle VVIEW_E_NO_DATA - return empty results with descriptive message
+        if is_vview_error(e, VVIEW_E_NO_DATA):
+            return jsonify(success_response(
+                {'results': [], 'headers': [], 'vectors_string': vectors_string, 'executed': True},
+                "No saved data files available"
+            ))
+        # Handle VVIEW_E_ALREADY_RUNNING - history not available during test
+        if is_vview_error(e, VVIEW_E_ALREADY_RUNNING):
+            return jsonify(success_response(
+                {'results': [], 'headers': [], 'vectors_string': vectors_string, 'executed': True},
+                "History not available while test is running"
+            ))
+        raise
     results = sanitize_nan(results)
 
     # Convert results to list for JSON serialization
