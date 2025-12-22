@@ -11,8 +11,10 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
-from datetime import datetime
+import os
+import config
 
 # Create blueprint
 gui_control_bp = Blueprint('gui_control', __name__)
@@ -29,12 +31,27 @@ def get_documentation():
         'endpoints': {
             'Test Editing': {
                 'GET /edittest': {
-                    'description': 'Edit VibrationVIEW Test',
+                    'description': 'Edit existing test by path',
                     'com_method': 'EditTest(szTestName)',
                     'parameters': {
-                        'testname': 'string - Test name to edit'
+                        'filename': 'string - Test filename as query parameter'
                     },
-                    'returns': 'HRESULT - Success status from COM method'
+                    'returns': 'Success status',
+                    'example': 'GET /api/v1/edittest?filename=test1.vsp'
+                },
+                'POST|PUT /edittest': {
+                    'description': 'Upload and edit test file, OR edit existing by path',
+                    'com_method': 'EditTest(szTestName)',
+                    'modes': {
+                        'With file content (upload)': 'multipart/form-data or raw binary + filename param',
+                        'Without file content': 'filename query parameter to edit existing'
+                    },
+                    'returns': 'Success status with file path',
+                    'examples': [
+                        'POST /api/v1/edittest with multipart/form-data (upload + edit)',
+                        'PUT /api/v1/edittest?filename=test.vsp with binary body',
+                        'POST /api/v1/edittest?filename=test.vsp (edit existing)'
+                    ]
                 },
                 'GET /abortedit': {
                     'description': 'Abort any open Edit session',
@@ -81,28 +98,97 @@ def get_documentation():
     return jsonify(docs)
 
 # Test Editing Control
-@gui_control_bp.route('/edittest', methods=['GET'])
+@gui_control_bp.route('/edittest', methods=['GET', 'POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def edit_test(vv_instance):
     """
     Edit VibrationVIEW Test
-    
+
     COM Method: EditTest(szTestName)
     Opens the specified test for editing in VibrationVIEW.
+
+    GET: Edit existing file by path
+        Query Parameters:
+            filename: string - Test filename (named parameter)
+            OR unnamed parameter: string - Test filename as first URL parameter
+        Example: GET /api/v1/edittest?filename=test1.vsp
+
+    POST/PUT: Upload file and edit, OR edit existing file by path
+        If request includes file content:
+            Option 1 - multipart/form-data (recommended):
+                Form Field: any - The test file (original filename auto-detected)
+                Example: POST /api/v1/edittest with Content-Type: multipart/form-data
+
+            Option 2 - Raw binary body:
+                Query Parameters: filename (required for raw binary)
+                Body: Binary file content
+                Example: POST /api/v1/edittest?filename=test1.vsp (with binary body)
+
+        If no file content:
+            Query Parameters:
+                filename: string - Test filename (named parameter)
+                OR unnamed parameter: string - Test filename as first URL parameter
+            Example: POST /api/v1/edittest?filename=test1.vsp
     """
-    test_name = request.args.get('testname', type=str)
-    if test_name is None:
+    # Check for file upload (PUT/POST only)
+    if request.method in ('PUT', 'POST'):
+        upload_result = detect_file_upload()
+        filename, binary_data, content_length = upload_result
+
+        # Check if detect_file_upload returned an error
+        if isinstance(filename, dict):
+            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
+
+        if filename is not None:
+            # File upload detected - save and edit
+            result, error, status_code = handle_binary_upload(filename, binary_data)
+            if error:
+                return jsonify(error), status_code
+
+            file_path = result['FilePath']
+            try:
+                vv_instance.EditTest(file_path)
+            except Exception as e:
+                return jsonify(error_response(
+                    f'File uploaded but failed to edit test "{filename}": {str(e)}',
+                    'EDIT_TEST_ERROR',
+                    f"EditTest command failed: {filename}"
+                )), 500
+
+            return jsonify(success_response(
+                {
+                    'result': True,
+                    'filepath': filename,
+                    'file_uploaded': True
+                },
+                f"Upload and EditTest command executed: {filename}"
+            ))
+
+    # No file upload - edit existing file by path
+    filename = get_filename_from_request()
+
+    if not filename:
         return jsonify(error_response(
-            'Missing required parameter: testname',
+            'Missing required query parameter: filename',
             'MISSING_PARAMETER'
         )), 400
-    
-    result = vv_instance.EditTest(test_name)
-    
+
+    try:
+        result = vv_instance.EditTest(filename)
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to edit test "{filename}": {str(e)}',
+            'EDIT_TEST_ERROR',
+            f"EditTest command failed: {filename}"
+        )), 500
+
     return jsonify(success_response(
-        {'result': result, 'test_name': test_name, 'executed': True},
-        f"EditTest command executed for '{test_name}' - Result: {result}"
+        {
+            'result': result,
+            'filepath': filename
+        },
+        f"EditTest command executed: {filename}"
     ))
 
 @gui_control_bp.route('/abortedit', methods=['GET'])

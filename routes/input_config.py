@@ -133,31 +133,25 @@ def get_documentation():
                         'POST /api/v1/inputcalibration (with JSON body)'
                     ]
                 },
-                'GET|POST /inputconfigurationfile': {
-                    'description': 'Get/Set input configuration file by name',
-                    'com_method': 'GetInputConfigurationFile() or SetInputConfigurationFile(configName)',
-                    'parameters': {
-                        'configName': 'str - Configuration file name (POST only, URL parameter)'
-                    },
-                    'returns': 'str|bool - Current config name (GET) or success status (POST)',
-                    'examples': [
-                        'GET /api/v1/inputconfigurationfile',
-                        'POST /api/v1/inputconfigurationfile?configName=10mv per G.vic',
-                        'POST /api/v1/inputconfigurationfile?10mv per G.vic'
-                    ]
+                'GET /inputconfigurationfile': {
+                    'description': 'Get current input configuration file name',
+                    'com_method': 'GetInputConfigurationFile()',
+                    'returns': 'str - Current configuration file name',
+                    'example': 'GET /api/v1/inputconfigurationfile'
                 },
-                'PUT /inputconfigurationfile': {
-                    'description': 'Upload and load input configuration file',
+                'POST|PUT /inputconfigurationfile': {
+                    'description': 'Upload and load config file, OR load existing by path',
                     'com_method': 'SetInputConfigurationFile(filepath)',
-                    'parameters': {
-                        'filename': 'str - Configuration filename (URL parameter)'
+                    'modes': {
+                        'With file content (upload)': 'multipart/form-data or raw binary + filename param',
+                        'Without file content': 'filename query parameter to load existing'
                     },
-                    'headers': {
-                        'Content-Length': 'Required - File size in bytes (max 10MB)'
-                    },
-                    'body': 'Binary file content',
                     'returns': 'dict - Success status and file info',
-                    'example': 'PUT /api/v1/inputconfigurationfile?10mv per G.vic (with binary file in body)'
+                    'examples': [
+                        'POST /api/v1/inputconfigurationfile with multipart/form-data',
+                        'PUT /api/v1/inputconfigurationfile?filename=10mv per G.vic (with binary body)',
+                        'POST /api/v1/inputconfigurationfile?filename=10mv per G.vic (load existing)'
+                    ]
                 }
             },
             'Transducer Database': {
@@ -667,64 +661,19 @@ def input_calibration(vv_instance):
         f"Channel {channel_user} calibration set successfully"
     ))
 
-@input_config_bp.route('/inputconfigurationfile', methods=['GET', 'POST'])
+@input_config_bp.route('/inputconfigurationfile', methods=['GET', 'POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def input_configuration_file(vv_instance):
     """
-    Get/Set Input Configuration File by Name
+    Get/Set Input Configuration File
 
     COM Method: GetInputConfigurationFile() or SetInputConfigurationFile(configName)
+
     GET: Returns current configuration file name
-    POST: Sets configuration file by name from URL parameter
+        Example: GET /api/v1/inputconfigurationfile
 
-    Examples:
-        GET /api/v1/inputconfigurationfile
-        POST /api/v1/inputconfigurationfile?configName=10mv per G.vic
-        POST /api/v1/inputconfigurationfile?10mv per G.vic
-    """
-    if request.method == "GET":
-        # GET - return current configuration file
-        result = vv_instance.GetInputConfigurationFile()
-        return jsonify(success_response(
-            {"result": result},
-            f"Current input configuration file: {result}"
-        ))
-
-    else:  # POST - set by name
-        config_name = request.args.get("configName")
-
-        # If no 'configName' parameter, try unnamed parameter
-        if config_name is None:
-            args = list(request.args.keys())
-            if args:
-                config_name = args[0]
-
-        if config_name is None:
-            return jsonify(error_response(
-                "Missing required URL parameter: configName (or unnamed parameter)",
-                "MISSING_PARAMETER"
-            )), 400
-
-        vv_instance.SetInputConfigurationFile(config_name)
-
-        return jsonify(success_response(
-            {"configName": config_name},
-            f"Input configuration file '{config_name}' loaded successfully"
-        ))
-
-
-@input_config_bp.route('/inputconfigurationfile', methods=['POST', 'PUT'])
-@handle_errors
-@with_vibrationview
-def upload_input_configuration_file(vv_instance):
-    """
-    Upload and Load Input Configuration File
-
-    COM Method: SetInputConfigurationFile(filepath)
-    Uploads an input configuration file (.vic) and loads it.
-
-    POST/PUT: Upload file
+    POST/PUT: Upload file and load, OR load existing file by path
         If request includes file content:
             Option 1 - multipart/form-data (recommended):
                 Form Field: any - The config file (original filename auto-detected)
@@ -734,8 +683,22 @@ def upload_input_configuration_file(vv_instance):
                 Query Parameters: filename (required for raw binary)
                 Body: Binary file content
                 Example: PUT /api/v1/inputconfigurationfile?filename=10mv per G.vic (with binary body)
+
+        If no file content:
+            Query Parameters:
+                filename: string - Config filename (named parameter)
+                OR unnamed parameter: string - Config filename as first URL parameter
+            Example: POST /api/v1/inputconfigurationfile?filename=10mv per G.vic
     """
-    # Detect file upload (multipart or raw binary)
+    if request.method == "GET":
+        # GET - return current configuration file
+        result = vv_instance.GetInputConfigurationFile()
+        return jsonify(success_response(
+            {"result": result},
+            f"Current input configuration file: {result}"
+        ))
+
+    # POST/PUT - check for file upload first
     upload_result = detect_file_upload()
     filename, binary_data, content_length = upload_result
 
@@ -743,37 +706,53 @@ def upload_input_configuration_file(vv_instance):
     if isinstance(filename, dict):
         return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
 
-    if filename is None:
+    if filename is not None:
+        # File upload detected - save and load
+        uploads_folder = os.path.join(config.Config.INPUTCONFIG_FOLDER, 'Uploads')
+        result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=uploads_folder)
+
+        if error:
+            return jsonify(error), status_code
+
+        file_path = result['FilePath']
+
+        try:
+            vv_instance.SetInputConfigurationFile(file_path)
+        except Exception as e:
+            return jsonify(error_response(
+                f'File uploaded but failed to load configuration "{filename}": {str(e)}',
+                'LOAD_CONFIG_ERROR'
+            )), 500
+
+        return jsonify(success_response(
+            {
+                'result': True,
+                'filepath': filename,
+                'file_uploaded': True
+            },
+            f"Input configuration file '{filename}' uploaded and loaded successfully"
+        ))
+
+    # No file upload - load existing file by path
+    filename = get_filename_from_request()
+
+    if not filename:
         return jsonify(error_response(
-            'Missing file: provide via multipart/form-data or raw binary with filename parameter',
-            'MISSING_FILE'
+            'Missing required parameter: filename',
+            'MISSING_PARAMETER'
         )), 400
 
-    # Handle file upload
-    uploads_folder = os.path.join(config.Config.INPUTCONFIG_FOLDER, 'Uploads')
-    result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=uploads_folder)
-
-    if error:
-        return jsonify(error), status_code
-
-    file_path = result['FilePath']
-
-    # Load the uploaded configuration file
     try:
-        vv_instance.SetInputConfigurationFile(file_path)
+        vv_instance.SetInputConfigurationFile(filename)
     except Exception as e:
         return jsonify(error_response(
-            f'File uploaded but failed to load configuration "{filename}": {str(e)}',
+            f'Failed to load configuration "{filename}": {str(e)}',
             'LOAD_CONFIG_ERROR'
         )), 500
 
     return jsonify(success_response(
-        {
-            'result': True,
-            'filepath': filename,
-            'file_uploaded': True
-        },
-        f"Input configuration file '{filename}' uploaded and loaded successfully"
+        {'filepath': filename},
+        f"Input configuration file '{filename}' loaded successfully"
     ))
 
 
