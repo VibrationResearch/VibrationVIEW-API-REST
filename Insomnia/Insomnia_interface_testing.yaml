@@ -1,9 +1,11 @@
 type: collection.insomnia.rest/5.0
+schema_version: "5.1"
 name: VibrationVIEW API
 meta:
   id: wrk_3095697a52034b209f3773ed248942cd
   created: 1765309442159
   modified: 1765309442159
+  description: ""
 collection:
   - name: Core Endpoints
     meta:
@@ -415,7 +417,7 @@ collection:
     meta:
       id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
       created: 1765309442184
-      modified: 1765839169294
+      modified: 1766412093867
       sortKey: -1753972452349
       description: Core test control operations
     children:
@@ -424,11 +426,11 @@ collection:
         meta:
           id: req_a5e757c4929c4b92aef6f450c3aa4ca6
           created: 1765309442185
-          modified: 1765309442185
+          modified: 1766412075213
           isPrivate: false
           description: Resume paused test execution
           sortKey: -1690628393000
-        method: PUT
+        method: POST
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -449,9 +451,6 @@ collection:
         method: POST
         body:
           mimeType: application/json
-        parameters:
-          - disabled: false
-            id: pair_f42012ba1c1848bcb8b918b81114c9a6
         headers:
           - name: Content-Type
             value: application/json
@@ -468,11 +467,11 @@ collection:
         meta:
           id: req_7c0e42a192cd4855a95cf41d52794437
           created: 1765309442187
-          modified: 1765309442187
+          modified: 1766412067497
           isPrivate: false
           description: Start test execution
           sortKey: -1690628396000
-        method: PUT
+        method: POST
         body:
           mimeType: application/json
           text: |-
@@ -556,9 +555,6 @@ collection:
         method: POST
         body:
           mimeType: application/json
-        parameters:
-          - disabled: false
-            id: pair_4dca6c5c8156499dbb06aa26be73e09a
         headers:
           - name: Content-Type
             value: application/json
@@ -570,46 +566,28 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/opentest"
-        name: opentest (with file)
-        meta:
-          id: req_9310fc3486c14e849b026db1f0f4b46c
-          created: 1765309442190
-          modified: 1765309442190
-          isPrivate: false
-          sortKey: -1690628396250
-        method: PUT
-        body:
-          mimeType: application/octet-stream
-          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
-        parameters:
-          - name: filename
-            value: randomtest-withpretest.vrp
-            disabled: false
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/runtest?c:\\vibrationview\\profiles\\sine1.vsp"
+      - url: "{{ _.base_url }}/runtest"
         name: runtest (with file)
         meta:
           id: req_ff14d14150a04e4d8359164eb7d6ce29
           created: 1765309442190
-          modified: 1765313694003
+          modified: 1766411736018
           isPrivate: false
+          description: ""
           sortKey: -1690628396750
         method: POST
         body:
-          mimeType: application/octet-stream
-          fileName: C:\VibrationVIEW\Profiles\gingerman_Test 1.vrp
-        parameters:
-          - disabled: false
-            id: pair_9ec2ef7788ee4edf9151f93efe69959d
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Sine.vsp
+              type: file
         headers:
+          - name: Content-Type
+            value: multipart/form-data
           - name: filename
             value: gingerman_Test 1.vrp
         settings:
@@ -625,16 +603,23 @@ collection:
         meta:
           id: req_11ded79fa7f4404eb4aed10b2dd1a724
           created: 1765309442191
-          modified: 1765309442191
+          modified: 1766412062284
           isPrivate: false
+          description: ""
           sortKey: -1690628396125
-        method: PUT
+        method: POST
         body:
-          mimeType: application/octet-stream
-          fileName: D:\Data\VibrationVIEW-API-REST\profiles\random.vrandomt
-        parameters:
-          - disabled: false
-            id: pair_43fc2643ea964f09b4344f2a558686bb
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\random.vrandomt
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -650,11 +635,11 @@ collection:
           created: 1765309442191
           modified: 1765309442191
           isPrivate: false
+          description: ""
           sortKey: -1690628392900
         method: POST
         parameters:
-          - id: pair_a911269da965496599f701c8f2f3f40a
-            name: filename
+          - name: filename
             value: testdata.csv
             disabled: false
         headers:
@@ -668,44 +653,28 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/opentest?Random_Profile.vrpj"
+      - url: "{{ _.base_url }}/opentest"
         name: opentest (with json file)
         meta:
           id: req_1dd5d328a8e24539859a97558c4c26a4
           created: 1765309442192
-          modified: 1765309442192
+          modified: 1766412038184
           isPrivate: false
+          description: ""
           sortKey: -1690628396187.5
-        method: PUT
+        method: POST
         body:
-          mimeType: application/octet-stream
-          fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
-        parameters:
-          - id: pair_9dae525464284a9ca3840a8acfdcadd2
-            disabled: false
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/runtest?Random_Profile.vrpj"
-        name: runtest (with json file)
-        meta:
-          id: req_96b7a4b332c34a469eccfbbd4d915658
-          created: 1765309442192
-          modified: 1765309442192
-          isPrivate: false
-          sortKey: -1690628396625
-        method: PUT
-        body:
-          mimeType: application/octet-stream
-          fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
-        parameters:
-          - id: pair_9dae525464284a9ca3840a8acfdcadd2
-            disabled: false
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -778,6 +747,95 @@ collection:
           description: Stop test execution
           sortKey: -1690628392800
         method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/runtest"
+        name: runtest (with json file)
+        meta:
+          id: req_c596d8b04c9447e8b676f983653052e6
+          created: 1766181121631
+          modified: 1766410323549
+          isPrivate: false
+          description: ""
+          sortKey: -1690628396656.25
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
+              type: file
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/runtest"
+        name: opentest (with file)
+        meta:
+          id: req_2c1619aa79d045e99974e0c3e81f3a72
+          created: 1766181347544
+          modified: 1766181351042
+          isPrivate: false
+          description: ""
+          sortKey: -1690628396218.75
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: filename
+            value: gingerman_Test 1.vrp
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest"
+        name: opentest (with template file)
+        meta:
+          id: req_d503cb1fbf39490da134a687b1def503
+          created: 1766181396082
+          modified: 1766412054221
+          isPrivate: false
+          description: ""
+          sortKey: -1690628396156.25
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\random.vrandomt
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1358,6 +1416,7 @@ collection:
       created: 1765309442211
       modified: 1765550128090
       sortKey: -1690628379000
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/teds"
         name: TEDS Config Docs
@@ -1384,6 +1443,7 @@ collection:
           created: 1765309442212
           modified: 1765309442212
           isPrivate: false
+          description: ""
           sortKey: -1753822876302
         method: GET
         headers:
@@ -1404,11 +1464,9 @@ collection:
           created: 1765309442213
           modified: 1765309442213
           isPrivate: false
+          description: ""
           sortKey: -1753822876352
         method: GET
-        parameters:
-          - disabled: false
-            id: pair_03c8984b17a446b2a0b70fb477ca1391
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1448,6 +1506,7 @@ collection:
           created: 1765309442214
           modified: 1765309442214
           isPrivate: false
+          description: ""
           sortKey: -1753650162534
         method: GET
         headers:
@@ -1468,6 +1527,7 @@ collection:
           created: 1765309442215
           modified: 1765309442215
           isPrivate: false
+          description: ""
           sortKey: -1753563805676
         method: GET
         headers:
@@ -1488,6 +1548,7 @@ collection:
           created: 1765309442215
           modified: 1765309442215
           isPrivate: false
+          description: ""
           sortKey: -1722052924409
         method: GET
         headers:
@@ -1508,6 +1569,7 @@ collection:
           created: 1765471299891
           modified: 1765471692034
           isPrivate: false
+          description: ""
           sortKey: -1706340662204.5
         method: POST
         body:
@@ -1534,9 +1596,6 @@ collection:
             			"Disabled"
             	]   
             }
-        parameters:
-          - id: pair_94d1790250fa412ba7bfc6df2c61910d
-            disabled: false
         headers:
           - name: Content-Type
             value: application/json
@@ -1570,8 +1629,9 @@ collection:
     meta:
       id: fld_f19e611571bf4448b339c6efb3058f47
       created: 1765309442216
-      modified: 1765549971737
+      modified: 1766412751931
       sortKey: -1753885060661
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/reporting"
         name: reporting docs
@@ -1598,11 +1658,9 @@ collection:
           created: 1765309442217
           modified: 1765309442217
           isPrivate: false
+          description: ""
           sortKey: -1753885096848
         method: GET
-        parameters:
-          - disabled: false
-            id: pair_04edeb37043b464a8ccdad29cab38883
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1620,6 +1678,7 @@ collection:
           created: 1765309442217
           modified: 1765468525035
           isPrivate: false
+          description: ""
           sortKey: -1753885096748
         method: GET
         body:
@@ -1635,13 +1694,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportfields?TestName,StartTime,Duration"
+      - url: "{{ _.base_url }}/reportfields?TestName&StartTime&Duration"
         name: reportfields
         meta:
           id: req_2fb6bc91c34c4f4783fdc2ccd1b9ce9f
           created: 1765309442218
-          modified: 1765309442218
+          modified: 1766412694723
           isPrivate: false
+          description: ""
           sortKey: -1753830653945.25
         method: GET
         settings:
@@ -1659,11 +1719,9 @@ collection:
           created: 1765309442219
           modified: 1765309442219
           isPrivate: false
+          description: ""
           sortKey: -1753885096798
         method: GET
-        parameters:
-          - disabled: false
-            id: pair_04edeb37043b464a8ccdad29cab38883
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1681,6 +1739,7 @@ collection:
           created: 1765309442219
           modified: 1765309442219
           isPrivate: false
+          description: ""
           sortKey: -1753830653845.25
         method: GET
         settings:
@@ -1698,6 +1757,7 @@ collection:
           created: 1765309442220
           modified: 1765478610560
           isPrivate: false
+          description: ""
           sortKey: -1753830653857.75
         method: GET
         settings:
@@ -1709,14 +1769,15 @@ collection:
             store: true
           rebuildPath: true
       - url: "{{ _.base_url
-          }}/reportfieldshistory?reportfieldshistory?LastData,StopCode,RunTime,\
+          }}/reportfieldshistory?reportfieldshistory&LastData&StopCode&RunTime&\
           Time"
         name: reportfieldshistory
         meta:
           id: req_f2853afbac894251b8943d21a887d25b
           created: 1765309442220
-          modified: 1765466545893
+          modified: 1766412679270
           isPrivate: false
+          description: ""
           sortKey: -1753885096698
         method: GET
         body:
@@ -1739,6 +1800,7 @@ collection:
           created: 1765309442221
           modified: 1765471891873
           isPrivate: false
+          description: ""
           sortKey: -1753830653870.25
         method: GET
         settings:
@@ -1756,6 +1818,7 @@ collection:
           created: 1765466467743
           modified: 1765466552139
           isPrivate: false
+          description: ""
           sortKey: -1753885096673
         method: POST
         body:
@@ -1790,6 +1853,7 @@ collection:
           created: 1765468432974
           modified: 1765468504489
           isPrivate: false
+          description: ""
           sortKey: -1753885096723
         method: POST
         body:
@@ -1825,6 +1889,7 @@ collection:
           created: 1765468600575
           modified: 1765468633751
           isPrivate: false
+          description: ""
           sortKey: -1753830653907.75
         method: POST
         body:
@@ -1860,6 +1925,7 @@ collection:
           created: 1765468651546
           modified: 1765469848025
           isPrivate: false
+          description: ""
           sortKey: -1753830653864
         method: POST
         body:
@@ -1884,13 +1950,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportvector?vectors=Frequency,FreqDrive,FreqChannel*"
+      - url: "{{ _.base_url }}/reportvector?vectors=Frequency&FreqDrive&FreqChannel*"
         name: reportvector
         meta:
           id: req_4ef101e3817444df9925d1410116ce8c
           created: 1765469864952
-          modified: 1765469882652
+          modified: 1766412737886
           isPrivate: false
+          description: ""
           sortKey: -1753830653851.5
         method: POST
         body:
@@ -1922,6 +1989,7 @@ collection:
           created: 1765479581889
           modified: 1765480344540
           isPrivate: false
+          description: ""
           sortKey: -1753830653848.375
         method: GET
         body:
@@ -1968,6 +2036,7 @@ collection:
       created: 1765309442221
       modified: 1765549446068
       sortKey: -1753972452408.375
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/auxinputs"
         name: auxinputs docs
@@ -1976,6 +2045,7 @@ collection:
           created: 1765309442222
           modified: 1765309442222
           isPrivate: false
+          description: ""
           sortKey: -1753906951682
         method: GET
         settings:
@@ -1996,9 +2066,6 @@ collection:
           description: Get current response values
           sortKey: -1753904348688
         method: GET
-        parameters:
-          - disabled: false
-            id: pair_24fe82ac9e8c46f2850801c59b61ccdf
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2017,9 +2084,6 @@ collection:
           description: Get current response values
           sortKey: -1753894722818
         method: GET
-        parameters:
-          - disabled: false
-            id: pair_606a9927b58649028e332285bc81a4d3
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2035,6 +2099,7 @@ collection:
           created: 1765309442223
           modified: 1765481340610
           isPrivate: false
+          description: ""
           sortKey: -1753894722718
         method: GET
         headers:
@@ -2055,6 +2120,7 @@ collection:
           created: 1765309442223
           modified: 1765310321216
           isPrivate: false
+          description: ""
           sortKey: -1753905650185
         method: GET
         headers:
@@ -2094,8 +2160,9 @@ collection:
     meta:
       id: fld_e700855f406e4ed69592dda7240b7b3b
       created: 1765309442224
-      modified: 1765379694402
+      modified: 1766414064337
       sortKey: -1753972452333.375
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/gui_control"
         name: gui_control docs
@@ -2104,6 +2171,7 @@ collection:
           created: 1765309442225
           modified: 1765314778427
           isPrivate: false
+          description: ""
           sortKey: -1753972933787
         method: GET
         settings:
@@ -2128,7 +2196,6 @@ collection:
           - name: channel
             value: "1"
             disabled: false
-            id: pair_11133f27236243179a90642ce8addf95
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2144,6 +2211,7 @@ collection:
           created: 1765309442226
           modified: 1765309442226
           isPrivate: false
+          description: ""
           sortKey: -1753972933687
         method: GET
         settings:
@@ -2154,26 +2222,21 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url
-          }}/edittest?testname=C:\\VibrationVIEW\\Profiles\\random1.vrp"
+      - url: "{{ _.base_url }}/edittest"
         name: edittest
         meta:
           id: req_f009e2dfe69c4dfeae3dc60cfaabf650
           created: 1765309442226
-          modified: 1765309442226
+          modified: 1766413981338
           isPrivate: false
           description: Get current response values
           sortKey: -1753972471965
         method: GET
         parameters:
-          - name: testname
+          - name: filename
+            value: "{{ _.profile_folder }}sine.vsp"
+            description: ""
             disabled: false
-            id: pair_b77a9c33862542caa532fd68fa71923b
-          - disabled: false
-            id: pair_f4dae55ed3414bbfaeba65b808ecb73e
-        headers:
-          - name: testname
-            value: C:\VibrationVIEW\Profiles\random1.vrp
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2189,6 +2252,7 @@ collection:
           created: 1765309442227
           modified: 1765309442227
           isPrivate: false
+          description: ""
           sortKey: -1753972702851
         method: GET
         settings:
@@ -2206,6 +2270,7 @@ collection:
           created: 1765309442227
           modified: 1765309442227
           isPrivate: false
+          description: ""
           sortKey: -1753972587433
         method: GET
         settings:
@@ -2223,6 +2288,7 @@ collection:
           created: 1765309442228
           modified: 1765309442228
           isPrivate: false
+          description: ""
           sortKey: -1753972529724
         method: GET
         settings:
@@ -2253,8 +2319,9 @@ collection:
     meta:
       id: fld_b2288d7fae234b4191be5478ede9a108
       created: 1765309442228
-      modified: 1765379403130
+      modified: 1766410143499
       sortKey: -1753972452411.5
+      description: ""
     children:
       - url: "{{ _.base_url }}/testtype?value=0"
         name: testtype - systemcheck
@@ -2281,6 +2348,7 @@ collection:
           created: 1765309442229
           modified: 1765309442229
           isPrivate: false
+          description: ""
           sortKey: -1753985099790
         method: GET
         headers:
@@ -2301,6 +2369,7 @@ collection:
           created: 1765309442230
           modified: 1765309442230
           isPrivate: false
+          description: ""
           sortKey: -1753985091132.75
         method: POST
         headers:
@@ -2321,6 +2390,7 @@ collection:
           created: 1765309442230
           modified: 1765309442230
           isPrivate: false
+          description: ""
           sortKey: -1753985094018.5
         method: POST
         headers:
@@ -2341,6 +2411,7 @@ collection:
           created: 1765309442231
           modified: 1765309442231
           isPrivate: false
+          description: ""
           sortKey: -1753985092575.625
         method: GET
         headers:
@@ -2397,8 +2468,9 @@ collection:
     meta:
       id: fld_4e01da444f5a4daabb7d4eee26fd9bae
       created: 1765309442232
-      modified: 1765379388600
+      modified: 1766410113077
       sortKey: -1753972452414.625
+      description: ""
     children:
       - url: "{{ _.base_url }}/testtype?value=1"
         name: testtype - sine
@@ -2483,6 +2555,7 @@ collection:
           created: 1765309442234
           modified: 1765309442234
           isPrivate: false
+          description: ""
           sortKey: -1753985660335
         method: GET
         headers:
@@ -2532,6 +2605,7 @@ collection:
           created: 1765309442235
           modified: 1765309442235
           isPrivate: false
+          description: ""
           sortKey: -1753985379962.5
         method: GET
         headers:
@@ -2552,6 +2626,7 @@ collection:
           created: 1765309442235
           modified: 1765309442235
           isPrivate: false
+          description: ""
           sortKey: -1753985660435
         method: GET
         headers:
@@ -2572,6 +2647,7 @@ collection:
           created: 1765309442236
           modified: 1765309442236
           isPrivate: false
+          description: ""
           sortKey: -1753985380062.5
         method: POST
         headers:
@@ -2592,6 +2668,7 @@ collection:
           created: 1765309442236
           modified: 1765309442236
           isPrivate: false
+          description: ""
           sortKey: -1753985660385
         method: POST
         headers:
@@ -2612,6 +2689,7 @@ collection:
           created: 1765309442237
           modified: 1765309442237
           isPrivate: false
+          description: ""
           sortKey: -1753985239876.25
         method: POST
         headers:
@@ -2755,8 +2833,9 @@ collection:
     meta:
       id: fld_c47ff10d237e4f398ba8297e8b4b656f
       created: 1765309442240
-      modified: 1765471167830
+      modified: 1766414291212
       sortKey: -1753961528371.5938
+      description: ""
     children:
       - url: "{{ _.base_url }}/inputmode"
         name: inputmode
@@ -2774,19 +2853,15 @@ collection:
           - name: channel
             value: "1"
             disabled: false
-            id: pair_b9eb83b1d355484d9160b66b363e1c4b
           - name: powersource
             value: "true"
             disabled: false
-            id: pair_66367ac6247c4ba2864db95a74f8d706
           - name: capcoupled
             value: "false"
             disabled: false
-            id: pair_9dd7cc8f34f640ae9d626025be8ca69e
           - name: differential
             value: "false"
             disabled: false
-            id: pair_bf53e9c8a0044bf5b07ebda784dfc0f0
         headers:
           - name: Content-Type
             value: application/json
@@ -3017,19 +3092,15 @@ collection:
           - name: channel
             value: "4"
             disabled: false
-            id: pair_9c29441ae26f4748b56995a44f78e77a
           - name: sensitivity
             value: "100"
             disabled: false
-            id: pair_398ded5d35104cf9a7cc2562fdad8498
           - name: serialnumber
             value: "199"
             disabled: false
-            id: pair_e6b56d2715ec4b468c7364d486b8ad0e
           - name: caldate
             value: 1/1/1999
             disabled: false
-            id: pair_2f0d5d90a3ad404a903af508d34e7edf
         headers:
           - name: Content-Type
             value: application/json
@@ -3051,9 +3122,6 @@ collection:
           description: Load input configuration file
           sortKey: -1754315964340
         method: POST
-        parameters:
-          - disabled: false
-            id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3062,25 +3130,28 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputconfigurationfile?6-channels-TEDS.vic"
-        name: inputconfigurationfile (put file)
+      - url: "{{ _.base_url }}/inputconfigurationfile"
+        name: inputconfigurationfile (with file)
         meta:
           id: req_878346f0d38048959a7dbfa68cbe3bfb
           created: 1765309442248
-          modified: 1765379755423
+          modified: 1766412510917
           isPrivate: false
           description: Load input configuration file
           sortKey: -1754315964345
-        method: PUT
+        method: POST
         body:
-          mimeType: application/octet-stream
-          fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
-        parameters:
-          - disabled: false
-            id: pair_bb5cf7eb60da40d2b3b70df3d4c64254
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+              type: file
         headers:
           - name: Content-Type
-            value: application/octet-stream
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3105,19 +3176,15 @@ collection:
           - name: channel
             value: "1"
             disabled: false
-            id: pair_b9eb83b1d355484d9160b66b363e1c4b
           - name: powersource
             value: "true"
             disabled: false
-            id: pair_66367ac6247c4ba2864db95a74f8d706
           - name: capcoupled
             value: "false"
             disabled: false
-            id: pair_9dd7cc8f34f640ae9d626025be8ca69e
           - name: differential
             value: "false"
             disabled: false
-            id: pair_bf53e9c8a0044bf5b07ebda784dfc0f0
         headers:
           - name: Content-Type
             value: application/json
@@ -3151,6 +3218,7 @@ collection:
       created: 1765309442249
       modified: 1765379928703
       sortKey: -1690628376000
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/virtual_channels"
         name: Virtual Channels Docs
@@ -3179,6 +3247,7 @@ collection:
           created: 1765309442250
           modified: 1765309442250
           isPrivate: false
+          description: ""
           sortKey: -1764076147763
         method: POST
         headers:
@@ -3199,6 +3268,7 @@ collection:
           created: 1765309442251
           modified: 1765309442251
           isPrivate: false
+          description: ""
           sortKey: -1764076147813
         method: POST
         headers:
@@ -3219,14 +3289,12 @@ collection:
           created: 1765309442251
           modified: 1765309442251
           isPrivate: false
+          description: ""
           sortKey: -1764076147750.5
         method: PUT
         body:
           mimeType: application/octet-stream
           fileName: C:\VibrationVIEW\InputConfig\virtual channels.vchan
-        parameters:
-          - id: pair_9dae525464284a9ca3840a8acfdcadd2
-            disabled: false
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3255,8 +3323,9 @@ collection:
     meta:
       id: fld_0e15f068d0594ca590de0940ce270496
       created: 1765309442252
-      modified: 1765549467450
+      modified: 1766411991161
       sortKey: -1753972452386.5
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/log"
         name: Logs Docs
@@ -3283,6 +3352,7 @@ collection:
           created: 1765309442253
           modified: 1765309442253
           isPrivate: false
+          description: ""
           sortKey: -1764102491647
         method: GET
         headers:
@@ -3318,6 +3388,7 @@ collection:
       created: 1765309442253
       modified: 1765471061885
       sortKey: -1753950604412.9375
+      description: ""
     children:
       - url: "{{ _.base_url }}/docs/report_generation"
         name: Report Generation Docs
@@ -3344,6 +3415,7 @@ collection:
           created: 1765309442254
           modified: 1765309442254
           isPrivate: false
+          description: ""
           sortKey: -1764102238021
         method: POST
         headers:
@@ -3364,6 +3436,7 @@ collection:
           created: 1765309442255
           modified: 1765309442255
           isPrivate: false
+          description: ""
           sortKey: -1764082670402.5
         method: POST
         headers:
@@ -3384,6 +3457,7 @@ collection:
           created: 1765309442255
           modified: 1765309442255
           isPrivate: false
+          description: ""
           sortKey: -1764089192942
         method: POST
         headers:
@@ -3404,6 +3478,7 @@ collection:
           created: 1765309442256
           modified: 1765309442256
           isPrivate: false
+          description: ""
           sortKey: -1764085931672.25
         method: GET
         headers:
@@ -3424,6 +3499,7 @@ collection:
           created: 1765309442256
           modified: 1765315324342
           isPrivate: false
+          description: ""
           sortKey: -1764079409132.75
         method: POST
         headers:
@@ -3486,15 +3562,14 @@ collection:
           created: 1765488515303
           modified: 1765488515303
           isPrivate: false
+          description: ""
           sortKey: -1690628384400
         method: GET
         parameters:
-          - id: pair_e99c8d90eb0b4f5fac46068f7a91f293
-            name: vectorenum
+          - name: vectorenum
             value: "0"
             disabled: false
-          - id: pair_aa61e315186847f9b1781fa4bc5df620
-            name: columns
+          - name: columns
             value: "5"
             disabled: false
         headers:
@@ -3533,15 +3608,14 @@ collection:
           created: 1765488515304
           modified: 1765488515304
           isPrivate: false
+          description: ""
           sortKey: -1690628378850
         method: GET
         parameters:
-          - id: pair_75091fbfb71b4102846e02324e43996a
-            name: vectorenum
+          - name: vectorenum
             value: "190"
             disabled: false
-          - id: pair_4eb43f7bd0f2475db0f874f8dbe8108b
-            name: columns
+          - name: columns
             value: "2"
             disabled: false
         headers:
@@ -3562,11 +3636,11 @@ collection:
           created: 1765488515304
           modified: 1765488515304
           isPrivate: false
+          description: ""
           sortKey: -1690628380700
         method: GET
         parameters:
-          - id: pair_ec4c9adf9db542ad9e5bbf5aef265733
-            name: vectorenum
+          - name: vectorenum
             value: "100"
             disabled: false
         headers:
@@ -3587,11 +3661,11 @@ collection:
           created: 1765488515306
           modified: 1765488515306
           isPrivate: false
+          description: ""
           sortKey: -1690628381625
         method: GET
         parameters:
-          - id: pair_b9fa26e700744dfd95a901add82bbd98
-            name: vectorenum
+          - name: vectorenum
             value: "0"
             disabled: false
         headers:
@@ -3612,11 +3686,11 @@ collection:
           created: 1765488515307
           modified: 1765488515307
           isPrivate: false
+          description: ""
           sortKey: -1690628381162.5
         method: GET
         parameters:
-          - id: pair_e993bb97335b4403ab3c23b195fd884e
-            name: vectorenum
+          - name: vectorenum
             value: "0"
             disabled: false
         headers:
@@ -3637,6 +3711,7 @@ collection:
           created: 1765488515307
           modified: 1765488515307
           isPrivate: false
+          description: ""
           sortKey: -1690628382550
         method: GET
         headers:
@@ -3657,6 +3732,7 @@ collection:
           created: 1765488515308
           modified: 1765488515308
           isPrivate: false
+          description: ""
           sortKey: -1690628383475
         method: POST
         body:
@@ -3696,13 +3772,14 @@ cookieJar:
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1765839169292
+    modified: 1766414291207
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1765839169293
+    modified: 1766414291210
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1
+    profile_folder: d:\data\vibrationview-api-rest\profiles\
