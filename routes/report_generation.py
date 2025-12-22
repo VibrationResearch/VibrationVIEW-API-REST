@@ -16,7 +16,6 @@ from utils.path_validator import validate_file_path, validate_output_path, PathV
 from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUFFFromVV
 import logging
 import os
-import tempfile
 import zipfile
 import io
 from datetime import datetime
@@ -25,6 +24,7 @@ from datetime import datetime
 report_generation_bp = Blueprint('report_generation', __name__)
 
 logger = logging.getLogger(__name__)
+
 
 @report_generation_bp.route('/docs/report_generation', methods=['GET'])
 def get_documentation():
@@ -169,9 +169,9 @@ def generate_report(vv_instance):
     File Upload Mode:
         Query Parameters:
             template_name: string - Name of the report template to use (required for upload mode)
-            output_name: string - Desired name of the generated report file (required for upload mode)
+            output_name: string - Desired name of the generated report file (optional - derived from uploaded filename)
         Headers:
-            Content-Length: Required for upload mode - File size in bytes (max 100MB)
+            Content-Length: Required for upload mode - File size in bytes
             Content-Type: application/octet-stream (for binary upload)
         Body: Binary VibrationVIEW data file content (.vrd)
 
@@ -188,89 +188,59 @@ def generate_report(vv_instance):
              Or:   POST /api/v1/generatereport (uses last data file, default template, and auto-generated filename)
              Or:   POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (query parameters)
     """
-    content_type = request.content_type or ''
+    file_path = None
+    template_name = None
+    output_name = None
 
-    # Check for file upload (multipart or raw binary)
-    has_multipart_file = len(request.files) > 0
-    has_binary_content = (
-        request.content_length and request.content_length > 0 and
-        not has_multipart_file and
-        'application/json' not in content_type and
-        'application/x-www-form-urlencoded' not in content_type
-    )
-    is_upload_mode = has_multipart_file or has_binary_content
+    # Check for file upload using common utility
+    if request.method in ('PUT', 'POST'):
+        upload_result = detect_file_upload()
+        filename, binary_data, content_length = upload_result
 
-    if is_upload_mode:
-        # Upload Mode: Handle file upload with query parameters
-        template_name = request.args.get('template_name')
-        output_name = request.args.get('output_name')
+        # Check if detect_file_upload returned an error
+        if isinstance(filename, dict):
+            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
 
-        if not template_name:
-            return jsonify(error_response(
-                'Upload mode requires template_name query parameter',
-                'MISSING_PARAMETER'
-            )), 400
+        if filename is not None:
+            # File upload detected - save file
+            template_name = request.args.get('template_name')
+            output_name = request.args.get('output_name')
 
-        if not output_name:
-            return jsonify(error_response(
-                'Upload mode requires output_name query parameter',
-                'MISSING_PARAMETER'
-            )), 400
+            if not template_name:
+                return jsonify(error_response(
+                    'Upload mode requires template_name query parameter',
+                    'MISSING_PARAMETER'
+                )), 400
 
-        # Get file data from multipart or raw binary
-        if has_multipart_file:
-            file_field = next(iter(request.files))
-            uploaded_file = request.files[file_field]
-            binary_data = uploaded_file.read()
-            content_length = len(binary_data)
-        else:
-            content_length = request.content_length
-            binary_data = request.get_data()
+            # If no output_name provided, derive from uploaded filename and template extension
+            if not output_name:
+                base_name = os.path.splitext(filename)[0]
+                template_ext = os.path.splitext(template_name)[1]
+                if template_ext:
+                    output_name = f"{base_name}{template_ext}"
+                else:
+                    output_name = f"{base_name}.pdf"
 
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify(error_response(
-                'File too large (max 100MB)',
-                'FILE_TOO_LARGE'
-            )), 413
-
-        # Validate output path security
-        try:
-            validated_output_path = validate_output_path(output_name, "report generation (upload)")
-            output_name = os.path.basename(validated_output_path)
-        except PathValidationError as e:
-            return jsonify(error_response(
-                str(e),
-                'OUTPUT_PATH_VALIDATION_ERROR'
-            )), 403
-
-        try:
-
-            # Create a temporary file for the uploaded .vrd data
-            with tempfile.NamedTemporaryFile(suffix='.vrd', delete=False) as temp_file:
-                temp_file.write(binary_data)
-                temp_file_path = temp_file.name
-
+            # Validate output path security
             try:
-                # Generate report using the temporary file
-                generated_file_path = GenerateReportFromVV(temp_file_path, template_name, output_name)
-                file_path = temp_file_path  # For response data
-                used_upload = True
+                validated_output_path = validate_output_path(output_name, "report generation (upload)")
+                output_name = os.path.basename(validated_output_path)
+            except PathValidationError as e:
+                return jsonify(error_response(
+                    str(e),
+                    'OUTPUT_PATH_VALIDATION_ERROR'
+                )), 403
 
-            finally:
-                # Clean up temporary file
-                try:
-                    os.unlink(temp_file_path)
-                except Exception as cleanup_error:
-                    logger.warning(f"Failed to clean up temporary file {temp_file_path}: {cleanup_error}")
+            # Save uploaded file using handle_binary_upload
+            result, error, status_code = handle_binary_upload(filename, binary_data)
 
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to upload and generate report: {str(e)}',
-                'UPLOAD_REPORT_GENERATION_ERROR'
-            )), 500
+            if error:
+                return jsonify(error), status_code
 
-    else:
-        # File Path Mode: Handle existing file with JSON body or query parameters
+            file_path = result['FilePath']
+
+    # No file upload - use existing file by path
+    if file_path is None:
         try:
             request_data = request.get_json() or {}
         except Exception:
@@ -279,7 +249,6 @@ def generate_report(vv_instance):
         file_path = request_data.get('file_path') or request.args.get('file_path')
         template_name = request_data.get('template_name') or request.args.get('template_name')
         output_name = request_data.get('output_name') or request.args.get('output_name')
-        used_upload = False
 
         # If file_path is not provided, use the last data file from VibrationVIEW
         if not file_path:
@@ -296,22 +265,6 @@ def generate_report(vv_instance):
                     'LAST_DATA_FILE_ERROR'
                 )), 500
 
-        # Use default template if not provided
-        if not template_name:
-            template_name = "Test Report.rtf"  # Default template
-
-        # Use default output_name if not provided - base it on the data file name
-        if not output_name:
-            # Extract base filename from file_path and use template extension (same scheme as generatetxt)
-            base_name = os.path.splitext(os.path.basename(file_path))[0]
-            template_ext = os.path.splitext(template_name)[1]  # Get extension from template
-            if template_ext:
-                # Use template extension (e.g., .rtf, .pdf, .html)
-                output_name = f"{base_name}{template_ext}"
-            else:
-                # Fallback to .pdf if template has no extension
-                output_name = f"{base_name}.pdf"
-
         # Validate file_path security and existence
         try:
             validated_file_path = validate_file_path(file_path, "report generation")
@@ -327,28 +280,39 @@ def generate_report(vv_instance):
                 'FILE_NOT_FOUND'
             )), 404
 
-        # Use validated path
         file_path = validated_file_path
 
-        # Validate output path security
-        try:
-            validated_output_path = validate_output_path(output_name, "report generation")
-            output_name = os.path.basename(validated_output_path)  # Use only filename for API call
-        except PathValidationError as e:
-            return jsonify(error_response(
-                str(e),
-                'OUTPUT_PATH_VALIDATION_ERROR'
-            )), 403
+    # Use default template if not provided
+    if not template_name:
+        template_name = "Test Report.rtf"
 
-        try:
-            # Generate report
-            generated_file_path = GenerateReportFromVV(file_path, template_name, output_name)
+    # Use default output_name if not provided - base it on the data file name
+    if not output_name:
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        template_ext = os.path.splitext(template_name)[1]
+        if template_ext:
+            output_name = f"{base_name}{template_ext}"
+        else:
+            output_name = f"{base_name}.pdf"
 
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to generate report: {str(e)}',
-                'REPORT_GENERATION_ERROR'
-            )), 500
+    # Validate output path security
+    try:
+        validated_output_path = validate_output_path(output_name, "report generation")
+        output_name = os.path.basename(validated_output_path)
+    except PathValidationError as e:
+        return jsonify(error_response(
+            str(e),
+            'OUTPUT_PATH_VALIDATION_ERROR'
+        )), 403
+
+    # Generate report
+    try:
+        generated_file_path = GenerateReportFromVV(file_path, template_name, output_name)
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to generate report: {str(e)}',
+            'REPORT_GENERATION_ERROR'
+        )), 500
 
     # Check if file was actually created
     if not os.path.exists(generated_file_path):
@@ -607,82 +571,47 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
         Flask response with file generation results
     """
     extension = f'.{file_type.lower()}'
-    content_type = request.content_type or ''
+    file_path = None
+    output_name = None
 
-    # Check for file upload (multipart or raw binary)
-    has_multipart_file = len(request.files) > 0
-    has_binary_content = (
-        request.content_length and request.content_length > 0 and
-        not has_multipart_file and
-        'application/json' not in content_type and
-        'application/x-www-form-urlencoded' not in content_type
-    )
-    is_upload_mode = has_multipart_file or has_binary_content
+    # Check for file upload using common utility
+    if request.method in ('PUT', 'POST'):
+        upload_result = detect_file_upload()
+        filename, binary_data, content_length = upload_result
 
-    if is_upload_mode:
-        # Upload Mode: Handle file upload with query parameters
-        output_name = request.args.get('output_name')
+        # Check if detect_file_upload returned an error
+        if isinstance(filename, dict):
+            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
 
-        if not output_name:
-            return jsonify(error_response(
-                'Upload mode requires output_name query parameter',
-                'MISSING_PARAMETER'
-            )), 400
+        if filename is not None:
+            # File upload detected - save file
+            output_name = request.args.get('output_name')
 
-        # Get file data from multipart or raw binary
-        if has_multipart_file:
-            file_field = next(iter(request.files))
-            uploaded_file = request.files[file_field]
-            binary_data = uploaded_file.read()
-            content_length = len(binary_data)
-        else:
-            content_length = request.content_length
-            binary_data = request.get_data()
+            # If no output_name provided, derive from uploaded filename
+            if not output_name:
+                base_name = os.path.splitext(filename)[0]
+                output_name = f"{base_name}{extension}"
 
-        if content_length > MAX_CONTENT_LENGTH:
-            return jsonify(error_response(
-                'File too large (max 100MB)',
-                'FILE_TOO_LARGE'
-            )), 413
-
-        # Validate output path security
-        try:
-            validated_output_path = validate_output_path(output_name, "text generation (upload)")
-            output_name = os.path.basename(validated_output_path)
-        except PathValidationError as e:
-            return jsonify(error_response(
-                str(e),
-                'OUTPUT_PATH_VALIDATION_ERROR'
-            )), 403
-
-        try:
-
-            # Create a temporary file for the uploaded .vrd data
-            with tempfile.NamedTemporaryFile(suffix='.vrd', delete=False) as temp_file:
-                temp_file.write(binary_data)
-                temp_file_path = temp_file.name
-
+            # Validate output path security
             try:
-                # Generate text file using the temporary file
-                primary_file_path = generate_func(temp_file_path, output_name)
-                file_path = temp_file_path  # For response data
-                used_upload = True
+                validated_output_path = validate_output_path(output_name, f"{description} generation (upload)")
+                output_name = os.path.basename(validated_output_path)
+            except PathValidationError as e:
+                return jsonify(error_response(
+                    str(e),
+                    'OUTPUT_PATH_VALIDATION_ERROR'
+                )), 403
 
-            finally:
-                # Clean up temporary file
-                try:
-                    os.unlink(temp_file_path)
-                except Exception as cleanup_error:
-                    logger.warning(f"Failed to clean up temporary file {temp_file_path}: {cleanup_error}")
+            # Save uploaded file using handle_binary_upload
+            result, error, status_code = handle_binary_upload(filename, binary_data)
 
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to upload and generate text file: {str(e)}',
-                'UPLOAD_TXT_GENERATION_ERROR'
-            )), 500
+            if error:
+                return jsonify(error), status_code
 
-    else:
-        # File Path Mode: Handle existing file with JSON body or query parameters
+            file_path = result['FilePath']
+
+    # No file upload - use existing file by path
+    if file_path is None:
         try:
             request_data = request.get_json() or {}
         except Exception:
@@ -690,7 +619,6 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
         file_path = request_data.get('file_path') or request.args.get('file_path')
         output_name = request_data.get('output_name') or request.args.get('output_name')
-        used_upload = False
 
         # If file_path is not provided, use the last data file from VibrationVIEW
         if not file_path:
@@ -707,14 +635,9 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
                     'LAST_DATA_FILE_ERROR'
                 )), 500
 
-        # Use default output_name if not provided - base it on the data file name
-        if not output_name:
-            base_name = os.path.splitext(os.path.basename(file_path))[0]
-            output_name = f"{base_name}{extension}"
-
         # Validate file_path security and existence
         try:
-            validated_file_path = validate_file_path(file_path, "text generation")
+            validated_file_path = validate_file_path(file_path, f"{description} generation")
         except PathValidationError as e:
             return jsonify(error_response(
                 str(e),
@@ -727,27 +650,31 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
                 'FILE_NOT_FOUND'
             )), 404
 
-        # Use validated path
         file_path = validated_file_path
+
+        # Use default output_name if not provided - base it on the data file name
+        if not output_name:
+            base_name = os.path.splitext(os.path.basename(file_path))[0]
+            output_name = f"{base_name}{extension}"
 
         # Validate output path security
         try:
-            validated_output_path = validate_output_path(output_name, "text generation")
-            output_name = os.path.basename(validated_output_path)  # Use only filename for API call
+            validated_output_path = validate_output_path(output_name, f"{description} generation")
+            output_name = os.path.basename(validated_output_path)
         except PathValidationError as e:
             return jsonify(error_response(
                 str(e),
                 'OUTPUT_PATH_VALIDATION_ERROR'
             )), 403
 
-        try:
-            primary_file_path = generate_func(file_path, output_name)
-
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to generate text file: {str(e)}',
-                'TXT_GENERATION_ERROR'
-            )), 500
+    # Generate the file
+    try:
+        primary_file_path = generate_func(file_path, output_name)
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to generate {description} file: {str(e)}',
+            f'{file_type}_GENERATION_ERROR'
+        )), 500
 
     # Find the first generated file (pattern: basename-1.ext)
     base_name = os.path.splitext(output_name)[0]
@@ -763,10 +690,6 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
         return send_file(primary_file_path, as_attachment=True)
 
     return jsonify(error_response(
-        f'Generated file not found',
+        'Generated file not found',
         'FILE_NOT_FOUND'
     )), 404
-
-
-# Constants for upload endpoints
-MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MB limit for .vrd files
