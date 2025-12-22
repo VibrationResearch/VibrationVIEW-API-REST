@@ -43,14 +43,13 @@ def get_documentation():
                 'description': 'Get multiple report field values in one call',
                 'com_method': 'ReportFields(fields)',
                 'parameters': {
-                    'fields': 'string or array - Comma-delimited field names or array of field names. Use *| suffix for all channels wildcard. For GET, if only one parameter is provided, it is assumed to be the fields value.'
+                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.'
                 },
                 'returns': 'array - Report field values in the same order as requested fields',
                 'examples': [
-                    'GET /api/v1/reportfields?fields=TestName,StartTime,Duration',
-                    'GET /api/v1/reportfields?TestName,StartTime,Duration (single param assumed as fields)',
-                    'GET /api/v1/reportfields?ChAccelRMS*|,ChDisplacement*|',
-                    'POST /api/v1/reportfields with body: {"fields": "TestName,StartTime,Duration"}',
+                    'GET /api/v1/reportfields?TestName&StartTime&LevelTime',
+                    'GET /api/v1/reportfields?ChAccelRMS*|&ChDisplacement*|',
+                    'POST /api/v1/reportfields with body: {"fields": "TestName,StartTime,LevelTime"}',
                     'POST /api/v1/reportfields with body: {"fields": ["TestName", "StartTime"]}',
                     'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}'
                 ]
@@ -59,33 +58,32 @@ def get_documentation():
                 'description': 'Get report field values for all data files from the most recent test',
                 'com_method': 'ReportFieldsHistory(fields)',
                 'parameters': {
-                    'fields': 'string or array - Comma-delimited field names or array of field names. Use *| suffix for all channels wildcard. For GET, if only one parameter is provided, it is assumed to be the fields value.'
+                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.'
                 },
                 'returns': 'array - 2D array where each row contains [filename, field1_value, field2_value, ...]',
                 'examples': [
-                    'GET /api/v1/reportfieldshistory?fields=StopCode,RunTime,Time',
-                    'GET /api/v1/reportfieldshistory?StopCode,RunTime,Time (single param assumed as fields)',
+                    'GET /api/v1/reportfieldshistory?StopCode&RunTime&Time',
                     'POST /api/v1/reportfieldshistory with body: {"fields": "StopCode,RunTime,Time"}',
                     'POST /api/v1/reportfieldshistory with body: {"fields": ["StopCode", "RunTime", "Time"]}'
                 ]
             },
-            'GET /reportvector': {
+            'GET|POST /reportvector': {
                 'description': 'Get report vector data',
                 'com_method': 'ReportVector(vectors, array_out)',
                 'parameters': {
-                    'vectors': 'str - Vector names to retrieve'
+                    'vectors': 'str - Vector names as separate query parameters (using &)'
                 },
                 'returns': 'list - Vector data',
-                'example': 'GET /api/v1/reportvector?vectors=Frequency'
+                'example': 'GET /api/v1/reportvector?Frequency&Demand'
             },
-            'GET /reportvectorheader': {
+            'GET|POST /reportvectorheader': {
                 'description': 'Get report vector header information',
                 'com_method': 'ReportVectorHeader(vectors, array_out)',
                 'parameters': {
-                    'vectors': 'str - Vector names to retrieve headers for'
+                    'vectors': 'str - Vector names as separate query parameters (using &)'
                 },
                 'returns': 'list - Vector header data',
-                'example': 'GET /api/v1/reportvectorheader?vectors=Frequency'
+                'example': 'GET /api/v1/reportvectorheader?Frequency&Demand'
             },
             'GET /formfields': {
                 'description': 'Get all form field name/value pairs',
@@ -110,10 +108,9 @@ def get_documentation():
         },
         'notes': [
             'ReportField returns string values for specified report fields',
-            'ReportFields accepts comma-delimited field names and returns array of values',
             'ReportFields returns values in the same order as the requested fields',
             'ReportFields supports both GET and POST methods',
-            'GET with single parameter assumes that parameter is the fields value',
+            'GET uses & to separate field names as query parameters (e.g., ?Field1&Field2&Field3)',
             'Use *| wildcard suffix to get values for all channels (e.g., "ChAccelRMS*|")',
             'Field names are case-sensitive and must match VibrationVIEW report fields',
             'If COM method raises exception, it will be caught and returned as error',
@@ -176,12 +173,11 @@ def report_fields(vv_instance):
     Gets multiple report values specified by field names in one call.
 
     GET Query Parameters:
-        fields: Comma-delimited field names (e.g., ?fields=TestName,StartTime)
-        OR use any parameter name if it's the only parameter (e.g., ?TestName,StartTime)
+        Field names as separate query parameters using & separator
 
     POST JSON Body:
         fields: String or array of report field names
-                - String: Comma-delimited field names (e.g., "TestName,StartTime,Duration")
+                - String: Comma-delimited field names (e.g., "TestName,StartTime,LevelTime")
                 - Array: Will be joined with commas automatically
 
     Wildcard Support:
@@ -193,15 +189,14 @@ def report_fields(vv_instance):
         fields_string: The comma-delimited string sent to COM
 
     Examples:
-        GET /api/v1/reportfields?fields=TestName,StartTime,Duration
-        GET /api/v1/reportfields?TestName,StartTime,Duration
-        GET /api/v1/reportfields?ChAccelRMS*|,ChDisplacement*|
+        GET /api/v1/reportfields?TestName&StartTime&LevelTime
+        GET /api/v1/reportfields?ChAccelRMS*|&ChDisplacement*|
 
         POST /api/v1/reportfields
-        Body: {"fields": "TestName,StartTime,Duration"}
+        Body: {"fields": "TestName,StartTime,LevelTime"}
 
         POST /api/v1/reportfields
-        Body: {"fields": ["TestName", "StartTime", "Duration"]}
+        Body: {"fields": ["TestName", "StartTime", "LevelTime"]}
 
         POST /api/v1/reportfields
         Body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}
@@ -276,8 +271,7 @@ def report_fields_history(vv_instance):
     Gets report field values for all data files generated during the most recent test.
 
     GET Query Parameters:
-        fields: Comma-delimited field names (e.g., ?fields=StopCode,RunTime,Time)
-        OR use any parameter name if it's the only parameter (e.g., ?StopCode,RunTime,Time)
+        Field names as separate query parameters using & separator
 
     POST JSON Body:
         fields: String or array of report field names
@@ -293,8 +287,7 @@ def report_fields_history(vv_instance):
         fields_string: The comma-delimited string sent to COM
 
     Examples:
-        GET /api/v1/reportfieldshistory?fields=StopCode,RunTime,Time
-        GET /api/v1/reportfieldshistory?StopCode,RunTime,Time
+        GET /api/v1/reportfieldshistory?StopCode&RunTime&Time
 
         POST /api/v1/reportfieldshistory
         Body: {"fields": "StopCode,RunTime,Time"}
@@ -374,8 +367,7 @@ def report_vector(vv_instance):
     Retrieves vector data from the report system.
 
     GET Query Parameters:
-        vectors: Vector names to retrieve (e.g., ?vectors=Frequency,Amplitude)
-        OR use any parameter name if it's the only parameter (e.g., ?Frequency,Amplitude)
+        Vector names as separate query parameters using & separator
 
     POST JSON Body:
         vectors: String or array of vector names
@@ -383,14 +375,13 @@ def report_vector(vv_instance):
                 - Array: Will be joined with commas automatically
 
     Examples:
-        GET /api/v1/reportvector?vectors=Frequency,Amplitude
-        GET /api/v1/reportvector?Frequency,Amplitude
+        GET /api/v1/reportvector?Frequency&Demand
 
         POST /api/v1/reportvector
-        Body: {"vectors": "Frequency,Amplitude"}
+        Body: {"vectors": "Frequency,Demand"}
 
         POST /api/v1/reportvector
-        Body: {"vectors": ["Frequency", "Amplitude"]}
+        Body: {"vectors": ["Frequency", "Demand"]}
     """
     vectors_string = None
 
@@ -435,8 +426,7 @@ def report_vector_header(vv_instance):
     Retrieves vector header information from the report system.
 
     GET Query Parameters:
-        vectors: Vector names to retrieve headers for (e.g., ?vectors=Frequency,Amplitude)
-        OR use any parameter name if it's the only parameter (e.g., ?Frequency,Amplitude)
+        Vector names as separate query parameters using & separator
 
     POST JSON Body:
         vectors: String or array of vector names
@@ -444,14 +434,13 @@ def report_vector_header(vv_instance):
                 - Array: Will be joined with commas automatically
 
     Examples:
-        GET /api/v1/reportvectorheader?vectors=Frequency,Amplitude
-        GET /api/v1/reportvectorheader?Frequency,Amplitude
+        GET /api/v1/reportvectorheader?Frequency&Demand
 
         POST /api/v1/reportvectorheader
-        Body: {"vectors": "Frequency,Amplitude"}
+        Body: {"vectors": "Frequency,Demand"}
 
         POST /api/v1/reportvectorheader
-        Body: {"vectors": ["Frequency", "Amplitude"]}
+        Body: {"vectors": ["Frequency", "Demand"]}
     """
     vectors_string = None
 
@@ -495,8 +484,7 @@ def report_vector_history(vv_instance):
     Gets vector data for all data files generated during the most recent test.
 
     GET Query Parameters:
-        vectors: Vector names to retrieve (e.g., ?vectors=Frequency,Amplitude)
-        OR use any parameter name if it's the only parameter (e.g., ?Frequency&Amplitude)
+        Vector names as separate query parameters using & separator
 
     POST JSON Body:
         vectors: String or array of vector names
@@ -508,14 +496,13 @@ def report_vector_history(vv_instance):
         vectors_string: The comma-delimited string sent to COM
 
     Examples:
-        GET /api/v1/reportvectorhistory?vectors=Frequency,Amplitude
-        GET /api/v1/reportvectorhistory?Frequency&Amplitude
+        GET /api/v1/reportvectorhistory?Frequency&Demand
 
         POST /api/v1/reportvectorhistory
-        Body: {"vectors": "Frequency,Amplitude"}
+        Body: {"vectors": "Frequency,Demand"}
 
         POST /api/v1/reportvectorhistory
-        Body: {"vectors": ["Frequency", "Amplitude"]}
+        Body: {"vectors": ["Frequency", "Demand"]}
     """
     vectors_string = None
 
