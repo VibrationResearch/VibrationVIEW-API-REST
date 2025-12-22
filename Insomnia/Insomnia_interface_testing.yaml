@@ -850,148 +850,6 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
-  - name: Recording
-    meta:
-      id: fld_7f06b2ea447042d384573d37e62c05d4
-      created: 1765309442193
-      modified: 1765379916949
-      sortKey: -1690628377500
-      description: Data recording control
-    children:
-      - url: "{{ _.base_url }}/docs/recording"
-        name: Recording Docs
-        meta:
-          id: req_4ecc0cff91be47d0b4f689fc449962b3
-          created: 1765309442193
-          modified: 1765309442193
-          isPrivate: false
-          description: Get recording documentation
-          sortKey: -1690628373000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/testrecording"
-        name: testrecording
-        meta:
-          id: req_1c522a1a3691409aac1dad04fed4b3b3
-          created: 1765309442194
-          modified: 1765309442194
-          isPrivate: false
-          description: Test recording methods (diagnostic)
-          sortKey: -1690628371100
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/recordstop"
-        name: recordstop
-        meta:
-          id: req_50718647092a42a7a8f26d2352feb826
-          created: 1765309442194
-          modified: 1765309442194
-          isPrivate: false
-          description: Stop data recording
-          sortKey: -1690628371000
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/recordstart"
-        name: recordstart
-        meta:
-          id: req_e2f4cb302e3148e58018bcaa270721d3
-          created: 1765309442194
-          modified: 1765309442194
-          isPrivate: false
-          description: Start data recording
-          sortKey: -1690628372000
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "filename": "test_recording.dat",
-              "channels": [1, 2, 3]
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/recordgetfilename"
-        name: recordgetfilename
-        meta:
-          id: req_13854366d88844828f1c8d3a8e4be133
-          created: 1765309442195
-          modified: 1765309442195
-          isPrivate: false
-          description: Get last recording filename
-          sortKey: -1690628371250
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/recordpause"
-        name: recordpause
-        meta:
-          id: req_ad5fa9f9c2704af4a567d158216a94e3
-          created: 1765309442195
-          modified: 1765309442195
-          isPrivate: false
-          description: Pause data recording
-          sortKey: -1690628371500
-        method: POST
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-    scripts:
-      afterResponse: |
-        
-        const statusCode = insomnia.response.code;
-        const jsonBody = insomnia.response.json();
-
-        insomnia.test('Check if status is 200', () => {
-            insomnia.expect(insomnia.response.code).to.eql(200);
-        });
-
-
-        // Test that response includes success: true
-        insomnia.test("Response includes success field set to true", () => {
-          insomnia.expect(jsonBody).to.have.property('success');
-          insomnia.expect(jsonBody.success).to.equal(true);
-        });
   - name: Status Properties
     meta:
       id: fld_77bd9bb1fc0e400680d698d7db88d5e8
@@ -1619,7 +1477,7 @@ collection:
     meta:
       id: fld_f19e611571bf4448b339c6efb3058f47
       created: 1765309442216
-      modified: 1766412751931
+      modified: 1766418890718
       sortKey: -1753885060661
       description: ""
     children:
@@ -1996,6 +1854,61 @@ collection:
         headers:
           - name: Content-Type
             value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/formfields"
+        name: formfields
+        meta:
+          id: req_813f2732ec1e43d084ebd70cc0735052
+          created: 1766418657866
+          modified: 1766418805823
+          isPrivate: false
+          description: ""
+          sortKey: -1766418657866
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/formfields"
+        name: formfields
+        meta:
+          id: req_11b72efa80e4448abebcdaa877234bc0
+          created: 1766418811295
+          modified: 1766418835524
+          isPrivate: false
+          description: ""
+          sortKey: -1765260574806.5
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: Preload
+              value: "10"
+              description: ""
+              disabled: false
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3186,6 +3099,148 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - name: Recording
+        meta:
+          id: fld_7f06b2ea447042d384573d37e62c05d4
+          created: 1765309442193
+          modified: 1766418728646
+          sortKey: -1754315964550
+          description: Data recording control
+        children:
+          - url: "{{ _.base_url }}/docs/recording"
+            name: Recording Docs
+            meta:
+              id: req_4ecc0cff91be47d0b4f689fc449962b3
+              created: 1765309442193
+              modified: 1765309442193
+              isPrivate: false
+              description: Get recording documentation
+              sortKey: -1690628373000
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/testrecording"
+            name: testrecording
+            meta:
+              id: req_1c522a1a3691409aac1dad04fed4b3b3
+              created: 1765309442194
+              modified: 1765309442194
+              isPrivate: false
+              description: Test recording methods (diagnostic)
+              sortKey: -1690628371100
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/recordstop"
+            name: recordstop
+            meta:
+              id: req_50718647092a42a7a8f26d2352feb826
+              created: 1765309442194
+              modified: 1765309442194
+              isPrivate: false
+              description: Stop data recording
+              sortKey: -1690628371000
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/recordstart"
+            name: recordstart
+            meta:
+              id: req_e2f4cb302e3148e58018bcaa270721d3
+              created: 1765309442194
+              modified: 1765309442194
+              isPrivate: false
+              description: Start data recording
+              sortKey: -1690628372000
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "filename": "test_recording.dat",
+                  "channels": [1, 2, 3]
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/recordgetfilename"
+            name: recordgetfilename
+            meta:
+              id: req_13854366d88844828f1c8d3a8e4be133
+              created: 1765309442195
+              modified: 1765309442195
+              isPrivate: false
+              description: Get last recording filename
+              sortKey: -1690628371250
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/recordpause"
+            name: recordpause
+            meta:
+              id: req_ad5fa9f9c2704af4a567d158216a94e3
+              created: 1765309442195
+              modified: 1765309442195
+              isPrivate: false
+              description: Pause data recording
+              sortKey: -1690628371500
+            method: POST
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+        scripts:
+          afterResponse: |
+            
+            const statusCode = insomnia.response.code;
+            const jsonBody = insomnia.response.json();
+
+            insomnia.test('Check if status is 200', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            });
+
+
+            // Test that response includes success: true
+            insomnia.test("Response includes success field set to true", () => {
+              insomnia.expect(jsonBody).to.have.property('success');
+              insomnia.expect(jsonBody.success).to.equal(true);
+            });
     scripts:
       afterResponse: |
         
@@ -3762,13 +3817,13 @@ cookieJar:
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1766416722630
+    modified: 1766418890714
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1766416722644
+    modified: 1766418890717
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1

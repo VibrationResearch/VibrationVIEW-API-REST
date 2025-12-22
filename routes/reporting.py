@@ -12,6 +12,7 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.utils import extract_com_error_info, sanitize_nan
+from utils.vv_error_codes import VVIEW_E_NO_DATA, is_vview_error
 
 import logging
 from datetime import datetime
@@ -85,6 +86,26 @@ def get_documentation():
                 },
                 'returns': 'list - Vector header data',
                 'example': 'GET /api/v1/reportvectorheader?vectors=Frequency'
+            },
+            'GET /formfields': {
+                'description': 'Get all form field name/value pairs',
+                'com_method': 'FormFields()',
+                'parameters': 'None',
+                'returns': '2D array - [[field_name, field_value], ...]',
+                'example': 'GET /api/v1/formfields'
+            },
+            'POST|PUT /formfields': {
+                'description': 'Post form field values (merges with existing)',
+                'com_method': 'PostFormFields(fields)',
+                'modes': {
+                    'JSON body': 'fields: 2D array of [field_name, field_value] pairs',
+                    'multipart/form-data': 'Each form field posted directly as name=value'
+                },
+                'returns': 'bool - True on success',
+                'examples': [
+                    'POST /api/v1/formfields with JSON: {"fields": [["Customer", "ACME"], ["PartNumber", "12345"]]}',
+                    'POST /api/v1/formfields with multipart/form-data: Customer=ACME&PartNumber=12345'
+                ]
             }
         },
         'notes': [
@@ -528,4 +549,111 @@ def report_vector_history(vv_instance):
 
     return jsonify(success_response(response_data, message))
 
+
+@reporting_bp.route('/formfields', methods=['GET'])
+@handle_errors
+@with_vibrationview
+def form_fields(vv_instance):
+    """
+    Get Form Field Values
+
+    COM Method: FormFields()
+    Returns all form field name/value pairs from VibrationVIEW.
+
+    Returns:
+        results: 2D array where each row contains [field_name, field_value]
+
+    Example:
+        GET /api/v1/formfields
+    """
+    try:
+        results = vv_instance.FormFields()
+    except Exception as e:
+        # Handle VVIEW_E_NO_DATA - return empty results instead of error
+        if is_vview_error(e, VVIEW_E_NO_DATA):
+            return jsonify(success_response(
+                {'results': []},
+                "No form data available"
+            ))
+        raise
+
+    # Convert results to list for JSON serialization
+    results_list = []
+    if results is not None:
+        for row in results:
+            if isinstance(row, (list, tuple)):
+                results_list.append(list(row))
+            else:
+                results_list.append(row)
+
+    return jsonify(success_response(
+        {'results': results_list},
+        f"FormFields executed successfully - {len(results_list)} fields returned"
+    ))
+
+
+@reporting_bp.route('/formfields', methods=['POST', 'PUT'])
+@handle_errors
+@with_vibrationview
+def post_form_fields(vv_instance):
+    """
+    Post Form Field Values
+
+    COM Method: PostFormFields(fields)
+    Posts form field values to VibrationVIEW. Values are merged with existing form fields.
+
+    Option 1 - JSON Body:
+        fields: 2D array of [field_name, field_value] pairs
+                Example: [["Customer", "ACME Corp"], ["PartNumber", "12345"]]
+
+    Option 2 - multipart/form-data:
+        Each form field name/value pair is posted directly
+        Example: Customer=ACME Corp&PartNumber=12345
+
+    Returns:
+        result: True on success
+
+    Examples:
+        POST /api/v1/formfields
+        Body: {"fields": [["Customer", "ACME Corp"], ["PartNumber", "12345"]]}
+
+        POST /api/v1/formfields (multipart/form-data)
+        Form: Customer=ACME Corp, PartNumber=12345
+    """
+    fields = None
+
+    # Check for multipart/form-data
+    if request.form:
+        # Convert form data to 2D array format
+        fields = [[key, value] for key, value in request.form.items()]
+    else:
+        # Try JSON body
+        data = request.get_json(silent=True)
+        if data and 'fields' in data:
+            fields = data['fields']
+
+    if not fields:
+        return jsonify(error_response(
+            'Missing required parameter: fields (JSON array or multipart/form-data)',
+            'MISSING_PARAMETER'
+        )), 400
+
+    if not isinstance(fields, list):
+        return jsonify(error_response(
+            'fields must be a 2D array of [field_name, field_value] pairs',
+            'INVALID_PARAMETER'
+        )), 400
+
+    try:
+        result = vv_instance.PostFormFields(fields)
+    except Exception as e:
+        return jsonify(error_response(
+            f'Failed to post form fields: {str(e)}',
+            'POST_FORM_FIELDS_ERROR'
+        )), 500
+
+    return jsonify(success_response(
+        {'result': result, 'fields_count': len(fields)},
+        f"PostFormFields executed successfully - {len(fields)} fields posted"
+    ))
 
