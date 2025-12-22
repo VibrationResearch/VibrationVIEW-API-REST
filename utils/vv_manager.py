@@ -8,8 +8,36 @@ VibrationVIEW manager using the app singleton
 
 from functools import wraps
 import logging
+from flask import jsonify
 
 logger = logging.getLogger(__name__)
+
+
+def extract_exception_info(e):
+    """Extract detailed information from an exception for JSON response"""
+    error_info = {
+        'raw': str(e),
+        'type': type(e).__name__
+    }
+
+    # Try to extract COM error details
+    if hasattr(e, 'args') and e.args:
+        args = e.args
+        if isinstance(args, tuple) and len(args) >= 3:
+            # COM errors often have (hr, description, exc, argErr) format
+            error_info['hr'] = args[0] if len(args) > 0 else None
+            error_info['description'] = args[1] if len(args) > 1 else None
+            if len(args) > 2 and args[2]:
+                exc_info = args[2]
+                if isinstance(exc_info, tuple):
+                    error_info['source'] = exc_info[1] if len(exc_info) > 1 else None
+                    error_info['details'] = exc_info[2] if len(exc_info) > 2 else None
+                    error_info['help_file'] = exc_info[3] if len(exc_info) > 3 else None
+                    error_info['help_context'] = exc_info[4] if len(exc_info) > 4 else None
+                    error_info['scode'] = exc_info[5] if len(exc_info) > 5 else None
+
+    # Clean up None values
+    return {k: v for k, v in error_info.items() if v is not None}
 
 class VibrationVIEWManager:
     """Manager for VibrationVIEW instances using app singleton"""
@@ -70,13 +98,14 @@ def with_vibrationview(func):
             
         except Exception as e:
             logger.error(f"Error in VibrationVIEW operation: {e}")
-            # Return error response that matches your API format
-            return {
+            # Return detailed error response
+            error_info = extract_exception_info(e)
+            return jsonify({
                 'success': False,
-                'error': str(e),
+                'error': error_info,
                 'data': None
-            }, 500
-    
+            }), 500
+
     return wrapper
 
 def with_vibrationview_safe(func):
@@ -121,10 +150,11 @@ def with_vibrationview_safe(func):
                 
         except Exception as e:
             logger.error(f"VibrationVIEW operation failed: {e}")
-            return {
+            error_info = extract_exception_info(e)
+            return jsonify({
                 'success': False,
-                'error': str(e),
+                'error': error_info,
                 'data': None
-            }
-    
+            }), 500
+
     return wrapper
