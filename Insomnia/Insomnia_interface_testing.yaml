@@ -417,7 +417,7 @@ collection:
     meta:
       id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
       created: 1765309442184
-      modified: 1766416722646
+      modified: 1766422232781
       sortKey: -1753972452349
       description: Core test control operations
     children:
@@ -451,33 +451,6 @@ collection:
         method: POST
         body:
           mimeType: application/json
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/starttest"
-        name: starttest
-        meta:
-          id: req_7c0e42a192cd4855a95cf41d52794437
-          created: 1765309442187
-          modified: 1766412067497
-          isPrivate: false
-          description: Start test execution
-          sortKey: -1690628396000
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "test_file": "path/to/test.vvs"
-            }
         headers:
           - name: Content-Type
             value: application/json
@@ -648,36 +621,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/opentest"
-        name: opentest (with json file)
-        meta:
-          id: req_1dd5d328a8e24539859a97558c4c26a4
-          created: 1765309442192
-          modified: 1766412038184
-          isPrivate: false
-          description: ""
-          sortKey: -1690628396187.5
-        method: POST
-        body:
-          mimeType: multipart/form-data
-          params:
-            - name: ""
-              value: ""
-              description: ""
-              disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
-              type: file
-        headers:
-          - name: Content-Type
-            value: multipart/form-data
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/stoptest"
         name: "stoptest "
         meta:
@@ -777,33 +720,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/runtest"
-        name: opentest (with file)
-        meta:
-          id: req_2c1619aa79d045e99974e0c3e81f3a72
-          created: 1766181347544
-          modified: 1766416699094
-          isPrivate: false
-          description: ""
-          sortKey: -1690628396218.75
-        method: POST
-        body:
-          mimeType: multipart/form-data
-          params:
-            - name: ""
-              value: ""
-              description: ""
-              disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
-              type: file
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/opentest"
         name: opentest (with template file)
         meta:
@@ -826,6 +742,90 @@ collection:
         headers:
           - name: Content-Type
             value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest"
+        name: opentest (with json file)
+        meta:
+          id: req_9abc6dc77775499580717d70302b2b72
+          created: 1766437459605
+          modified: 1766437459605
+          isPrivate: false
+          description: ""
+          sortKey: -1690628396171.875
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentests"
+        name: opentest (with file)
+        meta:
+          id: req_04dec9797b844886b6678804e8e3664d
+          created: 1766437496278
+          modified: 1766437496278
+          isPrivate: false
+          description: ""
+          sortKey: -1690628396261.7188
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
+              type: file
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/starttest"
+        name: starttest
+        meta:
+          id: req_1d8d6c9ed1d9452c81b5c1d95321b33d
+          created: 1766437523156
+          modified: 1766437523156
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1690628395500
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -858,24 +858,6 @@ collection:
       sortKey: -1690628392000
       description: System status and state checking
     children:
-      - url: "{{ _.base_url }}/isrunning"
-        name: isrunning
-        meta:
-          id: req_026d57042350406fa51c173b18591ae0
-          created: 1765309442196
-          modified: 1765309442196
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628391000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/status"
         name: status
         meta:
@@ -903,24 +885,6 @@ collection:
           isPrivate: false
           description: Get status properties documentation
           sortKey: -1690628392000
-        method: GET
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: "{{ _.base_url }}/isready"
-        name: isready
-        meta:
-          id: req_a3f5bc5d6f1f4c33875ebf17f41a609f
-          created: 1765309442198
-          modified: 1765309442198
-          isPrivate: false
-          description: Check if test is running
-          sortKey: -1690628391250
         method: GET
         settings:
           renderRequestBody: true
@@ -1047,6 +1011,42 @@ collection:
           isPrivate: false
           description: Check if test is running
           sortKey: -1690628388531.25
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isready"
+        name: isready
+        meta:
+          id: req_2d20f09f17d648ff878b38d0edcba184
+          created: 1766437128478
+          modified: 1766437128478
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628391125
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isrunning"
+        name: isrunning
+        meta:
+          id: req_c846696fd51f4163ab85b77d0d1ce340
+          created: 1766437575898
+          modified: 1766437575898
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1690628390500
         method: GET
         settings:
           renderRequestBody: true
@@ -1477,7 +1477,7 @@ collection:
     meta:
       id: fld_f19e611571bf4448b339c6efb3058f47
       created: 1765309442216
-      modified: 1766418890718
+      modified: 1766437740678
       sortKey: -1753885060661
       description: ""
     children:
@@ -1486,10 +1486,10 @@ collection:
         meta:
           id: req_afbbcddd92fc48c0998f7e022d2427be
           created: 1765309442216
-          modified: 1765309442216
+          modified: 1766426918526
           isPrivate: false
           description: Get status properties documentation
-          sortKey: -1753885096948
+          sortKey: -1766418657966
         method: GET
         settings:
           renderRequestBody: true
@@ -1616,14 +1616,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url
-          }}/reportfieldshistory?reportfieldshistory&LastData&StopCode&RunTime&\
-          Time"
+      - url: "{{ _.base_url }}/reportfieldshistory?LastData&StopCode&RunTime&Time"
         name: reportfieldshistory
         meta:
           id: req_f2853afbac894251b8943d21a887d25b
           created: 1765309442220
-          modified: 1766412679270
+          modified: 1766422541533
           isPrivate: false
           description: ""
           sortKey: -1753885096698
@@ -1830,38 +1828,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/reportvectorhistory?Frequency&Drive&Channel*"
-        name: reportvectorhistory
-        meta:
-          id: req_18267c8d652e4c0f9042e7d31fd2456e
-          created: 1765479581889
-          modified: 1765480344540
-          isPrivate: false
-          description: ""
-          sortKey: -1753830653848.375
-        method: GET
-        body:
-          mimeType: application/json
-          text: |
-            {     
-            	"vectors": 
-            	[       
-            		"Frequency",
-            		"FreqDrive",
-            		"FreqChannel*"
-            	]   
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/formfields"
         name: formfields
         meta:
@@ -1909,6 +1875,38 @@ collection:
             value: insomnia/12.2.0
             description: ""
             disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvectorhistory?Frequency&FreqDrive&FreqChannel*"
+        name: reportvectorhistory
+        meta:
+          id: req_1150d0c0b1984d219610282ed434c9c7
+          created: 1766437718961
+          modified: 1766437718961
+          isPrivate: false
+          description: ""
+          sortKey: -1753830653846.8125
+        method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {     
+            	"vectors": 
+            	[       
+            		"Frequency",
+            		"FreqDrive",
+            		"FreqChannel*"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2337,6 +2335,24 @@ collection:
           isPrivate: false
           description: Get test control documentation
           sortKey: -1763755089731
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isrunning"
+        name: isrunning
+        meta:
+          id: req_0d83dd0d59db4088951f74c0da2116e6
+          created: 1766437547425
+          modified: 1766437550757
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1763755089831
         method: GET
         settings:
           renderRequestBody: true
@@ -3033,36 +3049,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputconfigurationfile"
-        name: inputconfigurationfile (with file)
-        meta:
-          id: req_878346f0d38048959a7dbfa68cbe3bfb
-          created: 1765309442248
-          modified: 1766412510917
-          isPrivate: false
-          description: Load input configuration file
-          sortKey: -1754315964345
-        method: POST
-        body:
-          mimeType: multipart/form-data
-          params:
-            - name: ""
-              value: ""
-              description: ""
-              disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
-              type: file
-        headers:
-          - name: Content-Type
-            value: multipart/form-data
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: "{{ _.base_url }}/inputmode"
         name: inputmode
         meta:
@@ -3091,6 +3077,36 @@ collection:
         headers:
           - name: Content-Type
             value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/inputconfigurationfile"
+        name: inputconfigurationfile (with file)
+        meta:
+          id: req_ca248e9cb1a346bd8db879a490624e18
+          created: 1766437243663
+          modified: 1766437243663
+          isPrivate: false
+          description: Load input configuration file
+          sortKey: -1754315964342.5
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3431,7 +3447,7 @@ collection:
     meta:
       id: fld_4e3b05d7a98446ee88c10ca0462d2584
       created: 1765309442253
-      modified: 1765471061885
+      modified: 1766430232814
       sortKey: -1753950604412.9375
       description: ""
     children:
@@ -3458,14 +3474,13 @@ collection:
         meta:
           id: req_9758a16976aa4f50acd72397d3ba7517
           created: 1765309442254
-          modified: 1765309442254
+          modified: 1766428561387
           isPrivate: false
-          description: ""
+          description: |-
+            Insomnia has an issue here, but the CURL works
+            curl --request GET --url http://127.0.0.1:5000/api/v1/generatereport?template_name=Frequency.csv
           sortKey: -1764102238021
-        method: POST
-        headers:
-          - name: User-Agent
-            value: insomnia/11.0.2
+        method: GET
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3479,14 +3494,24 @@ collection:
         meta:
           id: req_0ef80842552c4401ae497d1d23feed38
           created: 1765309442255
-          modified: 1765309442255
+          modified: 1766429534268
           isPrivate: false
-          description: ""
+          description: curl -X POST http://127.0.0.1:5000/api/v1/generatetxt -F
+            "file=@D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd"
           sortKey: -1764082670402.5
         method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd
+              type: file
         headers:
-          - name: User-Agent
-            value: insomnia/11.0.2
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3500,11 +3525,15 @@ collection:
         meta:
           id: req_63bfdd590c99448388e5dd9e9ae3c548
           created: 1765309442255
-          modified: 1765309442255
+          modified: 1766428733101
           isPrivate: false
-          description: ""
+          description: >-
+            Insomnia does work with attachment, but curl works
+
+            curl --request GET http://127.0.0.1:5000/api/v1/datafile --output
+            file.vsd
           sortKey: -1764089192942
-        method: POST
+        method: GET
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -3521,9 +3550,10 @@ collection:
         meta:
           id: req_050af29ffbbe42b1a3e05727470900b4
           created: 1765309442256
-          modified: 1765309442256
+          modified: 1766428455577
           isPrivate: false
-          description: ""
+          description: curl --request GET http://127.0.0.1:5000/api/v1/datafiles --output
+            files.zip
           sortKey: -1764085931672.25
         method: GET
         headers:
@@ -3542,14 +3572,114 @@ collection:
         meta:
           id: req_60f9d0d1ca3d4b53a85f556105db3bd1
           created: 1765309442256
-          modified: 1765315324342
+          modified: 1766429562895
           isPrivate: false
-          description: ""
+          description: curl -X POST http://127.0.0.1:5000/api/v1/generateuff -F
+            "file=@D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd"
           sortKey: -1764079409132.75
         method: POST
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generatetxt"
+        name: generatetxt (last run test)
+        meta:
+          id: req_52ec6a5f6f174253a9a02a8b0d948661
+          created: 1766429820386
+          modified: 1766429919924
+          isPrivate: false
+          description: curl -X GET http://127.0.0.1:5000/api/v1/generatetxt
+          sortKey: -1764081039767.625
+        method: GET
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generateuff"
+        name: generateuff (last run test)
+        meta:
+          id: req_5c5846c07f6041c79226aa46dd477586
+          created: 1766429928145
+          modified: 1766429968337
+          isPrivate: false
+          description: curl -X GET http://127.0.0.1:5000/api/v1/generateuff
+          sortKey: -1764079409032.75
+        method: GET
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/generatereport"
+        name: Generate Report
+        meta:
+          id: req_27fbd4818a494a309feaed81fc5eddb7
+          created: 1766430163768
+          modified: 1766433771161
+          isPrivate: false
+          description: curl -X POST
+            "http://127.0.0.1:5000/api/v1/generatereport?template_name=Frequency.csv"
+            -F
+            "file=@D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd"
+          sortKey: -1764095715481.5
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              multiline: true
+              fileName: D:\Data\VibrationVIEW-API-REST\data\2025Sep22-1633-0002.vrd
+              type: file
+        parameters:
+          - name: template_name
+            value: Frequency.csv
+            description: ""
+            disabled: false
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3812,18 +3942,346 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+  - name: Workflow
+    meta:
+      id: fld_ce3630051a654b2092f8f8681a65aff2
+      created: 1766437117393
+      modified: 1766438102499
+      sortKey: -1766437117393
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/starttest"
+        name: starttest
+        meta:
+          id: req_7c0e42a192cd4855a95cf41d52794437
+          created: 1765309442187
+          modified: 1766437582994
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1766437135753.1108
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isrunning"
+        name: isrunning
+        meta:
+          id: req_026d57042350406fa51c173b18591ae0
+          created: 1765309442196
+          modified: 1766437609269
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1766437135752.3267
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/isready"
+        name: isready
+        meta:
+          id: req_a3f5bc5d6f1f4c33875ebf17f41a609f
+          created: 1765309442198
+          modified: 1766437135821
+          isPrivate: false
+          description: Check if test is running
+          sortKey: -1766437135802
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/inputconfigurationfile"
+        name: inputconfigurationfile (with file)
+        meta:
+          id: req_878346f0d38048959a7dbfa68cbe3bfb
+          created: 1765309442248
+          modified: 1766437303196
+          isPrivate: false
+          description: Load input configuration file
+          sortKey: -1766437135770.75
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportvectorhistory?Frequency&FreqDrive&FreqChannel*"
+        name: reportvectorhistory
+        meta:
+          id: req_18267c8d652e4c0f9042e7d31fd2456e
+          created: 1765479581889
+          modified: 1766437738449
+          isPrivate: false
+          description: ""
+          sortKey: -1766423277312.3855
+        method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {     
+            	"vectors": 
+            	[       
+            		"Frequency",
+            		"FreqDrive",
+            		"FreqChannel*"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/reportfields?BoxSerialNumber1&Version&SupportDate"
+        name: reportfields (system)
+        meta:
+          id: req_469e22c5570a4dfab5198e52c3d41905
+          created: 1766437178445
+          modified: 1766437254217
+          isPrivate: false
+          description: ""
+          sortKey: -1766437135777
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/tedsreadandapply"
+        name: tedsreadandapply
+        meta:
+          id: req_7efdc47db03f4c7ab78dd692d52dd61f
+          created: 1766437285318
+          modified: 1766437356220
+          isPrivate: false
+          description: ""
+          sortKey: -1766437135769.1875
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/inputtedschannel?1"
+        name: inputtedschannel-Channel 1
+        meta:
+          id: req_27dd7d0599e245dfb43cfabd792f8faf
+          created: 1766437346718
+          modified: 1766437411092
+          isPrivate: false
+          description: ""
+          sortKey: -1766437135768.7969
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/opentest"
+        name: opentest (with file)
+        meta:
+          id: req_08eee4e2840446d5a78d32b9aa29a2fc
+          created: 1766437403297
+          modified: 1766438076036
+          isPrivate: false
+          description: ""
+          sortKey: -1766437135756.248
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: ""
+              value: ""
+              description: ""
+              disabled: false
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
+              type: file
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/stoptest"
+        name: stoptest
+        meta:
+          id: req_b69e7917ab48472096891e25f3a03900
+          created: 1766437606347
+          modified: 1766437616017
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1766437135751.5422
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/log"
+        name: log
+        meta:
+          id: req_25cb68c176cf4cf6b861cba52d98ef28
+          created: 1766437629917
+          modified: 1766437643894
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1766427896858.771
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/datafiles"
+        name: datafiles
+        meta:
+          id: req_c47f7c340afd43b8b9aa1086f147ade8
+          created: 1766437660806
+          modified: 1766437668365
+          isPrivate: false
+          description: Start test execution
+          sortKey: -1766423277412.3855
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "test_file": "path/to/test.vvs"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: |+
+        
+        const statusCode = insomnia.response.code;
+        const jsonBody = insomnia.response.json();
+
+        insomnia.test('Check if status is 200', () => {
+            insomnia.expect(insomnia.response.code).to.eql(200);
+        });
+
+
+        // Test that response includes success: true
+        insomnia.test("Response includes success field set to true", () => {
+          insomnia.expect(jsonBody).to.have.property('success');
+          insomnia.expect(jsonBody.success).to.equal(true);
+        });
+
+
 cookieJar:
   name: Default Jar
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1766418890714
+    modified: 1766438102495
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1766418890717
+    modified: 1766438102498
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1
