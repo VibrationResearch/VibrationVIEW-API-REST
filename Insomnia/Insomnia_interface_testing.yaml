@@ -417,7 +417,7 @@ collection:
     meta:
       id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
       created: 1765309442184
-      modified: 1766412093867
+      modified: 1766416722646
       sortKey: -1753972452349
       description: Core test control operations
     children:
@@ -571,7 +571,7 @@ collection:
         meta:
           id: req_ff14d14150a04e4d8359164eb7d6ce29
           created: 1765309442190
-          modified: 1766411736018
+          modified: 1766416875387
           isPrivate: false
           description: ""
           sortKey: -1690628396750
@@ -585,11 +585,6 @@ collection:
               disabled: false
               fileName: D:\Data\VibrationVIEW-API-REST\profiles\Sine.vsp
               type: file
-        headers:
-          - name: Content-Type
-            value: multipart/form-data
-          - name: filename
-            value: gingerman_Test 1.vrp
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -787,7 +782,7 @@ collection:
         meta:
           id: req_2c1619aa79d045e99974e0c3e81f3a72
           created: 1766181347544
-          modified: 1766181351042
+          modified: 1766416699094
           isPrivate: false
           description: ""
           sortKey: -1690628396218.75
@@ -801,11 +796,6 @@ collection:
               disabled: false
               fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
               type: file
-        headers:
-          - name: Content-Type
-            value: multipart/form-data
-          - name: filename
-            value: gingerman_Test 1.vrp
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -3772,13 +3762,13 @@ cookieJar:
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1766414291207
+    modified: 1766416722630
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1766414291210
+    modified: 1766416722644
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1
