@@ -22,7 +22,7 @@ INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
 ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS
 
 
-def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usetemporaryfile=False):
+def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
     if not filename or '.' not in filename:
         return None, {'Error': 'Missing or invalid filename'}, 400
 
@@ -30,22 +30,18 @@ def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usete
     if ext not in ALLOWED_EXTENSIONS:
         return None, {'Error': f'Invalid file extension: .{ext}'}, 400
 
-    # Check if uploadsubfolder is an absolute path (for template files)
-    if os.path.isabs(uploadsubfolder):
-        temp_folder = uploadsubfolder
+    # Choose folder based on extension type
+    if ext in PROFILE_EXTENSIONS:
+        base_folder = config.Config.PROFILE_FOLDER
+    elif ext in DATA_EXTENSIONS:
+        base_folder = config.Config.DATA_FOLDER
+    elif ext in TEMPLATE_EXTENSIONS:
+        base_folder = config.Config.NEW_TEST_DEFAULTS_FOLDER
+    elif ext in INPUTCONFIG_EXTENSIONS:
+        base_folder = config.Config.INPUTCONFIG_FOLDER
     else:
-        # Choose base folder based on extension type
-        if ext in PROFILE_EXTENSIONS:
-            base_folder = config.Config.PROFILE_FOLDER
-        elif ext in DATA_EXTENSIONS:
-            base_folder = config.Config.DATA_FOLDER
-        elif ext in TEMPLATE_EXTENSIONS:
-            base_folder = config.Config.NEW_TEST_DEFAULTS_FOLDER
-        elif ext in INPUTCONFIG_EXTENSIONS:
-            base_folder = config.Config.INPUTCONFIG_FOLDER
-        else:
-            base_folder = config.Config.VIBRATIONVIEW_FOLDER
-        temp_folder = os.path.join(base_folder, uploadsubfolder)
+        base_folder = config.Config.VIBRATIONVIEW_FOLDER
+    temp_folder = os.path.join(base_folder, 'Uploads')
     
     os.makedirs(temp_folder, exist_ok=True)
 

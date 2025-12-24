@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, extract_com_error_info, is_template_file, get_new_test_defaults_path, is_default_template_filename, detect_file_upload, get_filename_from_request
+from utils.utils import handle_binary_upload, extract_com_error_info, is_default_template_filename, detect_file_upload, get_filename_from_request
 from utils.path_validator import validate_file_path, PathValidationError
 
 import logging
@@ -384,15 +384,7 @@ def open_test(vv_instance):
 
         if filename is not None:
             # File upload detected - save and open
-            # Check if this is a template file and handle accordingly
-            if is_template_file(filename):
-                defaults_path = get_new_test_defaults_path()
-                if defaults_path:
-                    result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=defaults_path, usetemporaryfile=False)
-                else:
-                    result, error, status_code = handle_binary_upload(filename, binary_data)
-            else:
-                result, error, status_code = handle_binary_upload(filename, binary_data)
+            result, error, status_code = handle_binary_upload(filename, binary_data)
 
             if error:
                 return jsonify(error), status_code

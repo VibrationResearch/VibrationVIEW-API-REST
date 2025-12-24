@@ -708,8 +708,7 @@ def input_configuration_file(vv_instance):
 
     if filename is not None:
         # File upload detected - save and load
-        uploads_folder = os.path.join(config.Config.INPUTCONFIG_FOLDER, 'Uploads')
-        result, error, status_code = handle_binary_upload(filename, binary_data, uploadsubfolder=uploads_folder)
+        result, error, status_code = handle_binary_upload(filename, binary_data)
 
         if error:
             return jsonify(error), status_code
