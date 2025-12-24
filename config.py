@@ -30,11 +30,12 @@ class Config:
     VV_MAX_INSTANCES = int(os.environ.get('VV_MAX_INSTANCES') or '5')
 
     # VibrationVIEW folders - configurable via environment variables
-    PROFILE_FOLDER = os.environ.get('PROFILE_FOLDER') or 'C:\\VibrationVIEW\\Profiles'
-    INPUTCONFIG_FOLDER = os.environ.get('INPUTCONFIG_FOLDER') or 'C:\\VibrationVIEW\\InputConfig'
-    NEW_TEST_DEFAULTS_FOLDER = os.environ.get('NEW_TEST_DEFAULTS_FOLDER') or 'C:\\VibrationVIEW\\New Test Defaults'
-    REPORT_FOLDER = os.environ.get('REPORT_FOLDER') or 'C:\\VibrationVIEW\\Reports'
-    DATA_FOLDER = os.environ.get('DATA_FOLDER') or 'C:\\VibrationVIEW\\Data'
+    VIBRATIONVIEW_FOLDER = os.environ.get('VIBRATIONVIEW_FOLDER') or 'C:\\VibrationVIEW'
+    PROFILE_FOLDER = os.environ.get('PROFILE_FOLDER') or os.path.join(VIBRATIONVIEW_FOLDER, 'Profiles')
+    INPUTCONFIG_FOLDER = os.environ.get('INPUTCONFIG_FOLDER') or os.path.join(VIBRATIONVIEW_FOLDER, 'InputConfig')
+    NEW_TEST_DEFAULTS_FOLDER = os.environ.get('NEW_TEST_DEFAULTS_FOLDER') or os.path.join(VIBRATIONVIEW_FOLDER, 'New Test Defaults')
+    REPORT_FOLDER = os.environ.get('REPORT_FOLDER') or os.path.join(VIBRATIONVIEW_FOLDER, 'Reports')
+    DATA_FOLDER = os.environ.get('DATA_FOLDER') or os.path.join(VIBRATIONVIEW_FOLDER, 'Data')
     EXE_NAME = os.environ.get('EXE_NAME') or 'C:\\Program Files\\VibrationVIEW 2025\\VibrationVIEW.exe'
     
     # Flask Settings
