@@ -10,12 +10,17 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'vrp', 'vrpj','vrd', 'vasor', 'vkp', 'vkpj', 'vkd', 'vsp', 'vspj', 'vsd', 'vdp', 'vdpj', 'vdd', 
-                     'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
-                     'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt', 'vic', 'vchan'}
+PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj'}
 
-TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort', 
-                      'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
+DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd'}  # v?d pattern
+
+TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort',
+                       'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
+
+INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
+
+ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS
+
 
 def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usetemporaryfile=False):
     if not filename or '.' not in filename:
@@ -29,7 +34,18 @@ def handle_binary_upload(filename, binary_data, uploadsubfolder='Uploads', usete
     if os.path.isabs(uploadsubfolder):
         temp_folder = uploadsubfolder
     else:
-        temp_folder = os.path.join(config.Config.PROFILE_FOLDER, uploadsubfolder)
+        # Choose base folder based on extension type
+        if ext in PROFILE_EXTENSIONS:
+            base_folder = config.Config.PROFILE_FOLDER
+        elif ext in DATA_EXTENSIONS:
+            base_folder = config.Config.DATA_FOLDER
+        elif ext in TEMPLATE_EXTENSIONS:
+            base_folder = config.Config.NEW_TEST_DEFAULTS_FOLDER
+        elif ext in INPUTCONFIG_EXTENSIONS:
+            base_folder = config.Config.INPUTCONFIG_FOLDER
+        else:
+            base_folder = config.Config.VIBRATIONVIEW_FOLDER
+        temp_folder = os.path.join(base_folder, uploadsubfolder)
     
     os.makedirs(temp_folder, exist_ok=True)
 
