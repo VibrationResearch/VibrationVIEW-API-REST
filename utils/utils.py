@@ -19,7 +19,7 @@ TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vs
 
 INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
 
-REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm'}
+REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm', 'pdf'}
 
 ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS | REPORT_EXTENSIONS
 
