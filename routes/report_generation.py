@@ -219,7 +219,7 @@ def generate_report(vv_instance):
                 if template_ext:
                     output_name = f"{base_name}{template_ext}"
                 else:
-                    output_name = f"{base_name}.pdf"
+                    output_name = f"{base_name}.rtf"
 
             # Validate output path security
             try:
