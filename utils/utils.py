@@ -19,7 +19,29 @@ TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vs
 
 INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
 
-ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS
+REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm'}
+
+ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS | REPORT_EXTENSIONS
+
+def get_folder_for_extension(filename_or_ext):
+    """Return the appropriate folder for a given filename or extension."""
+    if '.' in filename_or_ext:
+        ext = filename_or_ext.rsplit('.', 1)[1].lower()
+    else:
+        ext = filename_or_ext.lower()
+
+    if ext in PROFILE_EXTENSIONS:
+        return config.Config.PROFILE_FOLDER
+    elif ext in DATA_EXTENSIONS:
+        return config.Config.DATA_FOLDER
+    elif ext in TEMPLATE_EXTENSIONS:
+        return config.Config.NEW_TEST_DEFAULTS_FOLDER
+    elif ext in INPUTCONFIG_EXTENSIONS:
+        return config.Config.INPUTCONFIG_FOLDER
+    elif ext in REPORT_EXTENSIONS:
+        return config.Config.REPORT_FOLDER
+    else:
+        return config.Config.VIBRATIONVIEW_FOLDER
 
 
 def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
@@ -30,17 +52,7 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
     if ext not in ALLOWED_EXTENSIONS:
         return None, {'Error': f'Invalid file extension: .{ext}'}, 400
 
-    # Choose folder based on extension type
-    if ext in PROFILE_EXTENSIONS:
-        base_folder = config.Config.PROFILE_FOLDER
-    elif ext in DATA_EXTENSIONS:
-        base_folder = config.Config.DATA_FOLDER
-    elif ext in TEMPLATE_EXTENSIONS:
-        base_folder = config.Config.NEW_TEST_DEFAULTS_FOLDER
-    elif ext in INPUTCONFIG_EXTENSIONS:
-        base_folder = config.Config.INPUTCONFIG_FOLDER
-    else:
-        base_folder = config.Config.VIBRATIONVIEW_FOLDER
+    base_folder = get_folder_for_extension(ext)
     temp_folder = os.path.join(base_folder, 'Uploads')
     
     os.makedirs(temp_folder, exist_ok=True)
@@ -144,8 +156,9 @@ def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> s
         str: Path to the generated report file
     """
 
-    # Prepare report output directory
-    reportFolder = os.path.join(config.REPORT_FOLDER, 'Temporary')
+    # Prepare report output directory based on output file extension
+    base_folder = get_folder_for_extension(outputName)
+    reportFolder = os.path.join(base_folder, 'Temporary')
     os.makedirs(reportFolder, exist_ok=True)
 
     outPath = os.path.join(reportFolder, outputName)
