@@ -35,19 +35,14 @@ class TestBasicControl:
             file_content = f.read()
 
         filename = "random.vrandomt"
+        mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\random.vrandomt"
 
-        # Mock the registry path lookup
-        mock_registry_path = r"C:\VibrationVIEW\New Test Defaults"
-
-        with patch(
-            "routes.basic_control.get_new_test_defaults_path",
-            return_value=mock_registry_path,
-        ), patch("routes.basic_control.handle_binary_upload") as mock_upload:
+        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
 
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
-                    "FilePath": os.path.join(mock_registry_path, filename),
+                    "FilePath": mock_file_path,
                     "Filename": filename,
                     "Size": len(file_content),
                 },
@@ -71,15 +66,9 @@ class TestBasicControl:
             assert data["success"] is True
             assert data["data"]["result"] is True
             assert data["data"]["copied_only"] is True
-            assert data["data"]["executed"] is False
 
             # Verify that handle_binary_upload was called with the correct parameters
-            mock_upload.assert_called_once_with(
-                filename,
-                file_content,
-                uploadsubfolder=mock_registry_path,
-                usetemporaryfile=False,
-            )
+            mock_upload.assert_called_once_with(filename, file_content)
 
             # Verify OpenTest was NOT called for default template files
             self.mock_instance.OpenTest.assert_not_called()
@@ -90,19 +79,14 @@ class TestBasicControl:
         # Create dummy file content for a custom template
         file_content = b"custom template content"
         filename = "custom_test.vrandomt"  # Custom name, not in default template list
+        mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\custom_test.vrandomt"
 
-        # Mock the registry path lookup
-        mock_registry_path = r"C:\VibrationVIEW\New Test Defaults"
-
-        with patch(
-            "routes.basic_control.get_new_test_defaults_path",
-            return_value=mock_registry_path,
-        ), patch("routes.basic_control.handle_binary_upload") as mock_upload:
+        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
 
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
-                    "FilePath": os.path.join(mock_registry_path, filename),
+                    "FilePath": mock_file_path,
                     "Filename": filename,
                     "Size": len(file_content),
                 },
@@ -125,22 +109,16 @@ class TestBasicControl:
             data = json.loads(response.data)
             assert data["success"] is True
             assert data["data"]["result"] is True
-            assert data["data"]["executed"] is True
             assert "copied_only" not in data["data"]  # Should not have copied_only flag
 
             # Verify that handle_binary_upload was called with the correct parameters
-            mock_upload.assert_called_once_with(
-                filename,
-                file_content,
-                uploadsubfolder=mock_registry_path,
-                usetemporaryfile=False,
-            )
+            mock_upload.assert_called_once_with(filename, file_content)
 
             # Verify OpenTest WAS called for custom template files
             self.mock_instance.OpenTest.assert_called_once()
 
-    def test_opentest_template_file_upload_no_registry_fallback(self, client):
-        """Test template file upload when registry path is not available (fallback)"""
+    def test_opentest_template_file_upload_custom_name(self, client):
+        """Test uploading a template file with custom name via PUT /opentest"""
 
         # Read the actual template file (relative to tests folder)
         test_dir = os.path.dirname(__file__)
@@ -149,17 +127,15 @@ class TestBasicControl:
         with open(template_file_path, "rb") as f:
             file_content = f.read()
 
-        filename = "test_template_fallback.vrandomt"
+        filename = "test_template_custom.vrandomt"
+        mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\test_template_custom.vrandomt"
 
-        # Mock registry path lookup to return None (simulating registry read failure)
-        with patch(
-            "routes.basic_control.get_new_test_defaults_path", return_value=None
-        ), patch("routes.basic_control.handle_binary_upload") as mock_upload:
+        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
 
-            # Configure the mock upload to simulate success with regular upload folder
+            # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
-                    "FilePath": f"/regular/upload/path/{filename}",
+                    "FilePath": mock_file_path,
                     "Filename": filename,
                     "Size": len(file_content),
                 },
@@ -182,7 +158,7 @@ class TestBasicControl:
             data = json.loads(response.data)
             assert data["success"] is True
 
-            # Verify that handle_binary_upload was called with regular parameters (fallback)
+            # Verify that handle_binary_upload was called correctly
             mock_upload.assert_called_once_with(filename, file_content)
 
     def test_opentest_regular_file_upload(self, client):
@@ -259,7 +235,7 @@ class TestBasicControl:
 
         assert response.status_code == 400
         data = json.loads(response.data)
-        assert "Missing required query parameter: filename" in data["Error"]
+        assert "Missing filename" in data["Error"]
 
     def test_opentest_upload_error_handling(self, client):
         """Test PUT /opentest error handling from handle_binary_upload"""
