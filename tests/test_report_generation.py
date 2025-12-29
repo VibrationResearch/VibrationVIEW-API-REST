@@ -72,9 +72,9 @@ class TestReportGeneration:
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            # Make the request
+            # Make the request (filename required for binary upload detection)
             response = client.post(
-                f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
+                f'/api/v1/generatereport?filename=test.vrd&template_name={template_name}&output_name={output_name}',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(file_size),
@@ -109,7 +109,7 @@ class TestReportGeneration:
             vrd_content = f.read()
 
         response = client.post(
-            '/api/v1/generatereport?output_name=test_report.pdf',  # Missing template_name
+            '/api/v1/generatereport?filename=test.vrd&output_name=test_report.pdf',  # Missing template_name
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -124,7 +124,7 @@ class TestReportGeneration:
         assert data['error']['code'] == 'MISSING_PARAMETER'
 
     def test_generatereport_missing_output_name(self, client, mock_vv, sample_vrd_path):
-        """Test POST /generatereport with missing output_name parameter"""
+        """Test POST /generatereport with missing output_name parameter - output_name is derived from uploaded filename"""
 
         if not os.path.exists(sample_vrd_path):
             pytest.skip(f"Sample VRD file not found: {sample_vrd_path}")
@@ -132,20 +132,28 @@ class TestReportGeneration:
         with open(sample_vrd_path, 'rb') as f:
             vrd_content = f.read()
 
-        response = client.post(
-            '/api/v1/generatereport?template_name=Test Report.vvtemplate',  # Missing output_name
-            data=vrd_content,
-            headers={
-                'Content-Length': str(len(vrd_content)),
-                'Content-Type': 'application/octet-stream'
-            }
-        )
+        mock_generated_path = "C:\\VibrationVIEW\\Reports\\test.vvtemplate"
 
-        assert response.status_code == 400
-        data = response.get_json()
-        assert data['success'] is False
-        assert 'Upload mode requires output_name query parameter' in data['error']['message']
-        assert data['error']['code'] == 'MISSING_PARAMETER'
+        with patch('routes.report_generation.GenerateReportFromVV') as mock_generate, \
+             patch('routes.report_generation.os.path.exists') as mock_exists, \
+             patch('routes.report_generation.send_file') as mock_send_file:
+
+            mock_generate.return_value = mock_generated_path
+            mock_exists.return_value = True
+            mock_send_file.return_value = MagicMock()
+
+            # output_name is now derived from uploaded filename when not provided
+            response = client.post(
+                '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate',
+                data=vrd_content,
+                headers={
+                    'Content-Length': str(len(vrd_content)),
+                    'Content-Type': 'application/octet-stream'
+                }
+            )
+
+            # Should succeed - output_name derived from filename
+            mock_send_file.assert_called_once()
 
     def test_generatereport_empty_file_content(self, client, mock_vv):
         """Test POST /generatereport with empty file content"""
@@ -170,13 +178,13 @@ class TestReportGeneration:
         assert data['error']['code'] == 'NO_DATA_FILE_AVAILABLE'
 
     def test_generatereport_file_too_large(self, client, mock_vv):
-        """Test POST /generatereport with file exceeding size limit"""
+        """Test POST /generatereport with file exceeding size limit (10MB)"""
 
-        # Create a large content that exceeds the 100MB limit
-        large_content = b'x' * (101 * 1024 * 1024)  # 101MB
+        # Create content that exceeds the 10MB limit
+        large_content = b'x' * (11 * 1024 * 1024)  # 11MB
 
         response = client.post(
-            '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+            '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate&output_name=test.pdf',
             data=large_content,
             headers={
                 'Content-Length': str(len(large_content)),
@@ -186,9 +194,7 @@ class TestReportGeneration:
 
         assert response.status_code == 413  # Payload Too Large
         data = response.get_json()
-        assert data['success'] is False
-        assert 'File too large (max 100MB)' in data['error']['message']
-        assert data['error']['code'] == 'FILE_TOO_LARGE'
+        assert 'File too large' in data['Error']
 
     def test_generatereport_generation_failure(self, client, mock_vv, sample_vrd_path):
         """Test POST /generatereport when GenerateReportFromVV fails"""
@@ -203,7 +209,7 @@ class TestReportGeneration:
             mock_generate.side_effect = Exception("Report generation failed")
 
             response = client.post(
-                '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+                '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate&output_name=test.pdf',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(len(vrd_content)),
@@ -214,8 +220,8 @@ class TestReportGeneration:
             assert response.status_code == 500
             data = response.get_json()
             assert data['success'] is False
-            assert 'Failed to upload and generate report' in data['error']['message']
-            assert data['error']['code'] == 'UPLOAD_REPORT_GENERATION_ERROR'
+            assert 'Failed to generate report' in data['error']['message']
+            assert data['error']['code'] == 'REPORT_GENERATION_ERROR'
 
     def test_generatereport_path_validation_security(self, client, mock_vv, sample_vrd_path):
         """Test POST /generatereport with path validation for output_name"""
@@ -483,7 +489,7 @@ class TestDatafileRoute:
 
 
 class TestDatafilesRoute:
-    """Test datafiles endpoint that returns zip of all files in OutDir"""
+    """Test datafiles endpoint that returns zip of files from ReportFieldsHistory"""
 
     @pytest.fixture
     def app(self):
@@ -507,55 +513,55 @@ class TestDatafilesRoute:
         reset_vv_instance()
 
     def test_datafiles_returns_zip_when_files_exist(self, client, mock_vv):
-        """Test that datafiles returns a zip file when OutDir has files"""
-        mock_out_dir = 'C:\\VibrationVIEW\\Data'
-        mock_vv.ReportField.return_value = mock_out_dir
+        """Test that datafiles returns a zip file when history has files"""
+        # ReportFieldsHistory returns 2D array: [['LastData', 'file1.vrd', 'file2.vrd'], ...]
+        mock_history = [
+            ['LastData', 'C:\\VibrationVIEW\\Data\\file1.vrd', 'C:\\VibrationVIEW\\Data\\file2.vrd']
+        ]
+        mock_vv.ReportFieldsHistory.return_value = mock_history
 
         with patch('routes.report_generation.os.path.exists') as mock_exists, \
-             patch('routes.report_generation.os.path.isdir') as mock_isdir, \
-             patch('routes.report_generation.os.listdir') as mock_listdir, \
              patch('routes.report_generation.os.path.isfile') as mock_isfile, \
              patch('routes.report_generation.zipfile.ZipFile') as mock_zipfile, \
              patch('routes.report_generation.send_file') as mock_send_file:
 
             mock_exists.return_value = True
-            mock_isdir.return_value = True
-            mock_listdir.return_value = ['file1.vrd', 'file2.vrd', 'file3.txt']
             mock_isfile.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            # Mock the ZipFile context manager
+            # Mock ZipFile context manager
             mock_zip_instance = MagicMock()
             mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
             response = client.get('/api/v1/datafiles')
 
-            # Verify ReportField was called with OutDir
-            mock_vv.ReportField.assert_called_with('OutDir')
+            # Verify ReportFieldsHistory was called
+            mock_vv.ReportFieldsHistory.assert_called_once()
 
             # Verify send_file was called
             mock_send_file.assert_called_once()
             call_args = mock_send_file.call_args
             assert call_args.kwargs['mimetype'] == 'application/zip'
             assert call_args.kwargs['as_attachment'] is True
-            assert call_args.kwargs['download_name'].startswith('datafiles_')
             assert call_args.kwargs['download_name'].endswith('.zip')
 
-    def test_datafiles_returns_error_when_no_outdir(self, client, mock_vv):
-        """Test that datafiles returns error when OutDir is not configured"""
-        mock_vv.ReportField.return_value = None
+    def test_datafiles_returns_error_when_no_history(self, client, mock_vv):
+        """Test that datafiles returns error when no history available"""
+        mock_vv.ReportFieldsHistory.return_value = []
 
         response = client.get('/api/v1/datafiles')
 
-        assert response.status_code == 400
+        assert response.status_code == 404
         data = response.get_json()
         assert data['success'] is False
-        assert data['error']['code'] == 'NO_OUTPUT_DIRECTORY'
+        assert data['error']['code'] == 'NO_DATA_FILES'
 
-    def test_datafiles_returns_error_when_directory_not_found(self, client, mock_vv):
-        """Test that datafiles returns error when OutDir doesn't exist"""
-        mock_out_dir = 'C:\\NonExistent\\Directory'
-        mock_vv.ReportField.return_value = mock_out_dir
+    def test_datafiles_returns_error_when_files_not_found(self, client, mock_vv):
+        """Test that datafiles returns error when history files don't exist"""
+        mock_history = [
+            ['LastData', 'C:\\NonExistent\\file1.vrd']
+        ]
+        mock_vv.ReportFieldsHistory.return_value = mock_history
 
         with patch('routes.report_generation.os.path.exists') as mock_exists:
             mock_exists.return_value = False
@@ -565,56 +571,18 @@ class TestDatafilesRoute:
             assert response.status_code == 404
             data = response.get_json()
             assert data['success'] is False
-            assert data['error']['code'] == 'DIRECTORY_NOT_FOUND'
-
-    def test_datafiles_returns_error_when_path_not_directory(self, client, mock_vv):
-        """Test that datafiles returns error when OutDir is not a directory"""
-        mock_out_dir = 'C:\\VibrationVIEW\\somefile.txt'
-        mock_vv.ReportField.return_value = mock_out_dir
-
-        with patch('routes.report_generation.os.path.exists') as mock_exists, \
-             patch('routes.report_generation.os.path.isdir') as mock_isdir:
-
-            mock_exists.return_value = True
-            mock_isdir.return_value = False
-
-            response = client.get('/api/v1/datafiles')
-
-            assert response.status_code == 400
-            data = response.get_json()
-            assert data['success'] is False
-            assert data['error']['code'] == 'NOT_A_DIRECTORY'
-
-    def test_datafiles_returns_error_when_no_files(self, client, mock_vv):
-        """Test that datafiles returns error when OutDir has no files"""
-        mock_out_dir = 'C:\\VibrationVIEW\\Data'
-        mock_vv.ReportField.return_value = mock_out_dir
-
-        with patch('routes.report_generation.os.path.exists') as mock_exists, \
-             patch('routes.report_generation.os.path.isdir') as mock_isdir, \
-             patch('routes.report_generation.os.listdir') as mock_listdir:
-
-            mock_exists.return_value = True
-            mock_isdir.return_value = True
-            mock_listdir.return_value = []  # Empty directory
-
-            response = client.get('/api/v1/datafiles')
-
-            assert response.status_code == 404
-            data = response.get_json()
-            assert data['success'] is False
             assert data['error']['code'] == 'NO_FILES_FOUND'
 
-    def test_datafiles_returns_error_when_reportfield_fails(self, client, mock_vv):
-        """Test that datafiles returns error when ReportField raises exception"""
-        mock_vv.ReportField.side_effect = Exception("COM error")
+    def test_datafiles_returns_error_when_history_fails(self, client, mock_vv):
+        """Test that datafiles returns error when ReportFieldsHistory raises exception"""
+        mock_vv.ReportFieldsHistory.side_effect = Exception("COM error")
 
         response = client.get('/api/v1/datafiles')
 
         assert response.status_code == 500
         data = response.get_json()
         assert data['success'] is False
-        assert data['error']['code'] == 'OUTPUT_DIRECTORY_ERROR'
+        assert data['error']['code'] == 'HISTORY_RETRIEVAL_ERROR'
 
 
 class TestGenerateReportPathValidation:

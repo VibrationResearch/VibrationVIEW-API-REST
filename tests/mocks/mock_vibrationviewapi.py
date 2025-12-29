@@ -49,6 +49,7 @@ class MockVibrationVIEW:
         # Existing methods
         self.RearInputLabel = MagicMock()
         self.ReportField = MagicMock()
+        self.ReportFieldsHistory = MagicMock()
         self.RearInputUnit = MagicMock()
         self.Demand = MagicMock()
         self.Control = MagicMock()
@@ -127,7 +128,8 @@ class MockVibrationVIEW:
         
         # Reset all MagicMock methods
         magic_mock_attrs = [
-            'RearInputLabel', 'RearInputUnit', 'Demand', 'Control', 'Channel',
+            'RearInputLabel', 'RearInputUnit', 'ReportField', 'ReportFieldsHistory',
+            'Demand', 'Control', 'Channel',
             'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest',
             'IsReady', 'IsRunning', 'Teds', 'TedsFromURN', 'GetHardwareInputChannels',
             'GetHardwareOutputChannels', 'OpenTest', 'RunTest', 'ResumeTest',
