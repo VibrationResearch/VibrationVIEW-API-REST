@@ -399,8 +399,7 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
 
         assert data['success'] is False
-        assert 'URN not found in database' in data['error']
-        # The @with_vibrationview decorator returns error as a string, not a dict
+        assert 'URN not found in database' in data['error']['raw']
 
         print("✓ GET /tedsfromurn handles COM errors correctly!")
 
