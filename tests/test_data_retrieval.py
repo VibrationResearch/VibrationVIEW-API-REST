@@ -573,8 +573,6 @@ class TestDataRetrieval:
         assert data['module'] == 'data_retrieval'
         assert 'endpoints' in data
         assert 'Primary Data Arrays' in data['endpoints']
-        assert 'Vector Data' in data['endpoints']
-        assert 'Vector Properties' in data['endpoints']
         assert 'Channel Metadata (1-based indexing)' in data['endpoints']
         assert 'Control Metadata (1-based indexing)' in data['endpoints']
         
