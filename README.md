@@ -25,7 +25,11 @@ copy .env.example .env
 # Edit .env with your VibrationVIEW settings
 ```
 
-### 3. Start the Server
+### 3. Start VibrationVIEW
+Ensure VibrationVIEW is running before starting the REST API server. The API connects to VibrationVIEW via COM automation creating an automation instance for each called route, and destroying when the thread ends.
+
+
+### 4. Start the Server
 ```bash
 # Development mode
 python app.py --host 0.0.0.0 --port 5000 --debug
@@ -34,7 +38,7 @@ python app.py --host 0.0.0.0 --port 5000 --debug
 python app.py --host 0.0.0.0 --port 5000
 ```
 
-### 4. Access Documentation
+### 5. Access Documentation
 - **Main API Docs**: `http://localhost:5000/api/v1/docs`
 - **Health Check**: `http://localhost:5000/api/v1/health`
 - **Module-Specific Docs**: `http://localhost:5000/api/v1/docs/{module_name}`
