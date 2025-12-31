@@ -12,6 +12,7 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.teds_formatter import format_teds_data, format_single_channel_teds
+from utils.utils import is_valid_urn
 import logging
 from datetime import datetime
 
@@ -73,20 +74,11 @@ def get_documentation():
                     'example': 'POST /api/v1/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}'
                 },
                 'GET|POST /tedsread': {
-                    'description': 'Read TEDS information from hardware',
-                    'com_method': 'TedsRead()',
+                    'description': 'Read TEDS information from hardware and expand valid URNs',
+                    'com_method': 'TedsRead() + TedsFromURN(urn) for valid URNs',
                     'parameters': 'None',
-                    'returns': 'object - Success status and operation result',
+                    'returns': 'object - channels list with raw_value and transducer data for valid URNs',
                     'example': 'GET /api/v1/tedsread or POST /api/v1/tedsread'
-                },
-                'GET /tedsfromurn': {
-                    'description': 'Lookup formatted TEDS transducer by Unique Registration Number (URN)',
-                    'com_method': 'TedsFromURN(urn)',
-                    'parameters': {
-                        'urn': 'string - Unique Registration Number (first query parameter)'
-                    },
-                    'returns': 'object - Formatted transducer data for the specified URN',
-                    'example': 'GET /api/v1/tedsfromurn?urn123456'
                 }
             }
         },
@@ -459,78 +451,68 @@ def teds_read(vv_instance):
     """
     Read TEDS Information from Hardware
 
-    COM Method: TedsRead()
-    Reads TEDS information from the connected hardware.
-    This operation will read the TEDS data from all available channels.
+    COM Method: TedsRead() + TedsFromURN(urn) for valid URNs
+    Reads TEDS information from the connected hardware. For channels with
+    valid URNs, retrieves full transducer parameters via TedsFromURN().
+    Channels without valid URNs include the raw TedsRead() value.
 
     No parameters required.
 
     Example: GET /api/v1/tedsread or POST /api/v1/tedsread
+
+    Returns:
+        channels: List ordered by TedsRead() return order, each containing:
+            - channel: 1-based channel number
+            - raw_value: raw value from TedsRead()
+            - transducer: expanded transducer data (only for valid URNs)
+            - error: error message if URN lookup failed
+        transducer_count: number of channels with valid transducer data
     """
     result = vv_instance.TedsRead()
 
+    # Convert result to list, preserving order
+    raw_values = []
+    if isinstance(result, (list, tuple)):
+        raw_values = list(result)
+    elif result is not None:
+        raw_values = [result]
+
+    # Process each channel in order
+    channels = []
+    transducer_count = 0
+
+    for index, raw_value in enumerate(raw_values):
+        channel_data = {
+            'channel': index + 1,  # 1-based channel number
+            'raw_value': raw_value
+        }
+
+        # Check if this is a valid URN (16-digit hex string) to expand
+        if is_valid_urn(raw_value):
+            try:
+                teds_data = vv_instance.TedsFromURN(raw_value)
+                formatted_result = format_single_channel_teds(teds_data, -1)
+
+                if 'transducer' in formatted_result:
+                    transducer = formatted_result['transducer']
+                    transducer['urn'] = raw_value
+                    channel_data['transducer'] = transducer
+                    transducer_count += 1
+                else:
+                    channel_data['error'] = formatted_result.get('error', {}).get('error', 'Unknown error')
+            except Exception as e:
+                channel_data['error'] = str(e)
+
+        channels.append(channel_data)
+
     return jsonify(success_response(
         {
-            'result': result,
+            'channels': channels,
+            'transducer_count': transducer_count,
+            'channel_count': len(channels),
             'success': True
         },
-        "TEDS read operation completed successfully"
+        f"TEDS read completed: {transducer_count} transducer(s) found across {len(channels)} channel(s)"
     ))
-
-
-@teds_bp.route('/tedsfromurn', methods=['GET'])
-@handle_errors
-@with_vibrationview
-def teds_from_urn(vv_instance):
-    """
-    Lookup TEDS Transducer by Unique Registration Number (URN)
-
-    COM Method: TedsFromURN(urn)
-    Looks up TEDS transducer information using the specified URN.
-
-    Query Parameters:
-        urn: Unique Registration Number string (first positional parameter)
-
-    Example: GET /api/v1/tedsfromurn?urn123456
-    """
-    # Get URN from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: urn',
-            'MISSING_PARAMETER'
-        )), 400
-
-    urn = query_args[0]
-    if not urn or not isinstance(urn, str):
-        return jsonify(error_response(
-            'URN parameter must be a non-empty string',
-            'INVALID_PARAMETER'
-        )), 400
-
-    result = vv_instance.TedsFromURN(urn)
-
-    # Format the TEDS data using the single channel formatter
-    # Use channel index -1 to indicate this is URN-based data (no specific channel)
-    formatted_result = format_single_channel_teds(result, -1)
-
-    if 'transducer' in formatted_result:
-        return jsonify(success_response(
-            {
-                'transducer': formatted_result['transducer'],
-                'urn': urn,
-                'success': True
-            },
-            f"Formatted TEDS information retrieved for URN: {urn}"
-        ))
-    else:
-        return jsonify(success_response(
-            {
-                'error': formatted_result['error'],
-                'urn': urn,
-                'success': False
-            },
-            f"TEDS error for URN {urn}: {formatted_result['error']['error']}"
-        ))
 
 

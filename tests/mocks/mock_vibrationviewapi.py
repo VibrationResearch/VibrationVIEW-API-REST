@@ -63,6 +63,7 @@ class MockVibrationVIEW:
         self.IsRunning = MagicMock(side_effect=lambda: self._is_running)
         self.Teds = MagicMock()
         self.TedsFromURN = MagicMock()
+        self.TedsRead = MagicMock(return_value=[])
         self.GetHardwareInputChannels = MagicMock(return_value=4)
         self.GetHardwareOutputChannels = MagicMock(return_value=2)
         

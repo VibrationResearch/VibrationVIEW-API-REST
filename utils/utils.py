@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import uuid
 import math
@@ -292,6 +293,30 @@ def is_default_template_filename(filename):
         bool: True if filename matches a default template, False otherwise
     """
     return filename.lower() in DEFAULT_TEMPLATE_FILENAMES
+
+
+# URN pattern: exactly 16 hexadecimal characters (e.g., "3C00000186B96114")
+URN_PATTERN = re.compile(r'^[0-9A-Fa-f]{16}$')
+
+
+def is_valid_urn(value):
+    """
+    Check if a value is a valid TEDS URN (16-digit hex string).
+
+    Args:
+        value: The value to check
+
+    Returns:
+        bool: True if value is a valid URN (16 hex digits), False otherwise
+
+    Examples:
+        is_valid_urn("3C00000186B96114")  # True
+        is_valid_urn("ABC123")            # False (too short)
+        is_valid_urn("No TEDS data")      # False (not hex)
+    """
+    if not isinstance(value, str):
+        return False
+    return bool(URN_PATTERN.match(value.strip()))
 
 
 def sanitize_nan(value):

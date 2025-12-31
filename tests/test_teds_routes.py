@@ -320,111 +320,202 @@ class TestTEDSRoutes:
         
         print("✓ TEDS documentation is complete!")
 
-    def test_tedsfromurn_success(self, client, mock_vv):
-        """Test GET /tedsfromurn with valid URN"""
-        # Configure mock
+    # -------------------------------------------------------------------------
+    # /tedsread tests
+    # -------------------------------------------------------------------------
+
+    def test_tedsread_with_valid_urns(self, client, mock_vv):
+        """Test GET /tedsread returns transducer parameters for valid URNs"""
+        # Configure TedsRead to return list of URNs (16-digit hex strings)
+        raw_values = ["3C00000186B96114", "4D00000286C97225"]
+        mock_vv.TedsRead.return_value = raw_values
+
+        # Configure TedsFromURN to return TEDS data for each URN
         mock_teds_data = [
-            {'sensitivity': 100.0, 'units': 'mV/g', 'serial_number': 'SN123456'},
-            {'frequency_range': '1-1000 Hz', 'calibration_date': '2024-01-15'}
+            ['Manufacturer', 'PCB Piezotronics', ''],
+            ['Model number', '352C33', ''],
+            ['Sensitivity', '100.0', 'mV/g'],
+            ['Serial number', 'SN12345', '']
         ]
         mock_vv.TedsFromURN.return_value = mock_teds_data
         mock_vv.clear_method_calls()
 
-        urn = "test_urn_123456"
-        response = client.get(f'/api/v1/tedsfromurn?{urn}')
-
-        if response.status_code == 404:
-            pytest.skip("Route /api/v1/tedsfromurn not found")
+        response = client.get('/api/v1/tedsread')
 
         assert response.status_code == 200
         data = json.loads(response.data)
 
         assert data['success'] is True
-        assert data['data']['urn'] == urn
-        assert data['data']['success'] is True
-        # The response contains formatted transducer data, not raw result
-        assert 'transducer' in data['data']
+        assert data['data']['channel_count'] == 2
+        assert data['data']['transducer_count'] == 2
+        assert len(data['data']['channels']) == 2
 
-        # Verify VibrationVIEW was called with correct URN
-        assert mock_vv.TedsFromURN.called, "TedsFromURN method was not called"
-        mock_vv.TedsFromURN.assert_called_with(urn)
+        # Verify channels are in order with transducer data expanded
+        for i, channel in enumerate(data['data']['channels']):
+            assert channel['channel'] == i + 1
+            assert channel['raw_value'] == raw_values[i]
+            assert 'transducer' in channel
+            assert channel['transducer']['urn'] == raw_values[i]
+            assert 'manufacturer' in channel['transducer']
 
-        print("✓ GET /tedsfromurn with valid URN works!")
+        # Verify TedsFromURN was called for each valid URN
+        assert mock_vv.TedsFromURN.call_count == 2
 
-    def test_tedsfromurn_missing_urn(self, client, mock_vv):
-        """Test GET /tedsfromurn without URN parameter"""
-        response = client.get('/api/v1/tedsfromurn')
+    def test_tedsread_mixed_valid_invalid(self, client, mock_vv):
+        """Test GET /tedsread with mix of valid URNs and invalid values"""
+        # Channel 1: valid URN (16-digit hex), Channel 2: no TEDS, Channel 3: valid URN, Channel 4: error
+        raw_values = ["3C00000186B96114", "No TEDS data", "4D00000286C97225", "Error: sensor not found"]
+        mock_vv.TedsRead.return_value = raw_values
 
-        if response.status_code == 404:
-            pytest.skip("Route /api/v1/tedsfromurn not found")
-
-        assert response.status_code == 400
-        data = json.loads(response.data)
-
-        assert data['success'] is False
-        assert data['error']['message'] == 'Missing required query parameter: urn'
-        assert data['error']['code'] == 'MISSING_PARAMETER'
-
-        print("✓ GET /tedsfromurn rejects missing URN correctly!")
-
-    def test_tedsfromurn_empty_urn(self, client, mock_vv):
-        """Test GET /tedsfromurn with empty URN parameter"""
-        response = client.get('/api/v1/tedsfromurn?')
-
-        if response.status_code == 404:
-            pytest.skip("Route /api/v1/tedsfromurn not found")
-
-        assert response.status_code == 400
-        data = json.loads(response.data)
-
-        assert data['success'] is False
-        # With empty query string, it's treated as missing parameter
-        assert data['error']['message'] == 'Missing required query parameter: urn'
-        assert data['error']['code'] == 'MISSING_PARAMETER'
-
-        print("✓ GET /tedsfromurn rejects empty URN correctly!")
-
-    def test_tedsfromurn_com_error(self, client, mock_vv):
-        """Test GET /tedsfromurn when VibrationVIEW raises an exception"""
-        # Configure mock to raise exception
-        mock_vv.TedsFromURN.side_effect = Exception("URN not found in database")
-
-        urn = "invalid_urn_999"
-        response = client.get(f'/api/v1/tedsfromurn?{urn}')
-
-        if response.status_code == 404:
-            pytest.skip("Route /api/v1/tedsfromurn not found")
-
-        assert response.status_code == 500
-        data = json.loads(response.data)
-
-        assert data['success'] is False
-        assert 'URN not found in database' in data['error']['raw']
-
-        print("✓ GET /tedsfromurn handles COM errors correctly!")
-
-    def test_tedsfromurn_special_characters(self, client, mock_vv):
-        """Test GET /tedsfromurn with URN containing special characters"""
-        # Configure mock
-        mock_teds_data = [{'sensitivity': 50.0, 'units': 'mV/g'}]
+        mock_teds_data = [
+            ['Manufacturer', 'PCB', ''],
+            ['Sensitivity', '100.0', 'mV/g']
+        ]
         mock_vv.TedsFromURN.return_value = mock_teds_data
         mock_vv.clear_method_calls()
 
-        urn = "urn-with-dashes_and_underscores.123"
-        response = client.get(f'/api/v1/tedsfromurn?{urn}')
-
-        if response.status_code == 404:
-            pytest.skip("Route /api/v1/tedsfromurn not found")
+        response = client.get('/api/v1/tedsread')
 
         assert response.status_code == 200
         data = json.loads(response.data)
 
         assert data['success'] is True
-        assert 'transducer' in data['data']  # Formatted response, not raw result
-        assert data['data']['urn'] == urn
+        assert data['data']['channel_count'] == 4
+        assert data['data']['transducer_count'] == 2  # Only 2 valid URNs
 
-        # Verify VibrationVIEW was called with correct URN
-        mock_vv.TedsFromURN.assert_called_with(urn)
+        # Channel 1: has transducer
+        assert data['data']['channels'][0]['channel'] == 1
+        assert data['data']['channels'][0]['raw_value'] == "3C00000186B96114"
+        assert 'transducer' in data['data']['channels'][0]
 
-        print("✓ GET /tedsfromurn handles special characters in URN correctly!")
+        # Channel 2: no TEDS - just raw value, no transducer
+        assert data['data']['channels'][1]['channel'] == 2
+        assert data['data']['channels'][1]['raw_value'] == "No TEDS data"
+        assert 'transducer' not in data['data']['channels'][1]
+
+        # Channel 3: has transducer
+        assert data['data']['channels'][2]['channel'] == 3
+        assert 'transducer' in data['data']['channels'][2]
+
+        # Channel 4: error value - just raw value, no transducer
+        assert data['data']['channels'][3]['channel'] == 4
+        assert data['data']['channels'][3]['raw_value'] == "Error: sensor not found"
+        assert 'transducer' not in data['data']['channels'][3]
+
+        # TedsFromURN only called for valid URNs
+        assert mock_vv.TedsFromURN.call_count == 2
+
+    def test_tedsread_empty_result(self, client, mock_vv):
+        """Test GET /tedsread with no channels returned"""
+        mock_vv.TedsRead.return_value = []
+        mock_vv.clear_method_calls()
+
+        response = client.get('/api/v1/tedsread')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data['success'] is True
+        assert data['data']['channels'] == []
+        assert data['data']['channel_count'] == 0
+        assert data['data']['transducer_count'] == 0
+
+    def test_tedsread_single_urn_string(self, client, mock_vv):
+        """Test GET /tedsread when TedsRead returns a single string URN"""
+        urn = "5E00000386D08336"  # Valid 16-digit hex URN
+        mock_vv.TedsRead.return_value = urn
+
+        mock_teds_data = [
+            ['Manufacturer', 'Bruel & Kjaer', ''],
+            ['Sensitivity', '50.0', 'mV/g']
+        ]
+        mock_vv.TedsFromURN.return_value = mock_teds_data
+        mock_vv.clear_method_calls()
+
+        response = client.get('/api/v1/tedsread')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data['success'] is True
+        assert data['data']['channel_count'] == 1
+        assert data['data']['transducer_count'] == 1
+        assert data['data']['channels'][0]['channel'] == 1
+        assert data['data']['channels'][0]['raw_value'] == urn
+        assert data['data']['channels'][0]['transducer']['urn'] == urn
+
+    def test_tedsread_urn_lookup_error(self, client, mock_vv):
+        """Test GET /tedsread when TedsFromURN fails for some URNs"""
+        # All valid 16-digit hex URNs, but one will fail lookup
+        raw_values = ["6F00000487E19447", "7000000588F20558", "8100000689003669"]
+        mock_vv.TedsRead.return_value = raw_values
+
+        # Configure TedsFromURN to fail for the second URN
+        def teds_from_urn_side_effect(urn):
+            if urn == "7000000588F20558":
+                raise Exception("URN not found in database")
+            return [
+                ['Manufacturer', 'Test Mfg', ''],
+                ['Sensitivity', '100.0', 'mV/g']
+            ]
+
+        mock_vv.TedsFromURN.side_effect = teds_from_urn_side_effect
+        mock_vv.clear_method_calls()
+
+        response = client.get('/api/v1/tedsread')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data['success'] is True
+        assert data['data']['transducer_count'] == 2  # 2 successful lookups
+        assert data['data']['channel_count'] == 3
+
+        # Channel 1: success
+        assert 'transducer' in data['data']['channels'][0]
+
+        # Channel 2: error during lookup
+        assert data['data']['channels'][1]['raw_value'] == "7000000588F20558"
+        assert 'error' in data['data']['channels'][1]
+        assert "URN not found" in data['data']['channels'][1]['error']
+        assert 'transducer' not in data['data']['channels'][1]
+
+        # Channel 3: success
+        assert 'transducer' in data['data']['channels'][2]
+
+    def test_tedsread_post_method(self, client, mock_vv):
+        """Test POST /tedsread also works"""
+        mock_vv.TedsRead.return_value = ["920000078A11477A"]  # Valid 16-digit hex URN
+        mock_vv.TedsFromURN.return_value = [['Sensitivity', '75.0', 'mV/g']]
+        mock_vv.clear_method_calls()
+
+        response = client.post('/api/v1/tedsread')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['success'] is True
+        assert data['data']['transducer_count'] == 1
+        assert data['data']['channel_count'] == 1
+
+    def test_is_valid_urn_function(self, client, mock_vv):
+        """Test the is_valid_urn utility function"""
+        from utils.utils import is_valid_urn
+
+        # Valid URNs (exactly 16 hex digits)
+        assert is_valid_urn("3C00000186B96114") is True
+        assert is_valid_urn("0000000000000000") is True
+        assert is_valid_urn("FFFFFFFFFFFFFFFF") is True
+        assert is_valid_urn("abcdef0123456789") is True  # lowercase hex
+        assert is_valid_urn("AbCdEf0123456789") is True  # mixed case
+
+        # Invalid URNs
+        assert is_valid_urn("") is False                  # empty
+        assert is_valid_urn("ABC123") is False            # too short
+        assert is_valid_urn("3C00000186B961140") is False  # too long (17 digits)
+        assert is_valid_urn("No TEDS data") is False      # not hex
+        assert is_valid_urn("Error: not found") is False  # error message
+        assert is_valid_urn("urn:123:abc") is False       # old format
+        assert is_valid_urn(None) is False                # None
+        assert is_valid_urn(12345) is False               # not a string
+        assert is_valid_urn("  3C00000186B96114  ") is True  # with whitespace (stripped)
         
