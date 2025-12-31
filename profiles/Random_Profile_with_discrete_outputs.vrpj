@@ -1,389 +1,691 @@
 {
-    "Version": "1.0.0",
-    "Writer": "VibrationVIEW-2025.0.0000.09999-7cf03e2207",
+    "Version": "2025.1",
+    "Writer": "VibrationVIEW-2025.4.3-f65f336d6",
     "TestType": "Random",
     "ActiveChannels": 16,
     "TestDefinition": {
-        "Loops": [
-            {
-                "Index": 1,
-                "Label": "Loop 1",
-                "ControlUnit": "G"
-            }
-        ],
+        "ControlUnit": "G",
         "Schedule": [
             {
-                "Index": 1,
-                "Table": {
-                    "Levels": [
-                        {
-                            "Type": "Run",
-                            "Duration": {
-                                "Value": 3600,
-                                "Unit": "sec"
-                            },
-                            "Modifier": {
-                                "Value": 1,
-                                "Unit": "G"
-                            },
-                            "MemorizedDrive": false
-                        }
-                    ]
-                }
+                "Type": "Run",
+                "Duration": {
+                    "Value": 3600,
+                    "Unit": "sec"
+                },
+                "Modifier": {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                "MemorizedDrive": false,
+                "DigitalOutputs": [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true
+                ]
             }
         ],
-        "Profile": {
-            "BreakpointTable": {
-                "FrequencyUnit": "Hz",
-                "AmplitudeUnit": "G²/Hz",
-                "Breakpoints": [
-                    {
-                        "Frequency": 20,
-                        "Amplitude": 0.01004755
-                    },
-                    {
-                        "Frequency": 80,
-                        "Amplitude": 0.04
-                    },
-                    {
-                        "Frequency": 350,
-                        "Amplitude": 0.04
-                    },
-                    {
-                        "Frequency": 2000,
-                        "Amplitude": 0.007041871
-                    }
-                ]
+        "Table": {
+            "FrequencyUnit": "Hz",
+            "AmplitudeUnit": "G²/Hz",
+            "Breakpoints": [
+                {
+                    "Frequency": 20,
+                    "Amplitude": 0.01004755
+                },
+                {
+                    "Frequency": 80,
+                    "Amplitude": 0.04
+                },
+                {
+                    "Frequency": 350,
+                    "Amplitude": 0.04
+                },
+                {
+                    "Frequency": 2000,
+                    "Amplitude": 0.007041871
+                }
+            ]
+        },
+        "Tolerances": {
+            "ChannelTolerancesEnabled": false,
+            "IndividualTolerancesEnabled": false,
+            "SlopedTolAbortLines": false,
+            "PlusTol": {
+                "Value": 3,
+                "Unit": "dB"
             },
-            "Tolerances": {
-                "FrequencyUnit": "Hz",
-                "AmplitudeUnit": "G²/Hz",
-                "ControlUnit": "G",
-                "AbortUnit": "dB",
-                "ChannelTolerancesEnabled": false,
-                "IndividualTolerancesEnabled": false,
-                "SlopedTolAbortLines": false,
-                "Segments": [
-                    {
-                        "Frequency": 20,
-                        "Amplitude": 0.01004755,
-                        "Slope": 2.9999991,
-                        "PlusTol": 3,
-                        "MinusTol": 3,
-                        "PlusAbort": 6,
-                        "MinusAbort": 6
-                    },
-                    {
-                        "Frequency": 80,
-                        "Amplitude": 0.04,
-                        "Slope": 0,
-                        "PlusTol": 3,
-                        "MinusTol": 3,
-                        "PlusAbort": 6,
-                        "MinusAbort": 6
-                    },
-                    {
-                        "Frequency": 350,
-                        "Amplitude": 0.04,
-                        "Slope": -2.9999999,
-                        "PlusTol": 3,
-                        "MinusTol": 3,
-                        "PlusAbort": 6,
-                        "MinusAbort": 6
-                    },
-                    {
-                        "Frequency": 2000,
-                        "Amplitude": 0.007041871
-                    }
-                ]
+            "MinusTol": {
+                "Value": 3,
+                "Unit": "dB"
             },
-            "Parameters": {
-                "SampleRate": {
-                    "Value": 8192,
+            "PlusAbort": {
+                "Value": 6,
+                "Unit": "dB"
+            },
+            "MinusAbort": {
+                "Value": 6,
+                "Unit": "dB"
+            }
+        },
+        "Limits": {
+            "StartupLimits": {
+                "MaxSystemGain": {
+                    "Value": 5,
+                    "Unit": "Volts/G"
+                },
+                "OutputThreshold": {
+                    "Value": 0.005,
+                    "Unit": "Volts"
+                }
+            },
+            "RunningLimits": {
+                "MaxSystemGain": {
+                    "Value": 5,
+                    "Unit": "Volts/G"
+                },
+                "MaxOutput": {
+                    "Value": 1,
+                    "Unit": "Volts",
+                    "Type": "RMS"
+                }
+            },
+            "FirstDriveCheck": {
+                "Value": 20,
+                "Unit": "%"
+            },
+            "SecondDriveCheck": {
+                "Value": 50,
+                "Unit": "%"
+            },
+            "UseSystemDriveCheck": true,
+            "UseSystemThreshold": true,
+            "DisableAbortOnOutputLimit": false,
+            "MonitoredStartup": {
+                "StartWithProjectedLevels": false,
+                "StartUsingManualControl": false,
+                "InitialLevel": {
+                    "Value": -24,
+                    "Unit": "dB"
+                },
+                "StepSize": {
+                    "Value": 6,
+                    "Unit": "dB"
+                }
+            }
+        },
+        "Parameters": {
+            "SampleRate": {
+                "Value": 8192,
+                "Unit": "Hz"
+            },
+            "AutoSampleRate": true,
+            "Lines": 800,
+            "AutoLines": false,
+            "Oversampling": 1,
+            "AutoOversampling": false,
+            "UpdateRate": 1,
+            "AutoUpdateRate": false,
+            "WindowType": "Blackman",
+            "AbortRate": {
+                "Value": 60,
+                "Unit": "dB/s"
+            },
+            "StartupParams": {
+                "Gain": 0.5,
+                "Time": {
+                    "Value": 15,
+                    "Unit": "sec"
+                }
+            },
+            "RunningParams": {
+                "DOF": 80,
+                "Gain": 0.05,
+                "SlewRate": {
+                    "Value": 20,
+                    "Unit": "dB/s"
+                }
+            },
+            "Analyzer": {
+                "AnalysisDOF": 80,
+                "AnalysisAlgorithm": "H1",
+                "iDOF": {
+                    "Enabled": false,
+                    "EffectiveDOF": 10000
+                }
+            },
+            "SigmaClipping": {
+                "Method": "No clipping",
+                "Level": 6
+            },
+            "Kurtosis": {
+                "Demand": 3,
+                "Corner": {
+                    "Value": 100,
                     "Unit": "Hz"
                 },
-                "AutoSampleRate": true,
-                "Lines": 800,
-                "AutoLines": false,
-                "Oversampling": 1,
-                "AutoOversampling": false,
-                "UpdateRate": 1,
-                "AutoUpdateRate": false,
-                "WindowType": "Blackman",
-                "AbortRate": {
-                    "Value": 60,
-                    "Unit": "dB/sec"
-                },
-                "StartupParams": {
-                    "Gain": 0.5,
-                    "Time": {
-                        "Value": 15,
-                        "Unit": "sec"
-                    }
-                },
-                "RunningParams": {
-                    "DOF": 80,
-                    "Gain": 0.05,
-                    "SlewRate": {
-                        "Value": 20,
-                        "Unit": "dB/sec"
-                    }
-                },
-                "Analyzer": {
-                    "AnalysisDOF": 80,
-                    "AnalysisAlgorithm": "H1",
-                    "iDOF": {
-                        "Enabled": false,
-                        "EffectiveDOF": 10000
-                    }
-                },
-                "SigmaClipping": {
-                    "Method": "No clipping",
-                    "Level": 6
-                },
-                "Loops": [
-                    {
-                        "Index": 1,
-                        "Kurtosis": {
-                            "Demand": 3,
-                            "Corner": {
-                                "Value": 100,
-                                "Unit": "Hz"
-                            },
-                            "Gain": 0.05,
-                            "Rate": 0,
-                            "Timing": 0,
-                            "Amplitude": 0
-                        }
-                    }
-                ]
-            },
-            "NotchAbort": {
-                "Loops": [
-                    {
-                        "Index": 1,
-                        "ExtremalLimits": "none",
-                        "MathTraceNotches": []
-                    }
-                ]
+                "Gain": 0.05,
+                "Rate": 0,
+                "Timing": 0,
+                "Amplitude": 0
             }
         },
         "Channels": {
             "ForcedInputConfiguration": "",
             "MultiLoopControl": "Uncorrelated",
             "SeparateSoRControl": false,
-            "ControlChannelCombination": "Average of selected channels",
-            "Loops": [
+            "ControlChannelCombination": "Average",
+            "ChannelProperties": [
                 {
                     "Index": 1,
-                    "ChannelProperties": [
-                        {
-                            "Index": 1,
-                            "ControlChannel": true,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": true,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 9
-                        },
-                        {
-                            "Index": 2,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 9
-                        },
-                        {
-                            "Index": 3,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 9
-                        },
-                        {
-                            "Index": 4,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 9
-                        },
-                        {
-                            "Index": 5,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 6,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 7,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 8,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 9,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 10,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 11,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 12,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 13,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 14,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 15,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        },
-                        {
-                            "Index": 16,
-                            "ControlChannel": false,
-                            "Weighting": 1,
-                            "SystemLimitsEnabled": false,
-                            "RMSLimitsEnabled": false,
-                            "PlusAbort": 6,
-                            "MinusAbort": 6
-                        }
-                    ]
+                    "ControlChannel": true,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": true,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 9.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 2,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 9.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 3,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 9.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 4,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 9.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 5,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 6,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 7,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 8,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 9,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 10,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 11,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 12,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 13,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 14,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 15,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
+                },
+                {
+                    "Index": 16,
+                    "ControlChannel": false,
+                    "Weighting": 1.0,
+                    "SystemLimitsEnabled": false,
+                    "RMSLimitsEnabled": false,
+                    "PlusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    },
+                    "MinusAbort": {
+                        "Value": 6.0,
+                        "Unit": "dB"
+                    }
                 }
             ]
+        },
+        "NotchAbort": {
+            "MathTraceNotches": []
+        },
+        "DataStorage": {
+            "DataStorageDirectory": "",
+            "MatchReportDirectoryToData": false,
+            "ReportStorageDirectory": "",
+            "DataFileNameFormat": "",
+            "MatchReportNameToData": true,
+            "ReportFileNameFormat": "",
+            "PromptForRunName": false,
+            "GraphLayout": "",
+            "SaveOnLevel": false,
+            "SaveAtEndOfTest": true,
+            "SaveOnTime": false,
+            "TimeInterval": {
+                "Value": 10,
+                "Unit": "min"
+            },
+            "SaveOnSweep": false,
+            "SweepInterval": 10,
+            "SaveOnCycles": false,
+            "CyclesInterval": 20000,
+            "AnnotationLines": [
+                "",
+                "",
+                ""
+            ],
+            "Prompts": [
+                "Note 1",
+                "Note 2",
+                "Note 3"
+            ]
+        },
+        "PreTest": {
+            "Enabled": false,
+            "AutoFrequency": true,
+            "Frequencies": [
+                {
+                    "Value": 20,
+                    "Unit": "Hz"
+                },
+                {
+                    "Value": 20,
+                    "Unit": "Hz"
+                },
+                {
+                    "Value": 2000,
+                    "Unit": "Hz"
+                },
+                {
+                    "Value": 2000,
+                    "Unit": "Hz"
+                }
+            ],
+            "Slopes": [
+                {
+                    "Value": 6,
+                    "Unit": "dB/oct"
+                },
+                {
+                    "Value": -12,
+                    "Unit": "dB/oct"
+                }
+            ],
+            "Durations": [
+                {
+                    "Value": 10,
+                    "Unit": "sec"
+                },
+                {
+                    "Value": 10,
+                    "Unit": "sec"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "sec"
+                }
+            ],
+            "PreTestAmplitude": {
+                "Value": 0.0099999998,
+                "Unit": "Volts",
+                "Type": "RMS"
+            },
+            "Amplitudes": [
+                {
+                    "Value": 9.9999998e-05,
+                    "Unit": "Volts",
+                    "Type": "RMS"
+                },
+                {
+                    "Value": 0.0099999998,
+                    "Unit": "Volts",
+                    "Type": "RMS"
+                },
+                {
+                    "Value": 9.9999998e-05,
+                    "Unit": "Volts",
+                    "Type": "RMS"
+                }
+            ],
+            "AmplitudeSlopes": [
+                {
+                    "Value": 2,
+                    "Unit": "dB/s"
+                },
+                {
+                    "Value": -20,
+                    "Unit": "dB/s"
+                }
+            ],
+            "ChannelsEnabled": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+            ],
+            "ChannelLimits": [
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 1,
+                    "Unit": "G"
+                }
+            ],
+            "ChannelAborts": [
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                },
+                {
+                    "Value": 2,
+                    "Unit": "G"
+                }
+            ],
+            "PreTestReport": ""
         }
     },
-    "Units": {
-        "UnitDefinitions": {
-            "Categories": [],
-            "Units": []
-        },
-        "DataUnits": [
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "Pa",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G"
-        ],
-        "LimitUnits": [
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G"
-        ],
-        "PretestUnits": [
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G",
-            "G"
-        ]
+    "UnitDefinitions": {
+        "Categories": [],
+        "Units": []
     }
 }
