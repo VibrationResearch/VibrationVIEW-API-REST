@@ -132,9 +132,18 @@ def app(mock_vv_manager_with_api):
     if create_app is None:
         pytest.skip("Cannot create app - missing dependencies")
 
+    # CRITICAL: Set the mock instance BEFORE create_app() because early binding
+    # calls get_vv_instance() inside create_app()
+    from app import set_vv_instance, reset_vv_instance
+    set_vv_instance(mock_vv_manager_with_api)
+
     app = create_app(TestingConfig or object())
     app.config['TESTING'] = True
-    return app
+
+    yield app
+
+    # Cleanup after test
+    reset_vv_instance()
 
 @pytest.fixture
 def client(app):

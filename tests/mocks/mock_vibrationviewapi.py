@@ -41,6 +41,9 @@ class MockVibrationVIEW:
         # Connection state
         self._connected = False
 
+        # Mock the vv COM object (used by get_vv_instance() to verify connection)
+        self.vv = MagicMock()
+
         # Initialize all MagicMock methods
         self._init_magic_mocks()
 
