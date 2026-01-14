@@ -84,9 +84,16 @@ def set_vv_instance(instance):
         _vv_instance = instance
 
 def reset_vv_instance():
-    """Reset the VibrationVIEW instance - useful for testing cleanup"""
+    """Reset the VibrationVIEW instance - releases COM object and clears singleton"""
     global _vv_instance
     with _vv_lock:
+        if _vv_instance is not None:
+            try:
+                # Delete instance - lets Python/COM release the object
+                del _vv_instance
+                print("VibrationVIEW COM object released")
+            except Exception as e:
+                print(f"Error releasing VibrationVIEW COM object: {e}")
         _vv_instance = None
 
 def create_app(config_class=Config):
@@ -276,22 +283,25 @@ def create_app(config_class=Config):
             'error': 'Internal server error',
             'message': 'An unexpected error occurred'
         }), 500
-    
+
+    # Early binding: Create VibrationVIEW instance at startup
+    logger.info("Initializing VibrationVIEW connection (early binding)...")
+    vv = get_vv_instance()
+    if vv is None:
+        logger.error("Failed to connect to VibrationVIEW at startup")
+        raise RuntimeError("Failed to connect to VibrationVIEW - ensure VibrationVIEW is running")
+    logger.info("VibrationVIEW connection established successfully")
+
     return app
 
 if __name__ == '__main__':
-    # Simple connection test
-    print("Testing VibrationVIEW connection...")
-    test_instance = get_vv_instance()
-    if test_instance is None:
-        print("Failed to initialize VibrationVIEW. Exiting.")
-        exit(-1)
-    else:
-        print("VibrationVIEW connection test successful")
-    
-    # Create and run app
+    # Create app (early binding happens in create_app)
     print("Starting Flask server...")
-    app = create_app()
+    try:
+        app = create_app()
+    except RuntimeError as e:
+        print(f"Failed to initialize: {e}")
+        exit(-1)
     
     import argparse
     
