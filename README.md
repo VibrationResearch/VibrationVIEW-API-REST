@@ -12,6 +12,12 @@ A comprehensive, modular REST interface providing 1:1 functionality with Vibrati
 - **GET-First Design**: Prioritizes GET requests with URL parameters for simplicity
 - **Bulk Operations**: Efficient batch operations for data retrieval and reporting
 
+## Requirements
+
+- Windows operating system (compatible with Windows 10 and Windows 11)
+- VibrationVIEW software installed
+- VibrationVIEW automation option (VR9604) - OR - VibrationVIEW may be run in Simulation mode without any additional hardware or software
+- Python 3.7 or higher
 ## Quick Start
 
 ### 1. Install Dependencies
