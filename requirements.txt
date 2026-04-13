@@ -9,3 +9,4 @@ pytest>=7.4.2
 pytest-flask>=1.2.0
 requests>=2.31.0
 vibrationview_api>=0.1.7
+waitress>=3.0.0
