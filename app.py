@@ -302,24 +302,29 @@ if __name__ == '__main__':
     except RuntimeError as e:
         print(f"Failed to initialize: {e}")
         exit(-1)
-    
+
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='VibrationVIEW Flask REST API')
     parser.add_argument('--host', default='127.0.0.1', help='Host address')
     parser.add_argument('--port', type=int, default=5000, help='Port number')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
     parser.add_argument('--config', default='development', help='Configuration environment')
-    
+
     args = parser.parse_args()
 
     logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
     logger.info(f"Configuration: {args.config}")
     logger.info(f"API documentation: http://{args.host}:{args.port}/api/v1/docs")
     logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/v1/docs/basic_control")
-    
+
     try:
-        app.run(host=args.host, port=args.port, debug=args.debug, threaded=False)
+        if args.debug:
+            app.run(host=args.host, port=args.port, debug=True, threaded=False)
+        else:
+            from waitress import serve
+            print(f"Serving with Waitress on http://{args.host}:{args.port}")
+            serve(app, host=args.host, port=args.port, threads=1)
     except KeyboardInterrupt:
         print("\nShutting down...")
     except Exception as e:
