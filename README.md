@@ -25,13 +25,19 @@ A comprehensive, modular REST interface providing 1:1 functionality with Vibrati
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment
+### 2. Configure VibrationVIEW
+VibrationVIEW must be installed and configured, but does not need to be running before starting the server.
+
+- **With hardware**: Configure VibrationVIEW for your controller
+- **Demo/Simulation mode**: Download and install from https://vibrationresearch.com/download-demo/. When prompted, request a demo activation code. Once activated, you can run simulated tests without a physical controller.
+
+### 3. Configure Environment
 ```bash
 copy .env.example .env
 # Edit .env with your VibrationVIEW settings
 ```
 
-### 3. Start the Server
+### 4. Start the Server
 ```bash
 # Development mode
 python app.py --host 0.0.0.0 --port 5000 --debug
@@ -40,7 +46,7 @@ python app.py --host 0.0.0.0 --port 5000 --debug
 python app.py --host 0.0.0.0 --port 5000
 ```
 
-### 4. Access Documentation
+### 5. Access Documentation
 - **Main API Docs**: `http://localhost:5000/api/v1/docs`
 - **Health Check**: `http://localhost:5000/api/v1/health`
 - **Module-Specific Docs**: `http://localhost:5000/api/v1/docs/{module_name}`
