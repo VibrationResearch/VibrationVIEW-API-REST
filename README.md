@@ -424,6 +424,12 @@ curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
 
 ## Configuration
 
+### Secret Key
+The `SECRET_KEY` is not currently required — the API is stateless and does not use sessions, cookies, or CSRF protection. However, it is pre-configured in `.env` in case future features (authentication, sessions, Flask extensions) need it. To generate a random key:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
