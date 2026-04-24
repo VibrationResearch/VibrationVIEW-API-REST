@@ -61,10 +61,10 @@ clean:
 
 # Server
 dev-server:
-	python app.py --debug --host 0.0.0.0 --port 5000
+	python app.py --debug --host 127.0.0.1 --port 5000
 
 prod-server:
-	python app.py --host 0.0.0.0 --port 5000
+	python app.py --host 127.0.0.1 --port 5000
 
 # Documentation
 docs:
