@@ -21,6 +21,14 @@ A comprehensive, modular REST interface providing 1:1 functionality with Vibrati
 ## Quick Start
 
 ### 1. Install Dependencies
+
+**Option A: Using batch file (recommended for offline deployment)**
+```bash
+setup.bat
+```
+This creates a virtual environment, installs all dependencies from the local `vendor/` folder (no internet required), and creates a `.env` file from `.env.example`. Use `setup.bat --start` to set up and immediately start the server.
+
+**Option B: Using pip directly**
 ```bash
 pip install -r requirements.txt
 ```
@@ -38,6 +46,15 @@ copy .env.example .env
 ```
 
 ### 4. Start the Server
+
+**Option A: Using batch file**
+```bash
+start.bat                    # defaults: port 5000
+start.bat --port 8080        # custom port
+start.bat --debug            # enable debug mode
+```
+
+**Option B: Using Python directly**
 ```bash
 # Development mode
 python app.py --host 0.0.0.0 --port 5000 --debug
