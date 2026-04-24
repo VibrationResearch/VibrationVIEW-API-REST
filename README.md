@@ -18,17 +18,37 @@ A comprehensive, modular REST interface providing 1:1 functionality with Vibrati
 - VibrationVIEW software installed
 - VibrationVIEW automation option (VR9604) - OR - VibrationVIEW may be run in Simulation mode without any additional hardware or software
 - Python 3.7 or higher
+
+## Offline Deployment
+
+If the target machine has no internet access, use `prepare-offline.ps1` on a machine that does to create a self-contained deployment zip.
+
+### 1. Prepare the package (on a machine with internet)
+```powershell
+.\prepare-offline.ps1
+```
+This downloads all Python dependencies into a `vendor/` folder and packages everything into `VibrationVIEW-API.zip`. You can customize the output name:
+```powershell
+.\prepare-offline.ps1 -ZipName "MyDeployment.zip"
+```
+
+### 2. Deploy (on the target machine)
+Copy the zip to the target machine, extract it, and run:
+```cmd
+setup.bat
+```
+This creates a virtual environment, installs all dependencies from the bundled `vendor/` folder (no internet required), and creates a `.env` file from `.env.example`. Use `setup.bat --start` to set up and immediately start the server.
+
 ## Quick Start
 
 ### 1. Install Dependencies
 
 **Option A: Using batch file (recommended for offline deployment)**
-```bash
+```cmd
 setup.bat
 ```
-This creates a virtual environment, installs all dependencies from the local `vendor/` folder (no internet required), and creates a `.env` file from `.env.example`. Use `setup.bat --start` to set up and immediately start the server.
 
-**Option B: Using pip directly**
+**Option B: Using pip directly (requires internet)**
 ```bash
 pip install -r requirements.txt
 ```
@@ -48,10 +68,10 @@ copy .env.example .env
 ### 4. Start the Server
 
 **Option A: Using batch file**
-```bash
-start.bat                    # defaults: port 5000
-start.bat --port 8080        # custom port
-start.bat --debug            # enable debug mode
+```cmd
+start-api.bat                    # defaults: port 5000
+start-api.bat --port 8080        # custom port
+start-api.bat --debug            # enable debug mode
 ```
 
 **Option B: Using Python directly**
@@ -331,6 +351,12 @@ vibrationview_api/
 ├── app.py                    # Main application with health checks
 ├── config.py                 # Configuration management
 ├── requirements.txt          # Python dependencies
+├── setup.bat                 # Offline setup (Command Prompt)
+├── setup.ps1                 # Offline setup (PowerShell)
+├── start-api.bat             # Start the server (Command Prompt)
+├── prepare-offline.ps1       # Build deployment zip with vendored packages
+├── .env.example              # Environment variable template
+├── SETUP-README.md           # Offline deployment guide (included in zip)
 ├── routes/                   # Route modules (1:1 COM mapping)
 │   ├── __init__.py          # Blueprint exports
 │   ├── basic_control.py     # Core test operations
@@ -338,6 +364,7 @@ vibrationview_api/
 │   ├── data_retrieval.py    # Real-time data access
 │   ├── advanced_control.py  # Advanced test control
 │   ├── advanced_control_sine.py # Sine-specific advanced control
+│   ├── advanced_control_system_check.py # System check controls
 │   ├── hardware_config.py   # Hardware configuration
 │   ├── input_config.py      # Input channel configuration
 │   ├── gui_control.py       # Window management
@@ -346,19 +373,19 @@ vibrationview_api/
 │   ├── report_generation.py # Report/data file generation
 │   ├── virtual_channels.py  # Virtual channel management
 │   ├── log.py               # Event log retrieval
-│   ├── auxinputs.py         # Auxiliary inputs
+│   ├── aux_inputs.py        # Auxiliary inputs
 │   ├── teds.py              # TEDS information
-│   ├── vector_properties.py # Vector metadata
-│   ├── utility.py           # Enums and utilities
+│   ├── vectors_legacy.py    # Vector metadata
 │   └── common.py            # Shared utilities
 ├── utils/                    # Utility modules
 │   ├── vv_manager.py        # VibrationVIEW connection management
 │   ├── response_helpers.py  # Response formatting
 │   ├── decorators.py        # Common decorators
 │   └── utils.py             # General utilities
+├── templates/                # Test profile templates
 ├── tests/                    # Unit tests
-├── docs/                     # Additional documentation
-└── scripts/                  # Utility scripts
+└── docs/                     # Additional documentation
+    └── ENDPOINT-COM-CROSSREF.md  # REST endpoint to COM method cross-reference
 ```
 
 ### Adding New Endpoints
