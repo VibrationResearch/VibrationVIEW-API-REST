@@ -128,3 +128,4 @@ logs/
 *.vvc
 *.md
 /vendor/
+/VibrationVIEW-API.zip
