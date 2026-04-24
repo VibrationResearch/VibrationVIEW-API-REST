@@ -379,13 +379,17 @@ vibrationview_api/
 │   └── common.py            # Shared utilities
 ├── utils/                    # Utility modules
 │   ├── vv_manager.py        # VibrationVIEW connection management
+│   ├── vv_context_manager.py # VibrationVIEW COM context manager
+│   ├── vv_error_codes.py    # VibrationVIEW error code definitions
 │   ├── response_helpers.py  # Response formatting
 │   ├── decorators.py        # Common decorators
+│   ├── path_validator.py    # File path security validation
+│   ├── teds_formatter.py    # TEDS data formatting utilities
 │   └── utils.py             # General utilities
 ├── templates/                # Test profile templates
 ├── tests/                    # Unit tests
 └── docs/                     # Additional documentation
-    └── ENDPOINT-COM-CROSSREF.md  # REST endpoint to COM method cross-reference
+    └── Endpoint-Automation-CrossReference.md  # REST endpoint to Automation method cross-reference
 ```
 
 ### Adding New Endpoints
