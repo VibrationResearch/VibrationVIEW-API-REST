@@ -13,6 +13,7 @@ from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.teds_formatter import format_teds_data, format_single_channel_teds
 from utils.utils import is_valid_urn
+from utils.vv_error_codes import DISP_E_EXCEPTION
 import logging
 from datetime import datetime
 
@@ -355,6 +356,88 @@ def teds(vv_instance):
             )), 500
 
 
+# ---------------------------------------------------------------------------
+# TEDS channel status helpers (used by TedsReadAndApply / TedsVerifyAndApply)
+# ---------------------------------------------------------------------------
+
+def _teds_read_channel_status(vv_instance, expected_urns):
+    """!
+    @brief Read TEDS from hardware and return per-channel status compared to expected URNs.
+
+    Calls TedsRead() and for each channel compares the actual value against
+    the expected URN. Status is "ok" if both are valid URNs and match,
+    "disabled" if the channel is disabled, or "error" otherwise.
+
+    @param vv_instance   VibrationVIEW COM instance
+    @param expected_urns list of expected URN strings (or "disabled") per channel
+    @return list of dicts with 'status', 'expected_urn', and 'urn' keys
+    """
+    raw = vv_instance.TedsRead()
+
+    raw_values = []
+    if isinstance(raw, (list, tuple)):
+        raw_values = list(raw)
+    elif raw is not None:
+        raw_values = [raw]
+
+    channels = []
+    for index, raw_value in enumerate(raw_values):
+        expected = expected_urns[index] if index < len(expected_urns) else None
+        entry = {}
+
+        if isinstance(raw_value, str) and raw_value.strip().lower() == "disabled":
+            entry['status'] = 'disabled'
+        elif is_valid_urn(raw_value):
+            actual_urn = raw_value.strip()
+            entry['urn'] = actual_urn
+            if expected is not None:
+                entry['expected_urn'] = expected
+            if isinstance(expected, str) and is_valid_urn(expected) and actual_urn.upper() == expected.strip().upper():
+                entry['status'] = 'ok'
+            else:
+                entry['status'] = 'error'
+        else:
+            entry['status'] = 'error'
+            if expected is not None:
+                entry['expected_urn'] = expected
+
+        channels.append(entry)
+
+    return channels
+
+
+def _format_result_as_channels(result, expected_urns=None):
+    """!
+    @brief Format a TedsReadAndApply/TedsVerifyAndApply result list into per-channel status.
+
+    Converts the raw COM result into a list of per-channel dicts.
+    Each entry contains a status of "ok", "disabled", or "error",
+    plus the URN and expected URN where applicable.
+
+    @param result       list of URN strings or "Disabled" from COM
+    @param expected_urns optional list of expected URNs (from request body)
+    @return list of dicts with 'status', 'urn', and optionally 'expected_urn'
+    """
+    values = list(result) if isinstance(result, (list, tuple)) else ([result] if result is not None else [])
+    channels = []
+    for index, value in enumerate(values):
+        entry = {}
+        expected = expected_urns[index] if expected_urns and index < len(expected_urns) else None
+        if isinstance(value, str) and value.strip().lower() == "disabled":
+            entry['status'] = 'disabled'
+        elif is_valid_urn(value):
+            entry['status'] = 'ok'
+            entry['urn'] = value.strip()
+            if expected is not None:
+                entry['expected_urn'] = expected
+        else:
+            entry['status'] = 'error'
+            if expected is not None:
+                entry['expected_urn'] = expected
+        channels.append(entry)
+    return channels
+
+
 @teds_bp.route('/tedsreadandapply', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
@@ -366,17 +449,37 @@ def teds_read_and_apply(vv_instance):
     Reads and applies TEDS information for all channels on the hardware.
     This operation will automatically configure channels based on their TEDS data.
 
+    If the COM method raises a data mismatch error, falls back to TedsRead()
+    and returns per-channel status (URN, "disabled", or "error").
+
     No parameters required.
 
     Example: GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply
     """
-    result =  vv_instance.TedsReadAndApply()
+    try:
+        result = vv_instance.TedsReadAndApply()
+    except Exception as e:
+        if getattr(e, 'hresult', None) == DISP_E_EXCEPTION:
+            channels = _teds_read_channel_status(vv_instance, [])
+            urns = [ch['urn'] for ch in channels if 'urn' in ch]
+            return jsonify(success_response(
+                {'result': channels, 'urns': urns, 'urn_count': len(urns)},
+                "TEDS read and apply failed: data mismatch. Channel status retrieved via TedsRead."
+            )), 500
+        raise
+
+    channels = _format_result_as_channels(result)
+    urns = [ch['urn'] for ch in channels if 'urn' in ch]
+    has_errors = any(ch.get('status') == 'error' for ch in channels)
+
+    if has_errors:
+        return jsonify(success_response(
+            {'result': channels, 'urns': urns, 'urn_count': len(urns)},
+            "TEDS read and apply completed with errors: not all channels applied successfully"
+        )), 500
 
     return jsonify(success_response(
-        {
-            'result': result,
-            'success': True
-        },
+        {'result': channels, 'urns': urns, 'urn_count': len(urns)},
         "TEDS read and apply operation completed successfully for all channels"
     ))
 
@@ -431,15 +534,22 @@ def teds_verify_and_apply(vv_instance):
                 'INVALID_URN_TYPE'
             )), 400
 
-    result = vv_instance.TedsVerifyAndApply(urns)
+    try:
+        result = vv_instance.TedsVerifyAndApply(urns)
+    except Exception as e:
+        if getattr(e, 'hresult', None) == DISP_E_EXCEPTION:
+            channels = _teds_read_channel_status(vv_instance, urns)
+            read_urns = [ch['urn'] for ch in channels if 'urn' in ch]
+            return jsonify(success_response(
+                {'result': channels, 'urns': read_urns, 'urn_count': len(read_urns)},
+                "TEDS verify and apply failed: data mismatch. Channel status retrieved via TedsRead."
+            )), 500
+        raise
 
+    channels = _format_result_as_channels(result, urns)
+    result_urns = [ch['urn'] for ch in channels if 'urn' in ch]
     return jsonify(success_response(
-        {
-            'result': result,
-            'urns': urns,
-            'urn_count': len(urns),
-            'success': True
-        },
+        {'result': channels, 'urns': result_urns, 'urn_count': len(result_urns)},
         f"TEDS verify and apply operation completed successfully for {len(urns)} URNs"
     ))
 
