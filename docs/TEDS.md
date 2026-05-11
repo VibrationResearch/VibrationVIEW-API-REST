@@ -15,9 +15,29 @@ Configuring TEDS sensors via the REST API is a multi-step process:
 
 Create a client file `SendConfiguration.vic` with an `[EnableTEDS]` section. This file can also be generated from VibrationVIEW under Configuration > Inputs using the "Save Configuration" button. Sections present in this file will be applied; any missing sections will be unchanged.
 
+TEDS sensors generally require ICP/IEPE power to communicate. The `[Accel Power]` section must be set to `1` for any channel with `[EnableTEDS]` set to `1` or `2`.
+
 ### Example `SendConfiguration.vic`
 
 ```ini
+[Accel Power]
+Ch1=1
+Ch2=1
+Ch3=1
+Ch4=1
+Ch5=1
+Ch6=1
+Ch7=0
+Ch8=0
+Ch9=0
+Ch10=0
+Ch11=0
+Ch12=0
+Ch13=0
+Ch14=0
+Ch15=0
+Ch16=0
+
 [EnableTEDS]
 Ch1=1
 Ch2=1
