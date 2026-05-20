@@ -520,17 +520,6 @@ class TestInputConfig:
     # -------------------------------------------------------------------------
     # InputConfigurationFile tests
     # -------------------------------------------------------------------------
-    def test_inputconfigurationfile_get(self, client):
-        """Test GET /inputconfigurationfile"""
-        self.mock_instance.GetInputConfigurationFile = lambda: "10mv per G.vic"
-
-        response = client.get("/api/v1/inputconfigurationfile")
-
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data["success"] is True
-        assert data["data"]["result"] == "10mv per G.vic"
-
     def test_inputconfigurationfile_post_load_existing(self, client):
         """Test POST /inputconfigurationfile to load existing file by name"""
         self.mock_instance.SetInputConfigurationFile = lambda path: None

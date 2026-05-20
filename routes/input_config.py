@@ -133,12 +133,6 @@ def get_documentation():
                         'POST /api/v1/inputcalibration (with JSON body)'
                     ]
                 },
-                'GET /inputconfigurationfile': {
-                    'description': 'Get current input configuration file name',
-                    'com_method': 'GetInputConfigurationFile()',
-                    'returns': 'str - Current configuration file name',
-                    'example': 'GET /api/v1/inputconfigurationfile'
-                },
                 'POST|PUT /inputconfigurationfile': {
                     'description': 'Upload and load config file, OR load existing by path',
                     'com_method': 'SetInputConfigurationFile(filepath)',
@@ -661,17 +655,14 @@ def input_calibration(vv_instance):
         f"Channel {channel_user} calibration set successfully"
     ))
 
-@input_config_bp.route('/inputconfigurationfile', methods=['GET', 'POST', 'PUT'])
+@input_config_bp.route('/inputconfigurationfile', methods=['POST', 'PUT'])
 @handle_errors
 @with_vibrationview
 def input_configuration_file(vv_instance):
     """
-    Get/Set Input Configuration File
+    Set Input Configuration File
 
-    COM Method: GetInputConfigurationFile() or SetInputConfigurationFile(configName)
-
-    GET: Returns current configuration file name
-        Example: GET /api/v1/inputconfigurationfile
+    COM Method: SetInputConfigurationFile(configName)
 
     POST/PUT: Upload file and load, OR load existing file by path
         If request includes file content:
@@ -690,14 +681,6 @@ def input_configuration_file(vv_instance):
                 OR unnamed parameter: string - Config filename as first URL parameter
             Example: POST /api/v1/inputconfigurationfile?filename=10mv per G.vic
     """
-    if request.method == "GET":
-        # GET - return current configuration file
-        result = vv_instance.GetInputConfigurationFile()
-        return jsonify(success_response(
-            {"result": result},
-            f"Current input configuration file: {result}"
-        ))
-
     # POST/PUT - check for file upload first
     upload_result = detect_file_upload()
     filename, binary_data, content_length = upload_result
