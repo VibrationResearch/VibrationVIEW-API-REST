@@ -43,7 +43,8 @@ def get_documentation():
                 'description': 'Get multiple report field values in one call',
                 'com_method': 'ReportFields(fields)',
                 'parameters': {
-                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.'
+                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.',
+                    'channel': 'string (query param) - Use "all" to expand each field across all hardware input channels (e.g., TEDS becomes TEDS1,TEDS2,...)'
                 },
                 'returns': 'array - Report field values in the same order as requested fields',
                 'examples': [
@@ -51,7 +52,8 @@ def get_documentation():
                     'GET /api/v1/reportfields?ChAccelRMS*|&ChDisplacement*|',
                     'POST /api/v1/reportfields with body: {"fields": "TestName,StartTime,LevelTime"}',
                     'POST /api/v1/reportfields with body: {"fields": ["TestName", "StartTime"]}',
-                    'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}'
+                    'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}',
+                    'POST /api/v1/reportfields?channel=all with body: {"fields": ["TEDS"]}'
                 ]
             },
             'GET|POST /reportfieldshistory': {
@@ -111,7 +113,7 @@ def get_documentation():
             'ReportFields returns values in the same order as the requested fields',
             'ReportFields supports both GET and POST methods',
             'GET uses & to separate field names as query parameters (e.g., ?Field1&Field2&Field3)',
-            'Use *| wildcard suffix to get values for all channels (e.g., "ChAccelRMS*|")',
+            'Use *| wildcard suffix to get values for all channels (e.g., "ChAccelRMS*|"). Mutually exclusive with channel=all.',
             'Field names are case-sensitive and must match VibrationVIEW report fields',
             'If COM method raises exception, it will be caught and returned as error',
             'Available report fields depend on the current test and VibrationVIEW configuration',
@@ -180,9 +182,15 @@ def report_fields(vv_instance):
                 - String: Comma-delimited field names (e.g., "TestName,StartTime,LevelTime")
                 - Array: Will be joined with commas automatically
 
+    Channel Expansion:
+        Use channel=all query parameter to expand each field across all hardware
+        input channels. E.g., TEDS becomes TEDS1,TEDS2,...,TEDSN.
+        Note: channel=all and *| wildcard are mutually exclusive. Do not combine them.
+
     Wildcard Support:
         Use *| suffix to get values for all channels
         Example: "ChAccelRMS*|" returns all channel accelerometer RMS values
+        Note: *| wildcard and channel=all are mutually exclusive. Do not combine them.
 
     Returns:
         results: Array of values corresponding to the requested fields
@@ -198,17 +206,20 @@ def report_fields(vv_instance):
         POST /api/v1/reportfields
         Body: {"fields": ["TestName", "StartTime", "LevelTime"]}
 
-        POST /api/v1/reportfields
-        Body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}
+        POST /api/v1/reportfields?channel=all
+        Body: {"fields": ["TEDS"]}
     """
     fields_string = None
+    channel_param = request.args.get('channel', '').strip().lower()
+
 
     # Handle GET request
     if request.method == 'GET':
         fields_string = request.args.get('fields')
         # If no 'fields' parameter, join all query parameter keys with commas
+        # (excluding modifier params which are not field names)
         if not fields_string and request.args:
-            fields_string = ','.join(request.args.keys())
+            fields_string = ','.join(k for k in request.args.keys() if k != 'channel')
 
     # Handle POST request
     else:
@@ -223,6 +234,16 @@ def report_fields(vv_instance):
             'Missing required parameter: fields',
             'MISSING_PARAMETER'
         )), 400
+
+    # Expand fields for all channels if channel=all
+    if channel_param == 'all':
+        num_channels = vv_instance.GetHardwareInputChannels()
+        base_fields = [f.strip().rstrip('*|').rstrip('0123456789') for f in fields_string.split(',')]
+        expanded = []
+        for field in base_fields:
+            for ch in range(1, num_channels + 1):
+                expanded.append(f"{field}{ch}")
+        fields_string = ','.join(expanded)
 
     # Call ReportFields with the comma-delimited string
     results = vv_instance.ReportFields(fields_string)
@@ -254,6 +275,26 @@ def report_fields(vv_instance):
         'fields_string': fields_string,
         'executed': True
     }
+
+    # Build structured channels dict when channel=all
+    if channel_param == 'all':
+        channels = {}
+        for i, val in enumerate(results_list):
+            ch = (i % num_channels) + 1
+            field = base_fields[i // num_channels]
+            ch_key = str(ch)
+            if ch_key not in channels:
+                channels[ch_key] = {}
+            # Strip redundant field name from values
+            # e.g. ["ChManufacturer1", "Dytran Instruments"] → "Dytran Instruments"
+            # or [["ChManufacturer1", "Dytran Instruments"]] → "Dytran Instruments"
+            if isinstance(val, list):
+                if len(val) == 2 and isinstance(val[0], str) and val[0] == f"{field}{ch}":
+                    val = val[1]
+                elif len(val) == 1 and isinstance(val[0], list) and len(val[0]) == 2 and val[0][0] == f"{field}{ch}":
+                    val = val[0][1]
+            channels[ch_key][field] = val
+        response_data['channels'] = channels
 
     message = f"ReportFields executed successfully"
 
