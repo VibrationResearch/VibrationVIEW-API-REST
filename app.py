@@ -149,14 +149,25 @@ def create_app(config_class=Config):
     def health_check():
         """Health check endpoint"""
         vv = get_vv_instance()
-        vv_status = "connected" if vv is not None else "disconnected"
+        vv_connected = False
+        hardware_serial = None
+        vv_version = None
+        if vv is not None:
+            try:
+                vv_connected = vv.IsReady()
+                hardware_serial = hex(vv.GetHardwareSerialNumber())
+                vv_version = f"{vv.GetSoftwareVersion():.4f}"
+            except Exception:
+                pass
 
         return jsonify({
             'success': True,
             'message': 'VibrationVIEW API is running',
             'version': app.config.get('API_VERSION', '1.0.0'),
             'timestamp': datetime.now().isoformat(),
-            'vibrationview_status': vv_status,
+            'vibrationview_connected': vv_connected,
+            'hardware_serial_number': hardware_serial,
+            'vibrationview_version': vv_version,
             'modules': [
                 'basic_control',
                 'status_properties',
