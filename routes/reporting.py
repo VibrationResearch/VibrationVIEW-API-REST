@@ -271,20 +271,19 @@ def report_fields(vv_instance):
                 results_list.append(item)
 
     response_data = {
-        'results': results_list,
         'fields_string': fields_string,
         'executed': True
     }
 
-    # Build structured channels dict when channel=all
+    # Build structured results dict when channel=all
     if channel_param == 'all':
-        channels = {}
+        results = {}
         for i, val in enumerate(results_list):
             ch = (i % num_channels) + 1
             field = base_fields[i // num_channels]
             ch_key = str(ch)
-            if ch_key not in channels:
-                channels[ch_key] = {}
+            if ch_key not in results:
+                results[ch_key] = {}
             # Strip redundant field name from values
             # e.g. ["ChManufacturer1", "Dytran Instruments"] → "Dytran Instruments"
             # or [["ChManufacturer1", "Dytran Instruments"]] → "Dytran Instruments"
@@ -293,8 +292,10 @@ def report_fields(vv_instance):
                     val = val[1]
                 elif len(val) == 1 and isinstance(val[0], list) and len(val[0]) == 2 and val[0][0] == f"{field}{ch}":
                     val = val[0][1]
-            channels[ch_key][field] = val
-        response_data['channels'] = channels
+            results[ch_key][field] = val
+        response_data['results'] = results
+    else:
+        response_data['results'] = results_list
 
     message = f"ReportFields executed successfully"
 
