@@ -18,7 +18,7 @@ DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd'}  # v?d pattern
 TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort',
                        'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
 
-INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
+INPUTCONFIG_EXTENSIONS = {'vic', 'vchan', 'inputconfig'}
 
 REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm', 'pdf'}
 
