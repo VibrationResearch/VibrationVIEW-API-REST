@@ -11,9 +11,9 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
-PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj'}
+PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj', 'vyp'}
 
-DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd'}  # v?d pattern
+DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd', 'vyd'}  # v?d pattern
 
 TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort',
                        'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
