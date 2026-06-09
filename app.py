@@ -8,7 +8,7 @@ VibrationVIEW Flask REST API - Main Application
 Entry point for the modular VibrationVIEW automation interface.
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request as flask_request
 from flask_cors import CORS
 import logging
 import os
@@ -125,6 +125,43 @@ def create_app(config_class=Config):
         ]
     )
     
+    # Block GET on state-changing endpoints unless ALLOW_GET_WRITE is true
+    if not app.config.get('ALLOW_GET_WRITE', True):
+        WRITE_ENDPOINTS = {
+            '/api/v1/starttest',
+            '/api/v1/runtest',
+            '/api/v1/stoptest',
+            '/api/v1/resumetest',
+            '/api/v1/opentest',
+            '/api/v1/closetest',
+            '/api/v1/closetab',
+            '/api/v1/savedata',
+            '/api/v1/recordstart',
+            '/api/v1/recordstop',
+            '/api/v1/recordpause',
+            '/api/v1/edittest',
+            '/api/v1/abortedit',
+            '/api/v1/minimize',
+            '/api/v1/restore',
+            '/api/v1/maximize',
+            '/api/v1/activate',
+            '/api/v1/removeallvirtualchannels',
+            '/api/v1/importvirtualchannels',
+            '/api/v1/generatereport',
+            '/api/v1/generatetxt',
+            '/api/v1/generateuff',
+            '/api/v1/tedsreadandapply',
+        }
+
+        @app.before_request
+        def block_get_on_write_endpoints():
+            if flask_request.method == 'GET' and flask_request.path in WRITE_ENDPOINTS:
+                return jsonify({
+                    'success': False,
+                    'error': 'Method not allowed',
+                    'message': 'GET is not allowed on state-changing endpoints. Use POST instead.'
+                }), 405
+
     # Register blueprint modules directly under /api/v1/ (no module prefixes)
     app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
     app.register_blueprint(status_properties_bp, url_prefix='/api/v1')

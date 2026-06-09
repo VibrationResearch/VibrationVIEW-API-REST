@@ -20,6 +20,10 @@ class Config:
     
     # CORS Settings
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or '*'
+
+    # Allow GET requests on state-changing endpoints (start, stop, save, etc.).
+    # Set to true for demonstrations; set to false for production.
+    ALLOW_GET_WRITE = (os.environ.get('ALLOW_GET_WRITE') or 'true').lower() in ('true', '1', 'yes')
     
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
