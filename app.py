@@ -128,7 +128,13 @@ def create_app(config_class=Config):
     
     # API key authentication
     api_key = app.config.get('API_KEY', '')
+    if not api_key:
+        logger.warning('\033[91mAPI_KEY is not set. '
+                       'Set a strong, unique API_KEY in .env before deploying.\033[0m')
     if api_key:
+        if api_key == 'replace-with-generated-key':
+            logger.warning('\033[91mUsing placeholder API key for authentication. '
+                           'Replace with a strong, unique key before deploying.\033[0m')
         @app.before_request
         def require_api_key():
             auth = flask_request.headers.get('Authorization', '')
