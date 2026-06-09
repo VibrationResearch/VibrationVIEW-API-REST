@@ -26,7 +26,11 @@ class Config:
     # API Key Authentication
     # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
     API_KEY = os.environ.get('API_KEY') or ''
-    
+
+    # Allow GET requests on state-changing endpoints (start, stop, save, etc.).
+    # Set to true for backward compatibility or demonstrations only.
+    ALLOW_GET_WRITE = (os.environ.get('ALLOW_GET_WRITE') or 'false').lower() in ('true', '1', 'yes')
+
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
     
@@ -63,6 +67,7 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     LOG_LEVEL = 'DEBUG'
+    ALLOW_GET_WRITE = True
 
 config = {
     'development': DevelopmentConfig,

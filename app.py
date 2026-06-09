@@ -159,6 +159,11 @@ def create_app(config_class=Config):
                     'message': 'Valid API key required in Authorization header'
                 }), 401
 
+    # Block GET on state-changing endpoints unless ALLOW_GET_WRITE is true
+    if not app.config.get('ALLOW_GET_WRITE', True):
+        from utils.write_guard import register_write_guard
+        register_write_guard(app)
+
     # Register blueprint modules directly under /api/v1/ (no module prefixes)
     app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
     app.register_blueprint(status_properties_bp, url_prefix='/api/v1')
