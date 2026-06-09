@@ -115,6 +115,10 @@ The API is organized into functional modules with consistent patterns:
 
 ## API Usage Examples
 
+> **Note:** If `API_KEY` is configured, all requests must include the header
+> `-H "Authorization: Bearer <your-api-key>"`. This header is omitted from the
+> examples below for brevity.
+
 ### Basic Test Control
 ```bash
 # Start a test (existing file)

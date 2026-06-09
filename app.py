@@ -128,7 +128,10 @@ def create_app(config_class=Config):
     
     # API key authentication
     api_key = app.config.get('API_KEY', '')
-    if api_key:
+    if not app.debug and (not api_key or api_key == 'replace-with-generated-key'):
+        print('WARNING: API_KEY is not set or is still the placeholder value. '
+              'All endpoints are accessible without authentication.')
+    if api_key and api_key != 'replace-with-generated-key':
         @app.before_request
         def require_api_key():
             auth = flask_request.headers.get('Authorization', '')
