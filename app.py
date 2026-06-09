@@ -8,8 +8,9 @@ VibrationVIEW Flask REST API - Main Application
 Entry point for the modular VibrationVIEW automation interface.
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request as flask_request
 from flask_cors import CORS
+import hmac
 import logging
 import os
 from datetime import datetime
@@ -125,6 +126,23 @@ def create_app(config_class=Config):
         ]
     )
     
+    # API key authentication
+    api_key = app.config.get('API_KEY', '')
+    if api_key:
+        @app.before_request
+        def require_api_key():
+            auth = flask_request.headers.get('Authorization', '')
+            if auth.startswith('Bearer '):
+                token = auth[7:]
+            else:
+                token = auth
+            if not hmac.compare_digest(token, api_key):
+                return jsonify({
+                    'success': False,
+                    'error': 'Unauthorized',
+                    'message': 'Valid API key required in Authorization header'
+                }), 401
+
     # Register blueprint modules directly under /api/v1/ (no module prefixes)
     app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
     app.register_blueprint(status_properties_bp, url_prefix='/api/v1')

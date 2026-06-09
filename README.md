@@ -484,6 +484,18 @@ The `SECRET_KEY` is not currently required — the API is stateless and does not
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
+### API Key Authentication
+All requests must include an `Authorization: Bearer <key>` header. To set up:
+
+1. Generate a key:
+   ```bash
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+2. Set `API_KEY` in your `.env` file to the generated value.
+3. Configure the same key on the controller PC (outside of source control).
+
+If `API_KEY` is empty or not set, authentication is disabled.
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
@@ -492,6 +504,9 @@ SECRET_KEY=your-secret-key
 
 # CORS Settings — restricts browser-based cross-origin requests.
 CORS_ORIGINS=http://127.0.0.1
+
+# API Key Authentication
+API_KEY=replace-with-generated-key
 
 # Logging
 LOG_LEVEL=INFO

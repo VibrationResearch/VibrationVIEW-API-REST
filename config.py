@@ -23,6 +23,10 @@ class Config:
     # access.
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or 'http://127.0.0.1'
 
+    # API Key Authentication
+    # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
+    API_KEY = os.environ.get('API_KEY') or ''
+    
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
     
