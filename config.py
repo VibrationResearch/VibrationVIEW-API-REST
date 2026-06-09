@@ -20,6 +20,10 @@ class Config:
     
     # CORS Settings
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or '*'
+
+    # API Key Authentication
+    # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
+    API_KEY = os.environ.get('API_KEY') or ''
     
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
