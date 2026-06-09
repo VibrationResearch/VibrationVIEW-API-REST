@@ -490,8 +490,8 @@ python -c "import secrets; print(secrets.token_hex(32))"
 API_VERSION=1.0.0
 SECRET_KEY=your-secret-key
 
-# CORS Settings  
-CORS_ORIGINS=*
+# CORS Settings — restricts browser-based cross-origin requests.
+CORS_ORIGINS=http://127.0.0.1
 
 # Logging
 LOG_LEVEL=INFO
