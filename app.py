@@ -151,6 +151,8 @@ def create_app(config_class=Config):
             '/api/v1/generatetxt',
             '/api/v1/generateuff',
             '/api/v1/tedsreadandapply',
+            '/api/v1/tedsread',
+            '/api/v1/updatechannelconfigfromdatabase',
         }
 
         @app.before_request
