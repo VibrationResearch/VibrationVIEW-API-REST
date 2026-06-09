@@ -11,7 +11,7 @@ collection:
     meta:
       id: fld_db371e9cffa04eab9620273eaba11d26
       created: 1765309442165
-      modified: 1767190280261
+      modified: 1781027201814
       sortKey: -1753972452424
       description: Health check and documentation
     children:
@@ -38,7 +38,7 @@ collection:
         meta:
           id: req_eaf64f1f626b4e62b9544e52fe4491b3
           created: 1765309442168
-          modified: 1765309442168
+          modified: 1776093560852
           isPrivate: false
           description: Check API health and status
           sortKey: -1690628400000
@@ -71,11 +71,14 @@ collection:
 
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Hardware Config
     meta:
       id: fld_de609bd57bb243c6a7162523617efc32
       created: 1765309442169
-      modified: 1767190902496
+      modified: 1781027923780
       sortKey: -1753972452330.25
       description: Hardware configuration
     children:
@@ -239,11 +242,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Advanced Test Control
     meta:
       id: fld_a43a2a7da43c427c9eaecd29251a1c8f
       created: 1765309442177
-      modified: 1767190351470
+      modified: 1781027320060
       sortKey: -1753972452399
       description: Advanced test control
     children:
@@ -413,11 +419,14 @@ collection:
 
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Basic Control
     meta:
       id: fld_e81825bce6d949e2bbb0e7b5ae5639c6
       created: 1765309442184
-      modified: 1767190734267
+      modified: 1781027364466
       sortKey: -1753972452349
       description: Core test control operations
     children:
@@ -521,7 +530,7 @@ collection:
         meta:
           id: req_fbf9424661ec4f5e87b32571a6909994
           created: 1765309442189
-          modified: 1765309442189
+          modified: 1778510361620
           isPrivate: false
           description: Execute a complete test run
           sortKey: -1690628396500
@@ -698,7 +707,7 @@ collection:
         meta:
           id: req_c596d8b04c9447e8b676f983653052e6
           created: 1766181121631
-          modified: 1766410323549
+          modified: 1767200769330
           isPrivate: false
           description: ""
           sortKey: -1690628396656.25
@@ -785,7 +794,7 @@ collection:
         meta:
           id: req_04dec9797b844886b6678804e8e3664d
           created: 1766437496278
-          modified: 1767190618478
+          modified: 1780078634997
           isPrivate: false
           description: ""
           sortKey: -1690628396261.7188
@@ -797,7 +806,7 @@ collection:
               value: ""
               description: ""
               disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\system_check.vyp
               type: file
         settings:
           renderRequestBody: true
@@ -850,11 +859,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Recording
     meta:
       id: fld_7f06b2ea447042d384573d37e62c05d4
       created: 1765309442193
-      modified: 1767196274915
+      modified: 1781027857054
       sortKey: -1753917832536.9688
       description: Data recording control
     children:
@@ -992,11 +1004,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Status Properties
     meta:
       id: fld_77bd9bb1fc0e400680d698d7db88d5e8
       created: 1765309442196
-      modified: 1767196336170
+      modified: 1781027865016
       sortKey: -1690628392000
       description: System status and state checking
     children:
@@ -1214,11 +1229,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Data Retrieval
     meta:
       id: fld_f0d17cda28824f27a96d2bba709f4a50
       created: 1765309442202
-      modified: 1767190749250
+      modified: 1781027914560
       sortKey: -1753972452336.5
       description: Real-time data access
     children:
@@ -1281,7 +1299,7 @@ collection:
         meta:
           id: req_ff76017a460b461e9254ca1e9fa01807
           created: 1765309442204
-          modified: 1765309442204
+          modified: 1769614174990
           isPrivate: false
           description: Get channel data (change channel ID in URL)
           sortKey: -1690628387000
@@ -1312,12 +1330,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/channellabel?2"
+      - url: "{{ _.base_url }}/channellabel?1"
         name: channellabel
         meta:
           id: req_32c3a1941427406ea193e0d0795b9a7c
           created: 1765309442208
-          modified: 1765309442208
+          modified: 1769614217672
           isPrivate: false
           description: Get channel data (change channel ID in URL)
           sortKey: -1690628386500
@@ -1400,11 +1418,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: TEDS
     meta:
       id: fld_2fdd04ad219c4ba8a164a375917f6cda
       created: 1765309442211
-      modified: 1767200017043
+      modified: 1781027868890
       sortKey: -1690628379000
       description: ""
     children:
@@ -1426,12 +1447,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/teds"
+      - url: "{{ _.base_url }}/inputtedschannel?1"
         name: teds
         meta:
           id: req_ffce15734ec44c118243a06478e39cbb
           created: 1765309442212
-          modified: 1765309442212
+          modified: 1778505419482
           isPrivate: false
           description: ""
           sortKey: -1753822876302
@@ -1447,12 +1468,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputtedschannel?1"
+      - url: "{{ _.base_url }}/inputtedschannel"
         name: inputtedschannel
         meta:
           id: req_023daa6da0db4e25a7134fd9a76dc3d4
           created: 1765309442213
-          modified: 1765309442213
+          modified: 1779280007899
           isPrivate: false
           description: ""
           sortKey: -1753822876352
@@ -1515,11 +1536,11 @@ collection:
         meta:
           id: req_ff85f2933f45459dad72c2d0e30e872f
           created: 1765309442215
-          modified: 1765309442215
+          modified: 1778504304569
           isPrivate: false
           description: ""
           sortKey: -1722052924409
-        method: GET
+        method: POST
         headers:
           - name: User-Agent
             value: insomnia/11.0.2
@@ -1536,7 +1557,7 @@ collection:
         meta:
           id: req_e451dc5db43c47478082b06846f58c36
           created: 1765471299891
-          modified: 1765471692034
+          modified: 1777466085656
           isPrivate: false
           description: ""
           sortKey: -1706340662204.5
@@ -1552,7 +1573,7 @@ collection:
             			"010203040506072D",
             			"020203040506072D",
             			"030203040506072D",
-            			"040203040506072D",
+            			"040203040506072d",
             			"Disabled",
             			"Disabled",
             			"Disabled",
@@ -1583,7 +1604,7 @@ collection:
         meta:
           id: req_7d0253ec8c634f4a86a26db93bef5612
           created: 1767196393873
-          modified: 1767196443197
+          modified: 1778503731320
           isPrivate: false
           description: Load input configuration file
           sortKey: -1753822876377
@@ -1595,7 +1616,7 @@ collection:
               value: ""
               description: ""
               disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+              fileName: D:\Data\VibrationVIEW-API-REST\docs\SendConfiguration.vic
               type: file
         headers:
           - name: Content-Type
@@ -1624,11 +1645,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Reporting
     meta:
       id: fld_f19e611571bf4448b339c6efb3058f47
       created: 1765309442216
-      modified: 1767196319138
+      modified: 1781027861349
       sortKey: -1753885060661
       description: ""
     children:
@@ -1841,14 +1865,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url
-          }}/reportfields?ChName*|,ChStatus*|,ChStatusTeds*|,mVg*|,ChManufactur\
-          er*|,ChModel*|,ChSerialNumber*|"
+      - url: "{{ _.base_url }}/reportfields"
         name: reportfields
         meta:
           id: req_e8e7679c5504459db6d9fa55e0ba6d6e
           created: 1765468432974
-          modified: 1765468504489
+          modified: 1779299243205
           isPrivate: false
           description: ""
           sortKey: -1753885096723
@@ -2066,6 +2088,43 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.base_url }}/reportfields?channel=all"
+        name: reportfields (channels=all)
+        meta:
+          id: req_c41b0ff6d6e64c7c83a033a778c91309
+          created: 1779295894162
+          modified: 1779819960910
+          isPrivate: false
+          description: ""
+          sortKey: -1753885096710.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {     
+            	"fields": 
+            	[       
+            		"ChName",
+            		"ChStatus",
+            		"ChStatusTeds",
+            		"mVg",
+            		"ChManufacturer",
+            		"ChModel",
+            		"ChSerialNumber",
+            		"TEDS"
+            	]   
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
     scripts:
       afterResponse: |
         
@@ -2082,11 +2141,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Aux Inputs
     meta:
       id: fld_0ff3f4dec7d04d3b9c68e0b66522e80a
       created: 1765309442221
-      modified: 1767190330525
+      modified: 1781027257414
       sortKey: -1753972452408.375
       description: ""
     children:
@@ -2208,11 +2270,14 @@ collection:
 
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: GUI Control
     meta:
       id: fld_e700855f406e4ed69592dda7240b7b3b
       created: 1765309442224
-      modified: 1767190784659
+      modified: 1781027920781
       sortKey: -1753972452333.375
       description: ""
     children:
@@ -2367,11 +2432,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Advanced Test Control (System Check)
     meta:
       id: fld_b2288d7fae234b4191be5478ede9a108
       created: 1765309442228
-      modified: 1767190313688
+      modified: 1781027245007
       sortKey: -1753972452411.5
       description: ""
     children:
@@ -2534,11 +2602,14 @@ collection:
 
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Advanced Test Control (Sine)
     meta:
       id: fld_4e01da444f5a4daabb7d4eee26fd9bae
       created: 1765309442232
-      modified: 1767190297538
+      modified: 1781027228675
       sortKey: -1753972452414.625
       description: ""
     children:
@@ -2899,11 +2970,14 @@ collection:
 
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Input Configuration
     meta:
       id: fld_c47ff10d237e4f398ba8297e8b4b656f
       created: 1765309442240
-      modified: 1767197113678
+      modified: 1781027849260
       sortKey: -1753961528371.5938
       description: ""
     children:
@@ -3182,12 +3256,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/inputconfigurationfile?10mv per G.vic"
+      - url: "{{ _.base_url }}/inputconfigurationfile?6-channels-TEDS.vic"
         name: inputconfigurationfile
         meta:
           id: req_473751d5f0c74c20a29233bb6c966440
           created: 1765309442248
-          modified: 1765309442248
+          modified: 1777380000088
           isPrivate: false
           description: Load input configuration file
           sortKey: -1754315964340
@@ -3282,11 +3356,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Virtual Channels
     meta:
       id: fld_612af819c8ea481482d065bb9c0b48b1
       created: 1765309442249
-      modified: 1767197566553
+      modified: 1781027872946
       sortKey: -1690628376000
       description: ""
     children:
@@ -3389,11 +3466,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Logs
     meta:
       id: fld_0e15f068d0594ca590de0940ce270496
       created: 1765309442252
-      modified: 1767190368660
+      modified: 1781027332455
       sortKey: -1753972452386.5
       description: ""
     children:
@@ -3452,11 +3532,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Report Generation
     meta:
       id: fld_4e3b05d7a98446ee88c10ca0462d2584
       created: 1765309442253
-      modified: 1767196247209
+      modified: 1781027853532
       sortKey: -1753950604412.9375
       description: |-
         Insomnia does not handle requests where Content-Disposition is set.
@@ -3712,11 +3795,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Vectors Legacy
     meta:
       id: fld_ea40ba70365446d2978d263e356ea43c
       created: 1765488515297
-      modified: 1767190769260
+      modified: 1781027917853
       sortKey: -1753972452334.9375
       description: Real-time data access
     children:
@@ -3950,11 +4036,14 @@ collection:
           insomnia.expect(jsonBody).to.have.property('success');
           insomnia.expect(jsonBody.success).to.equal(true);
         });
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
   - name: Workflow
     meta:
       id: fld_ce3630051a654b2092f8f8681a65aff2
       created: 1766437117393
-      modified: 1767190254926
+      modified: 1781027830741
       sortKey: -1766437117393
       description: ""
     children:
@@ -3963,7 +4052,7 @@ collection:
         meta:
           id: req_7c0e42a192cd4855a95cf41d52794437
           created: 1765309442187
-          modified: 1766437582994
+          modified: 1776173970932
           isPrivate: false
           description: Start test execution
           sortKey: -1766437135753.1108
@@ -4008,7 +4097,7 @@ collection:
         meta:
           id: req_a3f5bc5d6f1f4c33875ebf17f41a609f
           created: 1765309442198
-          modified: 1766437135821
+          modified: 1776441703803
           isPrivate: false
           description: Check if test is running
           sortKey: -1766437135802
@@ -4026,7 +4115,7 @@ collection:
         meta:
           id: req_878346f0d38048959a7dbfa68cbe3bfb
           created: 1765309442248
-          modified: 1766437303196
+          modified: 1779909644887
           isPrivate: false
           description: Load input configuration file
           sortKey: -1766437135770.75
@@ -4038,7 +4127,8 @@ collection:
               value: ""
               description: ""
               disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\InputConfig\6-channels-TEDS.vic
+              fileName: Y:\Sharepoint\Vibration Research Corporation\Customers Drive -
+                Documents\Amazon\SendConfiguration.vic
               type: file
         headers:
           - name: Content-Type
@@ -4111,7 +4201,7 @@ collection:
         meta:
           id: req_7efdc47db03f4c7ab78dd692d52dd61f
           created: 1766437285318
-          modified: 1766437356220
+          modified: 1777388448882
           isPrivate: false
           description: ""
           sortKey: -1766437135769.1875
@@ -4157,7 +4247,7 @@ collection:
         meta:
           id: req_08eee4e2840446d5a78d32b9aa29a2fc
           created: 1766437403297
-          modified: 1766438076036
+          modified: 1779992521066
           isPrivate: false
           description: ""
           sortKey: -1766437135756.248
@@ -4169,7 +4259,7 @@ collection:
               value: ""
               description: ""
               disabled: false
-              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrp
+              fileName: D:\Data\VibrationVIEW-API-REST\profiles\Random_Profile.vrpj
               type: file
         settings:
           renderRequestBody: true
@@ -4278,19 +4368,25 @@ collection:
         });
 
 
+    authentication:
+      type: bearer
+      token: "{{ _.api_key }}"
+    environment:
+      "": ""
 cookieJar:
   name: Default Jar
   meta:
     id: jar_9165719148884b3baf22808209056286
     created: 1765309442163
-    modified: 1767200017039
+    modified: 1781027923779
 environments:
   name: Base Environment
   meta:
     id: env_bde5e190f164482fb3889ff56776882f
     created: 1765309442160
-    modified: 1767200017043
+    modified: 1781027923779
     isPrivate: false
   data:
     base_url: http://127.0.0.1:5000/api/v1
     profile_folder: d:\data\vibrationview-api-rest\profiles\
+    api_key: 2ef61309c32e2787f8c43936a04b65bf0ef38c8e825b5e1a458e85f4802c6cff
