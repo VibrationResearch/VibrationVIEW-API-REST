@@ -141,6 +141,12 @@ def create_app(config_class=Config):
                            'Replace with a strong, unique key before deploying.\033[0m')
         @app.before_request
         def require_api_key():
+            # Allow health and docs endpoints without authentication
+            parts = flask_request.path.rstrip('/').split('/')
+            # parts: ['', 'api', 'vN', '<resource>', ...]
+            resource = parts[3] if len(parts) > 3 else ''
+            if resource in ('health', 'docs'):
+                return
             auth = flask_request.headers.get('Authorization', '')
             if auth.startswith('Bearer '):
                 token = auth[7:]
