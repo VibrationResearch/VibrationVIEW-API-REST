@@ -17,10 +17,12 @@ class Config:
     # API Settings
     API_VERSION = os.environ.get('API_VERSION') or '1.0.0'
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    
-    # CORS Settings
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or '*'
-    
+
+    # CORS Settings — controls which browser origins may make cross-origin
+    # requests to the API.  Set to http://127.0.0.1 to block unexpected browser
+    # access.
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or 'http://127.0.0.1'
+
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
     
