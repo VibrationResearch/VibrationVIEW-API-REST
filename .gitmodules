@@ -1,0 +1,3 @@
+[submodule "Insomnia"]
+	path = Insomnia
+	url = git@github.com:VibrationResearch/vibrationview-api-rest-insomnia.git
