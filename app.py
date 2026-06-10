@@ -126,7 +126,11 @@ def create_app(config_class=Config):
         ]
     )
     
-    # API key authentication
+    # API key authentication — uses @app.before_request for global Bearer token check.
+    # Alternative: Flask-HTTPAuth (pip install Flask-HTTPAuth) provides a cleaner
+    # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
+    # easier extensibility for multiple keys or roles.
+    # tradeoff: custom implementation avoids extra dependencies and is straightforward for single-key use case.
     api_key = app.config.get('API_KEY', '')
     if not api_key:
         logger.warning('\033[91mAPI_KEY is not set. '
