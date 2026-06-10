@@ -64,6 +64,7 @@ Key settings in `.env`:
 | `EXE_NAME` | Full path to VibrationVIEW executable |
 | `VV_CONNECTION_TIMEOUT` | COM connection timeout in seconds |
 | `VV_RETRY_ATTEMPTS` | Number of connection retries |
+| `CORS_ORIGINS` | Restricts browser-based cross-origin requests. Defaults to `http://127.0.0.1`, which blocks any unexpected browser-based cross-origin request while having zero impact on the controller PC or CLI tool, since server-to-server HTTP calls do not check CORS headers. Do not change back to `*`. |
 | `LOG_LEVEL` | Logging level (DEBUG, INFO, WARNING, ERROR) |
 
 ## API Endpoints
