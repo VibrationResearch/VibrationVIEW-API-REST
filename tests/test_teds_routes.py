@@ -9,6 +9,7 @@ Tests for TEDS routes with GET pattern and proper indexing using singleton patte
 import pytest
 import json
 from app import create_app, set_vv_instance, reset_vv_instance
+from config import TestingConfig
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
 class TestTEDSRoutes:
@@ -17,8 +18,7 @@ class TestTEDSRoutes:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
     
     @pytest.fixture
@@ -43,8 +43,8 @@ class TestTEDSRoutes:
             [['Sensitivity', '100.0 mV/g'], ['Units', 'mV/g']],  # Channel 0
             [['Sensitivity', '200.0 mV/g'], ['Units', 'mV/g']]   # Channel 1
         ]
-        mock_vv.Teds.return_value = mock_all_teds
         mock_vv.clear_method_calls()
+        mock_vv.Teds.return_value = mock_all_teds
 
         response = client.get('/api/v1/teds')
 
@@ -82,9 +82,9 @@ class TestTEDSRoutes:
             ['Units', 'mV/g'],
             ['Serial Number', '12345']
         ]
+        mock_vv.clear_method_calls()
         mock_vv.Teds.return_value = mock_channel_teds
         mock_vv.GetHardwareInputChannels.return_value = 4
-        mock_vv.clear_method_calls()
         
         # Test with 1-based channel 3 (should convert to 0-based channel 2)
         channel_1based = 3
@@ -182,9 +182,9 @@ class TestTEDSRoutes:
         """Test GET /inputtedschannel with 1-based indexing (now consistent)"""
         # Configure mock
         mock_channel_teds = {'sensitivity': 250.0, 'units': 'mV/g'}
+        mock_vv.clear_method_calls()
         mock_vv.Teds.return_value = mock_channel_teds
         mock_vv.GetHardwareInputChannels.return_value = 4
-        mock_vv.clear_method_calls()
         
         # Test with 1-based channel 3 (should convert to 0-based channel 2)
         channel_1based = 3
