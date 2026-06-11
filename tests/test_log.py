@@ -8,22 +8,16 @@ Tests for Log Routes
 
 import pytest
 import json
-from app import set_vv_instance, reset_vv_instance
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+from app import get_vv_instance
 
 
 class TestLogRoutes:
     """Tests for the log module endpoints"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_vv = MockVibrationVIEW()
-        set_vv_instance(self.mock_vv)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_vv = get_vv_instance()
 
     def test_log_endpoint_returns_events(self, client):
         """Test GET /log returns parsed event log"""
@@ -111,15 +105,10 @@ class TestLogRoutes:
 class TestLogEdgeCases:
     """Edge case tests for log module"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_vv = MockVibrationVIEW()
-        set_vv_instance(self.mock_vv)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_vv = get_vv_instance()
 
     def test_log_with_special_characters(self, client):
         """Test handling of special characters in event messages"""

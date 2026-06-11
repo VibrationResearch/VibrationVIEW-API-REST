@@ -7,20 +7,15 @@ Tests for input configuration routes
 """
 
 import json
-from app import set_vv_instance, reset_vv_instance
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+import pytest
+from app import get_vv_instance
 
 
 class TestInputConfig:
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     # -------------------------------------------------------------------------
     # InputMode tests - JSON body

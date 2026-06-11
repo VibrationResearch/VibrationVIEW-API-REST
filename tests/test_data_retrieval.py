@@ -10,30 +10,20 @@ Matches current implementation with GET requests and query parameters
 
 import pytest
 import json
-from app import set_vv_instance, reset_vv_instance, get_vv_instance
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+from app import get_vv_instance
 
 class TestDataRetrieval:
     """Test data retrieval endpoints including vector properties"""
-    
-    def setup_method(self):
-        """Setup method run before each test"""
-        # Force reset singleton before each test
-        reset_vv_instance()
-        
-        # Create and configure mock instance
-        self.mock_vv = MockVibrationVIEW()
-        
-        # Set the singleton
-        set_vv_instance(self.mock_vv)
-        
-        # Verify our mock is properly set
-        instance = get_vv_instance()
-        assert instance is self.mock_vv, "Mock instance not properly set in singleton"
-    
-    def teardown_method(self):
-        """Cleanup method run after each test"""
-        reset_vv_instance()
+
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve.
+
+        setup_method runs before fixtures, so it cannot reliably access the
+        singleton that the conftest ``app`` fixture configures.  Using an
+        autouse fixture that depends on ``client`` guarantees ordering.
+        """
+        self.mock_vv = get_vv_instance()
     
     # ============================================================================
     # DEBUG AND ROUTE DISCOVERY TESTS
