@@ -85,8 +85,8 @@ class TestDataRetrieval:
         print(f"Is same as mock? {get_vv_instance() is self.mock_vv}")
         
         # Configure mock for a simple test
-        self.mock_vv.ChannelUnit.return_value = "debug_unit"
         self.mock_vv.ChannelUnit.reset_mock()
+        self.mock_vv.ChannelUnit.return_value = "debug_unit"
         
         # Test the route with GET request
         response = client.get('/api/v1/channelunit?channelnum=1')
@@ -111,8 +111,8 @@ class TestDataRetrieval:
     def test_demand(self, client):
         """Test demand endpoint"""
         # Configure mock
-        self.mock_vv.Demand.return_value = [1.5, 2.0, 2.5]
         self.mock_vv.Demand.reset_mock()
+        self.mock_vv.Demand.return_value = [1.5, 2.0, 2.5]
         
         response = client.get('/api/v1/demand')
         
@@ -136,8 +136,8 @@ class TestDataRetrieval:
     def test_control(self, client):
         """Test control endpoint"""
         # Configure mock
-        self.mock_vv.Control.return_value = [0.8, 1.2, 1.0]
         self.mock_vv.Control.reset_mock()
+        self.mock_vv.Control.return_value = [0.8, 1.2, 1.0]
         
         response = client.get('/api/v1/control')
         
@@ -161,8 +161,8 @@ class TestDataRetrieval:
     def test_channel(self, client):
         """Test channel endpoint"""
         # Configure mock
-        self.mock_vv.Channel.return_value = [1.0, 2.0, 3.0, 4.0]
         self.mock_vv.Channel.reset_mock()
+        self.mock_vv.Channel.return_value = [1.0, 2.0, 3.0, 4.0]
         
         response = client.get('/api/v1/channel')
         
@@ -186,8 +186,8 @@ class TestDataRetrieval:
     def test_output(self, client):
         """Test output endpoint"""
         # Configure mock
-        self.mock_vv.Output.return_value = [2.5, 3.0]
         self.mock_vv.Output.reset_mock()
+        self.mock_vv.Output.return_value = [2.5, 3.0]
         
         response = client.get('/api/v1/output')
         
@@ -216,9 +216,9 @@ class TestDataRetrieval:
         """Test vector endpoint with default columns"""
         # Configure mock
         mock_vector_data = [[1.0, 2.0, 3.0, 4.0]]
-        self.mock_vv.Vector.return_value = mock_vector_data
         self.mock_vv.Vector.reset_mock()
-        
+        self.mock_vv.Vector.return_value = mock_vector_data
+
         response = client.get('/api/v1/vector?vectorenum=1')
         
         if response.status_code == 404:
@@ -245,9 +245,9 @@ class TestDataRetrieval:
         """Test vector endpoint with specified columns"""
         # Configure mock
         mock_vector_data = [[1.0, 2.0], [3.0, 4.0]]
-        self.mock_vv.Vector.return_value = mock_vector_data
         self.mock_vv.Vector.reset_mock()
-        
+        self.mock_vv.Vector.return_value = mock_vector_data
+
         response = client.get('/api/v1/vector?vectorenum=2&columns=2')
         
         if response.status_code == 404:
@@ -308,8 +308,8 @@ class TestDataRetrieval:
     def test_vector_unit(self, client):
         """Test VectorUnit endpoint - no base conversion"""
         # Configure mock
-        self.mock_vv.VectorUnit.return_value = "g"
         self.mock_vv.VectorUnit.reset_mock()
+        self.mock_vv.VectorUnit.return_value = "g"
         
         response = client.get('/api/v1/vectorunit?vectorenum=1')
         
@@ -334,8 +334,8 @@ class TestDataRetrieval:
     def test_vector_label(self, client):
         """Test VectorLabel endpoint - no base conversion"""
         # Configure mock
-        self.mock_vv.VectorLabel.return_value = "Acceleration"
         self.mock_vv.VectorLabel.reset_mock()
+        self.mock_vv.VectorLabel.return_value = "Acceleration"
         
         response = client.get('/api/v1/vectorlabel?vectorenum=2')
         
@@ -360,8 +360,8 @@ class TestDataRetrieval:
     def test_vector_length(self, client):
         """Test VectorLength endpoint - no base conversion"""
         # Configure mock
-        self.mock_vv.VectorLength.return_value = 1024
         self.mock_vv.VectorLength.reset_mock()
+        self.mock_vv.VectorLength.return_value = 1024
         
         response = client.get('/api/v1/vectorlength?vectorenum=3')
         
@@ -406,9 +406,9 @@ class TestDataRetrieval:
     def test_channel_unit_base1_conversion(self, client):
         """Test that channelnum is converted from base-1 to base-0"""
         # Configure mock
-        self.mock_vv.ChannelUnit.return_value = "g"
         self.mock_vv.ChannelUnit.reset_mock()
-        
+        self.mock_vv.ChannelUnit.return_value = "g"
+
         # Send request with 1-based channel number
         channel_1based = 3
         expected_channel_0based = 2  # 3-1=2
@@ -460,8 +460,8 @@ class TestDataRetrieval:
     def test_channel_label_base1_conversion(self, client):
         """Test channel label with base-1 conversion"""
         # Configure mock
-        self.mock_vv.ChannelLabel.return_value = "Accel X"
         self.mock_vv.ChannelLabel.reset_mock()
+        self.mock_vv.ChannelLabel.return_value = "Accel X"
         
         # Send request with 1-based channel number
         channel_1based = 1
@@ -509,8 +509,8 @@ class TestDataRetrieval:
     def test_control_label_base1_conversion(self, client):
         """Test control label with base-1 conversion"""
         # Configure mock
-        self.mock_vv.ControlLabel.return_value = "Control Loop 1"
         self.mock_vv.ControlLabel.reset_mock()
+        self.mock_vv.ControlLabel.return_value = "Control Loop 1"
         
         # Send request with 1-based loop number
         loop_1based = 4
@@ -611,15 +611,14 @@ class TestDataRetrieval:
             if response.status_code == 404:
                 pytest.skip(f"Route {route} not found - blueprint may not be registered")
         
-        # Configure mocks for workflow
-        self.mock_vv.Demand.return_value = [1.0, 2.0]
-        self.mock_vv.Vector.return_value = [[0.1, 0.2, 0.3]]
-        self.mock_vv.ChannelUnit.return_value = "g"
-        
-        # Reset all mocks
+        # Reset all mocks then configure
         self.mock_vv.Demand.reset_mock()
         self.mock_vv.Vector.reset_mock()
         self.mock_vv.ChannelUnit.reset_mock()
+
+        self.mock_vv.Demand.return_value = [1.0, 2.0]
+        self.mock_vv.Vector.return_value = [[0.1, 0.2, 0.3]]
+        self.mock_vv.ChannelUnit.return_value = "g"
         
         # Test workflow: Get demand -> Get vector data -> Get channel info
         
@@ -722,8 +721,8 @@ class TestDataRetrieval:
         """Test edge cases with large numbers"""
         
         # Test large vector enumeration
-        self.mock_vv.VectorUnit.return_value = "Hz"
         self.mock_vv.VectorUnit.reset_mock()
+        self.mock_vv.VectorUnit.return_value = "Hz"
         
         response = client.get('/api/v1/vectorunit?vectorenum=999999')
         if response.status_code != 404:
@@ -732,8 +731,8 @@ class TestDataRetrieval:
             assert data['data']['vectorenum'] == 999999
         
         # Test large channel number (should still convert correctly)
-        self.mock_vv.ChannelUnit.return_value = "m/s²"
         self.mock_vv.ChannelUnit.reset_mock()
+        self.mock_vv.ChannelUnit.return_value = "m/s²"
         
         response = client.get('/api/v1/channelunit?channelnum=1000')
         if response.status_code != 404:
@@ -753,8 +752,8 @@ class TestDataRetrieval:
         """Test boundary values for 1-based indexing"""
         
         # Test channel 1 (minimum valid value)
-        self.mock_vv.ChannelLabel.return_value = "Channel 1"
         self.mock_vv.ChannelLabel.reset_mock()
+        self.mock_vv.ChannelLabel.return_value = "Channel 1"
         
         response = client.get('/api/v1/channellabel?channelnum=1')
         if response.status_code != 404:
@@ -768,8 +767,8 @@ class TestDataRetrieval:
                 assert calls[0] == ((0,),)
         
         # Test loop 1 (minimum valid value)
-        self.mock_vv.ControlLabel.return_value = "Loop 1"
         self.mock_vv.ControlLabel.reset_mock()
+        self.mock_vv.ControlLabel.return_value = "Loop 1"
         
         response = client.get('/api/v1/controllabel?loopnum=1')
         if response.status_code != 404:
@@ -816,7 +815,6 @@ class TestDataRetrieval:
         # Make multiple rapid requests
         responses = []
         for i in range(10):
-            self.mock_vv.Demand.reset_mock()
             response = client.get('/api/v1/demand')
             responses.append(response)
         
@@ -834,14 +832,14 @@ class TestDataRetrieval:
         """Test mixed requests across different endpoint types"""
         
         # Configure all mocks
-        self.mock_vv.Channel.return_value = [1.0, 2.0, 3.0]
-        self.mock_vv.VectorLabel.return_value = "Test Label"
-        self.mock_vv.ControlUnit.return_value = "V"
-        
-        # Reset all mocks
+        # Reset all mocks then configure
         self.mock_vv.Channel.reset_mock()
         self.mock_vv.VectorLabel.reset_mock()
         self.mock_vv.ControlUnit.reset_mock()
+
+        self.mock_vv.Channel.return_value = [1.0, 2.0, 3.0]
+        self.mock_vv.VectorLabel.return_value = "Test Label"
+        self.mock_vv.ControlUnit.return_value = "V"
         
         # Make mixed requests
         test_requests = [
@@ -902,8 +900,8 @@ class TestDataRetrieval:
         # Apply mock configuration
         for method_name, return_value in mock_config.items():
             if hasattr(self.mock_vv, method_name):
-                getattr(self.mock_vv, method_name).return_value = return_value
                 getattr(self.mock_vv, method_name).reset_mock()
+                getattr(self.mock_vv, method_name).return_value = return_value
         
         # Test all endpoints
         endpoint_tests = [
