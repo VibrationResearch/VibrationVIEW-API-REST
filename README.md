@@ -115,6 +115,10 @@ The API is organized into functional modules with consistent patterns:
 
 ## API Usage Examples
 
+> **Note:** If `API_KEY` is configured, all requests must include the header
+> `-H "Authorization: Bearer <your-api-key>"`. This header is omitted from the
+> examples below for brevity.
+
 ### Basic Test Control
 ```bash
 # Start a test (existing file)
@@ -484,6 +488,18 @@ The `SECRET_KEY` is not currently required — the API is stateless and does not
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
+### API Key Authentication
+All requests must include an `Authorization: Bearer <key>` header. To set up:
+
+1. Generate a key:
+   ```bash
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+2. Set `API_KEY` in your `.env` file to the generated value.
+3. Configure the same key on the controller PC (outside of source control).
+
+If `API_KEY` is empty or not set, authentication is disabled.
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
@@ -492,6 +508,9 @@ SECRET_KEY=your-secret-key
 
 # CORS Settings — restricts browser-based cross-origin requests.
 CORS_ORIGINS=http://127.0.0.1
+
+# API Key Authentication
+API_KEY=replace-with-generated-key
 
 # Logging
 LOG_LEVEL=INFO
@@ -505,6 +524,24 @@ VV_MAX_INSTANCES=5
 PROFILE_FOLDER=C:\VibrationVIEW\Profiles
 REPORT_FOLDER=C:\VibrationVIEW\Reports
 ```
+
+## Production Deployment
+
+### Configure Waitress to Bind to the VLAN Interface IP
+
+By default `start-api.bat` binds to `127.0.0.1`. To accept connections from the controller PC, use `--host` with the VLAN adapter IP:
+```
+start-api.bat --host 192.168.1.10 --port 5000
+```
+Do not use `0.0.0.0`, which would expose the API on all network interfaces.
+
+### Add a Firewall Rule to Restrict Access to the Controller PC
+
+From an elevated command prompt on the VibrationVIEW PC:
+```
+netsh advfirewall firewall add rule name="VibrationVIEW REST API" dir=in action=allow protocol=TCP localport=5000 remoteip=192.168.1.20
+```
+Replace `5000` with the Waitress port and `192.168.1.20` with the controller PC's IP address.
 
 ## Troubleshooting
 

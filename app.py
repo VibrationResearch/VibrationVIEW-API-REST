@@ -8,8 +8,9 @@ VibrationVIEW Flask REST API - Main Application
 Entry point for the modular VibrationVIEW automation interface.
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request as flask_request
 from flask_cors import CORS
+import hmac
 import logging
 import os
 from datetime import datetime
@@ -125,6 +126,39 @@ def create_app(config_class=Config):
         ]
     )
     
+    # API key authentication — uses @app.before_request for global Bearer token check.
+    # Alternative: Flask-HTTPAuth (pip install Flask-HTTPAuth) provides a cleaner
+    # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
+    # easier extensibility for multiple keys or roles.
+    # tradeoff: custom implementation avoids extra dependencies and is straightforward for single-key use case.
+    api_key = app.config.get('API_KEY', '')
+    if not api_key:
+        logger.warning('\033[91mAPI_KEY is not set. '
+                       'Set a strong, unique API_KEY in .env before deploying.\033[0m')
+    if api_key:
+        if api_key == 'replace-with-generated-key':
+            logger.warning('\033[91mUsing placeholder API key for authentication. '
+                           'Replace with a strong, unique key before deploying.\033[0m')
+        @app.before_request
+        def require_api_key():
+            # Allow health and docs endpoints without authentication
+            parts = flask_request.path.rstrip('/').split('/')
+            # parts: ['', 'api', 'vN', '<resource>', ...]
+            resource = parts[3] if len(parts) > 3 else ''
+            if resource in ('health', 'docs'):
+                return
+            auth = flask_request.headers.get('Authorization', '')
+            if auth.startswith('Bearer '):
+                token = auth[7:]
+            else:
+                token = auth
+            if not hmac.compare_digest(token, api_key):
+                return jsonify({
+                    'success': False,
+                    'error': 'Unauthorized',
+                    'message': 'Valid API key required in Authorization header'
+                }), 401
+
     # Register blueprint modules directly under /api/v1/ (no module prefixes)
     app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
     app.register_blueprint(status_properties_bp, url_prefix='/api/v1')

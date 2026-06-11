@@ -139,6 +139,7 @@ def app(mock_vv_manager_with_api):
 
     app = create_app(TestingConfig or object())
     app.config['TESTING'] = True
+    app.config['API_KEY'] = ''  # Disable auth in tests by default
 
     yield app
 
