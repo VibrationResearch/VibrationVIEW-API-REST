@@ -11,6 +11,7 @@ import pytest
 import os
 from unittest.mock import patch, MagicMock
 from app import create_app, set_vv_instance, reset_vv_instance
+from config import TestingConfig
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
 
@@ -20,8 +21,7 @@ class TestReportGeneration:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
@@ -343,8 +343,7 @@ class TestDatafileRoute:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
@@ -494,8 +493,7 @@ class TestDatafilesRoute:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
@@ -591,8 +589,7 @@ class TestGenerateReportPathValidation:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
@@ -687,8 +684,7 @@ class TestGenerateTxtPathValidation:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
@@ -783,8 +779,7 @@ class TestGenerateUffPathValidation:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture

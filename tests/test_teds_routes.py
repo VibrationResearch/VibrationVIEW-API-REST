@@ -9,6 +9,7 @@ Tests for TEDS routes with GET pattern and proper indexing using singleton patte
 import pytest
 import json
 from app import create_app, set_vv_instance, reset_vv_instance
+from config import TestingConfig
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
 class TestTEDSRoutes:
@@ -17,8 +18,7 @@ class TestTEDSRoutes:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
     
     @pytest.fixture
@@ -43,8 +43,8 @@ class TestTEDSRoutes:
             [['Sensitivity', '100.0 mV/g'], ['Units', 'mV/g']],  # Channel 0
             [['Sensitivity', '200.0 mV/g'], ['Units', 'mV/g']]   # Channel 1
         ]
-        mock_vv.Teds.return_value = mock_all_teds
         mock_vv.clear_method_calls()
+        mock_vv.Teds.return_value = mock_all_teds
 
         response = client.get('/api/v1/teds')
 
@@ -82,9 +82,9 @@ class TestTEDSRoutes:
             ['Units', 'mV/g'],
             ['Serial Number', '12345']
         ]
+        mock_vv.clear_method_calls()
         mock_vv.Teds.return_value = mock_channel_teds
         mock_vv.GetHardwareInputChannels.return_value = 4
-        mock_vv.clear_method_calls()
         
         # Test with 1-based channel 3 (should convert to 0-based channel 2)
         channel_1based = 3
@@ -182,9 +182,9 @@ class TestTEDSRoutes:
         """Test GET /inputtedschannel with 1-based indexing (now consistent)"""
         # Configure mock
         mock_channel_teds = {'sensitivity': 250.0, 'units': 'mV/g'}
+        mock_vv.clear_method_calls()
         mock_vv.Teds.return_value = mock_channel_teds
         mock_vv.GetHardwareInputChannels.return_value = 4
-        mock_vv.clear_method_calls()
         
         # Test with 1-based channel 3 (should convert to 0-based channel 2)
         channel_1based = 3
@@ -328,7 +328,6 @@ class TestTEDSRoutes:
         """Test GET /tedsread returns transducer parameters for valid URNs"""
         # Configure TedsRead to return list of URNs (16-digit hex strings)
         raw_values = ["3C00000186B96114", "4D00000286C97225"]
-        mock_vv.TedsRead.return_value = raw_values
 
         # Configure TedsFromURN to return TEDS data for each URN
         mock_teds_data = [
@@ -337,8 +336,9 @@ class TestTEDSRoutes:
             ['Sensitivity', '100.0', 'mV/g'],
             ['Serial number', 'SN12345', '']
         ]
-        mock_vv.TedsFromURN.return_value = mock_teds_data
         mock_vv.clear_method_calls()
+        mock_vv.TedsRead.return_value = raw_values
+        mock_vv.TedsFromURN.return_value = mock_teds_data
 
         response = client.get('/api/v1/tedsread')
 
@@ -365,14 +365,14 @@ class TestTEDSRoutes:
         """Test GET /tedsread with mix of valid URNs and invalid values"""
         # Channel 1: valid URN (16-digit hex), Channel 2: no TEDS, Channel 3: valid URN, Channel 4: error
         raw_values = ["3C00000186B96114", "No TEDS data", "4D00000286C97225", "Error: sensor not found"]
-        mock_vv.TedsRead.return_value = raw_values
 
         mock_teds_data = [
             ['Manufacturer', 'PCB', ''],
             ['Sensitivity', '100.0', 'mV/g']
         ]
-        mock_vv.TedsFromURN.return_value = mock_teds_data
         mock_vv.clear_method_calls()
+        mock_vv.TedsRead.return_value = raw_values
+        mock_vv.TedsFromURN.return_value = mock_teds_data
 
         response = client.get('/api/v1/tedsread')
 
@@ -407,8 +407,8 @@ class TestTEDSRoutes:
 
     def test_tedsread_empty_result(self, client, mock_vv):
         """Test GET /tedsread with no channels returned"""
-        mock_vv.TedsRead.return_value = []
         mock_vv.clear_method_calls()
+        mock_vv.TedsRead.return_value = []
 
         response = client.get('/api/v1/tedsread')
 
@@ -423,14 +423,14 @@ class TestTEDSRoutes:
     def test_tedsread_single_urn_string(self, client, mock_vv):
         """Test GET /tedsread when TedsRead returns a single string URN"""
         urn = "5E00000386D08336"  # Valid 16-digit hex URN
-        mock_vv.TedsRead.return_value = urn
 
         mock_teds_data = [
             ['Manufacturer', 'Bruel & Kjaer', ''],
             ['Sensitivity', '50.0', 'mV/g']
         ]
-        mock_vv.TedsFromURN.return_value = mock_teds_data
         mock_vv.clear_method_calls()
+        mock_vv.TedsRead.return_value = urn
+        mock_vv.TedsFromURN.return_value = mock_teds_data
 
         response = client.get('/api/v1/tedsread')
 
@@ -448,7 +448,6 @@ class TestTEDSRoutes:
         """Test GET /tedsread when TedsFromURN fails for some URNs"""
         # All valid 16-digit hex URNs, but one will fail lookup
         raw_values = ["6F00000487E19447", "7000000588F20558", "8100000689003669"]
-        mock_vv.TedsRead.return_value = raw_values
 
         # Configure TedsFromURN to fail for the second URN
         def teds_from_urn_side_effect(urn):
@@ -459,8 +458,9 @@ class TestTEDSRoutes:
                 ['Sensitivity', '100.0', 'mV/g']
             ]
 
-        mock_vv.TedsFromURN.side_effect = teds_from_urn_side_effect
         mock_vv.clear_method_calls()
+        mock_vv.TedsRead.return_value = raw_values
+        mock_vv.TedsFromURN.side_effect = teds_from_urn_side_effect
 
         response = client.get('/api/v1/tedsread')
 

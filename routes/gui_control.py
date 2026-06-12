@@ -191,7 +191,7 @@ def edit_test(vv_instance):
         f"EditTest command executed: {filename}"
     ))
 
-@gui_control_bp.route('/abortedit', methods=['GET'])
+@gui_control_bp.route('/abortedit', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def abort_edit(vv_instance):
@@ -209,7 +209,7 @@ def abort_edit(vv_instance):
     ))
 
 # Window Management Control
-@gui_control_bp.route('/minimize', methods=['GET'])
+@gui_control_bp.route('/minimize', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def minimize(vv_instance):
@@ -226,7 +226,7 @@ def minimize(vv_instance):
         f"Minimize command executed - Result: {result}"
     ))
 
-@gui_control_bp.route('/restore', methods=['GET'])
+@gui_control_bp.route('/restore', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def restore(vv_instance):
@@ -243,7 +243,7 @@ def restore(vv_instance):
         f"Restore command executed - Result: {result}"
     ))
 
-@gui_control_bp.route('/maximize', methods=['GET'])
+@gui_control_bp.route('/maximize', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def maximize(vv_instance):
@@ -260,7 +260,7 @@ def maximize(vv_instance):
         f"Maximize command executed - Result: {result}"
     ))
 
-@gui_control_bp.route('/activate', methods=['GET'])
+@gui_control_bp.route('/activate', methods=['GET', 'POST'])
 @handle_errors
 @with_vibrationview
 def activate(vv_instance):
