@@ -31,6 +31,10 @@ class Config:
     # Set to true for backward compatibility or demonstrations only.
     ALLOW_GET_WRITE = (os.environ.get('ALLOW_GET_WRITE') or 'false').lower() in ('true', '1', 'yes')
 
+    # Maximum request body size. Flask rejects requests larger than this before
+    # they reach application code, preventing memory exhaustion from oversized uploads.
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH') or 10 * 1024 * 1024)
+
     # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
     
