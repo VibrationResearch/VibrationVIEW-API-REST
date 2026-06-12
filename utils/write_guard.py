@@ -28,7 +28,6 @@ WRITE_ENDPOINTS = {
     'maximize',
     'activate',
     'removeallvirtualchannels',
-    'importvirtualchannels',
     'generatereport',
     'generatetxt',
     'generateuff',
