@@ -500,6 +500,11 @@ All requests must include an `Authorization: Bearer <key>` header. To set up:
 
 If `API_KEY` is empty or not set, authentication is disabled.
 
+### Write Guard (ALLOW_GET_WRITE)
+By default, state-changing endpoints (`starttest`, `stoptest`, `savedata`, `recordstart`, etc.) reject GET requests with 405 and require POST. This follows REST conventions and prevents accidental triggers from browser navigation.
+
+Set `ALLOW_GET_WRITE=true` in `.env` to allow GET on these endpoints for backward compatibility or demonstrations.
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
@@ -511,6 +516,9 @@ CORS_ORIGINS=http://127.0.0.1
 
 # API Key Authentication
 API_KEY=replace-with-generated-key
+
+# Write Guard — block GET on state-changing endpoints (default: false)
+ALLOW_GET_WRITE=false
 
 # Logging
 LOG_LEVEL=INFO
