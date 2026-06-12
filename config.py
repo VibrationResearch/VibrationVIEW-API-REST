@@ -68,6 +68,7 @@ class TestingConfig(Config):
     DEBUG = True
     LOG_LEVEL = 'DEBUG'
     ALLOW_GET_WRITE = True
+    API_KEY = ''  # Disable auth — must be set before create_app() registers the before_request hook
 
 config = {
     'development': DevelopmentConfig,

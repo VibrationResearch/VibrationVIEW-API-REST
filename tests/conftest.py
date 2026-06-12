@@ -137,9 +137,11 @@ def app(mock_vv_manager_with_api):
     from app import set_vv_instance, reset_vv_instance
     set_vv_instance(mock_vv_manager_with_api)
 
+    # API_KEY and ALLOW_GET_WRITE are set in TestingConfig — they must be
+    # configured before create_app() because before_request hooks capture
+    # config values in closures at registration time.
     app = create_app(TestingConfig or object())
     app.config['TESTING'] = True
-    app.config['API_KEY'] = ''  # Disable auth in tests by default
 
     yield app
 
