@@ -14,7 +14,7 @@ import os
 from unittest.mock import patch
 from app import create_app, set_vv_instance, reset_vv_instance
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
-from config import Config
+from config import Config, TestingConfig
 
 
 class TestGetDataFileSecurity:
@@ -23,8 +23,7 @@ class TestGetDataFileSecurity:
     @pytest.fixture
     def app(self):
         """Create test app"""
-        app = create_app()
-        app.config['TESTING'] = True
+        app = create_app(TestingConfig)
         return app
 
     @pytest.fixture
