@@ -9,6 +9,7 @@ Decorators for error handling and COM exception management
 import functools
 import logging
 from flask import jsonify
+from werkzeug.exceptions import HTTPException
 from utils.response_helpers import error_response, com_error_response
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,9 @@ def handle_errors(func):
         try:
             return func(*args, **kwargs)
             
+        except HTTPException:
+            raise
+
         except ImportError as e:
             # VibrationVIEW API not available
             logger.error(f"VibrationVIEW API import error in {func.__name__}: {str(e)}")
