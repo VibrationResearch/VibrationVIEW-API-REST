@@ -256,7 +256,7 @@ def run_test(vv_instance):
             file_path = result['FilePath']
             try:
                 vv_instance.RunTest(file_path)
-                success = vv_instance.IsRunning()
+                result = vv_instance.IsRunning()
             except Exception as e:
                 return jsonify(error_response(
                     f'File uploaded but failed to run test "{filename}": {str(e)}',
@@ -266,12 +266,11 @@ def run_test(vv_instance):
 
             return jsonify(success_response(
                 {
-                    'result': success,
+                    'result': result,
                     'filepath': filename,
-                    'file_uploaded': True,
-                    'test_started': success
+                    'file_uploaded': True
                 },
-                f"Upload and RunTest command {'executed successfully' if success else 'failed'}: {filename}"
+                f"Upload and RunTest command {'executed successfully' if result else 'failed'}: {filename}"
             ))
 
     # No file upload - run existing file by path
@@ -284,7 +283,8 @@ def run_test(vv_instance):
         )), 400
 
     try:
-        result = vv_instance.RunTest(filename)
+        vv_instance.RunTest(filename)
+        result = vv_instance.IsRunning()
     except Exception as e:
         return jsonify(error_response(
             f'Failed to run test "{filename}": {str(e)}',
@@ -441,7 +441,7 @@ def open_test(vv_instance):
         )), 400
 
     try:
-        result = vv_instance.OpenTest(filename)
+        vv_instance.OpenTest(filename)
     except Exception as e:
         return jsonify(error_response(
             f'Failed to open test "{filename}": {str(e)}',
@@ -451,7 +451,7 @@ def open_test(vv_instance):
 
     return jsonify(success_response(
         {
-            'result': result,
+            'result': True,
             'filepath': filename
         },
         f"OpenTest command executed: {filename}"
