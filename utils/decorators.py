@@ -71,6 +71,7 @@ def handle_errors(func):
             error_info = get_error_info(e)
             if error_info:
                 http_status, error_code, message = classify_vview_error(error_info["code"])
+                error_info["raw"] = str(e)
                 logger.error(f"VibrationVIEW error in {func.__name__}: {error_code} - {message}")
                 return jsonify(error_response(message, error_code, details=error_info)), http_status
 
