@@ -6,12 +6,12 @@ import math
 
 import logging
 from flask import request
-
-logger = logging.getLogger(__name__)
 from urllib.parse import unquote
 from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
+
+logger = logging.getLogger(__name__)
 
 PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj', 'vyp'}
 
