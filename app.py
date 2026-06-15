@@ -362,11 +362,12 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     # Create app (early binding happens in create_app)
-    logger.info("Starting Flask server...")
+    # print() used here because logging is not configured until create_app() runs.
+    print("Starting Flask server...")
     try:
         app = create_app()
     except RuntimeError as e:
-        logger.error(f"Failed to initialize: {e}")
+        print(f"Failed to initialize: {e}")
         exit(-1)
 
     import argparse
