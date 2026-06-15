@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import convert_channel_to_com_index, handle_binary_upload, extract_com_error_info, detect_file_upload, get_filename_from_request
+from utils.utils import convert_channel_to_com_index, handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
 from datetime import datetime
 import config

@@ -11,7 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import extract_com_error_info, sanitize_nan
+from utils.utils import sanitize_nan
 from utils.vv_error_codes import VVIEW_E_NO_DATA, VVIEW_E_ALREADY_RUNNING, is_vview_error
 
 import logging

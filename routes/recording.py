@@ -11,8 +11,6 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import extract_com_error_info
-
 import logging
 from datetime import datetime
 

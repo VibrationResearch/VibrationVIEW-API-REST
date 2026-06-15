@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, extract_com_error_info, is_default_template_filename, detect_file_upload, get_filename_from_request
+from utils.utils import handle_binary_upload, is_default_template_filename, detect_file_upload, get_filename_from_request
 from utils.path_validator import validate_file_path, PathValidationError
 
 import logging
