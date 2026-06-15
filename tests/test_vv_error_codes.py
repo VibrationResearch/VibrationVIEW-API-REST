@@ -106,6 +106,23 @@ class TestGetScodeFromException:
         exc = Exception("a", "b", "not a tuple")
         assert get_scode_from_exception(exc) is None
 
+    def test_extracts_from_hresult_attribute(self):
+        """When the VV error code is the hresult itself (no DISP_E_EXCEPTION wrapper)"""
+        exc = Exception("COM error")
+        exc.hresult = VVIEW_E_ALREADY_RUNNING
+        assert get_scode_from_exception(exc) == VVIEW_E_ALREADY_RUNNING
+
+    def test_prefers_excepinfo_scode_over_hresult(self):
+        """When both excepinfo scode and hresult are present, prefer excepinfo scode"""
+        from utils.vv_error_codes import DISP_E_EXCEPTION
+        exc = Exception(
+            DISP_E_EXCEPTION,
+            "Exception occurred.",
+            (None, None, None, None, None, VVIEW_E_BADPARAMETER),
+        )
+        exc.hresult = DISP_E_EXCEPTION
+        assert get_scode_from_exception(exc) == VVIEW_E_BADPARAMETER
+
 
 class TestIsVviewError:
     """Test is_vview_error matching"""
@@ -144,7 +161,7 @@ class TestGetErrorInfo:
         info = get_error_info(exc)
         assert info is not None
         assert info["code"] == -12345
-        assert "UNKNOWN" in info["name"]
+        assert "COM error" in info["name"]
 
     def test_plain_exception_returns_none(self):
         exc = Exception("no COM info")
@@ -209,6 +226,20 @@ class TestHandleErrorsDecorator:
         with app.test_request_context():
             response, status = fake_endpoint()
             assert status == 503
+
+    def test_already_running_via_hresult_returns_409(self, app):
+        """When the VV error code is directly on e.hresult (no DISP_E_EXCEPTION wrapper)"""
+        from utils.decorators import handle_errors
+
+        @handle_errors
+        def fake_endpoint():
+            exc = Exception("Test is already running")
+            exc.hresult = VVIEW_E_ALREADY_RUNNING
+            raise exc
+
+        with app.test_request_context():
+            response, status = fake_endpoint()
+            assert status == 409
 
     def test_unknown_exception_returns_500(self, app):
         from utils.decorators import handle_errors
