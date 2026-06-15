@@ -7,7 +7,6 @@ import uuid
 from urllib.parse import unquote
 
 from flask import request
-from vibrationviewapi import ExtractComErrorInfo
 from werkzeug.utils import secure_filename
 
 import config
@@ -201,18 +200,6 @@ def GetVectorData(vvInstance, vector):
 
     except Exception as e:
         raise RuntimeError(f"Error retrieving vector data: {e}")
-
-
-def extract_com_error_info(exception):
-    """
-    Extract information from COM errors for better error reporting
-    This is a wrapper for ExtractComErrorInfo to ensure consistent error handling
-    """
-    try:
-        return ExtractComErrorInfo(exception)
-    except Exception:
-        # Fallback if ExtractComErrorInfo fails
-        return str(exception)
 
 
 def convert_channel_to_com_index(channel_user):
