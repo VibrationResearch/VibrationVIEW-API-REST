@@ -75,7 +75,7 @@ class TestReportGeneration:
             mock_send_file.return_value = MagicMock()
 
             # Make the request (filename required for binary upload detection)
-            response = client.post(
+            client.post(
                 f'/api/v1/generatereport?filename=test.vrd&template_name={template_name}&output_name={output_name}',
                 data=vrd_content,
                 headers={
@@ -145,7 +145,7 @@ class TestReportGeneration:
             mock_send_file.return_value = MagicMock()
 
             # output_name is now derived from uploaded filename when not provided
-            response = client.post(
+            client.post(
                 '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate',
                 data=vrd_content,
                 headers={
@@ -276,7 +276,7 @@ class TestReportGeneration:
                 mock_exists.return_value = True
                 mock_send_file.return_value = MagicMock()
 
-                response = client.post(
+                client.post(
                     f'/api/v1/generatereport?template_name={template_name}&output_name=output.pdf',
                     data=vrd_content,
                     headers={
@@ -316,7 +316,7 @@ class TestReportGeneration:
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            response = client.post(
+            client.post(
                 f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
                 data=vrd_content,
                 headers={
@@ -480,7 +480,7 @@ class TestDatafileRoute:
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            response = client.get(f'/api/v1/datafile?file_path={test_file_path}')
+            client.get(f'/api/v1/datafile?file_path={test_file_path}')
 
             # send_file should have been called with the validated path
             mock_send_file.assert_called_once()
@@ -533,7 +533,7 @@ class TestDatafilesRoute:
             mock_zip_instance = MagicMock()
             mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
-            response = client.get('/api/v1/datafiles')
+            client.get('/api/v1/datafiles')
 
             # Verify ReportFieldsHistory was called
             mock_vv.ReportFieldsHistory.assert_called_once()
