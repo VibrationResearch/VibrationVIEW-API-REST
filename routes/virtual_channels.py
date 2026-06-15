@@ -21,8 +21,6 @@ virtual_channels_bp = Blueprint('virtual_channels', __name__)
 
 logger = logging.getLogger(__name__)
 
-MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB limit
-
 
 @virtual_channels_bp.route('/docs/virtual_channels', methods=['GET'])
 def get_documentation():

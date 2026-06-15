@@ -194,7 +194,7 @@ class TestReportGeneration:
 
         assert response.status_code == 413  # Payload Too Large
         data = response.get_json()
-        assert 'File too large' in data['Error']
+        assert data['success'] is False
 
     def test_generatereport_generation_failure(self, client, mock_vv, sample_vrd_path):
         """Test POST /generatereport when GenerateReportFromVV fails"""

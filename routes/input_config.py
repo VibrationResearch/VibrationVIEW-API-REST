@@ -23,8 +23,6 @@ input_config_bp = Blueprint('input_config', __name__)
 
 logger = logging.getLogger(__name__)
 
-MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB limit
-
 @input_config_bp.route('/docs/input_config', methods=['GET'])
 def get_documentation():
     """Get input configuration module documentation"""

@@ -326,6 +326,15 @@ def create_app(config_class=Config):
             'message': 'Invalid request parameters'
         }), 400
 
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        max_mb = app.config.get('MAX_CONTENT_LENGTH', 0) // (1024 * 1024)
+        return jsonify({
+            'success': False,
+            'error': 'Request entity too large',
+            'message': f'Request body exceeds the {max_mb}MB limit'
+        }), 413
+
     @app.errorhandler(500)
     def internal_error(error):
         return jsonify({

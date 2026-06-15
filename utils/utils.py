@@ -338,9 +338,6 @@ def sanitize_nan(value):
     return value
 
 
-# Maximum file upload size (10 MB)
-MAX_UPLOAD_SIZE = 10 * 1024 * 1024
-
 
 def detect_file_upload():
     """
@@ -384,9 +381,6 @@ def detect_file_upload():
         if not filename:
             return ({'Error': 'Multipart file field has no filename'}, 400, None)
 
-        if content_length > MAX_UPLOAD_SIZE:
-            return ({'Error': 'File too large (max 10MB)'}, 413, None)
-
         return (filename, binary_data, content_length)
 
     elif is_binary_content_type:
@@ -402,10 +396,6 @@ def detect_file_upload():
             return ({'Error': 'Missing filename: provide via multipart/form-data file field or query parameter'}, 400, None)
 
         content_length = request.content_length
-
-        if content_length > MAX_UPLOAD_SIZE:
-            return ({'Error': 'File too large (max 10MB)'}, 413, None)
-
         binary_data = request.get_data()
         logging.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
 

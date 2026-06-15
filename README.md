@@ -505,6 +505,13 @@ By default, state-changing endpoints (`starttest`, `stoptest`, `savedata`, `reco
 
 Set `ALLOW_GET_WRITE=true` in `.env` to allow GET on these endpoints for backward compatibility or demonstrations.
 
+### Upload Size Limit (MAX_CONTENT_LENGTH)
+Flask rejects request bodies larger than `MAX_CONTENT_LENGTH` (default: 10 MB) before they reach application code, preventing memory exhaustion from oversized uploads. Set in `.env` to override:
+
+```
+MAX_CONTENT_LENGTH=10485760
+```
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
