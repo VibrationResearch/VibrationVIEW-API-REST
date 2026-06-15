@@ -24,53 +24,51 @@ logger = logging.getLogger(__name__)
 @advanced_control_system_check_bp.route("/docs/advanced_control_system_check", methods=["GET"])
 def get_docs():
     """Documentation for System Check Routes"""
-    return jsonify({
-        "module": "advanced_control_system_check",
-        "description": "System check operations for frequency and output voltage control",
-        "endpoints": {
-            "GET /docs/advanced_control_system_check": {
-                "description": "Get documentation for this module",
-                "returns": "dict - This documentation",
-            },
-            "GET /systemcheckfrequency": {
-                "description": "Get current system check frequency",
-                "com_method": "SystemCheckFrequency()",
-                "returns": "float - Current frequency",
-                "example": "GET /api/v1/systemcheckfrequency",
-            },
-            "GET|POST /systemcheckfrequency": {
-                "description": "Get/Set system check frequency",
-                "com_method": "SystemCheckFrequency() or SystemCheckFrequency(value)",
-                "parameters": {
-                    "value": "float - Frequency value (POST URL parameter only)"
+    return jsonify(
+        {
+            "module": "advanced_control_system_check",
+            "description": "System check operations for frequency and output voltage control",
+            "endpoints": {
+                "GET /docs/advanced_control_system_check": {
+                    "description": "Get documentation for this module",
+                    "returns": "dict - This documentation",
                 },
-                "returns": "float - Current frequency",
-                "example": "POST /api/v1/systemcheckfrequency?value=120.0 or /api/v1/systemcheckfrequency?120.0",
-            },
-            "GET /systemcheckoutputvoltage": {
-                "description": "Get current system check output voltage",
-                "com_method": "SystemCheckOutputVoltage()",
-                "returns": "float - Current voltage",
-                "example": "GET /api/v1/systemcheckoutputvoltage",
-            },
-            "GET|POST /systemcheckoutputvoltage": {
-                "description": "Get/Set system check output voltage",
-                "com_method": "SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)",
-                "parameters": {
-                    "value": "float - Voltage value (POST URL parameter only)"
+                "GET /systemcheckfrequency": {
+                    "description": "Get current system check frequency",
+                    "com_method": "SystemCheckFrequency()",
+                    "returns": "float - Current frequency",
+                    "example": "GET /api/v1/systemcheckfrequency",
                 },
-                "returns": "float - Current voltage",
-                "example": "POST /api/v1/systemcheckoutputvoltage?value=5.0 or /api/v1/systemcheckoutputvoltage?5.0",
+                "GET|POST /systemcheckfrequency": {
+                    "description": "Get/Set system check frequency",
+                    "com_method": "SystemCheckFrequency() or SystemCheckFrequency(value)",
+                    "parameters": {"value": "float - Frequency value (POST URL parameter only)"},
+                    "returns": "float - Current frequency",
+                    "example": "POST /api/v1/systemcheckfrequency?value=120.0 or /api/v1/systemcheckfrequency?120.0",
+                },
+                "GET /systemcheckoutputvoltage": {
+                    "description": "Get current system check output voltage",
+                    "com_method": "SystemCheckOutputVoltage()",
+                    "returns": "float - Current voltage",
+                    "example": "GET /api/v1/systemcheckoutputvoltage",
+                },
+                "GET|POST /systemcheckoutputvoltage": {
+                    "description": "Get/Set system check output voltage",
+                    "com_method": "SystemCheckOutputVoltage() or SystemCheckOutputVoltage(value)",
+                    "parameters": {"value": "float - Voltage value (POST URL parameter only)"},
+                    "returns": "float - Current voltage",
+                    "example": "POST /api/v1/systemcheckoutputvoltage?value=5.0 or /api/v1/systemcheckoutputvoltage?5.0",
+                },
             },
-        },
-        "notes": [
-            "GET /systemcheckfrequency returns current frequency value",
-            "POST /systemcheckfrequency with value parameter sets frequency",
-            "GET /systemcheckoutputvoltage returns current voltage value",
-            "POST /systemcheckoutputvoltage with value parameter sets voltage",
-            "COM interface uses 0-based indexing for all arrays",
-        ],
-    })
+            "notes": [
+                "GET /systemcheckfrequency returns current frequency value",
+                "POST /systemcheckfrequency with value parameter sets frequency",
+                "GET /systemcheckoutputvoltage returns current voltage value",
+                "POST /systemcheckoutputvoltage with value parameter sets voltage",
+                "COM interface uses 0-based indexing for all arrays",
+            ],
+        }
+    )
 
 
 @advanced_control_system_check_bp.route("/systemcheckfrequency", methods=["GET", "POST"])
@@ -90,24 +88,20 @@ def system_check_frequency(vv_instance):
     if request.method == "GET" and not request.args:
         # GET without parameters - return current value
         result = vv_instance.SystemCheckFrequency()
-        return jsonify(
-            success_response(
-                {"result": result}, f"SystemCheckFrequency retrieved: {result} Hz"
-            )
-        )
+        return jsonify(success_response({"result": result}, f"SystemCheckFrequency retrieved: {result} Hz"))
     else:
         # Set frequency from parameters
         value = request.args.get("value", type=float)
-        
+
         # If no 'value' parameter, try to get the first unnamed parameter
         if value is None:
             args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
+            if args and args[0].replace(".", "").replace("-", "").isdigit():
                 try:
                     value = float(args[0])
                 except ValueError:
                     pass
-        
+
         if value is None:
             return (
                 jsonify(
@@ -144,24 +138,20 @@ def system_check_output_voltage(vv_instance):
     if request.method == "GET" and not request.args:
         # GET without parameters - return current value
         result = vv_instance.SystemCheckOutputVoltage()
-        return jsonify(
-            success_response(
-                {"result": result}, f"SystemCheckOutputVoltage retrieved: {result} V"
-            )
-        )
+        return jsonify(success_response({"result": result}, f"SystemCheckOutputVoltage retrieved: {result} V"))
     else:
         # Set voltage from parameters
         value = request.args.get("value", type=float)
-        
+
         # If no 'value' parameter, try to get the first unnamed parameter
         if value is None:
             args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
+            if args and args[0].replace(".", "").replace("-", "").isdigit():
                 try:
                     value = float(args[0])
                 except ValueError:
                     pass
-        
+
         if value is None:
             return (
                 jsonify(
