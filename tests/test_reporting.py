@@ -6,8 +6,10 @@
 Tests for reporting routes (/reportfield, /reportfields, /reportfieldshistory, etc.)
 """
 
-import pytest
 import json
+
+import pytest
+
 from app import get_vv_instance
 
 
@@ -267,6 +269,7 @@ class TestReportFieldsHistory:
     def test_reportfieldshistory_no_data(self, client):
         """Test /reportfieldshistory when no data files available"""
         from pywintypes import com_error
+
         from utils.vv_error_codes import VVIEW_E_NO_DATA
         # Simulate VVIEW_E_NO_DATA error - scode at index 5
         error = com_error(-2147352567, 'Exception occurred.', (0, None, 'No data', None, 0, VVIEW_E_NO_DATA), None)
@@ -283,6 +286,7 @@ class TestReportFieldsHistory:
     def test_reportfieldshistory_test_running(self, client):
         """Test /reportfieldshistory when test is running"""
         from pywintypes import com_error
+
         from utils.vv_error_codes import VVIEW_E_ALREADY_RUNNING
         # Simulate VVIEW_E_ALREADY_RUNNING error - scode at index 5
         error = com_error(-2147352567, 'Exception occurred.', (0, None, 'Already running', None, 0, VVIEW_E_ALREADY_RUNNING), None)
@@ -415,6 +419,7 @@ class TestFormFields:
     def test_formfields_get_empty(self, client):
         """Test GET /formfields when no form data"""
         from pywintypes import com_error
+
         from utils.vv_error_codes import VVIEW_E_NO_DATA
         # Simulate VVIEW_E_NO_DATA error - scode at index 5
         error = com_error(-2147352567, 'Exception occurred.', (0, None, 'No data', None, 0, VVIEW_E_NO_DATA), None)

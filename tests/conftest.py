@@ -6,10 +6,11 @@
 Pytest configuration and shared fixtures for VibrationVIEW API tests
 """
 
-import pytest
-from unittest.mock import MagicMock
-import sys
 import os
+import sys
+from unittest.mock import MagicMock
+
+import pytest
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -134,7 +135,7 @@ def app(mock_vv_manager_with_api):
 
     # CRITICAL: Set the mock instance BEFORE create_app() because early binding
     # calls get_vv_instance() inside create_app()
-    from app import set_vv_instance, reset_vv_instance
+    from app import reset_vv_instance, set_vv_instance
     set_vv_instance(mock_vv_manager_with_api)
 
     # API_KEY and ALLOW_GET_WRITE are set in TestingConfig — they must be

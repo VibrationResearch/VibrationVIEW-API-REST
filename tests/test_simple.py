@@ -1,16 +1,16 @@
 # ============================================================================
 # FILE: tests/test_simple.py
 # ============================================================================
-import pytest
 import json
-from unittest.mock import patch
-from app import create_app, set_vv_instance, reset_vv_instance
+
+from app import reset_vv_instance, set_vv_instance
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW  # Add this line
+
 
 class TestSimple:
     def test_debug_singleton_behavior(self, client):
         """Debug test to understand what's happening with the singleton"""
-        from app import get_vv_instance, _vv_instance
+        from app import _vv_instance, get_vv_instance
         
         print(f"Initial singleton instance: {_vv_instance}")
         

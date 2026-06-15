@@ -9,11 +9,11 @@ Verify that the application uses an absolute log directory, configures
 RotatingFileHandler with the expected defaults, and respects overrides.
 """
 
-import os
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
-from config import Config, TestingConfig
+from config import Config
 
 
 class TestLoggingConfig:

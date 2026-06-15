@@ -6,11 +6,12 @@
 Tests to verify each route module includes a get_documentation endpoint
 """
 
-import pytest
 import json
-from app import set_vv_instance, reset_vv_instance
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
+import pytest
+
+from app import reset_vv_instance, set_vv_instance
+from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
 # All route modules that should have documentation endpoints
 ROUTE_MODULES = [

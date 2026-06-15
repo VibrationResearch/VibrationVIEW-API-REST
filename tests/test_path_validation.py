@@ -7,20 +7,21 @@ Test cases for path validation security functionality
 Ensures that file path restrictions prevent path traversal attacks
 """
 
-import pytest
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
+from config import Config
 from utils.path_validator import (
     PathValidationError,
     get_authorized_directories,
-    normalize_path,
     is_path_within_authorized_directories,
+    normalize_path,
+    secure_path_join,
     validate_file_path,
     validate_output_path,
-    secure_path_join
 )
-from config import Config
 
 
 class TestPathValidation:

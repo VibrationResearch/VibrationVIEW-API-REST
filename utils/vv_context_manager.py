@@ -7,6 +7,7 @@ Context manager wrapper for VibrationVIEW API using the official thread-safe imp
 """
 
 import logging
+
 from vibrationviewapi import VibrationVIEW
 
 logger = logging.getLogger(__name__)

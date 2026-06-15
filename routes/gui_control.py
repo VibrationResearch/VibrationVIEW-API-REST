@@ -7,14 +7,14 @@ GUI Control Routes - 1:1 VibrationVIEW COM Interface Mapping
 GUI and window management operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
-import os
-import config
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.utils import detect_file_upload, get_filename_from_request, handle_binary_upload
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 gui_control_bp = Blueprint('gui_control', __name__)

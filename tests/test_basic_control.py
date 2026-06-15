@@ -6,10 +6,12 @@
 Tests for basic control routes, including template file upload functionality
 """
 
-import os
 import json
-import pytest
+import os
 from unittest.mock import patch
+
+import pytest
+
 from app import get_vv_instance
 
 

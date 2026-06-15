@@ -7,16 +7,19 @@ Input Configuration Routes - 1:1 VibrationVIEW COM Interface Mapping
 Input channel properties, settings, and configuration operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from urllib.parse import unquote
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
-from utils.utils import convert_channel_to_com_index, handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
-from datetime import datetime
-import config
-import os
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.utils import (
+    convert_channel_to_com_index,
+    detect_file_upload,
+    get_filename_from_request,
+    handle_binary_upload,
+)
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 input_config_bp = Blueprint('input_config', __name__)

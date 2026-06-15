@@ -7,15 +7,15 @@ Reporting Control Routes - 1:1 VibrationVIEW COM Interface Mapping
 Report data retrieval operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
-from utils.utils import sanitize_nan
-from utils.vv_error_codes import VVIEW_E_NO_DATA, VVIEW_E_ALREADY_RUNNING, is_vview_error
-
 import logging
-from datetime import datetime
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.utils import sanitize_nan
+from utils.vv_error_codes import VVIEW_E_ALREADY_RUNNING, VVIEW_E_NO_DATA, is_vview_error
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 reporting_bp = Blueprint('reporting', __name__)
@@ -297,7 +297,7 @@ def report_fields(vv_instance):
     else:
         response_data['results'] = results_list
 
-    message = f"ReportFields executed successfully"
+    message = "ReportFields executed successfully"
 
     return jsonify(success_response(response_data, message))
 
@@ -393,7 +393,7 @@ def report_fields_history(vv_instance):
         'executed': True
     }
 
-    message = f"ReportFieldsHistory executed successfully"
+    message = "ReportFieldsHistory executed successfully"
 
     return jsonify(success_response(response_data, message))
 
@@ -604,7 +604,7 @@ def report_vector_history(vv_instance):
         'executed': True
     }
 
-    message = f"ReportVectorHistory executed successfully"
+    message = "ReportVectorHistory executed successfully"
 
     return jsonify(success_response(response_data, message))
 

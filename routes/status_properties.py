@@ -7,13 +7,13 @@ Status Properties Routes - 1:1 VibrationVIEW COM Interface Mapping
 System status checking and monitoring operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
 import logging
-import time
-from datetime import datetime
+
+from flask import Blueprint, jsonify
+
+from utils.decorators import handle_errors
+from utils.response_helpers import success_response
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 status_properties_bp = Blueprint('status_properties', __name__)

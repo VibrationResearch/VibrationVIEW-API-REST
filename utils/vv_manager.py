@@ -6,8 +6,9 @@
 VibrationVIEW manager using the app singleton
 """
 
-from functools import wraps
 import logging
+from functools import wraps
+
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 

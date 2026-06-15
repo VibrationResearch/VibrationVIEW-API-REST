@@ -9,6 +9,7 @@ Response formatting utilities for consistent API responses
 from datetime import datetime
 from typing import Any, Dict, Optional
 
+
 def success_response(data: Any = None, message: str = "Operation completed successfully") -> Dict:
     """
     Create standardized success response

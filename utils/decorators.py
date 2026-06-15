@@ -8,9 +8,11 @@ Decorators for error handling and COM exception management
 
 import functools
 import logging
+
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
-from utils.response_helpers import error_response, com_error_response
+
+from utils.response_helpers import com_error_response, error_response
 
 logger = logging.getLogger(__name__)
 

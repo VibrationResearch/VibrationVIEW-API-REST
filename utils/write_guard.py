@@ -7,7 +7,7 @@ When ALLOW_GET_WRITE is false, registers a before_request hook that returns
 405 for GET requests to state-changing endpoints.
 """
 
-from flask import request, jsonify
+from flask import jsonify, request
 
 WRITE_ENDPOINTS = {
     'starttest',

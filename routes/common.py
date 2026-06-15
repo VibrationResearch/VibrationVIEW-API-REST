@@ -8,11 +8,12 @@ routes/common.py
 Shared utilities and decorators for all route modules.
 """
 
-import traceback
 import logging
+import traceback
 from datetime import datetime
-from typing import Dict, Any, List, Optional
 from functools import wraps
+from typing import Any, Dict, Optional
+
 from flask import jsonify
 
 logger = logging.getLogger(__name__)

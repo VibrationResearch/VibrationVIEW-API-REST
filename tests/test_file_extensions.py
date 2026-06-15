@@ -7,20 +7,21 @@ Tests to verify all file extensions are recognized as valid
 and routed to the correct folders.
 """
 
-import pytest
 from unittest.mock import patch
+
+import pytest
+
+from config import Config
 from utils.utils import (
-    PROFILE_EXTENSIONS,
-    DATA_EXTENSIONS,
-    TEMPLATE_EXTENSIONS,
-    INPUTCONFIG_EXTENSIONS,
-    REPORT_EXTENSIONS,
     ALLOWED_EXTENSIONS,
+    DATA_EXTENSIONS,
+    INPUTCONFIG_EXTENSIONS,
+    PROFILE_EXTENSIONS,
+    REPORT_EXTENSIONS,
+    TEMPLATE_EXTENSIONS,
     get_folder_for_extension,
     handle_binary_upload,
 )
-from config import Config
-
 
 # ---- Extension set membership ----
 

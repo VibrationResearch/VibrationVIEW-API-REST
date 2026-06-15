@@ -8,7 +8,8 @@ state-changing endpoints must return 405, while POST still works.
 """
 
 import pytest
-from app import create_app, set_vv_instance, reset_vv_instance
+
+from app import create_app, reset_vv_instance, set_vv_instance
 from config import TestingConfig
 from utils.write_guard import WRITE_ENDPOINTS
 

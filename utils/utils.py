@@ -1,15 +1,16 @@
+import logging
+import math
 import os
 import re
 import subprocess
 import uuid
-import math
-
-import logging
-from flask import request
 from urllib.parse import unquote
+
+from flask import request
 from vibrationviewapi import ExtractComErrorInfo
-import config
 from werkzeug.utils import secure_filename
+
+import config
 
 logger = logging.getLogger(__name__)
 

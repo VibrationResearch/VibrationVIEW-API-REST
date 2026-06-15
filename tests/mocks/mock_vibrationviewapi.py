@@ -1,6 +1,7 @@
-from unittest.mock import MagicMock
 import time
-from typing import List, Dict, Any, Optional, Union
+from typing import Dict, List, Optional
+from unittest.mock import MagicMock
+
 
 class MockVibrationVIEW:
     """

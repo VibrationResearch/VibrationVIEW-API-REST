@@ -8,9 +8,12 @@ Tests both data retrieval and vector properties functionality
 Matches current implementation with GET requests and query parameters
 """
 
-import pytest
 import json
+
+import pytest
+
 from app import get_vv_instance
+
 
 class TestDataRetrieval:
     """Test data retrieval endpoints including vector properties"""
@@ -67,7 +70,7 @@ class TestDataRetrieval:
         
     def test_debug_singleton_behavior(self, client):
         """Debug test to understand singleton behavior"""
-        from app import get_vv_instance, _vv_instance
+        from app import _vv_instance, get_vv_instance
         
         print(f"Current singleton instance: {_vv_instance}")
         print(f"Retrieved instance: {get_vv_instance()}")
@@ -939,7 +942,7 @@ class TestDataRetrieval:
         not_found_count = len([r for r in results.values() if r == "NOT_FOUND"])
         error_count = len([r for r in results.values() if r not in ["SUCCESS", "NOT_FOUND"]])
         
-        print(f"\n=== SUMMARY ===")
+        print("\n=== SUMMARY ===")
         print(f"✅ Working endpoints: {success_count}/{len(endpoint_tests)}")
         print(f"❌ Not found endpoints: {not_found_count}/{len(endpoint_tests)}")
         print(f"⚠️  Error endpoints: {error_count}/{len(endpoint_tests)}")

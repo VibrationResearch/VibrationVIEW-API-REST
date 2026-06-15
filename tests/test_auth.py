@@ -7,9 +7,9 @@ Tests for API key authentication and public endpoint exemptions.
 """
 
 import pytest
-from app import create_app, set_vv_instance, reset_vv_instance
+
+from app import create_app, reset_vv_instance, set_vv_instance
 from config import TestingConfig
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
 
 class AuthTestConfig(TestingConfig):

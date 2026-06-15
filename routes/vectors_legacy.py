@@ -14,11 +14,13 @@ Includes:
 - Vector properties and metadata (unit, label, length)
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
 import logging
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 vectors_legacy_bp = Blueprint('vectors_legacy', __name__)

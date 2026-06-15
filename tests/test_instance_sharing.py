@@ -6,8 +6,9 @@
 Test to verify that the mock VibrationVIEW instance is shared correctly
 """
 
+
 import pytest
-import json
+
 
 class TestInstanceSharing:
     """Test that all VibrationVIEW() calls return the same mock instance"""

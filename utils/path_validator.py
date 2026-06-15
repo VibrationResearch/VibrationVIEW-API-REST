@@ -8,7 +8,8 @@ Ensures file paths are restricted to authorized directories
 """
 
 from pathlib import Path
-from typing import Union, List
+from typing import List, Union
+
 from config import Config
 
 

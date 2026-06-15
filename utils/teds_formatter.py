@@ -5,7 +5,7 @@ Converts raw TEDS data from VibrationVIEW COM interface into structured JSON for
 """
 
 import re
-from typing import List, Dict, Any, Optional, Union
+from typing import Any, Dict, List, Optional
 
 
 def parse_numeric_value(value_str: str) -> Optional[float]:

@@ -9,10 +9,11 @@ Auxiliary input properties and metadata methods
 - Rear input channel metadata (1-based indexing)
 """
 
-from flask import Blueprint, request, jsonify
-from vibrationviewapi import VibrationVIEW
+from flask import Blueprint, jsonify, request
+
 from utils.vv_manager import with_vibrationview
-from .common import handle_errors, success_response, validate_required_params
+
+from .common import handle_errors, success_response
 
 auxinputs_bp = Blueprint('auxinputs', __name__, url_prefix='/api')
 

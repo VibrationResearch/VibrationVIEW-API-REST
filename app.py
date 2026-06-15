@@ -8,40 +8,41 @@ VibrationVIEW Flask REST API - Main Application
 Entry point for the modular VibrationVIEW automation interface.
 """
 
-from flask import Flask, jsonify, request as flask_request
-from flask_cors import CORS
 import hmac
 import logging
 import os
-from datetime import datetime
 import threading
+from datetime import datetime
+
+from flask import Flask, jsonify
+from flask import request as flask_request
+from flask_cors import CORS
 
 # Module-level logger
 logger = logging.getLogger(__name__)
 
 # Import route modules - clean imports using __init__.py
+# Import configuration
+from config import Config
 from routes import (
-    basic_control_bp,
-    status_properties_bp,
-    data_retrieval_bp,
     advanced_control_bp,
     advanced_control_sine_bp,
     advanced_control_system_check_bp,
+    auxinputs_bp,
+    basic_control_bp,
+    data_retrieval_bp,
+    gui_control_bp,
     hardware_config_bp,
     input_config_bp,
-    teds_bp,
-    recording_bp,
-    reporting_bp,
-    auxinputs_bp,
-    gui_control_bp,
-    report_generation_bp,
-    virtual_channels_bp,
     log_bp,
-    vectors_legacy_bp
+    recording_bp,
+    report_generation_bp,
+    reporting_bp,
+    status_properties_bp,
+    teds_bp,
+    vectors_legacy_bp,
+    virtual_channels_bp,
 )
-
-# Import configuration
-from config import Config
 
 # Global singleton instance and lock
 _vv_instance = None
