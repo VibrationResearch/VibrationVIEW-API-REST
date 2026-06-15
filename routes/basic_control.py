@@ -200,10 +200,8 @@ def start_test(vv_instance):
     Starts execution of a test that has been previously loaded with
     OpenTest. If no test is loaded, this will fail.
     """
-    result = vv_instance.StartTest()
-
-    # Check if test is actually running
-    success = vv_instance.IsRunning()
+    vv_instance.StartTest()
+    result = vv_instance.IsRunning()
 
     return jsonify(success_response(
         {'result': result},
@@ -315,9 +313,8 @@ def stop_test(vv_instance):
     COM Method: StopTest()
     Terminates the currently running vibration test.
     """
-    result = vv_instance.StopTest()
-    # Check if test actually stopped
-    success = not vv_instance.IsRunning()
+    vv_instance.StopTest()
+    result = not vv_instance.IsRunning()
 
     return jsonify(success_response(
         {'result': result},
@@ -334,10 +331,8 @@ def resume_test(vv_instance):
     COM Method: ResumeTest()
     Resumes a previously paused vibration test.
     """
-    result = vv_instance.ResumeTest()
-
-    # Check if test is actually running
-    success = vv_instance.IsRunning()
+    vv_instance.ResumeTest()
+    result = vv_instance.IsRunning()
 
     return jsonify(success_response(
         {'result': result},
