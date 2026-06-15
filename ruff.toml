@@ -1,0 +1,26 @@
+# Ruff configuration — replaces flake8 + isort
+line-length = 120
+target-version = "py311"
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+]
+ignore = [
+    "E501",  # line too long — handled by formatter
+    "E402",  # module-level import not at top — intentional late imports
+    "W291",  # trailing whitespace — handled by formatter
+    "W292",  # missing newline at end of file — handled by formatter
+    "W293",  # blank line with whitespace — handled by formatter
+]
+
+[lint.isort]
+known-first-party = ["routes", "utils", "config"]
+
+[format]
+# Compatible with black
+quote-style = "double"
+indent-style = "space"
