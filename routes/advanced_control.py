@@ -33,9 +33,7 @@ def get_documentation():
                 "GET|POST /testtype": {
                     "description": "Get/Set test type",
                     "com_method": "TestType() or TestType(value)",
-                    "parameters": {
-                        "value": "int - Test type value (POST URL parameter only)"
-                    },
+                    "parameters": {"value": "int - Test type value (POST URL parameter only)"},
                     "returns": "int - Current test type",
                     "example": "POST /api/v1/testtype?value=1",
                 },
@@ -69,18 +67,12 @@ def test_type(vv_instance):
     """
     if request.method == "GET":
         result = vv_instance.TestType()
-        return jsonify(
-            success_response({"result": result}, f"TestType retrieved: {result}")
-        )
+        return jsonify(success_response({"result": result}, f"TestType retrieved: {result}"))
     else:
         value = request.args.get("value", type=int)
         if value is None:
             return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
-                    )
-                ),
+                jsonify(error_response("Missing required URL parameter: value", "MISSING_PARAMETER")),
                 400,
             )
 
