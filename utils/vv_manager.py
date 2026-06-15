@@ -98,6 +98,8 @@ def with_vibrationview(func):
             return func(vv, *args, **kwargs)
 
         except HTTPException:
+            # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
+            # Flask handles them instead of swallowing them as 500s.
             raise
 
         except Exception as e:
@@ -153,6 +155,8 @@ def with_vibrationview_safe(func):
                 }
                 
         except HTTPException:
+            # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
+            # Flask handles them instead of swallowing them as 500s.
             raise
 
         except Exception as e:

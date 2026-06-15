@@ -27,6 +27,8 @@ def handle_errors(func):
             return func(*args, **kwargs)
             
         except HTTPException:
+            # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
+            # Flask handles them instead of swallowing them as 500s.
             raise
 
         except ImportError as e:
