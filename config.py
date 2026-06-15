@@ -35,8 +35,14 @@ class Config:
     # they reach application code, preventing memory exhaustion from oversized uploads.
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH') or 10 * 1024 * 1024)
 
-    # Logging
+    # Logging — VV_LOG_DIR is resolved to an absolute path so logs are
+    # written to a predictable location regardless of the working directory.
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
+    VV_LOG_DIR = os.path.abspath(
+        os.environ.get('VV_LOG_DIR') or r'C:\ProgramData\VibrationVIEW\logs'
+    )
+    VV_LOG_MAX_BYTES = int(os.environ.get('VV_LOG_MAX_BYTES') or 5 * 1024 * 1024)
+    VV_LOG_BACKUP_COUNT = int(os.environ.get('VV_LOG_BACKUP_COUNT') or 5)
     
     # VibrationVIEW Settings
     VV_CONNECTION_TIMEOUT = float(os.environ.get('VV_CONNECTION_TIMEOUT') or '10.0')

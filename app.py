@@ -64,18 +64,18 @@ def get_vv_instance():
             vv_instance = VibrationVIEW()
             
             if vv_instance.vv is None:
-                print("Failed to connect to VibrationVIEW")
+                logger.error("Failed to connect to VibrationVIEW")
                 return None
-                
+
             _vv_instance = vv_instance
-            print("VibrationVIEW singleton instance created successfully")
+            logger.info("VibrationVIEW singleton instance created successfully")
             return _vv_instance
-            
+
         except ImportError as e:
-            print(f"Could not import VibrationVIEW API: {e}")
+            logger.error(f"Could not import VibrationVIEW API: {e}")
             return None
         except Exception as e:
-            print(f"Error connecting to VibrationVIEW: {e}")
+            logger.error(f"Error connecting to VibrationVIEW: {e}")
             return None
 
 def set_vv_instance(instance):
@@ -92,9 +92,9 @@ def reset_vv_instance():
             try:
                 # Delete instance - lets Python/COM release the object
                 del _vv_instance
-                print("VibrationVIEW COM object released")
+                logger.info("VibrationVIEW COM object released")
             except Exception as e:
-                print(f"Error releasing VibrationVIEW COM object: {e}")
+                logger.error(f"Error releasing VibrationVIEW COM object: {e}")
         _vv_instance = None
 
 def create_app(config_class=Config):
@@ -111,9 +111,16 @@ def create_app(config_class=Config):
         }
     })
     
-    # Configure logging
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    # Configure logging — use an absolute log directory so logs are not
+    # scattered when the service is started from different directories.
+    from logging.handlers import RotatingFileHandler
+
+    log_dir = app.config['VV_LOG_DIR']
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_file = os.path.join(log_dir, 'api.log')
+    max_bytes = app.config['VV_LOG_MAX_BYTES']
+    backup_count = app.config['VV_LOG_BACKUP_COUNT']
 
     # Clear any existing handlers to ensure basicConfig takes effect
     logging.root.handlers = []
@@ -121,7 +128,7 @@ def create_app(config_class=Config):
         level=getattr(logging, app.config.get('LOG_LEVEL', 'INFO')),
         format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
         handlers=[
-            logging.FileHandler('logs/api.log'),
+            RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count),
             logging.StreamHandler()
         ]
     )
@@ -355,6 +362,7 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     # Create app (early binding happens in create_app)
+    # print() used here because logging is not configured until create_app() runs.
     print("Starting Flask server...")
     try:
         app = create_app()
@@ -382,10 +390,10 @@ if __name__ == '__main__':
             app.run(host=args.host, port=args.port, debug=True, threaded=False)
         else:
             from waitress import serve
-            print(f"Serving with Waitress on http://{args.host}:{args.port}")
+            logger.info(f"Serving with Waitress on http://{args.host}:{args.port}")
             serve(app, host=args.host, port=args.port, threads=1)
     except KeyboardInterrupt:
-        print("\nShutting down...")
+        logger.info("Shutting down...")
     except Exception as e:
-        print(f"Server error: {e}")
+        logger.error(f"Server error: {e}")
         raise

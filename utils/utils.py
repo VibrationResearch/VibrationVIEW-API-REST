@@ -11,6 +11,8 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
+logger = logging.getLogger(__name__)
+
 PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj', 'vyp'}
 
 DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd', 'vyd'}  # v?d pattern
@@ -70,7 +72,7 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
     with open(file_path, 'wb') as f:
         f.write(binary_data)
 
-    logging.info(f"Binary file saved: {file_path}")
+    logger.info(f"Binary file saved: {file_path}")
 
     return {
         'FilePath': file_path,
@@ -92,7 +94,7 @@ def ParseVvTable(tsv_text: str):
             if len(values) == len(headers):
                 data.append(dict(zip(headers, values)))
             else:
-                print(f'Skipping malformed line: {line}')
+                logger.warning(f'Skipping malformed line: {line}')
 
         return data
 
@@ -354,7 +356,7 @@ def detect_file_upload():
     """
     content_type = request.content_type or ''
 
-    logging.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
+    logger.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
                   f"content_length={request.content_length}, files={list(request.files.keys())}")
 
     # Check for multipart file upload (any field name)
@@ -376,7 +378,7 @@ def detect_file_upload():
         filename = uploaded_file.filename
         binary_data = uploaded_file.read()
         content_length = len(binary_data)
-        logging.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
+        logger.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
 
         if not filename:
             return ({'Error': 'Multipart file field has no filename'}, 400, None)
@@ -397,7 +399,7 @@ def detect_file_upload():
 
         content_length = request.content_length
         binary_data = request.get_data()
-        logging.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
+        logger.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
 
         return (filename, binary_data, content_length)
 
