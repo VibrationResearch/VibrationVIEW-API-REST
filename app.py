@@ -115,12 +115,12 @@ def create_app(config_class=Config):
     # scattered when the service is started from different directories.
     from logging.handlers import RotatingFileHandler
 
-    log_dir = app.config.get('VV_LOG_DIR', r'C:\ProgramData\VibrationVIEW\logs')
+    log_dir = app.config['VV_LOG_DIR']
     os.makedirs(log_dir, exist_ok=True)
 
     log_file = os.path.join(log_dir, 'api.log')
-    max_bytes = app.config.get('VV_LOG_MAX_BYTES', 5 * 1024 * 1024)
-    backup_count = app.config.get('VV_LOG_BACKUP_COUNT', 5)
+    max_bytes = app.config['VV_LOG_MAX_BYTES']
+    backup_count = app.config['VV_LOG_BACKUP_COUNT']
 
     # Clear any existing handlers to ensure basicConfig takes effect
     logging.root.handlers = []
