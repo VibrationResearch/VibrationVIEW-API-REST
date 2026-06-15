@@ -80,7 +80,7 @@ class TestGetDataFileSecurity:
             # Clean up
             try:
                 os.unlink(temp_file_path)
-            except:
+            except OSError:
                 pass
 
     def test_getdatafile_invalid_path_outside_authorized_dirs(self, client, mock_vv, mock_config):
