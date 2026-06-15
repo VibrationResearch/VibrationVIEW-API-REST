@@ -8,7 +8,7 @@ Routes package for VibrationVIEW API
 This package contains all the route modules organized by functionality.
 """
 
-__version__ = '1.0.0'
+__version__ = "1.0.0"
 
 # Import all blueprints for easy access
 from .advanced_control import advanced_control_bp
@@ -30,21 +30,21 @@ from .vectors_legacy import vectors_legacy_bp
 from .virtual_channels import virtual_channels_bp
 
 __all__ = [
-    'basic_control_bp',
-    'status_properties_bp',
-    'data_retrieval_bp',
-    'advanced_control_bp',
-    'advanced_control_sine_bp',
-    'advanced_control_system_check_bp',
-    'hardware_config_bp',
-    'input_config_bp',
-    'recording_bp',
-    'teds_bp',
-    'reporting_bp',
-    'auxinputs_bp',
-    'gui_control_bp',
-    'report_generation_bp',
-    'virtual_channels_bp',
-    'log_bp',
-    'vectors_legacy_bp'
+    "basic_control_bp",
+    "status_properties_bp",
+    "data_retrieval_bp",
+    "advanced_control_bp",
+    "advanced_control_sine_bp",
+    "advanced_control_system_check_bp",
+    "hardware_config_bp",
+    "input_config_bp",
+    "recording_bp",
+    "teds_bp",
+    "reporting_bp",
+    "auxinputs_bp",
+    "gui_control_bp",
+    "report_generation_bp",
+    "virtual_channels_bp",
+    "log_bp",
+    "vectors_legacy_bp",
 ]
