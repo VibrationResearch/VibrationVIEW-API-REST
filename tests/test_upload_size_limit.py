@@ -78,14 +78,18 @@ class TestUploadSizeLimit:
 
     def test_custom_limit_is_respected(self, app, client):
         """A lower MAX_CONTENT_LENGTH is enforced"""
+        original_limit = app.config.get('MAX_CONTENT_LENGTH')
         app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 MB
 
-        body = b'x' * (2 * 1024 * 1024)  # 2 MB
+        try:
+            body = b'x' * (2 * 1024 * 1024)  # 2 MB
 
-        response = client.post(
-            '/api/v1/opentest',
-            data=body,
-            content_type='application/octet-stream',
-        )
+            response = client.post(
+                '/api/v1/opentest',
+                data=body,
+                content_type='application/octet-stream',
+            )
 
-        assert response.status_code == 413
+            assert response.status_code == 413
+        finally:
+            app.config['MAX_CONTENT_LENGTH'] = original_limit
