@@ -18,153 +18,151 @@ from utils.vv_error_codes import VVIEW_E_ALREADY_RUNNING, VVIEW_E_NO_DATA, is_vv
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
-reporting_bp = Blueprint('reporting', __name__)
+reporting_bp = Blueprint("reporting", __name__)
 
 logger = logging.getLogger(__name__)
 
-@reporting_bp.route('/docs/reporting', methods=['GET'])
+
+@reporting_bp.route("/docs/reporting", methods=["GET"])
 def get_documentation():
     """Get reporting control module documentation"""
     docs = {
-        'module': 'reporting',
-        'description': '1:1 mapping of VibrationVIEW COM reporting methods',
-        'com_object': 'VibrationVIEW.Application',
-        'endpoints': {
-            'GET /reportfield': {
-                'description': 'Get report value specified by field name',
-                'com_method': 'ReportField(sField)',
-                'parameters': {
-                    'field': 'string - Query parameter with report field name (optional - if missing, uses first query parameter)'
+        "module": "reporting",
+        "description": "1:1 mapping of VibrationVIEW COM reporting methods",
+        "com_object": "VibrationVIEW.Application",
+        "endpoints": {
+            "GET /reportfield": {
+                "description": "Get report value specified by field name",
+                "com_method": "ReportField(sField)",
+                "parameters": {
+                    "field": "string - Query parameter with report field name (optional - if missing, uses first query parameter)"
                 },
-                'returns': 'string - Report field value',
-                'examples': ['GET /api/v1/reportfield?field=TestName', 'GET /api/v1/reportfield?TestName=']
+                "returns": "string - Report field value",
+                "examples": ["GET /api/v1/reportfield?field=TestName", "GET /api/v1/reportfield?TestName="],
             },
-            'GET|POST /reportfields': {
-                'description': 'Get multiple report field values in one call',
-                'com_method': 'ReportFields(fields)',
-                'parameters': {
-                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.',
-                    'channel': 'string (query param) - Use "all" to expand each field across all hardware input channels (e.g., TEDS becomes TEDS1,TEDS2,...)'
+            "GET|POST /reportfields": {
+                "description": "Get multiple report field values in one call",
+                "com_method": "ReportFields(fields)",
+                "parameters": {
+                    "fields": "string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.",
+                    "channel": 'string (query param) - Use "all" to expand each field across all hardware input channels (e.g., TEDS becomes TEDS1,TEDS2,...)',
                 },
-                'returns': 'array - Report field values in the same order as requested fields',
-                'examples': [
-                    'GET /api/v1/reportfields?TestName&StartTime&LevelTime',
-                    'GET /api/v1/reportfields?ChAccelRMS*|&ChDisplacement*|',
+                "returns": "array - Report field values in the same order as requested fields",
+                "examples": [
+                    "GET /api/v1/reportfields?TestName&StartTime&LevelTime",
+                    "GET /api/v1/reportfields?ChAccelRMS*|&ChDisplacement*|",
                     'POST /api/v1/reportfields with body: {"fields": "TestName,StartTime,LevelTime"}',
                     'POST /api/v1/reportfields with body: {"fields": ["TestName", "StartTime"]}',
                     'POST /api/v1/reportfields with body: {"fields": "ChAccelRMS*|,ChDisplacement*|"}',
-                    'POST /api/v1/reportfields?channel=all with body: {"fields": ["TEDS"]}'
-                ]
+                    'POST /api/v1/reportfields?channel=all with body: {"fields": ["TEDS"]}',
+                ],
             },
-            'GET|POST /reportfieldshistory': {
-                'description': 'Get report field values for all data files from the most recent test',
-                'com_method': 'ReportFieldsHistory(fields)',
-                'parameters': {
-                    'fields': 'string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard.'
+            "GET|POST /reportfieldshistory": {
+                "description": "Get report field values for all data files from the most recent test",
+                "com_method": "ReportFieldsHistory(fields)",
+                "parameters": {
+                    "fields": "string or array - Field names as separate query parameters (using &). Use *| suffix for all channels wildcard."
                 },
-                'returns': 'array - 2D array where each row contains [filename, field1_value, field2_value, ...]',
-                'examples': [
-                    'GET /api/v1/reportfieldshistory?StopCode&RunTime&Time',
+                "returns": "array - 2D array where each row contains [filename, field1_value, field2_value, ...]",
+                "examples": [
+                    "GET /api/v1/reportfieldshistory?StopCode&RunTime&Time",
                     'POST /api/v1/reportfieldshistory with body: {"fields": "StopCode,RunTime,Time"}',
-                    'POST /api/v1/reportfieldshistory with body: {"fields": ["StopCode", "RunTime", "Time"]}'
-                ]
+                    'POST /api/v1/reportfieldshistory with body: {"fields": ["StopCode", "RunTime", "Time"]}',
+                ],
             },
-            'GET|POST /reportvector': {
-                'description': 'Get report vector data',
-                'com_method': 'ReportVector(vectors, array_out)',
-                'parameters': {
-                    'vectors': 'str - Vector names as separate query parameters (using &)'
+            "GET|POST /reportvector": {
+                "description": "Get report vector data",
+                "com_method": "ReportVector(vectors, array_out)",
+                "parameters": {"vectors": "str - Vector names as separate query parameters (using &)"},
+                "returns": "list - Vector data",
+                "example": "GET /api/v1/reportvector?Frequency&Demand",
+            },
+            "GET|POST /reportvectorheader": {
+                "description": "Get report vector header information",
+                "com_method": "ReportVectorHeader(vectors, array_out)",
+                "parameters": {"vectors": "str - Vector names as separate query parameters (using &)"},
+                "returns": "list - Vector header data",
+                "example": "GET /api/v1/reportvectorheader?Frequency&Demand",
+            },
+            "GET /formfields": {
+                "description": "Get all form field name/value pairs",
+                "com_method": "FormFields()",
+                "parameters": "None",
+                "returns": "2D array - [[field_name, field_value], ...]",
+                "example": "GET /api/v1/formfields",
+            },
+            "POST|PUT /formfields": {
+                "description": "Post form field values (merges with existing)",
+                "com_method": "PostFormFields(fields)",
+                "modes": {
+                    "JSON body": "fields: 2D array of [field_name, field_value] pairs",
+                    "multipart/form-data": "Each form field posted directly as name=value",
                 },
-                'returns': 'list - Vector data',
-                'example': 'GET /api/v1/reportvector?Frequency&Demand'
-            },
-            'GET|POST /reportvectorheader': {
-                'description': 'Get report vector header information',
-                'com_method': 'ReportVectorHeader(vectors, array_out)',
-                'parameters': {
-                    'vectors': 'str - Vector names as separate query parameters (using &)'
-                },
-                'returns': 'list - Vector header data',
-                'example': 'GET /api/v1/reportvectorheader?Frequency&Demand'
-            },
-            'GET /formfields': {
-                'description': 'Get all form field name/value pairs',
-                'com_method': 'FormFields()',
-                'parameters': 'None',
-                'returns': '2D array - [[field_name, field_value], ...]',
-                'example': 'GET /api/v1/formfields'
-            },
-            'POST|PUT /formfields': {
-                'description': 'Post form field values (merges with existing)',
-                'com_method': 'PostFormFields(fields)',
-                'modes': {
-                    'JSON body': 'fields: 2D array of [field_name, field_value] pairs',
-                    'multipart/form-data': 'Each form field posted directly as name=value'
-                },
-                'returns': 'bool - True on success',
-                'examples': [
+                "returns": "bool - True on success",
+                "examples": [
                     'POST /api/v1/formfields with JSON: {"fields": [["Customer", "ACME"], ["PartNumber", "12345"]]}',
-                    'POST /api/v1/formfields with multipart/form-data: Customer=ACME&PartNumber=12345'
-                ]
-            }
+                    "POST /api/v1/formfields with multipart/form-data: Customer=ACME&PartNumber=12345",
+                ],
+            },
         },
-        'notes': [
-            'ReportField returns string values for specified report fields',
-            'ReportFields returns values in the same order as the requested fields',
-            'ReportFields supports both GET and POST methods',
-            'GET uses & to separate field names as query parameters (e.g., ?Field1&Field2&Field3)',
+        "notes": [
+            "ReportField returns string values for specified report fields",
+            "ReportFields returns values in the same order as the requested fields",
+            "ReportFields supports both GET and POST methods",
+            "GET uses & to separate field names as query parameters (e.g., ?Field1&Field2&Field3)",
             'Use *| wildcard suffix to get values for all channels (e.g., "ChAccelRMS*|"). Mutually exclusive with channel=all.',
-            'Field names are case-sensitive and must match VibrationVIEW report fields',
-            'If COM method raises exception, it will be caught and returned as error',
-            'Available report fields depend on the current test and VibrationVIEW configuration',
-            'POST accepts both string (comma-delimited) and array formats for fields'
-        ]
+            "Field names are case-sensitive and must match VibrationVIEW report fields",
+            "If COM method raises exception, it will be caught and returned as error",
+            "Available report fields depend on the current test and VibrationVIEW configuration",
+            "POST accepts both string (comma-delimited) and array formats for fields",
+        ],
     }
     return jsonify(docs)
 
-@reporting_bp.route('/reportfield', methods=['GET'])
+
+@reporting_bp.route("/reportfield", methods=["GET"])
 @handle_errors
 @with_vibrationview
 def report_field(vv_instance):
     """
     Get Report Field Value
-    
+
     COM Method: ReportField(sField)
     Gets the report value specified by the field name.
-    
+
     Query Parameters:
         field: Report field name to retrieve (optional - if missing, uses first query parameter)
-    
-    Examples: 
+
+    Examples:
         GET /api/v1/reportfield?field=TestName
         GET /api/v1/reportfield?TestName
     """
     # Get field name from query string, use first parameter if 'field' is missing
-    field_name = request.args.get('field')
-    
+    field_name = request.args.get("field")
+
     if not field_name:
         # Use the first query parameter if 'field' is missing
         if request.args:
             field_name = list(request.args.keys())[0]
 
         if not field_name:
-            return jsonify(error_response(
-                'Missing query parameter: either "field" or provide any query parameter',
-                'MISSING_PARAMETER'
-            )), 400
-    
-    result = vv_instance.ReportField(field_name)
-    
-    return jsonify(success_response(
-        {
-            'result': result,
-            'field': field_name,
-            'executed': True
-        },
-        f"ReportField executed successfully for field: {field_name}"
-    ))
+            return jsonify(
+                error_response(
+                    'Missing query parameter: either "field" or provide any query parameter', "MISSING_PARAMETER"
+                )
+            ), 400
 
-@reporting_bp.route('/reportfields', methods=['GET', 'POST'])
+    result = vv_instance.ReportField(field_name)
+
+    return jsonify(
+        success_response(
+            {"result": result, "field": field_name, "executed": True},
+            f"ReportField executed successfully for field: {field_name}",
+        )
+    )
+
+
+@reporting_bp.route("/reportfields", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def report_fields(vv_instance):
@@ -210,40 +208,36 @@ def report_fields(vv_instance):
         Body: {"fields": ["TEDS"]}
     """
     fields_string = None
-    channel_param = request.args.get('channel', '').strip().lower()
-
+    channel_param = request.args.get("channel", "").strip().lower()
 
     # Handle GET request
-    if request.method == 'GET':
-        fields_string = request.args.get('fields')
+    if request.method == "GET":
+        fields_string = request.args.get("fields")
         # If no 'fields' parameter, join all query parameter keys with commas
         # (excluding modifier params which are not field names)
         if not fields_string and request.args:
-            fields_string = ','.join(k for k in request.args.keys() if k != 'channel')
+            fields_string = ",".join(k for k in request.args.keys() if k != "channel")
 
     # Handle POST request
     else:
         data = request.get_json(silent=True)
-        if data and 'fields' in data:
-            fields = data['fields']
-            fields_string = ','.join(fields) if isinstance(fields, list) else fields
+        if data and "fields" in data:
+            fields = data["fields"]
+            fields_string = ",".join(fields) if isinstance(fields, list) else fields
 
     # Validate we have fields
     if not fields_string or not fields_string.strip():
-        return jsonify(error_response(
-            'Missing required parameter: fields',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: fields", "MISSING_PARAMETER")), 400
 
     # Expand fields for all channels if channel=all
-    if channel_param == 'all':
+    if channel_param == "all":
         num_channels = vv_instance.GetHardwareInputChannels()
-        base_fields = [f.strip().rstrip('*|').rstrip('0123456789') for f in fields_string.split(',')]
+        base_fields = [f.strip().rstrip("*|").rstrip("0123456789") for f in fields_string.split(",")]
         expanded = []
         for field in base_fields:
             for ch in range(1, num_channels + 1):
                 expanded.append(f"{field}{ch}")
-        fields_string = ','.join(expanded)
+        fields_string = ",".join(expanded)
 
     # Call ReportFields with the comma-delimited string
     results = vv_instance.ReportFields(fields_string)
@@ -256,27 +250,26 @@ def report_fields(vv_instance):
                 # Parse each element in nested lists/tuples
                 parsed_item = []
                 for elem in item:
-                    if isinstance(elem, str) and ('\t' in elem or '\r\n' in elem):
+                    if isinstance(elem, str) and ("\t" in elem or "\r\n" in elem):
                         # Split by newline to get rows, remove single trailing tab from each row
-                        rows = [(row[:-1] if row.endswith('\t') else row).split('\t') for row in elem.split('\r\n') if row]
+                        rows = [
+                            (row[:-1] if row.endswith("\t") else row).split("\t") for row in elem.split("\r\n") if row
+                        ]
                         parsed_item.append(rows)
                     else:
                         parsed_item.append(elem)
                 results_list.append(parsed_item)
-            elif isinstance(item, str) and ('\t' in item or '\r\n' in item):
+            elif isinstance(item, str) and ("\t" in item or "\r\n" in item):
                 # Split by newline to get rows, remove single trailing tab from each row
-                rows = [(row[:-1] if row.endswith('\t') else row).split('\t') for row in item.split('\r\n') if row]
+                rows = [(row[:-1] if row.endswith("\t") else row).split("\t") for row in item.split("\r\n") if row]
                 results_list.append(rows)
             else:
                 results_list.append(item)
 
-    response_data = {
-        'fields_string': fields_string,
-        'executed': True
-    }
+    response_data = {"fields_string": fields_string, "executed": True}
 
     # Build structured results dict when channel=all
-    if channel_param == 'all':
+    if channel_param == "all":
         results = {}
         for i, val in enumerate(results_list):
             ch = (i % num_channels) + 1
@@ -293,16 +286,16 @@ def report_fields(vv_instance):
                 elif len(val) == 1 and isinstance(val[0], list) and len(val[0]) == 2 and val[0][0] == f"{field}{ch}":
                     val = val[0][1]
             results[ch_key][field] = val
-        response_data['results'] = results
+        response_data["results"] = results
     else:
-        response_data['results'] = results_list
+        response_data["results"] = results_list
 
     message = "ReportFields executed successfully"
 
     return jsonify(success_response(response_data, message))
 
 
-@reporting_bp.route('/reportfieldshistory', methods=['GET', 'POST'])
+@reporting_bp.route("/reportfieldshistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def report_fields_history(vv_instance):
@@ -340,25 +333,22 @@ def report_fields_history(vv_instance):
     fields_string = None
 
     # Handle GET request
-    if request.method == 'GET':
-        fields_string = request.args.get('fields')
+    if request.method == "GET":
+        fields_string = request.args.get("fields")
         # If no 'fields' parameter, join all query parameter keys with commas
         if not fields_string and request.args:
-            fields_string = ','.join(request.args.keys())
+            fields_string = ",".join(request.args.keys())
 
     # Handle POST request
     else:
         data = request.get_json(silent=True)
-        if data and 'fields' in data:
-            fields = data['fields']
-            fields_string = ','.join(fields) if isinstance(fields, list) else fields
+        if data and "fields" in data:
+            fields = data["fields"]
+            fields_string = ",".join(fields) if isinstance(fields, list) else fields
 
     # Validate we have fields
     if not fields_string or not fields_string.strip():
-        return jsonify(error_response(
-            'Missing required parameter: fields',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: fields", "MISSING_PARAMETER")), 400
 
     # Call ReportFieldsHistory with the comma-delimited string
     try:
@@ -366,16 +356,19 @@ def report_fields_history(vv_instance):
     except Exception as e:
         # Handle VVIEW_E_NO_DATA - return empty results with descriptive message
         if is_vview_error(e, VVIEW_E_NO_DATA):
-            return jsonify(success_response(
-                {'results': [], 'fields_string': fields_string, 'executed': True},
-                "No saved data files available"
-            ))
+            return jsonify(
+                success_response(
+                    {"results": [], "fields_string": fields_string, "executed": True}, "No saved data files available"
+                )
+            )
         # Handle VVIEW_E_ALREADY_RUNNING - history not available during test
         if is_vview_error(e, VVIEW_E_ALREADY_RUNNING):
-            return jsonify(success_response(
-                {'results': [], 'fields_string': fields_string, 'executed': True},
-                "History not available while test is running"
-            ))
+            return jsonify(
+                success_response(
+                    {"results": [], "fields_string": fields_string, "executed": True},
+                    "History not available while test is running",
+                )
+            )
         raise
 
     # Convert results to list for JSON serialization
@@ -387,18 +380,14 @@ def report_fields_history(vv_instance):
             else:
                 results_list.append(row)
 
-    response_data = {
-        'results': results_list,
-        'fields_string': fields_string,
-        'executed': True
-    }
+    response_data = {"results": results_list, "fields_string": fields_string, "executed": True}
 
     message = "ReportFieldsHistory executed successfully"
 
     return jsonify(success_response(response_data, message))
 
 
-@reporting_bp.route('/reportvector', methods=['GET', 'POST'])
+@reporting_bp.route("/reportvector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def report_vector(vv_instance):
@@ -428,36 +417,32 @@ def report_vector(vv_instance):
     vectors_string = None
 
     # Handle GET request
-    if request.method == 'GET':
-        vectors_string = request.args.get('vectors')
+    if request.method == "GET":
+        vectors_string = request.args.get("vectors")
         # If no 'vectors' parameter, join all query parameter keys with commas
         if not vectors_string and request.args:
-            vectors_string = ','.join(request.args.keys())
+            vectors_string = ",".join(request.args.keys())
 
     # Handle POST request
     else:
         data = request.get_json(silent=True)
-        if data and 'vectors' in data:
-            vectors = data['vectors']
-            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+        if data and "vectors" in data:
+            vectors = data["vectors"]
+            vectors_string = ",".join(vectors) if isinstance(vectors, list) else vectors
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response(
-            'Missing required parameter: vectors',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
 
     result = vv_instance.ReportVector(vectors_string)
     result = sanitize_nan(result)
 
-    return jsonify(success_response(
-        {'result': result, 'vectors': vectors_string},
-        f"ReportVector executed for: {vectors_string}"
-    ))
+    return jsonify(
+        success_response({"result": result, "vectors": vectors_string}, f"ReportVector executed for: {vectors_string}")
+    )
 
 
-@reporting_bp.route('/reportvectorheader', methods=['GET', 'POST'])
+@reporting_bp.route("/reportvectorheader", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def report_vector_header(vv_instance):
@@ -487,35 +472,33 @@ def report_vector_header(vv_instance):
     vectors_string = None
 
     # Handle GET request
-    if request.method == 'GET':
-        vectors_string = request.args.get('vectors')
+    if request.method == "GET":
+        vectors_string = request.args.get("vectors")
         # If no 'vectors' parameter, join all query parameter keys with commas
         if not vectors_string and request.args:
-            vectors_string = ','.join(request.args.keys())
+            vectors_string = ",".join(request.args.keys())
 
     # Handle POST request
     else:
         data = request.get_json(silent=True)
-        if data and 'vectors' in data:
-            vectors = data['vectors']
-            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+        if data and "vectors" in data:
+            vectors = data["vectors"]
+            vectors_string = ",".join(vectors) if isinstance(vectors, list) else vectors
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response(
-            'Missing required parameter: vectors',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
 
     result = vv_instance.ReportVectorHeader(vectors_string)
 
-    return jsonify(success_response(
-        {'result': result, 'vectors': vectors_string},
-        f"ReportVectorHeader executed for: {vectors_string}"
-    ))
+    return jsonify(
+        success_response(
+            {"result": result, "vectors": vectors_string}, f"ReportVectorHeader executed for: {vectors_string}"
+        )
+    )
 
 
-@reporting_bp.route('/reportvectorhistory', methods=['GET', 'POST'])
+@reporting_bp.route("/reportvectorhistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def report_vector_history(vv_instance):
@@ -549,25 +532,22 @@ def report_vector_history(vv_instance):
     vectors_string = None
 
     # Handle GET request
-    if request.method == 'GET':
-        vectors_string = request.args.get('vectors')
+    if request.method == "GET":
+        vectors_string = request.args.get("vectors")
         # If no 'vectors' parameter, join all query parameter keys with commas
         if not vectors_string and request.args:
-            vectors_string = ','.join(request.args.keys())
+            vectors_string = ",".join(request.args.keys())
 
     # Handle POST request
     else:
         data = request.get_json(silent=True)
-        if data and 'vectors' in data:
-            vectors = data['vectors']
-            vectors_string = ','.join(vectors) if isinstance(vectors, list) else vectors
+        if data and "vectors" in data:
+            vectors = data["vectors"]
+            vectors_string = ",".join(vectors) if isinstance(vectors, list) else vectors
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response(
-            'Missing required parameter: vectors',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
 
     # Call ReportVectorHistory with the comma-delimited string
     try:
@@ -575,16 +555,20 @@ def report_vector_history(vv_instance):
     except Exception as e:
         # Handle VVIEW_E_NO_DATA - return empty results with descriptive message
         if is_vview_error(e, VVIEW_E_NO_DATA):
-            return jsonify(success_response(
-                {'results': [], 'headers': [], 'vectors_string': vectors_string, 'executed': True},
-                "No saved data files available"
-            ))
+            return jsonify(
+                success_response(
+                    {"results": [], "headers": [], "vectors_string": vectors_string, "executed": True},
+                    "No saved data files available",
+                )
+            )
         # Handle VVIEW_E_ALREADY_RUNNING - history not available during test
         if is_vview_error(e, VVIEW_E_ALREADY_RUNNING):
-            return jsonify(success_response(
-                {'results': [], 'headers': [], 'vectors_string': vectors_string, 'executed': True},
-                "History not available while test is running"
-            ))
+            return jsonify(
+                success_response(
+                    {"results": [], "headers": [], "vectors_string": vectors_string, "executed": True},
+                    "History not available while test is running",
+                )
+            )
         raise
     results = sanitize_nan(results)
 
@@ -598,10 +582,10 @@ def report_vector_history(vv_instance):
                 results_list.append(row)
 
     response_data = {
-        'results': results_list[0] if len(results_list) > 0 else [],
-        'headers': results_list[1] if len(results_list) > 1 else [],
-        'vectors_string': vectors_string,
-        'executed': True
+        "results": results_list[0] if len(results_list) > 0 else [],
+        "headers": results_list[1] if len(results_list) > 1 else [],
+        "vectors_string": vectors_string,
+        "executed": True,
     }
 
     message = "ReportVectorHistory executed successfully"
@@ -609,7 +593,7 @@ def report_vector_history(vv_instance):
     return jsonify(success_response(response_data, message))
 
 
-@reporting_bp.route('/formfields', methods=['GET'])
+@reporting_bp.route("/formfields", methods=["GET"])
 @handle_errors
 @with_vibrationview
 def form_fields(vv_instance):
@@ -630,10 +614,7 @@ def form_fields(vv_instance):
     except Exception as e:
         # Handle VVIEW_E_NO_DATA - return empty results instead of error
         if is_vview_error(e, VVIEW_E_NO_DATA):
-            return jsonify(success_response(
-                {'results': []},
-                "No form data available"
-            ))
+            return jsonify(success_response({"results": []}, "No form data available"))
         raise
 
     # Convert results to list for JSON serialization
@@ -645,13 +626,14 @@ def form_fields(vv_instance):
             else:
                 results_list.append(row)
 
-    return jsonify(success_response(
-        {'results': results_list},
-        f"FormFields executed successfully - {len(results_list)} fields returned"
-    ))
+    return jsonify(
+        success_response(
+            {"results": results_list}, f"FormFields executed successfully - {len(results_list)} fields returned"
+        )
+    )
 
 
-@reporting_bp.route('/formfields', methods=['POST', 'PUT'])
+@reporting_bp.route("/formfields", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
 def post_form_fields(vv_instance):
@@ -688,31 +670,29 @@ def post_form_fields(vv_instance):
     else:
         # Try JSON body
         data = request.get_json(silent=True)
-        if data and 'fields' in data:
-            fields = data['fields']
+        if data and "fields" in data:
+            fields = data["fields"]
 
     if not fields:
-        return jsonify(error_response(
-            'Missing required parameter: fields (JSON array or multipart/form-data)',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(
+            error_response(
+                "Missing required parameter: fields (JSON array or multipart/form-data)", "MISSING_PARAMETER"
+            )
+        ), 400
 
     if not isinstance(fields, list):
-        return jsonify(error_response(
-            'fields must be a 2D array of [field_name, field_value] pairs',
-            'INVALID_PARAMETER'
-        )), 400
+        return jsonify(
+            error_response("fields must be a 2D array of [field_name, field_value] pairs", "INVALID_PARAMETER")
+        ), 400
 
     try:
         result = vv_instance.PostFormFields(fields)
     except Exception as e:
-        return jsonify(error_response(
-            f'Failed to post form fields: {str(e)}',
-            'POST_FORM_FIELDS_ERROR'
-        )), 500
+        return jsonify(error_response(f"Failed to post form fields: {str(e)}", "POST_FORM_FIELDS_ERROR")), 500
 
-    return jsonify(success_response(
-        {'result': result, 'fields_count': len(fields)},
-        f"PostFormFields executed successfully - {len(fields)} fields posted"
-    ))
-
+    return jsonify(
+        success_response(
+            {"result": result, "fields_count": len(fields)},
+            f"PostFormFields executed successfully - {len(fields)} fields posted",
+        )
+    )
