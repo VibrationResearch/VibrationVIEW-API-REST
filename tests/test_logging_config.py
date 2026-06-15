@@ -17,7 +17,6 @@ from config import Config
 
 
 class TestLoggingConfig:
-
     def test_vv_log_dir_is_absolute(self):
         """VV_LOG_DIR resolves to an absolute path"""
         assert os.path.isabs(Config.VV_LOG_DIR)
@@ -32,7 +31,7 @@ class TestLoggingConfig:
         """RotatingFileHandler maxBytes matches config"""
         for h in logging.root.handlers:
             if isinstance(h, RotatingFileHandler):
-                assert h.maxBytes == app.config['VV_LOG_MAX_BYTES']
+                assert h.maxBytes == app.config["VV_LOG_MAX_BYTES"]
                 break
         else:
             assert False, "No RotatingFileHandler found"
@@ -41,14 +40,14 @@ class TestLoggingConfig:
         """RotatingFileHandler backupCount matches config"""
         for h in logging.root.handlers:
             if isinstance(h, RotatingFileHandler):
-                assert h.backupCount == app.config['VV_LOG_BACKUP_COUNT']
+                assert h.backupCount == app.config["VV_LOG_BACKUP_COUNT"]
                 break
         else:
             assert False, "No RotatingFileHandler found"
 
     def test_log_file_in_configured_directory(self, app):
         """Log file is created inside VV_LOG_DIR"""
-        log_dir = app.config['VV_LOG_DIR']
+        log_dir = app.config["VV_LOG_DIR"]
         for h in logging.root.handlers:
             if isinstance(h, RotatingFileHandler):
                 log_path = os.path.abspath(h.baseFilename)

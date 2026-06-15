@@ -35,7 +35,6 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\random.vrandomt"
 
         with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
@@ -79,7 +78,6 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\custom_test.vrandomt"
 
         with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
@@ -128,7 +126,6 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\test_template_custom.vrandomt"
 
         with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
@@ -166,7 +163,6 @@ class TestBasicControl:
         filename = "test_regular.vsp"
 
         with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-
             # Configure the mock upload to simulate success
             mock_upload.return_value = (
                 {
@@ -426,7 +422,7 @@ class TestBasicControl:
         open_tests = [
             ["1", "Random", "C:\\VibrationVIEW\\Profiles\\Random_Profile.vrpj", "Random_Profile"],
             ["2", "Sine", "C:\\VibrationVIEW\\Profiles\\test2.vrp", "test2"],
-            ["3", "Shock", "C:\\VibrationVIEW\\Profiles\\test3.vsp", "test3"]
+            ["3", "Shock", "C:\\VibrationVIEW\\Profiles\\test3.vsp", "test3"],
         ]
 
         # Configure mock to return list of open tests (2D array)
