@@ -1,5 +1,5 @@
 # ============================================================================
-# GUI Control Routes 
+# GUI Control Routes
 # ============================================================================
 
 """
@@ -17,88 +17,88 @@ from utils.utils import detect_file_upload, get_filename_from_request, handle_bi
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
-gui_control_bp = Blueprint('gui_control', __name__)
+gui_control_bp = Blueprint("gui_control", __name__)
 
 logger = logging.getLogger(__name__)
 
-@gui_control_bp.route('/docs/gui_control', methods=['GET'])
+
+@gui_control_bp.route("/docs/gui_control", methods=["GET"])
 def get_documentation():
     """Get GUI control module documentation"""
     docs = {
-        'module': 'gui_control',
-        'description': '1:1 mapping of VibrationVIEW COM GUI control methods',
-        'com_object': 'VibrationVIEW.Application',
-        'endpoints': {
-            'Test Editing': {
-                'GET /edittest': {
-                    'description': 'Edit existing test by path',
-                    'com_method': 'EditTest(szTestName)',
-                    'parameters': {
-                        'filename': 'string - Test filename as query parameter'
-                    },
-                    'returns': 'Success status',
-                    'example': 'GET /api/v1/edittest?filename=test1.vsp'
+        "module": "gui_control",
+        "description": "1:1 mapping of VibrationVIEW COM GUI control methods",
+        "com_object": "VibrationVIEW.Application",
+        "endpoints": {
+            "Test Editing": {
+                "GET /edittest": {
+                    "description": "Edit existing test by path",
+                    "com_method": "EditTest(szTestName)",
+                    "parameters": {"filename": "string - Test filename as query parameter"},
+                    "returns": "Success status",
+                    "example": "GET /api/v1/edittest?filename=test1.vsp",
                 },
-                'POST|PUT /edittest': {
-                    'description': 'Upload and edit test file, OR edit existing by path',
-                    'com_method': 'EditTest(szTestName)',
-                    'modes': {
-                        'With file content (upload)': 'multipart/form-data or raw binary + filename param',
-                        'Without file content': 'filename query parameter to edit existing'
+                "POST|PUT /edittest": {
+                    "description": "Upload and edit test file, OR edit existing by path",
+                    "com_method": "EditTest(szTestName)",
+                    "modes": {
+                        "With file content (upload)": "multipart/form-data or raw binary + filename param",
+                        "Without file content": "filename query parameter to edit existing",
                     },
-                    'returns': 'Success status with file path',
-                    'examples': [
-                        'POST /api/v1/edittest with multipart/form-data (upload + edit)',
-                        'PUT /api/v1/edittest?filename=test.vsp with binary body',
-                        'POST /api/v1/edittest?filename=test.vsp (edit existing)'
-                    ]
+                    "returns": "Success status with file path",
+                    "examples": [
+                        "POST /api/v1/edittest with multipart/form-data (upload + edit)",
+                        "PUT /api/v1/edittest?filename=test.vsp with binary body",
+                        "POST /api/v1/edittest?filename=test.vsp (edit existing)",
+                    ],
                 },
-                'GET /abortedit': {
-                    'description': 'Abort any open Edit session',
-                    'com_method': 'AbortEdit()',
-                    'parameters': 'None',
-                    'returns': 'HRESULT - Success status from COM method'
-                }
+                "GET /abortedit": {
+                    "description": "Abort any open Edit session",
+                    "com_method": "AbortEdit()",
+                    "parameters": "None",
+                    "returns": "HRESULT - Success status from COM method",
+                },
             },
-            'Window Management': {
-                'GET /minimize': {
-                    'description': 'Minimize VibrationVIEW',
-                    'com_method': 'Minimize()',
-                    'parameters': 'None',
-                    'returns': 'HRESULT - Success status from COM method'
+            "Window Management": {
+                "GET /minimize": {
+                    "description": "Minimize VibrationVIEW",
+                    "com_method": "Minimize()",
+                    "parameters": "None",
+                    "returns": "HRESULT - Success status from COM method",
                 },
-                'GET /restore': {
-                    'description': 'Restore VibrationVIEW',
-                    'com_method': 'Restore()',
-                    'parameters': 'None',
-                    'returns': 'HRESULT - Success status from COM method'
+                "GET /restore": {
+                    "description": "Restore VibrationVIEW",
+                    "com_method": "Restore()",
+                    "parameters": "None",
+                    "returns": "HRESULT - Success status from COM method",
                 },
-                'GET /maximize': {
-                    'description': 'Maximize VibrationVIEW',
-                    'com_method': 'Maximize()',
-                    'parameters': 'None',
-                    'returns': 'HRESULT - Success status from COM method'
+                "GET /maximize": {
+                    "description": "Maximize VibrationVIEW",
+                    "com_method": "Maximize()",
+                    "parameters": "None",
+                    "returns": "HRESULT - Success status from COM method",
                 },
-                'GET /activate': {
-                    'description': 'Activate VibrationVIEW',
-                    'com_method': 'Activate()',
-                    'parameters': 'None',
-                    'returns': 'HRESULT - Success status from COM method'
-                }
-            }
+                "GET /activate": {
+                    "description": "Activate VibrationVIEW",
+                    "com_method": "Activate()",
+                    "parameters": "None",
+                    "returns": "HRESULT - Success status from COM method",
+                },
+            },
         },
-        'notes': [
-            'GET requests with parameters use URL query strings',
-            'All methods return HRESULT status codes',
-            'EditTest requires valid test file name',
-            'Window management methods affect VibrationVIEW main window',
-            'COM interface uses 0-based indexing for all arrays'
-        ]
+        "notes": [
+            "GET requests with parameters use URL query strings",
+            "All methods return HRESULT status codes",
+            "EditTest requires valid test file name",
+            "Window management methods affect VibrationVIEW main window",
+            "COM interface uses 0-based indexing for all arrays",
+        ],
     }
     return jsonify(docs)
 
+
 # Test Editing Control
-@gui_control_bp.route('/edittest', methods=['GET', 'POST', 'PUT'])
+@gui_control_bp.route("/edittest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
 def edit_test(vv_instance):
@@ -132,7 +132,7 @@ def edit_test(vv_instance):
             Example: POST /api/v1/edittest?filename=test1.vsp
     """
     # Check for file upload (PUT/POST only)
-    if request.method in ('PUT', 'POST'):
+    if request.method in ("PUT", "POST"):
         upload_result = detect_file_upload()
         filename, binary_data, content_length = upload_result
 
@@ -146,133 +146,124 @@ def edit_test(vv_instance):
             if error:
                 return jsonify(error), status_code
 
-            file_path = result['FilePath']
+            file_path = result["FilePath"]
             try:
                 vv_instance.EditTest(file_path)
             except Exception as e:
-                return jsonify(error_response(
-                    f'File uploaded but failed to edit test "{filename}": {str(e)}',
-                    'EDIT_TEST_ERROR',
-                    f"EditTest command failed: {filename}"
-                )), 500
+                return jsonify(
+                    error_response(
+                        f'File uploaded but failed to edit test "{filename}": {str(e)}',
+                        "EDIT_TEST_ERROR",
+                        f"EditTest command failed: {filename}",
+                    )
+                ), 500
 
-            return jsonify(success_response(
-                {
-                    'result': True,
-                    'filepath': filename,
-                    'file_uploaded': True
-                },
-                f"Upload and EditTest command executed: {filename}"
-            ))
+            return jsonify(
+                success_response(
+                    {"result": True, "filepath": filename, "file_uploaded": True},
+                    f"Upload and EditTest command executed: {filename}",
+                )
+            )
 
     # No file upload - edit existing file by path
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response(
-            'Missing required query parameter: filename',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
     try:
         result = vv_instance.EditTest(filename)
     except Exception as e:
-        return jsonify(error_response(
-            f'Failed to edit test "{filename}": {str(e)}',
-            'EDIT_TEST_ERROR',
-            f"EditTest command failed: {filename}"
-        )), 500
+        return jsonify(
+            error_response(
+                f'Failed to edit test "{filename}": {str(e)}', "EDIT_TEST_ERROR", f"EditTest command failed: {filename}"
+            )
+        ), 500
 
-    return jsonify(success_response(
-        {
-            'result': result,
-            'filepath': filename
-        },
-        f"EditTest command executed: {filename}"
-    ))
+    return jsonify(success_response({"result": result, "filepath": filename}, f"EditTest command executed: {filename}"))
 
-@gui_control_bp.route('/abortedit', methods=['GET', 'POST'])
+
+@gui_control_bp.route("/abortedit", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def abort_edit(vv_instance):
     """
     Abort Edit Session
-    
+
     COM Method: AbortEdit()
     Aborts any currently open edit session without saving changes.
     """
     result = vv_instance.AbortEdit()
-    
-    return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"AbortEdit command executed - Result: {result}"
-    ))
+
+    return jsonify(
+        success_response({"result": result, "executed": True}, f"AbortEdit command executed - Result: {result}")
+    )
+
 
 # Window Management Control
-@gui_control_bp.route('/minimize', methods=['GET', 'POST'])
+@gui_control_bp.route("/minimize", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def minimize(vv_instance):
     """
     Minimize VibrationVIEW
-    
+
     COM Method: Minimize()
     Minimizes the VibrationVIEW application window.
     """
     result = vv_instance.Minimize()
-    
-    return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"Minimize command executed - Result: {result}"
-    ))
 
-@gui_control_bp.route('/restore', methods=['GET', 'POST'])
+    return jsonify(
+        success_response({"result": result, "executed": True}, f"Minimize command executed - Result: {result}")
+    )
+
+
+@gui_control_bp.route("/restore", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def restore(vv_instance):
     """
     Restore VibrationVIEW
-    
+
     COM Method: Restore()
     Restores the VibrationVIEW application window from minimized state.
     """
     result = vv_instance.Restore()
-    
-    return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"Restore command executed - Result: {result}"
-    ))
 
-@gui_control_bp.route('/maximize', methods=['GET', 'POST'])
+    return jsonify(
+        success_response({"result": result, "executed": True}, f"Restore command executed - Result: {result}")
+    )
+
+
+@gui_control_bp.route("/maximize", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def maximize(vv_instance):
     """
     Maximize VibrationVIEW
-    
+
     COM Method: Maximize()
     Maximizes the VibrationVIEW application window.
     """
     result = vv_instance.Maximize()
-    
-    return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"Maximize command executed - Result: {result}"
-    ))
 
-@gui_control_bp.route('/activate', methods=['GET', 'POST'])
+    return jsonify(
+        success_response({"result": result, "executed": True}, f"Maximize command executed - Result: {result}")
+    )
+
+
+@gui_control_bp.route("/activate", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def activate(vv_instance):
     """
     Activate VibrationVIEW
-    
+
     COM Method: Activate()
     Brings the VibrationVIEW application window to the foreground and activates it.
     """
     result = vv_instance.Activate()
-    
-    return jsonify(success_response(
-        {'result': result, 'executed': True},
-        f"Activate command executed - Result: {result}"
-    ))
+
+    return jsonify(
+        success_response({"result": result, "executed": True}, f"Activate command executed - Result: {result}")
+    )
