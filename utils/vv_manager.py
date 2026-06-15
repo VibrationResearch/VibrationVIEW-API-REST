@@ -9,6 +9,7 @@ VibrationVIEW manager using the app singleton
 from functools import wraps
 import logging
 from flask import jsonify
+from werkzeug.exceptions import HTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +96,12 @@ def with_vibrationview(func):
             
             # Call the decorated function with the VibrationVIEW instance as first parameter
             return func(vv, *args, **kwargs)
-            
+
+        except HTTPException:
+            # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
+            # Flask handles them instead of swallowing them as 500s.
+            raise
+
         except Exception as e:
             logger.error(f"Error in VibrationVIEW operation: {e}")
             # Return detailed error response
@@ -148,6 +154,11 @@ def with_vibrationview_safe(func):
                     'error': None
                 }
                 
+        except HTTPException:
+            # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
+            # Flask handles them instead of swallowing them as 500s.
+            raise
+
         except Exception as e:
             logger.error(f"VibrationVIEW operation failed: {e}")
             error_info = extract_exception_info(e)

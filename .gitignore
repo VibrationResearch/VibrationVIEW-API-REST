@@ -126,6 +126,7 @@ logs/
 *.vvs
 *.vvr
 *.vvc
-*.md
+CLAUDE.md
+.github/copilot-instructions.md
 /vendor/
 /VibrationVIEW-API.zip

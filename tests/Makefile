@@ -38,15 +38,15 @@ coverage:
 
 # Code Quality
 lint:
-	flake8 routes/ utils/ app.py tests/
+	ruff check routes/ utils/ app.py tests/
 
 format:
-	black .
-	isort .
+	ruff format .
+	ruff check --fix .
 
 format-check:
-	black --check .
-	isort --check-only .
+	ruff format --check .
+	ruff check .
 
 type-check:
 	mypy routes/ utils/ --ignore-missing-imports

@@ -17,12 +17,32 @@ class Config:
     # API Settings
     API_VERSION = os.environ.get('API_VERSION') or '1.0.0'
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    
-    # CORS Settings
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or '*'
-    
-    # Logging
+
+    # CORS Settings — controls which browser origins may make cross-origin
+    # requests to the API.  Set to http://127.0.0.1 to block unexpected browser
+    # access.
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or 'http://127.0.0.1'
+
+    # API Key Authentication
+    # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
+    API_KEY = os.environ.get('API_KEY') or ''
+
+    # Allow GET requests on state-changing endpoints (start, stop, save, etc.).
+    # Set to true for backward compatibility or demonstrations only.
+    ALLOW_GET_WRITE = (os.environ.get('ALLOW_GET_WRITE') or 'false').lower() in ('true', '1', 'yes')
+
+    # Maximum request body size. Flask rejects requests larger than this before
+    # they reach application code, preventing memory exhaustion from oversized uploads.
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH') or 10 * 1024 * 1024)
+
+    # Logging — VV_LOG_DIR is resolved to an absolute path so logs are
+    # written to a predictable location regardless of the working directory.
     LOG_LEVEL = os.environ.get('LOG_LEVEL') or 'INFO'
+    VV_LOG_DIR = os.path.abspath(
+        os.environ.get('VV_LOG_DIR') or r'C:\ProgramData\VibrationVIEW\logs'
+    )
+    VV_LOG_MAX_BYTES = int(os.environ.get('VV_LOG_MAX_BYTES') or 5 * 1024 * 1024)
+    VV_LOG_BACKUP_COUNT = int(os.environ.get('VV_LOG_BACKUP_COUNT') or 5)
     
     # VibrationVIEW Settings
     VV_CONNECTION_TIMEOUT = float(os.environ.get('VV_CONNECTION_TIMEOUT') or '10.0')
@@ -57,6 +77,8 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     LOG_LEVEL = 'DEBUG'
+    ALLOW_GET_WRITE = True
+    API_KEY = ''  # Disable auth — must be set before create_app() registers the before_request hook
 
 config = {
     'development': DevelopmentConfig,

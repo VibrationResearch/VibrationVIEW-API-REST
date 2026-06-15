@@ -115,6 +115,10 @@ The API is organized into functional modules with consistent patterns:
 
 ## API Usage Examples
 
+> **Note:** If `API_KEY` is configured, all requests must include the header
+> `-H "Authorization: Bearer <your-api-key>"`. This header is omitted from the
+> examples below for brevity.
+
 ### Basic Test Control
 ```bash
 # Start a test (existing file)
@@ -484,17 +488,50 @@ The `SECRET_KEY` is not currently required — the API is stateless and does not
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
+### API Key Authentication
+All requests must include an `Authorization: Bearer <key>` header. To set up:
+
+1. Generate a key:
+   ```bash
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+2. Set `API_KEY` in your `.env` file to the generated value.
+3. Configure the same key on the controller PC (outside of source control).
+
+If `API_KEY` is empty or not set, authentication is disabled.
+
+### Write Guard (ALLOW_GET_WRITE)
+By default, state-changing endpoints (`starttest`, `stoptest`, `savedata`, `recordstart`, etc.) reject GET requests with 405 and require POST. This follows REST conventions and prevents accidental triggers from browser navigation.
+
+Set `ALLOW_GET_WRITE=true` in `.env` to allow GET on these endpoints for backward compatibility or demonstrations.
+
+### Upload Size Limit (MAX_CONTENT_LENGTH)
+Flask rejects request bodies larger than `MAX_CONTENT_LENGTH` (default: 10 MB) before they reach application code, preventing memory exhaustion from oversized uploads. Set in `.env` to override:
+
+```
+MAX_CONTENT_LENGTH=10485760
+```
+
 ### Environment Variables (.env)
 ```bash
 # API Configuration
 API_VERSION=1.0.0
 SECRET_KEY=your-secret-key
 
-# CORS Settings  
-CORS_ORIGINS=*
+# CORS Settings — restricts browser-based cross-origin requests.
+CORS_ORIGINS=http://127.0.0.1
+
+# API Key Authentication
+API_KEY=replace-with-generated-key
+
+# Write Guard — block GET on state-changing endpoints (default: false)
+ALLOW_GET_WRITE=false
 
 # Logging
 LOG_LEVEL=INFO
+# VV_LOG_DIR=C:\ProgramData\VibrationVIEW\logs
+# VV_LOG_MAX_BYTES=5242880
+# VV_LOG_BACKUP_COUNT=5
 
 # VibrationVIEW Settings
 VV_CONNECTION_TIMEOUT=10.0
@@ -505,6 +542,24 @@ VV_MAX_INSTANCES=5
 PROFILE_FOLDER=C:\VibrationVIEW\Profiles
 REPORT_FOLDER=C:\VibrationVIEW\Reports
 ```
+
+## Production Deployment
+
+### Configure Waitress to Bind to the VLAN Interface IP
+
+By default `start-api.bat` binds to `127.0.0.1`. To accept connections from the controller PC, use `--host` with the VLAN adapter IP:
+```
+start-api.bat --host 192.168.1.10 --port 5000
+```
+Do not use `0.0.0.0`, which would expose the API on all network interfaces.
+
+### Add a Firewall Rule to Restrict Access to the Controller PC
+
+From an elevated command prompt on the VibrationVIEW PC:
+```
+netsh advfirewall firewall add rule name="VibrationVIEW REST API" dir=in action=allow protocol=TCP localport=5000 remoteip=192.168.1.20
+```
+Replace `5000` with the Waitress port and `192.168.1.20` with the controller PC's IP address.
 
 ## Troubleshooting
 

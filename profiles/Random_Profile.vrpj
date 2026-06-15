@@ -13,7 +13,7 @@
                     "Unit": "sec"
                 },
                 "Modifier": {
-                    "Value": 100,
+                    "Value": 20,
                     "Unit": "%"
                 },
                 "MemorizedDrive": false,

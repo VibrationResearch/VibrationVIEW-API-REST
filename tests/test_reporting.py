@@ -8,22 +8,16 @@ Tests for reporting routes (/reportfield, /reportfields, /reportfieldshistory, e
 
 import pytest
 import json
-from app import set_vv_instance, reset_vv_instance
-from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+from app import get_vv_instance
 
 
 class TestReportField:
     """Test /reportfield endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_reportfield_with_field_parameter(self, client):
         """Test GET /reportfield?field=TestName"""
@@ -119,15 +113,10 @@ class TestReportField:
 class TestReportFields:
     """Test /reportfields endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_reportfields_get_multiple_fields(self, client):
         """Test GET /reportfields?TestName&StartTime&RunTime"""
@@ -215,15 +204,10 @@ class TestReportFields:
 class TestReportFieldsHistory:
     """Test /reportfieldshistory endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_reportfieldshistory_get(self, client):
         """Test GET /reportfieldshistory?StopCode&RunTime&Time"""
@@ -316,15 +300,10 @@ class TestReportFieldsHistory:
 class TestReportVector:
     """Test /reportvector endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_reportvector_get(self, client):
         """Test GET /reportvector?Frequency&Demand"""
@@ -381,15 +360,10 @@ class TestReportVector:
 class TestReportVectorHeader:
     """Test /reportvectorheader endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_reportvectorheader_get(self, client):
         """Test GET /reportvectorheader?Frequency&Demand"""
@@ -416,15 +390,10 @@ class TestReportVectorHeader:
 class TestFormFields:
     """Test /formfields endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_formfields_get(self, client):
         """Test GET /formfields returns all form fields"""
@@ -529,15 +498,10 @@ class TestFormFields:
 class TestReportingDocs:
     """Test /docs/reporting endpoint"""
 
-    def setup_method(self):
-        """Setup for each test method"""
-        reset_vv_instance()
-        self.mock_instance = MockVibrationVIEW()
-        set_vv_instance(self.mock_instance)
-
-    def teardown_method(self):
-        """Cleanup after each test method"""
-        reset_vv_instance()
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
 
     def test_docs_reporting(self, client):
         """Test GET /docs/reporting returns documentation"""

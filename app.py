@@ -8,8 +8,9 @@ VibrationVIEW Flask REST API - Main Application
 Entry point for the modular VibrationVIEW automation interface.
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request as flask_request
 from flask_cors import CORS
+import hmac
 import logging
 import os
 from datetime import datetime
@@ -63,18 +64,18 @@ def get_vv_instance():
             vv_instance = VibrationVIEW()
             
             if vv_instance.vv is None:
-                print("Failed to connect to VibrationVIEW")
+                logger.error("Failed to connect to VibrationVIEW")
                 return None
-                
+
             _vv_instance = vv_instance
-            print("VibrationVIEW singleton instance created successfully")
+            logger.info("VibrationVIEW singleton instance created successfully")
             return _vv_instance
-            
+
         except ImportError as e:
-            print(f"Could not import VibrationVIEW API: {e}")
+            logger.error(f"Could not import VibrationVIEW API: {e}")
             return None
         except Exception as e:
-            print(f"Error connecting to VibrationVIEW: {e}")
+            logger.error(f"Error connecting to VibrationVIEW: {e}")
             return None
 
 def set_vv_instance(instance):
@@ -91,9 +92,9 @@ def reset_vv_instance():
             try:
                 # Delete instance - lets Python/COM release the object
                 del _vv_instance
-                print("VibrationVIEW COM object released")
+                logger.info("VibrationVIEW COM object released")
             except Exception as e:
-                print(f"Error releasing VibrationVIEW COM object: {e}")
+                logger.error(f"Error releasing VibrationVIEW COM object: {e}")
         _vv_instance = None
 
 def create_app(config_class=Config):
@@ -110,9 +111,16 @@ def create_app(config_class=Config):
         }
     })
     
-    # Configure logging
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    # Configure logging — use an absolute log directory so logs are not
+    # scattered when the service is started from different directories.
+    from logging.handlers import RotatingFileHandler
+
+    log_dir = app.config['VV_LOG_DIR']
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_file = os.path.join(log_dir, 'api.log')
+    max_bytes = app.config['VV_LOG_MAX_BYTES']
+    backup_count = app.config['VV_LOG_BACKUP_COUNT']
 
     # Clear any existing handlers to ensure basicConfig takes effect
     logging.root.handlers = []
@@ -120,11 +128,49 @@ def create_app(config_class=Config):
         level=getattr(logging, app.config.get('LOG_LEVEL', 'INFO')),
         format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
         handlers=[
-            logging.FileHandler('logs/api.log'),
+            RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count),
             logging.StreamHandler()
         ]
     )
     
+    # API key authentication — uses @app.before_request for global Bearer token check.
+    # Alternative: Flask-HTTPAuth (pip install Flask-HTTPAuth) provides a cleaner
+    # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
+    # easier extensibility for multiple keys or roles.
+    # tradeoff: custom implementation avoids extra dependencies and is straightforward for single-key use case.
+    api_key = app.config.get('API_KEY', '')
+    if not api_key:
+        logger.warning('\033[91mAPI_KEY is not set. '
+                       'Set a strong, unique API_KEY in .env before deploying.\033[0m')
+    if api_key:
+        if api_key == 'replace-with-generated-key':
+            logger.warning('\033[91mUsing placeholder API key for authentication. '
+                           'Replace with a strong, unique key before deploying.\033[0m')
+        @app.before_request
+        def require_api_key():
+            # Allow health and docs endpoints without authentication
+            parts = flask_request.path.rstrip('/').split('/')
+            # parts: ['', 'api', 'vN', '<resource>', ...]
+            resource = parts[3] if len(parts) > 3 else ''
+            if resource in ('health', 'docs'):
+                return
+            auth = flask_request.headers.get('Authorization', '')
+            if auth.startswith('Bearer '):
+                token = auth[7:]
+            else:
+                token = auth
+            if not hmac.compare_digest(token, api_key):
+                return jsonify({
+                    'success': False,
+                    'error': 'Unauthorized',
+                    'message': 'Valid API key required in Authorization header'
+                }), 401
+
+    # Block GET on state-changing endpoints unless ALLOW_GET_WRITE is true
+    if not app.config.get('ALLOW_GET_WRITE', True):
+        from utils.write_guard import register_write_guard
+        register_write_guard(app)
+
     # Register blueprint modules directly under /api/v1/ (no module prefixes)
     app.register_blueprint(basic_control_bp, url_prefix='/api/v1')
     app.register_blueprint(status_properties_bp, url_prefix='/api/v1')
@@ -149,14 +195,25 @@ def create_app(config_class=Config):
     def health_check():
         """Health check endpoint"""
         vv = get_vv_instance()
-        vv_status = "connected" if vv is not None else "disconnected"
+        vv_connected = False
+        hardware_serial = None
+        vv_version = None
+        if vv is not None:
+            try:
+                vv_connected = vv.IsReady()
+                hardware_serial = hex(vv.GetHardwareSerialNumber())
+                vv_version = f"{vv.GetSoftwareVersion():.4f}"
+            except Exception:
+                pass
 
         return jsonify({
             'success': True,
             'message': 'VibrationVIEW API is running',
             'version': app.config.get('API_VERSION', '1.0.0'),
             'timestamp': datetime.now().isoformat(),
-            'vibrationview_status': vv_status,
+            'vibrationview_connected': vv_connected,
+            'hardware_serial_number': hardware_serial,
+            'vibrationview_version': vv_version,
             'modules': [
                 'basic_control',
                 'status_properties',
@@ -276,6 +333,15 @@ def create_app(config_class=Config):
             'message': 'Invalid request parameters'
         }), 400
 
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        max_mb = app.config.get('MAX_CONTENT_LENGTH', 0) // (1024 * 1024)
+        return jsonify({
+            'success': False,
+            'error': 'Request entity too large',
+            'message': f'Request body exceeds the {max_mb}MB limit'
+        }), 413
+
     @app.errorhandler(500)
     def internal_error(error):
         return jsonify({
@@ -296,6 +362,7 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     # Create app (early binding happens in create_app)
+    # print() used here because logging is not configured until create_app() runs.
     print("Starting Flask server...")
     try:
         app = create_app()
@@ -323,10 +390,10 @@ if __name__ == '__main__':
             app.run(host=args.host, port=args.port, debug=True, threaded=False)
         else:
             from waitress import serve
-            print(f"Serving with Waitress on http://{args.host}:{args.port}")
+            logger.info(f"Serving with Waitress on http://{args.host}:{args.port}")
             serve(app, host=args.host, port=args.port, threads=1)
     except KeyboardInterrupt:
-        print("\nShutting down...")
+        logger.info("Shutting down...")
     except Exception as e:
-        print(f"Server error: {e}")
+        logger.error(f"Server error: {e}")
         raise

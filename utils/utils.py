@@ -11,14 +11,16 @@ from vibrationviewapi import ExtractComErrorInfo
 import config
 from werkzeug.utils import secure_filename
 
-PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj'}
+logger = logging.getLogger(__name__)
 
-DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd'}  # v?d pattern
+PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj', 'vyp'}
+
+DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd', 'vyd'}  # v?d pattern
 
 TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort',
                        'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
 
-INPUTCONFIG_EXTENSIONS = {'vic', 'vchan'}
+INPUTCONFIG_EXTENSIONS = {'vic', 'vchan', 'inputconfig'}
 
 REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm', 'pdf'}
 
@@ -70,7 +72,7 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
     with open(file_path, 'wb') as f:
         f.write(binary_data)
 
-    logging.info(f"Binary file saved: {file_path}")
+    logger.info(f"Binary file saved: {file_path}")
 
     return {
         'FilePath': file_path,
@@ -92,7 +94,7 @@ def ParseVvTable(tsv_text: str):
             if len(values) == len(headers):
                 data.append(dict(zip(headers, values)))
             else:
-                print(f'Skipping malformed line: {line}')
+                logger.warning(f'Skipping malformed line: {line}')
 
         return data
 
@@ -338,9 +340,6 @@ def sanitize_nan(value):
     return value
 
 
-# Maximum file upload size (10 MB)
-MAX_UPLOAD_SIZE = 10 * 1024 * 1024
-
 
 def detect_file_upload():
     """
@@ -357,7 +356,7 @@ def detect_file_upload():
     """
     content_type = request.content_type or ''
 
-    logging.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
+    logger.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
                   f"content_length={request.content_length}, files={list(request.files.keys())}")
 
     # Check for multipart file upload (any field name)
@@ -379,13 +378,10 @@ def detect_file_upload():
         filename = uploaded_file.filename
         binary_data = uploaded_file.read()
         content_length = len(binary_data)
-        logging.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
+        logger.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
 
         if not filename:
             return ({'Error': 'Multipart file field has no filename'}, 400, None)
-
-        if content_length > MAX_UPLOAD_SIZE:
-            return ({'Error': 'File too large (max 10MB)'}, 413, None)
 
         return (filename, binary_data, content_length)
 
@@ -402,12 +398,8 @@ def detect_file_upload():
             return ({'Error': 'Missing filename: provide via multipart/form-data file field or query parameter'}, 400, None)
 
         content_length = request.content_length
-
-        if content_length > MAX_UPLOAD_SIZE:
-            return ({'Error': 'File too large (max 10MB)'}, 413, None)
-
         binary_data = request.get_data()
-        logging.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
+        logger.debug(f"detect_file_upload: raw binary filename={filename}, size={content_length}")
 
         return (filename, binary_data, content_length)
 
