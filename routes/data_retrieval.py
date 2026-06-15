@@ -483,7 +483,6 @@ def get_data_file(vv_instance):
 
     try:
         # Get file info
-        file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
 
         # Return raw file as binary download
