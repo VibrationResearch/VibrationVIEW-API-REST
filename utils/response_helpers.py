@@ -63,11 +63,17 @@ def com_error_response(com_exception: Exception) -> Dict:
     Returns:
         Dict: Standardized COM error response
     """
+    from utils.vv_error_codes import get_error_info
+
+    details: Dict[str, Any] = {
+        "exception_type": type(com_exception).__name__,
+        "com_hresult": getattr(com_exception, "hresult", None),
+    }
+
+    error_info = get_error_info(com_exception)
+    if error_info:
+        details["vv_error"] = error_info
+
     return error_response(
-        message=f"VibrationVIEW COM Error: {str(com_exception)}",
-        error_code="COM_ERROR",
-        details={
-            "exception_type": type(com_exception).__name__,
-            "com_hresult": getattr(com_exception, "hresult", None),
-        },
+        message=f"VibrationVIEW COM Error: {str(com_exception)}", error_code="COM_ERROR", details=details
     )
