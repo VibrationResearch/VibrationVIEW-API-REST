@@ -122,7 +122,7 @@ def mock_vv_manager_with_api(monkeypatch, mock_vibrationview):
     try:
         monkeypatch.setitem(sys.modules, 'vibrationviewapi', MagicMock())
         monkeypatch.setattr('vibrationviewapi.VibrationVIEW', mock_vibrationview_class)
-    except:
+    except Exception:
         pass
 
     return mock_vibrationview
