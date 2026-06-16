@@ -18,7 +18,7 @@ from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUF
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path, validate_output_path
 from utils.response_helpers import error_response
-from utils.utils import detect_file_upload, handle_binary_upload
+from utils.utils import detect_file_upload, get_last_data_file, handle_binary_upload
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -247,19 +247,7 @@ def generate_report(vv_instance):
 
         # If file_path is not provided, use the last data file from VibrationVIEW
         if not file_path:
-            try:
-                file_path = vv_instance.ReportField("LastDataFile")
-                if not file_path:
-                    return jsonify(
-                        error_response(
-                            "No file_path provided and no last data file available in VibrationVIEW",
-                            "NO_DATA_FILE_AVAILABLE",
-                        )
-                    ), 400
-            except Exception as e:
-                return jsonify(
-                    error_response(f"Failed to get last data file from VibrationVIEW: {str(e)}", "LAST_DATA_FILE_ERROR")
-                ), 500
+            file_path = get_last_data_file(vv_instance)
 
         # Validate file_path security and existence
         try:
@@ -333,19 +321,7 @@ def get_datafile(vv_instance):
 
     # If file_path is not provided, use the last data file from VibrationVIEW
     if not file_path:
-        try:
-            file_path = vv_instance.ReportField("LastDataFile")
-            if not file_path:
-                return jsonify(
-                    error_response(
-                        "No file_path provided and no last data file available in VibrationVIEW",
-                        "NO_DATA_FILE_AVAILABLE",
-                    )
-                ), 400
-        except Exception as e:
-            return jsonify(
-                error_response(f"Failed to get last data file from VibrationVIEW: {str(e)}", "LAST_DATA_FILE_ERROR")
-            ), 500
+        file_path = get_last_data_file(vv_instance)
 
     # Validate file_path security and existence
     try:
@@ -573,19 +549,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
         # If file_path is not provided, use the last data file from VibrationVIEW
         if not file_path:
-            try:
-                file_path = vv_instance.ReportField("LastDataFile")
-                if not file_path:
-                    return jsonify(
-                        error_response(
-                            "No file_path provided and no last data file available in VibrationVIEW",
-                            "NO_DATA_FILE_AVAILABLE",
-                        )
-                    ), 400
-            except Exception as e:
-                return jsonify(
-                    error_response(f"Failed to get last data file from VibrationVIEW: {str(e)}", "LAST_DATA_FILE_ERROR")
-                ), 500
+            file_path = get_last_data_file(vv_instance)
 
         # Validate file_path security and existence
         try:

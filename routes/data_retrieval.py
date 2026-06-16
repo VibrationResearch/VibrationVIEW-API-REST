@@ -24,6 +24,7 @@ from flask import Blueprint, jsonify, request, send_file
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
+from utils.utils import get_last_data_file
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -435,19 +436,7 @@ def get_data_file(vv_instance):
 
     # If file_path is not provided, use the last data file from VibrationVIEW
     if not file_path:
-        try:
-            file_path = vv_instance.ReportField("LastDataFile")
-            if not file_path:
-                return jsonify(
-                    error_response(
-                        "No file_path provided and no last data file available in VibrationVIEW",
-                        "NO_DATA_FILE_AVAILABLE",
-                    )
-                ), 400
-        except Exception as e:
-            return jsonify(
-                error_response(f"Failed to get last data file from VibrationVIEW: {str(e)}", "LAST_DATA_FILE_ERROR")
-            ), 500
+        file_path = get_last_data_file(vv_instance)
 
     # Validate file_path security and existence
     try:
