@@ -293,10 +293,7 @@ def generate_report(vv_instance):
         return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
 
     # Generate report
-    try:
-        generated_file_path = GenerateReportFromVV(file_path, template_name, output_name)
-    except Exception as e:
-        return jsonify(error_response(f"Failed to generate report: {str(e)}", "REPORT_GENERATION_ERROR")), 500
+    generated_file_path = GenerateReportFromVV(file_path, template_name, output_name)
 
     # Check if file was actually created
     if not os.path.exists(generated_file_path):
@@ -378,28 +375,22 @@ def get_datafiles(vv_instance):
     Example: GET /api/v1/datafiles
     """
     # Get the list of data files from VibrationVIEW history using ReportFieldsHistory
-    try:
-        # ReportFieldsHistory returns a 2D array: (parameter, value1, value2, ...)
-        # Using 'LastData' to get the history of data files
-        # if more than one data file, an additional row with LastData is always added to the top
-        # when only one data file, it returns just fields without additional row
-        fields_history = vv_instance.ReportFieldsHistory("LastData,StopCode,RunTime,Time")
-        if not fields_history or len(fields_history) == 0:
-            return jsonify(error_response("No data files found in VibrationVIEW history", "NO_DATA_FILES")), 404
+    # ReportFieldsHistory returns a 2D array: (parameter, value1, value2, ...)
+    # Using 'LastData' to get the history of data files
+    # if more than one data file, an additional row with LastData is always added to the top
+    # when only one data file, it returns just fields without additional row
+    fields_history = vv_instance.ReportFieldsHistory("LastData,StopCode,RunTime,Time")
+    if not fields_history or len(fields_history) == 0:
+        return jsonify(error_response("No data files found in VibrationVIEW history", "NO_DATA_FILES")), 404
 
-        # Extract file paths from the history (skip first element which is the field name)
-        # fields_history format: [['LastDataFile', 'file1.vrd', 'file2.vrd', ...]]
-        file_paths = []
-        for row in fields_history:
-            # Skip the first element (field name) and collect file paths
-            for file_path in row[1:]:
-                if file_path and os.path.exists(file_path):
-                    file_paths.append(file_path)
-
-    except Exception as e:
-        return jsonify(
-            error_response(f"Failed to get data files from VibrationVIEW history: {str(e)}", "HISTORY_RETRIEVAL_ERROR")
-        ), 500
+    # Extract file paths from the history (skip first element which is the field name)
+    # fields_history format: [['LastDataFile', 'file1.vrd', 'file2.vrd', ...]]
+    file_paths = []
+    for row in fields_history:
+        # Skip the first element (field name) and collect file paths
+        for file_path in row[1:]:
+            if file_path and os.path.exists(file_path):
+                file_paths.append(file_path)
 
     if not file_paths:
         return jsonify(error_response("No valid data files found in VibrationVIEW history", "NO_FILES_FOUND")), 404
@@ -620,12 +611,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
             return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
 
     # Generate the file
-    try:
-        primary_file_path = generate_func(file_path, output_name)
-    except Exception as e:
-        return jsonify(
-            error_response(f"Failed to generate {description} file: {str(e)}", f"{file_type}_GENERATION_ERROR")
-        ), 500
+    primary_file_path = generate_func(file_path, output_name)
 
     # Find the first generated file (pattern: basename-1.ext)
     base_name = os.path.splitext(output_name)[0]

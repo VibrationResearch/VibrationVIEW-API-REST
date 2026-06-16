@@ -461,12 +461,8 @@ def get_data_file(vv_instance):
     # Use validated path
     file_path = validated_file_path
 
-    try:
-        # Get file info
-        file_name = os.path.basename(file_path)
+    # Get file info
+    file_name = os.path.basename(file_path)
 
-        # Return raw file as binary download
-        return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
-
-    except Exception as e:
-        return jsonify(error_response(f"Failed to retrieve data file: {str(e)}", "DATA_FILE_RETRIEVAL_ERROR")), 500
+    # Return raw file as binary download
+    return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")

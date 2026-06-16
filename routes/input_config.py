@@ -660,14 +660,7 @@ def input_configuration_file(vv_instance):
 
         file_path = result["FilePath"]
 
-        try:
-            vv_instance.SetInputConfigurationFile(file_path)
-        except Exception as e:
-            return jsonify(
-                error_response(
-                    f'File uploaded but failed to load configuration "{filename}": {str(e)}', "LOAD_CONFIG_ERROR"
-                )
-            ), 500
+        vv_instance.SetInputConfigurationFile(file_path)
 
         return jsonify(
             success_response(
@@ -682,10 +675,7 @@ def input_configuration_file(vv_instance):
     if not filename:
         return jsonify(error_response("Missing required parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        vv_instance.SetInputConfigurationFile(filename)
-    except Exception as e:
-        return jsonify(error_response(f'Failed to load configuration "{filename}": {str(e)}', "LOAD_CONFIG_ERROR")), 500
+    vv_instance.SetInputConfigurationFile(filename)
 
     return jsonify(
         success_response({"filepath": filename}, f"Input configuration file '{filename}' loaded successfully")

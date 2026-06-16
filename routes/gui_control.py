@@ -147,16 +147,7 @@ def edit_test(vv_instance):
                 return jsonify(error), status_code
 
             file_path = result["FilePath"]
-            try:
-                vv_instance.EditTest(file_path)
-            except Exception as e:
-                return jsonify(
-                    error_response(
-                        f'File uploaded but failed to edit test "{filename}": {str(e)}',
-                        "EDIT_TEST_ERROR",
-                        f"EditTest command failed: {filename}",
-                    )
-                ), 500
+            vv_instance.EditTest(file_path)
 
             return jsonify(
                 success_response(
@@ -171,14 +162,7 @@ def edit_test(vv_instance):
     if not filename:
         return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        result = vv_instance.EditTest(filename)
-    except Exception as e:
-        return jsonify(
-            error_response(
-                f'Failed to edit test "{filename}": {str(e)}', "EDIT_TEST_ERROR", f"EditTest command failed: {filename}"
-            )
-        ), 500
+    result = vv_instance.EditTest(filename)
 
     return jsonify(success_response({"result": result, "filepath": filename}, f"EditTest command executed: {filename}"))
 

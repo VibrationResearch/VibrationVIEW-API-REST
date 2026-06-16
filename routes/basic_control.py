@@ -256,17 +256,8 @@ def run_test(vv_instance):
                 return jsonify(error), status_code
 
             file_path = result["FilePath"]
-            try:
-                vv_instance.RunTest(file_path)
-                result = vv_instance.IsRunning()
-            except Exception as e:
-                return jsonify(
-                    error_response(
-                        f'File uploaded but failed to run test "{filename}": {str(e)}',
-                        "RUN_TEST_ERROR",
-                        f"RunTest command failed: {filename}",
-                    )
-                ), 500
+            vv_instance.RunTest(file_path)
+            result = vv_instance.IsRunning()
 
             return jsonify(
                 success_response(
@@ -281,15 +272,8 @@ def run_test(vv_instance):
     if not filename:
         return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        vv_instance.RunTest(filename)
-        result = vv_instance.IsRunning()
-    except Exception as e:
-        return jsonify(
-            error_response(
-                f'Failed to run test "{filename}": {str(e)}', "RUN_TEST_ERROR", f"RunTest command failed: {filename}"
-            )
-        ), 500
+    vv_instance.RunTest(filename)
+    result = vv_instance.IsRunning()
 
     return jsonify(success_response({"result": result, "filepath": filename}, f"RunTest command executed: {filename}"))
 
@@ -397,16 +381,7 @@ def open_test(vv_instance):
                         vv_instance.CloseTab(int(test[0]))
 
             # Open the uploaded test file
-            try:
-                vv_instance.OpenTest(file_path)
-            except Exception as e:
-                return jsonify(
-                    error_response(
-                        f'File uploaded but failed to open test "{filename}": {str(e)}',
-                        "OPEN_TEST_ERROR",
-                        f"OpenTest command failed: {filename}",
-                    )
-                ), 500
+            vv_instance.OpenTest(file_path)
 
             return jsonify(
                 success_response(
@@ -421,14 +396,7 @@ def open_test(vv_instance):
     if not filename:
         return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        vv_instance.OpenTest(filename)
-    except Exception as e:
-        return jsonify(
-            error_response(
-                f'Failed to open test "{filename}": {str(e)}', "OPEN_TEST_ERROR", f"OpenTest command failed: {filename}"
-            )
-        ), 500
+    vv_instance.OpenTest(filename)
 
     return jsonify(success_response({"result": True, "filepath": filename}, f"OpenTest command executed: {filename}"))
 

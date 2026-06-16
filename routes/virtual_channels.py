@@ -144,15 +144,11 @@ def import_virtual_channels(vv_instance):
             file_path = result["FilePath"]
 
             # Import the uploaded virtual channels file
-            try:
-                vv_instance.ImportVirtualChannels(file_path)
-                result = True
-            except Exception:
-                result = False
+            vv_instance.ImportVirtualChannels(file_path)
 
             return jsonify(
                 success_response(
-                    {"result": result, "filepath": filename, "file_uploaded": True},
+                    {"result": True, "filepath": filename, "file_uploaded": True},
                     f"Upload and ImportVirtualChannels command executed: {filename}",
                 )
             )
@@ -163,14 +159,10 @@ def import_virtual_channels(vv_instance):
     if not filename:
         return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        vv_instance.ImportVirtualChannels(filename)
-        result = True
-    except Exception:
-        result = False
+    vv_instance.ImportVirtualChannels(filename)
 
     return jsonify(
         success_response(
-            {"result": result, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}"
+            {"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}"
         )
     )

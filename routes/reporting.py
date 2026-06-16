@@ -685,10 +685,7 @@ def post_form_fields(vv_instance):
             error_response("fields must be a 2D array of [field_name, field_value] pairs", "INVALID_PARAMETER")
         ), 400
 
-    try:
-        result = vv_instance.PostFormFields(fields)
-    except Exception as e:
-        return jsonify(error_response(f"Failed to post form fields: {str(e)}", "POST_FORM_FIELDS_ERROR")), 500
+    result = vv_instance.PostFormFields(fields)
 
     return jsonify(
         success_response(

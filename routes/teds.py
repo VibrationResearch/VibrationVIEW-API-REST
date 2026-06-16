@@ -226,20 +226,14 @@ def get_input_teds_channel(vv_instance):
             )
         ), 400
 
-    try:
-        teds_info = vv_instance.Teds(channel_0based)
+    teds_info = vv_instance.Teds(channel_0based)
 
-        return jsonify(
-            success_response(
-                {"result": teds_info, "channel": channel_1based, "internal_channel": channel_0based, "success": True},
-                f"TEDS information retrieved for channel {channel_1based} (1-based)",
-            )
+    return jsonify(
+        success_response(
+            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_0based, "success": True},
+            f"TEDS information retrieved for channel {channel_1based} (1-based)",
         )
-
-    except Exception as e:
-        return jsonify(
-            error_response(f"Failed to retrieve TEDS for channel {channel_1based}: {str(e)}", "TEDS_READ_ERROR")
-        ), 500
+    )
 
 
 @teds_bp.route("/teds", methods=["GET"])
@@ -288,50 +282,38 @@ def teds(vv_instance):
                 )
             ), 400
 
-        try:
-            teds_info = vv_instance.Teds(channel_0based)
+        teds_info = vv_instance.Teds(channel_0based)
 
-            # Format the single channel data using the single channel formatter
-            formatted_channel = format_single_channel_teds(teds_info, channel_0based)
+        # Format the single channel data using the single channel formatter
+        formatted_channel = format_single_channel_teds(teds_info, channel_0based)
 
-            # Prepare result data based on whether we got a transducer or error
-            if "transducer" in formatted_channel:
-                result_data = {
-                    "transducer": formatted_channel["transducer"],
-                    "channel": channel_1based,
-                    "success": True,
-                }
-                message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
-            else:  # 'error' in formatted_channel
-                result_data = {"error": formatted_channel["error"], "channel": channel_1based, "success": False}
-                message = f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}"
+        # Prepare result data based on whether we got a transducer or error
+        if "transducer" in formatted_channel:
+            result_data = {
+                "transducer": formatted_channel["transducer"],
+                "channel": channel_1based,
+                "success": True,
+            }
+            message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
+        else:  # 'error' in formatted_channel
+            result_data = {"error": formatted_channel["error"], "channel": channel_1based, "success": False}
+            message = f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}"
 
-            return jsonify(success_response(result_data, message))
-
-        except Exception as e:
-            return jsonify(
-                error_response(f"Failed to retrieve TEDS for channel {channel_1based}: {str(e)}", "TEDS_READ_ERROR")
-            ), 500
+        return jsonify(success_response(result_data, message))
 
     else:
         # No channel specified - get all TEDS data with formatting
-        try:
-            teds_info = vv_instance.Teds()
+        teds_info = vv_instance.Teds()
 
-            # Format the data using the formatter
-            formatted_data = format_teds_data(teds_info)
+        # Format the data using the formatter
+        formatted_data = format_teds_data(teds_info)
 
-            return jsonify(
-                success_response(
-                    {"result": formatted_data, "channel": "all", "success": True},
-                    f"Formatted TEDS information retrieved: {len(formatted_data['transducers'])} transducers, {len(formatted_data['errors'])} errors",
-                )
+        return jsonify(
+            success_response(
+                {"result": formatted_data, "channel": "all", "success": True},
+                f"Formatted TEDS information retrieved: {len(formatted_data['transducers'])} transducers, {len(formatted_data['errors'])} errors",
             )
-
-        except Exception as e:
-            return jsonify(
-                error_response(f"Failed to retrieve TEDS for all channels: {str(e)}", "TEDS_READ_ERROR")
-            ), 500
+        )
 
 
 # ---------------------------------------------------------------------------

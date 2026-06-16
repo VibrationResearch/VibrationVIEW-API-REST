@@ -264,18 +264,14 @@ def vector(vv_instance):
     if columns < 1:
         return jsonify(error_response(f"columns must be >= 1, got {columns}", "INVALID_PARAMETER")), 400
 
-    try:
-        result = vv_instance.Vector(vectorenum, columns)
+    result = vv_instance.Vector(vectorenum, columns)
 
-        return jsonify(
-            success_response(
-                {"result": result, "vectorenum": vectorenum, "columns": columns, "rows": len(result) if result else 0},
-                f"Retrieved vector data for vectorenum {vectorenum} with {columns} columns",
-            )
+    return jsonify(
+        success_response(
+            {"result": result, "vectorenum": vectorenum, "columns": columns, "rows": len(result) if result else 0},
+            f"Retrieved vector data for vectorenum {vectorenum} with {columns} columns",
         )
-
-    except Exception as e:
-        return jsonify(error_response(f"Failed to retrieve vector data: {str(e)}", "VECTOR_READ_ERROR")), 500
+    )
 
 
 # ============================================================================
