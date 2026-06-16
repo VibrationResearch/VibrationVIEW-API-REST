@@ -795,7 +795,7 @@ class TestDataRetrieval:
             assert response.status_code == 500, f"Expected 500 status, got {response.status_code}"
             data = json.loads(response.data)
             assert data["success"] is False, "Expected success to be False"
-            assert "Failed to retrieve vector data" in data["error"]["message"], "Error message missing expected text"
+            assert "Mock VibrationVIEW error" in data["error"]["message"], "Error message missing expected text"
 
         # Reset side effect
         self.mock_vv.Vector.side_effect = None

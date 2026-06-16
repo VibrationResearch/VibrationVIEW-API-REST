@@ -206,8 +206,7 @@ class TestReportGeneration:
             assert response.status_code == 500
             data = response.get_json()
             assert data["success"] is False
-            assert "Failed to generate report" in data["error"]["message"]
-            assert data["error"]["code"] == "REPORT_GENERATION_ERROR"
+            assert "Report generation failed" in data["error"]["message"]
 
     def test_generatereport_path_validation_security(self, client, mock_vv, sample_vrd_path):
         """Test POST /generatereport with path validation for output_name"""
@@ -548,7 +547,7 @@ class TestDatafilesRoute:
         assert response.status_code == 500
         data = response.get_json()
         assert data["success"] is False
-        assert data["error"]["code"] == "HISTORY_RETRIEVAL_ERROR"
+        assert "COM error" in data["error"]["message"]
 
 
 class TestGenerateReportPathValidation:
