@@ -150,6 +150,23 @@ def get_channel_data(vv_instance, field_keys):
     return channels
 
 
+def get_last_data_file(vv_instance):
+    """Get the last data file path from VibrationVIEW.
+
+    Raises APIError(400) if no file is available.
+    COM exceptions propagate to @handle_errors for proper classification.
+    """
+    from utils.exceptions import APIError
+
+    file_path = vv_instance.ReportField("LastDataFile")
+    if not file_path:
+        raise APIError(
+            "No file_path provided and no last data file available in VibrationVIEW",
+            "NO_DATA_FILE_AVAILABLE",
+        )
+    return file_path
+
+
 def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> str:
     """
     Runs the external report generator,
