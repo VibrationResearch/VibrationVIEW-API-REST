@@ -12,8 +12,9 @@ import logging
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 
+from utils.exceptions import APIError
 from utils.response_helpers import com_error_response, error_response
-from utils.vv_error_codes import classify_vview_error, get_error_info
+from utils.vv_error_codes import classify_vview_error, get_description_from_exception, get_error_info
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,10 @@ def handle_errors(func):
             # Re-raise HTTP errors (e.g. 413 Request Entity Too Large) so
             # Flask handles them instead of swallowing them as 500s.
             raise
+
+        except APIError as e:
+            logger.error(f"API error in {func.__name__}: {e.message}")
+            return jsonify(error_response(e.message, e.error_code)), e.http_status
 
         except ImportError as e:
             # VibrationVIEW API not available
@@ -70,7 +75,8 @@ def handle_errors(func):
             # Check if it's a COM exception with a known VibrationVIEW error code
             error_info = get_error_info(e)
             if error_info:
-                http_status, error_code, message = classify_vview_error(error_info["code"])
+                http_status, error_code, default_message = classify_vview_error(error_info["code"])
+                message = get_description_from_exception(e) or default_message
                 error_info["raw"] = str(e)
                 logger.error(f"VibrationVIEW error in {func.__name__}: {error_code} - {message}")
                 return jsonify(error_response(message, error_code, details=error_info)), http_status
