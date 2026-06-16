@@ -108,12 +108,28 @@ def classify_vview_error(scode):
     return (500, "COM_ERROR", f"VibrationVIEW COM error (scode={scode})")
 
 
-def get_scode_from_exception(e):
-    """Extract scode from a COM exception if available"""
+def _get_excepinfo(e):
+    """Extract the excepinfo tuple from a COM exception, or None."""
     if hasattr(e, "args") and len(e.args) >= 3:
         exc_info = e.args[2]
         if isinstance(exc_info, tuple) and len(exc_info) > 5:
-            return exc_info[5]  # scode is at index 5
+            return exc_info
+    return None
+
+
+def get_scode_from_exception(e):
+    """Extract scode from a COM exception if available"""
+    exc_info = _get_excepinfo(e)
+    if exc_info is not None:
+        return exc_info[5]  # scode is at index 5
+    return None
+
+
+def get_description_from_exception(e):
+    """Extract human-readable description from a COM exception if available."""
+    exc_info = _get_excepinfo(e)
+    if exc_info is not None and exc_info[2]:
+        return exc_info[2]  # description is at index 2
     return None
 
 
