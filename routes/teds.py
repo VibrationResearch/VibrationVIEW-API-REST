@@ -15,7 +15,7 @@ from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
 from utils.teds_formatter import format_single_channel_teds, format_teds_data
 from utils.utils import is_valid_urn
-from utils.vv_error_codes import DISP_E_EXCEPTION, format_com_error
+from utils.vv_error_codes import VVIEW_E_MISMATCH, format_com_error, is_vview_error
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -420,7 +420,7 @@ def teds_read_and_apply(vv_instance):
     try:
         result = vv_instance.TedsReadAndApply()
     except Exception as e:
-        if getattr(e, "hresult", None) == DISP_E_EXCEPTION:
+        if is_vview_error(e, VVIEW_E_MISMATCH):
             channels = _teds_read_channel_status(vv_instance, [])
             urns = [ch["urn"] for ch in channels if "urn" in ch]
             return jsonify(
@@ -491,7 +491,7 @@ def teds_verify_and_apply(vv_instance):
     try:
         result = vv_instance.TedsVerifyAndApply(urns)
     except Exception as e:
-        if getattr(e, "hresult", None) == DISP_E_EXCEPTION:
+        if is_vview_error(e, VVIEW_E_MISMATCH):
             channels = _teds_read_channel_status(vv_instance, urns)
             read_urns = [ch["urn"] for ch in channels if "urn" in ch]
             return jsonify(
