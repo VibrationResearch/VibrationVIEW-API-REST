@@ -17,6 +17,7 @@ import config
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
+from utils.vv_error_codes import format_com_error
 from utils.utils import (
     detect_file_upload,
     get_filename_from_request,
@@ -635,7 +636,7 @@ def test_com_connection(vv_instance):
             "is_ready": is_ready,
         }
     except Exception as e:
-        results["connection"]["error"] = str(e)
+        results["connection"].update(format_com_error(e))
 
     # System info
     try:

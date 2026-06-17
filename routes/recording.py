@@ -14,6 +14,7 @@ from flask import Blueprint, jsonify
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
+from utils.vv_error_codes import format_com_error
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -156,7 +157,7 @@ def test_recording_connection(vv_instance):
         results["recording_methods"] = {"RecordGetFilename_available": True, "last_filename": filename}
 
     except Exception as e:
-        results["recording_methods"]["error"] = str(e)
+        results["recording_methods"].update(format_com_error(e))
 
     # System info
     try:
