@@ -15,7 +15,7 @@ from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
 from utils.teds_formatter import format_single_channel_teds, format_teds_data
 from utils.utils import is_valid_urn
-from utils.vv_error_codes import DISP_E_EXCEPTION
+from utils.vv_error_codes import DISP_E_EXCEPTION, format_com_error
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -118,7 +118,7 @@ def get_input_teds_all(vv_instance):
             teds_error = {
                 "channel": channel + 1,  # 1-based for display
                 "success": False,
-                "error": str(e),
+                **format_com_error(e),
                 "teds": [],
             }
             all_teds_data.append(teds_error)
@@ -569,7 +569,7 @@ def teds_read(vv_instance):
                 else:
                     channel_data["error"] = formatted_result.get("error", {}).get("error", "Unknown error")
             except Exception as e:
-                channel_data["error"] = str(e)
+                channel_data.update(format_com_error(e))
 
         channels.append(channel_data)
 

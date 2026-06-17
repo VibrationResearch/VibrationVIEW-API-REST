@@ -146,3 +146,19 @@ def get_error_info(e):
         _, _, name = classify_vview_error(scode)
         return {"code": scode, "name": name}
     return None
+
+
+def format_com_error(e):
+    """Format a COM exception into a dict with message and error_code.
+
+    Returns a dict with 'error' and 'error_code' keys if the exception
+    contains a known VibrationVIEW scode, otherwise returns a dict with
+    just 'error' containing str(e).  Intended for per-item error capture
+    inside loops where @handle_errors cannot be used.
+    """
+    scode = get_scode_from_exception(e)
+    if scode is not None:
+        _, error_code, default_message = classify_vview_error(scode)
+        message = get_description_from_exception(e) or default_message
+        return {"error": message, "error_code": error_code}
+    return {"error": str(e)}
