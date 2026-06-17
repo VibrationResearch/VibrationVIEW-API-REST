@@ -264,6 +264,7 @@ def vector(vv_instance):
     if columns < 1:
         return jsonify(error_response(f"columns must be >= 1, got {columns}", "INVALID_PARAMETER")), 400
 
+    # Note: library wrapper suppresses COM exceptions and returns dummy array on failure
     result = vv_instance.Vector(vectorenum, columns)
 
     return jsonify(

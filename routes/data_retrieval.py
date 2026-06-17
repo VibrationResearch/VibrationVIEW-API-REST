@@ -176,6 +176,7 @@ def channel(vv_instance):
     Returns the channel values for all input channels.
     Array returned in order: [channel1, channel2, channel3, ...] (1-based channel numbering for reference)
     """
+    # Note: library wrapper suppresses COM exceptions and returns [] on failure
     result = vv_instance.Channel()
 
     return jsonify(success_response({"result": result}, f"Retrieved {len(result)} channel values"))
