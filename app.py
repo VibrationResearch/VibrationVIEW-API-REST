@@ -78,7 +78,10 @@ def get_vv_instance():
             logger.error(f"Could not import VibrationVIEW API: {e}")
             return None
         except Exception as e:
-            logger.error(f"Error connecting to VibrationVIEW: {e}")
+            logger.error(
+                f"Error connecting to VibrationVIEW: {e}. "
+                "Verify VibrationVIEW is running and the Automation Interface option (VR9604) is licensed."
+            )
             return None
 
 
