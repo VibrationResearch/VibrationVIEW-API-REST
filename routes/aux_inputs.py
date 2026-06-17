@@ -11,9 +11,9 @@ Auxiliary input properties and metadata methods
 
 from flask import Blueprint, jsonify, request
 
+from utils.decorators import handle_errors
+from utils.response_helpers import success_response
 from utils.vv_manager import with_vibrationview
-
-from .common import handle_errors, success_response
 
 auxinputs_bp = Blueprint("auxinputs", __name__, url_prefix="/api")
 
