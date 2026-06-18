@@ -258,7 +258,6 @@ def can_resume_test(vv_instance):
     return jsonify(success_response({"result": result}, f"Test {'can be resumed' if result else 'cannot be resumed'}"))
 
 
-@handle_errors
 @status_properties_bp.route("/allstatus", methods=["GET"])
 @handle_errors
 @with_vibrationview
@@ -268,25 +267,16 @@ def test_com_connection(vv_instance):
 
     Tests status properties COM connection and capabilities.
     """
-    results = {"connection": {"success": False, "error": None}, "status_tests": {}}
-
-    # Test status properties connection
-    try:
-        # Test basic status methods
-        results["status_tests"] = {
-            "is_ready": vv_instance.IsReady(),
-            "is_running": vv_instance.IsRunning(),
-            "is_starting": vv_instance.IsStarting(),
-            "is_changing_level": vv_instance.IsChangingLevel(),
-            "is_hold_level": vv_instance.IsHoldLevel(),
-            "is_open_loop": vv_instance.IsOpenLoop(),
-            "is_aborted": vv_instance.IsAborted(),
-            "can_resume_test": vv_instance.CanResumeTest(),
-            "status": vv_instance.Status(),
-        }
-
-        results["connection"] = {"success": True, "tests_completed": len(results["status_tests"])}
-    except Exception as e:
-        results["connection"]["error"] = str(e)
+    results = {
+        "is_ready": vv_instance.IsReady(),
+        "is_running": vv_instance.IsRunning(),
+        "is_starting": vv_instance.IsStarting(),
+        "is_changing_level": vv_instance.IsChangingLevel(),
+        "is_hold_level": vv_instance.IsHoldLevel(),
+        "is_open_loop": vv_instance.IsOpenLoop(),
+        "is_aborted": vv_instance.IsAborted(),
+        "can_resume_test": vv_instance.CanResumeTest(),
+        "status": vv_instance.Status(),
+    }
 
     return jsonify(success_response(results, "Status properties COM connection diagnostic completed"))
