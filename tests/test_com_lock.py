@@ -10,8 +10,6 @@ Verifies that concurrent requests are serialized through the lock.
 import threading
 import time
 
-import pytest
-
 
 class TestComLock:
     """Test that the COM lock serializes concurrent requests"""
@@ -56,8 +54,7 @@ class TestComLock:
         later_start = max(starts)
         earlier_end = min(ends)
         assert later_start >= earlier_end, (
-            f"COM calls overlapped: second started at {later_start} "
-            f"but first ended at {earlier_end}"
+            f"COM calls overlapped: second started at {later_start} but first ended at {earlier_end}"
         )
 
     def test_lock_is_released_on_error(self, client, mock_vibrationview):

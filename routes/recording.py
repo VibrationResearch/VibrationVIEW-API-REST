@@ -8,7 +8,6 @@ Recording operations matching exact COM method signatures
 """
 
 import logging
-from datetime import datetime
 
 from flask import Blueprint, jsonify
 

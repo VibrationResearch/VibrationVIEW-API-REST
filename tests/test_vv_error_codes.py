@@ -215,7 +215,7 @@ class TestHandleErrorsDecorator:
 
         @handle_errors
         def fake_endpoint():
-            raise ValueError("something unexpected") 
+            raise ValueError("something unexpected")
 
         with app.test_request_context():
             response, status = fake_endpoint()
