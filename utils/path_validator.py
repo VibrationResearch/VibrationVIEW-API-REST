@@ -8,12 +8,14 @@ Ensures file paths are restricted to authorized directories
 """
 
 from pathlib import Path
-from typing import Union, List
+from typing import List, Union
+
 from config import Config
 
 
 class PathValidationError(Exception):
     """Raised when a path validation check fails"""
+
     pass
 
 
@@ -27,14 +29,14 @@ def get_authorized_directories() -> List[str]:
     directories = []
 
     # Add configured directories if they exist
-    if hasattr(Config, 'REPORT_FOLDER') and Config.REPORT_FOLDER:
+    if hasattr(Config, "REPORT_FOLDER") and Config.REPORT_FOLDER:
         directories.append(Config.REPORT_FOLDER)
 
-    if hasattr(Config, 'PROFILE_FOLDER') and Config.PROFILE_FOLDER:
+    if hasattr(Config, "PROFILE_FOLDER") and Config.PROFILE_FOLDER:
         directories.append(Config.PROFILE_FOLDER)
 
     # Add DATA_FOLDER if it exists (to be added to config)
-    if hasattr(Config, 'DATA_FOLDER') and Config.DATA_FOLDER:
+    if hasattr(Config, "DATA_FOLDER") and Config.DATA_FOLDER:
         directories.append(Config.DATA_FOLDER)
 
     return directories
@@ -105,12 +107,12 @@ def validate_file_path(file_path: Union[str, Path], operation: str = "access") -
 
     # Check for obvious path traversal attempts
     # Allow Windows drive letters (C:, D:, etc.) but detect other colons that might indicate injection
-    if '..' in path_str or path_str.startswith('/'):
+    if ".." in path_str or path_str.startswith("/"):
         raise PathValidationError(f"Path traversal detected in path: {path_str}")
 
     # Check for colons that are not Windows drive letters (position 1)
-    if ':' in path_str:
-        colon_positions = [i for i, char in enumerate(path_str) if char == ':']
+    if ":" in path_str:
+        colon_positions = [i for i, char in enumerate(path_str) if char == ":"]
         # Allow only the first colon at position 1 (C:, D:, etc.)
         if len(colon_positions) > 1 or (len(colon_positions) == 1 and colon_positions[0] != 1):
             raise PathValidationError(f"Path traversal detected in path: {path_str}")
@@ -151,8 +153,8 @@ def validate_output_path(output_name: Union[str, Path], operation: str = "output
     output_path = Path(output_name)
 
     # If it's just a filename (no directory separators), place it in REPORT_FOLDER
-    if not output_path.parent or str(output_path.parent) == '.':
-        report_folder = getattr(Config, 'REPORT_FOLDER', None)
+    if not output_path.parent or str(output_path.parent) == ".":
+        report_folder = getattr(Config, "REPORT_FOLDER", None)
         if not report_folder:
             raise PathValidationError("No REPORT_FOLDER configured for output files")
 
@@ -191,8 +193,6 @@ def secure_path_join(base_dir: Union[str, Path], *paths: Union[str, Path]) -> st
     try:
         final_path.relative_to(base_normalized)
     except ValueError:
-        raise PathValidationError(
-            f"Path '{final_path}' would escape base directory '{base_normalized}'"
-        )
+        raise PathValidationError(f"Path '{final_path}' would escape base directory '{base_normalized}'")
 
     return str(final_path)

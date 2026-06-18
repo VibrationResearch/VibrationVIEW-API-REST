@@ -7,75 +7,75 @@ Virtual Channels Routes - 1:1 VibrationVIEW COM Interface Mapping
 Virtual channel management operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, detect_file_upload, get_filename_from_request
 import logging
-import config
-import os
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.utils import detect_file_upload, get_filename_from_request, handle_binary_upload
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
-virtual_channels_bp = Blueprint('virtual_channels', __name__)
+virtual_channels_bp = Blueprint("virtual_channels", __name__)
 
 logger = logging.getLogger(__name__)
 
 
-@virtual_channels_bp.route('/docs/virtual_channels', methods=['GET'])
+@virtual_channels_bp.route("/docs/virtual_channels", methods=["GET"])
 def get_documentation():
     """Get virtual channels module documentation"""
     docs = {
-        'module': 'virtual_channels',
-        'description': '1:1 mapping of VibrationVIEW COM virtual channel methods',
-        'com_object': 'VibrationVIEW.Application',
-        'endpoints': {
-            'POST /removeallvirtualchannels': {
-                'description': 'Remove all virtual channels from the current test',
-                'com_method': 'RemoveAllVirtualChannels()',
-                'parameters': 'None',
-                'returns': 'bool - Success status',
-                'example': 'POST /api/v1/removeallvirtualchannels'
+        "module": "virtual_channels",
+        "description": "1:1 mapping of VibrationVIEW COM virtual channel methods",
+        "com_object": "VibrationVIEW.Application",
+        "endpoints": {
+            "POST /removeallvirtualchannels": {
+                "description": "Remove all virtual channels from the current test",
+                "com_method": "RemoveAllVirtualChannels()",
+                "parameters": "None",
+                "returns": "bool - Success status",
+                "example": "POST /api/v1/removeallvirtualchannels",
             },
-            'GET /importvirtualchannels': {
-                'description': 'Import virtual channels from an existing configuration file by path',
-                'com_method': 'ImportVirtualChannels(filepath)',
-                'parameters': {
-                    'filename': 'string - Virtual channels configuration filename (named parameter)',
-                    'OR unnamed parameter': 'string - Filename as first URL parameter'
+            "GET /importvirtualchannels": {
+                "description": "Import virtual channels from an existing configuration file by path",
+                "com_method": "ImportVirtualChannels(filepath)",
+                "parameters": {
+                    "filename": "string - Virtual channels configuration filename (named parameter)",
+                    "OR unnamed parameter": "string - Filename as first URL parameter",
                 },
-                'returns': 'Result from ImportVirtualChannels()',
-                'example': 'GET /api/v1/importvirtualchannels?filename=channels.vvc'
+                "returns": "Result from ImportVirtualChannels()",
+                "example": "GET /api/v1/importvirtualchannels?filename=channels.vvc",
             },
-            'POST|PUT /importvirtualchannels': {
-                'description': 'Upload and import a virtual channels file, OR import existing file by path',
-                'com_method': 'ImportVirtualChannels(filepath)',
-                'modes': {
-                    'With file content (upload mode)': {
-                        'Option 1 (multipart/form-data)': 'any file field (filename auto-detected)',
-                        'Option 2 (raw binary)': 'filename query parameter required, binary body'
+            "POST|PUT /importvirtualchannels": {
+                "description": "Upload and import a virtual channels file, OR import existing file by path",
+                "com_method": "ImportVirtualChannels(filepath)",
+                "modes": {
+                    "With file content (upload mode)": {
+                        "Option 1 (multipart/form-data)": "any file field (filename auto-detected)",
+                        "Option 2 (raw binary)": "filename query parameter required, binary body",
                     },
-                    'Without file content': 'Same as GET - filename query parameter required'
+                    "Without file content": "Same as GET - filename query parameter required",
                 },
-                'returns': 'object - Status, file path',
-                'examples': [
-                    'POST /api/v1/importvirtualchannels with multipart/form-data (upload + import)',
-                    'POST /api/v1/importvirtualchannels?filename=channels.vvc with raw binary body (upload + import)',
-                    'POST /api/v1/importvirtualchannels?filename=channels.vvc (import existing file)'
-                ]
-            }
+                "returns": "object - Status, file path",
+                "examples": [
+                    "POST /api/v1/importvirtualchannels with multipart/form-data (upload + import)",
+                    "POST /api/v1/importvirtualchannels?filename=channels.vvc with raw binary body (upload + import)",
+                    "POST /api/v1/importvirtualchannels?filename=channels.vvc (import existing file)",
+                ],
+            },
         },
-        'notes': [
-            'All endpoints are 1:1 COM method mappings',
-            'RemoveAllVirtualChannels clears all virtual channels from the current test',
-            'ImportVirtualChannels loads virtual channel definitions from a file',
-            'PUT method allows uploading and importing in one operation'
-        ]
+        "notes": [
+            "All endpoints are 1:1 COM method mappings",
+            "RemoveAllVirtualChannels clears all virtual channels from the current test",
+            "ImportVirtualChannels loads virtual channel definitions from a file",
+            "PUT method allows uploading and importing in one operation",
+        ],
     }
     return jsonify(docs)
 
 
-@virtual_channels_bp.route('/removeallvirtualchannels', methods=['GET', 'POST'])
+@virtual_channels_bp.route("/removeallvirtualchannels", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def remove_all_virtual_channels(vv_instance):
@@ -89,13 +89,10 @@ def remove_all_virtual_channels(vv_instance):
     """
     result = vv_instance.RemoveAllVirtualChannels()
 
-    return jsonify(success_response(
-        {'result': result},
-        "RemoveAllVirtualChannels command executed"
-    ))
+    return jsonify(success_response({"result": result}, "RemoveAllVirtualChannels command executed"))
 
 
-@virtual_channels_bp.route('/importvirtualchannels', methods=['GET', 'POST', 'PUT'])
+@virtual_channels_bp.route("/importvirtualchannels", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
 def import_virtual_channels(vv_instance):
@@ -129,7 +126,7 @@ def import_virtual_channels(vv_instance):
             Example: POST /api/v1/importvirtualchannels?filename=channels.vvc
     """
     # Check for file upload (PUT/POST only)
-    if request.method in ('PUT', 'POST'):
+    if request.method in ("PUT", "POST"):
         upload_result = detect_file_upload()
         filename, binary_data, content_length = upload_result
 
@@ -144,43 +141,28 @@ def import_virtual_channels(vv_instance):
             if error:
                 return jsonify(error), status_code
 
-            file_path = result['FilePath']
+            file_path = result["FilePath"]
 
             # Import the uploaded virtual channels file
-            try:
-                vv_instance.ImportVirtualChannels(file_path)
-                result = True
-            except Exception:
-                result = False
+            vv_instance.ImportVirtualChannels(file_path)
 
-            return jsonify(success_response(
-                {
-                    'result': result,
-                    'filepath': filename,
-                    'file_uploaded': True
-                },
-                f"Upload and ImportVirtualChannels command executed: {filename}"
-            ))
+            return jsonify(
+                success_response(
+                    {"result": True, "filepath": filename, "file_uploaded": True},
+                    f"Upload and ImportVirtualChannels command executed: {filename}",
+                )
+            )
 
     # No file upload - import existing file by path
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response(
-            'Missing required query parameter: filename',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
 
-    try:
-        vv_instance.ImportVirtualChannels(filename)
-        result = True
-    except Exception:
-        result = False
+    vv_instance.ImportVirtualChannels(filename)
 
-    return jsonify(success_response(
-        {
-            'result': result,
-            'filepath': filename
-        },
-        f"ImportVirtualChannels command executed: {filename}"
-    ))
+    return jsonify(
+        success_response(
+            {"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}"
+        )
+    )

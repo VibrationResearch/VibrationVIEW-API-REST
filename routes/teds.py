@@ -7,113 +7,110 @@ TEDS Information Routes - 1:1 VibrationVIEW COM Interface Mapping
 TEDS (Transducer Electronic Data Sheet) operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
-from utils.teds_formatter import format_teds_data, format_single_channel_teds
-from utils.utils import is_valid_urn
-from utils.vv_error_codes import DISP_E_EXCEPTION
 import logging
-from datetime import datetime
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.teds_formatter import format_single_channel_teds, format_teds_data
+from utils.utils import is_valid_urn
+from utils.vv_error_codes import VVIEW_E_MISMATCH, format_com_error, is_vview_error
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
-teds_bp = Blueprint('teds', __name__)
+teds_bp = Blueprint("teds", __name__)
 
 logger = logging.getLogger(__name__)
 
-@teds_bp.route('/docs/teds', methods=['GET'])
+
+@teds_bp.route("/docs/teds", methods=["GET"])
 def get_documentation():
     """Get TEDS module documentation"""
     docs = {
-        'module': 'teds',
-        'description': '1:1 mapping of VibrationVIEW COM TEDS information methods',
-        'com_object': 'VibrationVIEW.Application',
-        'endpoints': {
-            'TEDS Information': {
-                'GET /inputteds': {
-                    'description': 'Get TEDS information for all input channels',
-                    'com_method': 'Teds(channel) for each channel',
-                    'parameters': 'None',
-                    'returns': 'array - TEDS information for all channels'
+        "module": "teds",
+        "description": "1:1 mapping of VibrationVIEW COM TEDS information methods",
+        "com_object": "VibrationVIEW.Application",
+        "endpoints": {
+            "TEDS Information": {
+                "GET /inputteds": {
+                    "description": "Get TEDS information for all input channels",
+                    "com_method": "Teds(channel) for each channel",
+                    "parameters": "None",
+                    "returns": "array - TEDS information for all channels",
                 },
-                'GET /inputtedschannel': {
-                    'description': 'Get TEDS information for a specific channel',
-                    'com_method': 'Teds(channel)',
-                    'parameters': {
-                        'channel': 'int - Input channel number (1-based, first query parameter)'
-                    },
-                    'returns': 'object - TEDS information for specified channel',
-                    'example': 'GET /api/v1/inputtedschannel?3 (channel 3, 1-based)'
+                "GET /inputtedschannel": {
+                    "description": "Get TEDS information for a specific channel",
+                    "com_method": "Teds(channel)",
+                    "parameters": {"channel": "int - Input channel number (1-based, first query parameter)"},
+                    "returns": "object - TEDS information for specified channel",
+                    "example": "GET /api/v1/inputtedschannel?3 (channel 3, 1-based)",
                 },
-                'GET /teds': {
-                    'description': 'Get formatted TEDS information for specific channel or all channels',
-                    'com_method': 'Teds(channel) or Teds()',
-                    'parameters': {
-                        'channel': 'int - Optional channel number (1-based, first query parameter)'
-                    },
-                    'returns': 'object - Structured transducer data for specific channel or transducers/errors arrays for all channels',
-                    'examples': [
-                        'GET /api/v1/teds (all channels - transducers/errors arrays)',
-                        'GET /api/v1/teds?3 (channel 3, 1-based - single transducer object)'
-                    ]
+                "GET /teds": {
+                    "description": "Get formatted TEDS information for specific channel or all channels",
+                    "com_method": "Teds(channel) or Teds()",
+                    "parameters": {"channel": "int - Optional channel number (1-based, first query parameter)"},
+                    "returns": "object - Structured transducer data for specific channel or transducers/errors arrays for all channels",
+                    "examples": [
+                        "GET /api/v1/teds (all channels - transducers/errors arrays)",
+                        "GET /api/v1/teds?3 (channel 3, 1-based - single transducer object)",
+                    ],
                 },
-                'GET|POST /tedsreadandapply': {
-                    'description': 'Read and apply TEDS information for all channels',
-                    'com_method': 'TedsReadAndApply()',
-                    'parameters': 'None',
-                    'returns': 'object - Success status and operation result',
-                    'example': 'GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply'
+                "GET|POST /tedsreadandapply": {
+                    "description": "Read and apply TEDS information for all channels",
+                    "com_method": "TedsReadAndApply()",
+                    "parameters": "None",
+                    "returns": "object - Success status and operation result",
+                    "example": "GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply",
                 },
-                'POST /tedsverifyandapply': {
-                    'description': 'Verify and apply TEDS information for specified URNs',
-                    'com_method': 'TedsVerifyAndApply(urns)',
-                    'parameters': {
-                        'urns': 'array - List of URN strings to verify and apply TEDS for'
-                    },
-                    'returns': 'object - Success status and operation result',
-                    'example': 'POST /api/v1/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}'
+                "POST /tedsverifyandapply": {
+                    "description": "Verify and apply TEDS information for specified URNs",
+                    "com_method": "TedsVerifyAndApply(urns)",
+                    "parameters": {"urns": "array - List of URN strings to verify and apply TEDS for"},
+                    "returns": "object - Success status and operation result",
+                    "example": 'POST /api/v1/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}',
                 },
-                'GET|POST /tedsread': {
-                    'description': 'Read TEDS information from hardware and expand valid URNs',
-                    'com_method': 'TedsRead() + TedsFromURN(urn) for valid URNs',
-                    'parameters': 'None',
-                    'returns': 'object - channels list with raw_value and transducer data for valid URNs',
-                    'example': 'GET /api/v1/tedsread or POST /api/v1/tedsread'
-                }
+                "GET|POST /tedsread": {
+                    "description": "Read TEDS information from hardware and expand valid URNs",
+                    "com_method": "TedsRead() + TedsFromURN(urn) for valid URNs",
+                    "parameters": "None",
+                    "returns": "object - channels list with raw_value and transducer data for valid URNs",
+                    "example": "GET /api/v1/tedsread or POST /api/v1/tedsread",
+                },
             }
         },
-        'notes': [
-            'TEDS (Transducer Electronic Data Sheet) contains sensor information',
-            'All routes now use 1-based channel indexing for consistency (user-friendly)',
-            'Channels are automatically converted to 0-based for VibrationVIEW COM interface',
-            'Channels without TEDS data will return error information',
-            'COM interface uses 0-based indexing internally but this is handled automatically'
-        ]
+        "notes": [
+            "TEDS (Transducer Electronic Data Sheet) contains sensor information",
+            "All routes now use 1-based channel indexing for consistency (user-friendly)",
+            "Channels are automatically converted to 0-based for VibrationVIEW COM interface",
+            "Channels without TEDS data will return error information",
+            "COM interface uses 0-based indexing internally but this is handled automatically",
+        ],
     }
     return jsonify(docs)
 
-@teds_bp.route('/inputteds', methods=['GET'])
+
+@teds_bp.route("/inputteds", methods=["GET"])
 @handle_errors
 @with_vibrationview
 def get_input_teds_all(vv_instance):
     """
     Get TEDS Information for All Channels
-    
+
     COM Method: Teds(channel) for each available channel
     Returns TEDS information for all input channels on the hardware.
     Channels without TEDS will include error information.
     """
     all_teds_data = []
     num_channels = vv_instance.GetHardwareInputChannels()
-    
+
     for channel in range(num_channels):
         try:
             teds_info = vv_instance.Teds(channel)
             teds_data = {
                 "channel": channel + 1,  # 1-based for display
                 "success": True,
-                "teds": teds_info
+                "teds": teds_info,
             }
             all_teds_data.append(teds_data)
 
@@ -121,25 +118,25 @@ def get_input_teds_all(vv_instance):
             teds_error = {
                 "channel": channel + 1,  # 1-based for display
                 "success": False,
-                "error": str(e),
-                "teds": []
+                **format_com_error(e),
+                "teds": [],
             }
             all_teds_data.append(teds_error)
 
     # Count channels with actual TEDS data and errors
     channels_with_teds_data = 0
     channels_with_errors = 0
-    
+
     for t in all_teds_data:
-        if not t.get('success', True):
+        if not t.get("success", True):
             # Channel failed to retrieve TEDS data
             channels_with_errors += 1
-        elif 'teds' in t:
+        elif "teds" in t:
             # Check if TEDS data contains actual information
-            teds_data = t['teds']
+            teds_data = t["teds"]
             has_real_teds = False
             has_error = False
-            
+
             if isinstance(teds_data, list):
                 if len(teds_data) == 0:
                     # Empty list - no TEDS data
@@ -163,7 +160,7 @@ def get_input_teds_all(vv_instance):
                 # Direct dict format (mock or simplified format)
                 if "Error" not in teds_data:
                     has_real_teds = True
-            
+
             if has_error:
                 channels_with_errors += 1
             elif has_real_teds:
@@ -172,193 +169,157 @@ def get_input_teds_all(vv_instance):
     # Calculate total channels with TEDS enabled (data + errors)
     channels_with_teds_enabled = channels_with_teds_data + channels_with_errors
 
-    return jsonify(success_response(
-        {
-            'result': all_teds_data,
-            'total_channels': num_channels,
-            'channels_with_teds': channels_with_teds_data,
-            'channels_with_errors': channels_with_errors,
-            'channels_with_teds_enabled': channels_with_teds_enabled
-        },
-        f"TEDS information retrieved for {num_channels} channels"
-    ))
+    return jsonify(
+        success_response(
+            {
+                "result": all_teds_data,
+                "total_channels": num_channels,
+                "channels_with_teds": channels_with_teds_data,
+                "channels_with_errors": channels_with_errors,
+                "channels_with_teds_enabled": channels_with_teds_enabled,
+            },
+            f"TEDS information retrieved for {num_channels} channels",
+        )
+    )
 
-@teds_bp.route('/inputtedschannel', methods=['GET'])
+
+@teds_bp.route("/inputtedschannel", methods=["GET"])
 @handle_errors
 @with_vibrationview
 def get_input_teds_channel(vv_instance):
     """
     Get TEDS Information for Specific Channel (1-based indexing)
-    
+
     COM Method: Teds(channel)
     Returns TEDS information for the specified input channel.
-    
+
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
-    
+
     Example: GET /api/v1/inputtedschannel?3 (gets channel 3, 1-based)
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
+        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+
     try:
         channel_1based = int(query_args[0])
     except (ValueError, IndexError):
-        return jsonify(error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+        return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+
     # Validate 1-based channel number
     if channel_1based < 1:
-        return jsonify(error_response(
-            f'Channel must be >= 1 (1-based indexing), got {channel_1based}',
-            'INVALID_CHANNEL'
-        )), 400
-    
+        return jsonify(
+            error_response(f"Channel must be >= 1 (1-based indexing), got {channel_1based}", "INVALID_CHANNEL")
+        ), 400
+
     # Convert from 1-based to 0-based for COM interface
     channel_0based = channel_1based - 1
-    
+
     # Validate channel range
     num_channels = vv_instance.GetHardwareInputChannels()
     if channel_0based >= num_channels:
-        return jsonify(error_response(
-            f'Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)',
-            'CHANNEL_OUT_OF_RANGE'
-        )), 400
-    
-    try:
-        teds_info = vv_instance.Teds(channel_0based)
-        
-        return jsonify(success_response(
-            {
-                'result': teds_info,
-                'channel': channel_1based,
-                'internal_channel': channel_0based,
-                'success': True
-            },
-            f"TEDS information retrieved for channel {channel_1based} (1-based)"
-        ))
-        
-    except Exception as e:
-        return jsonify(error_response(
-            f'Failed to retrieve TEDS for channel {channel_1based}: {str(e)}',
-            'TEDS_READ_ERROR'
-        )), 500
+        return jsonify(
+            error_response(
+                f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)", "CHANNEL_OUT_OF_RANGE"
+            )
+        ), 400
 
-@teds_bp.route('/teds', methods=['GET'])
+    teds_info = vv_instance.Teds(channel_0based)
+
+    return jsonify(
+        success_response(
+            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_0based, "success": True},
+            f"TEDS information retrieved for channel {channel_1based} (1-based)",
+        )
+    )
+
+
+@teds_bp.route("/teds", methods=["GET"])
 @handle_errors
 @with_vibrationview
 def teds(vv_instance):
     """
     Get TEDS Information for Specific Channel or All Channels (1-based indexing)
-    
+
     COM Method: Teds(channel) or Teds()
     Returns TEDS information for the specified channel (1-based) or all channels if no channel specified.
-    
+
     Query Parameters:
         channel: Optional input channel number (1-based) - first positional parameter
-    
-    Examples: 
+
+    Examples:
         GET /api/v1/teds (all channels)
         GET /api/v1/teds?3 (channel 3, 1-based)
     """
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
-    
+
     if query_args:
         # Channel specified - get specific channel TEDS (1-based)
         try:
             channel_1based = int(query_args[0])
         except (ValueError, IndexError):
-            return jsonify(error_response(
-                'Invalid channel parameter - must be an integer',
-                'INVALID_PARAMETER'
-            )), 400
-        
+            return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+
         # Validate 1-based channel number
         if channel_1based < 1:
-            return jsonify(error_response(
-                f'Channel must be >= 1 (1-based indexing), got {channel_1based}',
-                'INVALID_CHANNEL'
-            )), 400
-        
+            return jsonify(
+                error_response(f"Channel must be >= 1 (1-based indexing), got {channel_1based}", "INVALID_CHANNEL")
+            ), 400
+
         # Convert from 1-based to 0-based
         channel_0based = channel_1based - 1
-        
+
         # Validate channel range
         num_channels = vv_instance.GetHardwareInputChannels()
         if channel_0based >= num_channels:
-            return jsonify(error_response(
-                f'Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)',
-                'CHANNEL_OUT_OF_RANGE'
-            )), 400
-        
-        try:
-            teds_info = vv_instance.Teds(channel_0based)
+            return jsonify(
+                error_response(
+                    f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)",
+                    "CHANNEL_OUT_OF_RANGE",
+                )
+            ), 400
 
-            # Format the single channel data using the single channel formatter
-            formatted_channel = format_single_channel_teds(teds_info, channel_0based)
+        teds_info = vv_instance.Teds(channel_0based)
 
-            # Prepare result data based on whether we got a transducer or error
-            if 'transducer' in formatted_channel:
-                result_data = {
-                    'transducer': formatted_channel['transducer'],
-                    'channel': channel_1based,
-                    'success': True
-                }
-                message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
-            else:  # 'error' in formatted_channel
-                result_data = {
-                    'error': formatted_channel['error'],
-                    'channel': channel_1based,
-                    'success': False
-                }
-                message = f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}"
+        # Format the single channel data using the single channel formatter
+        formatted_channel = format_single_channel_teds(teds_info, channel_0based)
 
-            return jsonify(success_response(
-                result_data,
-                message
-            ))
+        # Prepare result data based on whether we got a transducer or error
+        if "transducer" in formatted_channel:
+            result_data = {
+                "transducer": formatted_channel["transducer"],
+                "channel": channel_1based,
+                "success": True,
+            }
+            message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
+        else:  # 'error' in formatted_channel
+            result_data = {"error": formatted_channel["error"], "channel": channel_1based, "success": False}
+            message = f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}"
 
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to retrieve TEDS for channel {channel_1based}: {str(e)}',
-                'TEDS_READ_ERROR'
-            )), 500
-    
+        return jsonify(success_response(result_data, message))
+
     else:
         # No channel specified - get all TEDS data with formatting
-        try:
-            teds_info = vv_instance.Teds()
+        teds_info = vv_instance.Teds()
 
-            # Format the data using the formatter
-            formatted_data = format_teds_data(teds_info)
+        # Format the data using the formatter
+        formatted_data = format_teds_data(teds_info)
 
-            return jsonify(success_response(
-                {
-                    'result': formatted_data,
-                    'channel': 'all',
-                    'success': True
-                },
-                f"Formatted TEDS information retrieved: {len(formatted_data['transducers'])} transducers, {len(formatted_data['errors'])} errors"
-            ))
-
-        except Exception as e:
-            return jsonify(error_response(
-                f'Failed to retrieve TEDS for all channels: {str(e)}',
-                'TEDS_READ_ERROR'
-            )), 500
+        return jsonify(
+            success_response(
+                {"result": formatted_data, "channel": "all", "success": True},
+                f"Formatted TEDS information retrieved: {len(formatted_data['transducers'])} transducers, {len(formatted_data['errors'])} errors",
+            )
+        )
 
 
 # ---------------------------------------------------------------------------
 # TEDS channel status helpers (used by TedsReadAndApply / TedsVerifyAndApply)
 # ---------------------------------------------------------------------------
+
 
 def _teds_read_channel_status(vv_instance, expected_urns):
     """!
@@ -386,20 +347,20 @@ def _teds_read_channel_status(vv_instance, expected_urns):
         entry = {}
 
         if isinstance(raw_value, str) and raw_value.strip().lower() == "disabled":
-            entry['status'] = 'disabled'
+            entry["status"] = "disabled"
         elif is_valid_urn(raw_value):
             actual_urn = raw_value.strip()
-            entry['urn'] = actual_urn
+            entry["urn"] = actual_urn
             if expected is not None:
-                entry['expected_urn'] = expected
+                entry["expected_urn"] = expected
             if isinstance(expected, str) and is_valid_urn(expected) and actual_urn.upper() == expected.strip().upper():
-                entry['status'] = 'ok'
+                entry["status"] = "ok"
             else:
-                entry['status'] = 'error'
+                entry["status"] = "error"
         else:
-            entry['status'] = 'error'
+            entry["status"] = "error"
             if expected is not None:
-                entry['expected_urn'] = expected
+                entry["expected_urn"] = expected
 
         channels.append(entry)
 
@@ -424,21 +385,21 @@ def _format_result_as_channels(result, expected_urns=None):
         entry = {}
         expected = expected_urns[index] if expected_urns and index < len(expected_urns) else None
         if isinstance(value, str) and value.strip().lower() == "disabled":
-            entry['status'] = 'disabled'
+            entry["status"] = "disabled"
         elif is_valid_urn(value):
-            entry['status'] = 'ok'
-            entry['urn'] = value.strip()
+            entry["status"] = "ok"
+            entry["urn"] = value.strip()
             if expected is not None:
-                entry['expected_urn'] = expected
+                entry["expected_urn"] = expected
         else:
-            entry['status'] = 'error'
+            entry["status"] = "error"
             if expected is not None:
-                entry['expected_urn'] = expected
+                entry["expected_urn"] = expected
         channels.append(entry)
     return channels
 
 
-@teds_bp.route('/tedsreadandapply', methods=['GET', 'POST'])
+@teds_bp.route("/tedsreadandapply", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def teds_read_and_apply(vv_instance):
@@ -459,32 +420,38 @@ def teds_read_and_apply(vv_instance):
     try:
         result = vv_instance.TedsReadAndApply()
     except Exception as e:
-        if getattr(e, 'hresult', None) == DISP_E_EXCEPTION:
+        if is_vview_error(e, VVIEW_E_MISMATCH):
             channels = _teds_read_channel_status(vv_instance, [])
-            urns = [ch['urn'] for ch in channels if 'urn' in ch]
-            return jsonify(success_response(
-                {'result': channels, 'urns': urns, 'urn_count': len(urns)},
-                "TEDS read and apply failed: data mismatch. Channel status retrieved via TedsRead."
-            )), 500
+            urns = [ch["urn"] for ch in channels if "urn" in ch]
+            return jsonify(
+                success_response(
+                    {"result": channels, "urns": urns, "urn_count": len(urns)},
+                    "TEDS read and apply failed: data mismatch. Channel status retrieved via TedsRead.",
+                )
+            ), 500
         raise
 
     channels = _format_result_as_channels(result)
-    urns = [ch['urn'] for ch in channels if 'urn' in ch]
-    has_errors = any(ch.get('status') == 'error' for ch in channels)
+    urns = [ch["urn"] for ch in channels if "urn" in ch]
+    has_errors = any(ch.get("status") == "error" for ch in channels)
 
     if has_errors:
-        return jsonify(success_response(
-            {'result': channels, 'urns': urns, 'urn_count': len(urns)},
-            "TEDS read and apply completed with errors: not all channels applied successfully"
-        )), 500
+        return jsonify(
+            success_response(
+                {"result": channels, "urns": urns, "urn_count": len(urns)},
+                "TEDS read and apply completed with errors: not all channels applied successfully",
+            )
+        ), 500
 
-    return jsonify(success_response(
-        {'result': channels, 'urns': urns, 'urn_count': len(urns)},
-        "TEDS read and apply operation completed successfully for all channels"
-    ))
+    return jsonify(
+        success_response(
+            {"result": channels, "urns": urns, "urn_count": len(urns)},
+            "TEDS read and apply operation completed successfully for all channels",
+        )
+    )
 
 
-@teds_bp.route('/tedsverifyandapply', methods=['POST'])
+@teds_bp.route("/tedsverifyandapply", methods=["POST"])
 @handle_errors
 @with_vibrationview
 def teds_verify_and_apply(vv_instance):
@@ -502,59 +469,50 @@ def teds_verify_and_apply(vv_instance):
     """
     request_data = request.get_json(silent=True)
     if not request_data:
-        return jsonify(error_response(
-            'Missing request body - JSON required',
-            'MISSING_BODY'
-        )), 400
+        return jsonify(error_response("Missing request body - JSON required", "MISSING_BODY")), 400
 
-    urns = request_data.get('urns')
+    urns = request_data.get("urns")
     if urns is None:
-        return jsonify(error_response(
-            'Missing required parameter: urns',
-            'MISSING_PARAMETER'
-        )), 400
+        return jsonify(error_response("Missing required parameter: urns", "MISSING_PARAMETER")), 400
 
     if not isinstance(urns, list):
-        return jsonify(error_response(
-            'Parameter "urns" must be an array',
-            'INVALID_PARAMETER_TYPE'
-        )), 400
+        return jsonify(error_response('Parameter "urns" must be an array', "INVALID_PARAMETER_TYPE")), 400
 
     if len(urns) == 0:
-        return jsonify(error_response(
-            'Parameter "urns" cannot be empty',
-            'EMPTY_PARAMETER'
-        )), 400
+        return jsonify(error_response('Parameter "urns" cannot be empty', "EMPTY_PARAMETER")), 400
 
     # Validate URNs are strings
     for i, urn in enumerate(urns):
         if not isinstance(urn, str):
-            return jsonify(error_response(
-                f'URN at index {i} must be a string, got {type(urn).__name__}',
-                'INVALID_URN_TYPE'
-            )), 400
+            return jsonify(
+                error_response(f"URN at index {i} must be a string, got {type(urn).__name__}", "INVALID_URN_TYPE")
+            ), 400
 
     try:
         result = vv_instance.TedsVerifyAndApply(urns)
     except Exception as e:
-        if getattr(e, 'hresult', None) == DISP_E_EXCEPTION:
+        if is_vview_error(e, VVIEW_E_MISMATCH):
             channels = _teds_read_channel_status(vv_instance, urns)
-            read_urns = [ch['urn'] for ch in channels if 'urn' in ch]
-            return jsonify(success_response(
-                {'result': channels, 'urns': read_urns, 'urn_count': len(read_urns)},
-                "TEDS verify and apply failed: data mismatch. Channel status retrieved via TedsRead."
-            )), 500
+            read_urns = [ch["urn"] for ch in channels if "urn" in ch]
+            return jsonify(
+                success_response(
+                    {"result": channels, "urns": read_urns, "urn_count": len(read_urns)},
+                    "TEDS verify and apply failed: data mismatch. Channel status retrieved via TedsRead.",
+                )
+            ), 500
         raise
 
     channels = _format_result_as_channels(result, urns)
-    result_urns = [ch['urn'] for ch in channels if 'urn' in ch]
-    return jsonify(success_response(
-        {'result': channels, 'urns': result_urns, 'urn_count': len(result_urns)},
-        f"TEDS verify and apply operation completed successfully for {len(urns)} URNs"
-    ))
+    result_urns = [ch["urn"] for ch in channels if "urn" in ch]
+    return jsonify(
+        success_response(
+            {"result": channels, "urns": result_urns, "urn_count": len(result_urns)},
+            f"TEDS verify and apply operation completed successfully for {len(urns)} URNs",
+        )
+    )
 
 
-@teds_bp.route('/tedsread', methods=['GET', 'POST'])
+@teds_bp.route("/tedsread", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
 def teds_read(vv_instance):
@@ -593,8 +551,8 @@ def teds_read(vv_instance):
 
     for index, raw_value in enumerate(raw_values):
         channel_data = {
-            'channel': index + 1,  # 1-based channel number
-            'raw_value': raw_value
+            "channel": index + 1,  # 1-based channel number
+            "raw_value": raw_value,
         }
 
         # Check if this is a valid URN (16-digit hex string) to expand
@@ -603,26 +561,26 @@ def teds_read(vv_instance):
                 teds_data = vv_instance.TedsFromURN(raw_value)
                 formatted_result = format_single_channel_teds(teds_data, -1)
 
-                if 'transducer' in formatted_result:
-                    transducer = formatted_result['transducer']
-                    transducer['urn'] = raw_value
-                    channel_data['transducer'] = transducer
+                if "transducer" in formatted_result:
+                    transducer = formatted_result["transducer"]
+                    transducer["urn"] = raw_value
+                    channel_data["transducer"] = transducer
                     transducer_count += 1
                 else:
-                    channel_data['error'] = formatted_result.get('error', {}).get('error', 'Unknown error')
+                    channel_data["error"] = formatted_result.get("error", {}).get("error", "Unknown error")
             except Exception as e:
-                channel_data['error'] = str(e)
+                channel_data.update(format_com_error(e))
 
         channels.append(channel_data)
 
-    return jsonify(success_response(
-        {
-            'channels': channels,
-            'transducer_count': transducer_count,
-            'channel_count': len(channels),
-            'success': True
-        },
-        f"TEDS read completed: {transducer_count} transducer(s) found across {len(channels)} channel(s)"
-    ))
-
-
+    return jsonify(
+        success_response(
+            {
+                "channels": channels,
+                "transducer_count": transducer_count,
+                "channel_count": len(channels),
+                "success": True,
+            },
+            f"TEDS read completed: {transducer_count} transducer(s) found across {len(channels)} channel(s)",
+        )
+    )

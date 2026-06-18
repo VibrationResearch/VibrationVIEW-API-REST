@@ -1,6 +1,7 @@
-from unittest.mock import MagicMock
 import time
-from typing import List, Dict, Any, Optional, Union
+from typing import Dict, List, Optional
+from unittest.mock import MagicMock
+
 
 class MockVibrationVIEW:
     """
@@ -69,7 +70,7 @@ class MockVibrationVIEW:
         self.TedsRead = MagicMock(return_value=[])
         self.GetHardwareInputChannels = MagicMock(return_value=4)
         self.GetHardwareOutputChannels = MagicMock(return_value=2)
-        
+
         # Add missing basic control methods
         self.OpenTest = MagicMock(return_value=True)
         self.RunTest = MagicMock(return_value=True)
@@ -77,7 +78,7 @@ class MockVibrationVIEW:
         self.CloseTest = MagicMock(return_value=True)
         self.CloseTab = MagicMock(return_value=True)
         self.ListOpenTests = MagicMock(return_value=tuple())
-        
+
         # Add missing vector properties methods
         self.ChannelUnit = MagicMock()
         self.ChannelLabel = MagicMock()
@@ -99,49 +100,77 @@ class MockVibrationVIEW:
         self.InputDifferential = MagicMock(return_value=False)
 
     def _log_call(self, method_name: str, *args, **kwargs):
-        self.method_calls.append({
-            'method': method_name,
-            'args': args,
-            'kwargs': kwargs,
-            'timestamp': time.time()
-        })
+        self.method_calls.append({"method": method_name, "args": args, "kwargs": kwargs, "timestamp": time.time()})
 
     def get_method_calls(self, method_name: Optional[str] = None) -> List[Dict]:
         """Get logged method calls for verification"""
         # Handle MagicMock methods
         magic_mock_methods = [
-            "RearInputLabel", "RearInputUnit", "ChannelUnit", "ChannelLabel",
-            "ControlUnit", "ControlLabel", "VectorUnit", "VectorLabel",
-            "VectorLength", "Teds", "TedsFromURN"
+            "RearInputLabel",
+            "RearInputUnit",
+            "ChannelUnit",
+            "ChannelLabel",
+            "ControlUnit",
+            "ControlLabel",
+            "VectorUnit",
+            "VectorLabel",
+            "VectorLength",
+            "Teds",
+            "TedsFromURN",
         ]
-        
+
         if method_name in magic_mock_methods:
             mock = getattr(self, method_name, None)
             if mock and isinstance(mock, MagicMock):
-                return [{'method': method_name, 'args': call.args, 'kwargs': call.kwargs} for call in mock.call_args_list]
+                return [
+                    {"method": method_name, "args": call.args, "kwargs": call.kwargs} for call in mock.call_args_list
+                ]
             return []
 
         # Handle regular method calls
         if method_name:
-            return [call for call in self.method_calls if call['method'] == method_name]
+            return [call for call in self.method_calls if call["method"] == method_name]
         return self.method_calls.copy()
 
     def clear_method_calls(self):
         """Clear all method call history"""
         self.method_calls.clear()
-        
+
         # Reset all MagicMock methods
         magic_mock_attrs = [
-            'RearInputLabel', 'RearInputUnit', 'ReportField', 'ReportFieldsHistory',
-            'Demand', 'Control', 'Channel',
-            'Output', 'Vector', 'DemandMultiplier', 'StartTest', 'StopTest',
-            'IsReady', 'IsRunning', 'Teds', 'TedsFromURN', 'GetHardwareInputChannels',
-            'GetHardwareOutputChannels', 'OpenTest', 'RunTest', 'ResumeTest',
-            'CloseTest', 'CloseTab', 'ListOpenTests',
-            'ChannelUnit', 'ChannelLabel', 'ControlUnit', 'ControlLabel',
-            'VectorUnit', 'VectorLabel', 'VectorLength'
+            "RearInputLabel",
+            "RearInputUnit",
+            "ReportField",
+            "ReportFieldsHistory",
+            "Demand",
+            "Control",
+            "Channel",
+            "Output",
+            "Vector",
+            "DemandMultiplier",
+            "StartTest",
+            "StopTest",
+            "IsReady",
+            "IsRunning",
+            "Teds",
+            "TedsFromURN",
+            "GetHardwareInputChannels",
+            "GetHardwareOutputChannels",
+            "OpenTest",
+            "RunTest",
+            "ResumeTest",
+            "CloseTest",
+            "CloseTab",
+            "ListOpenTests",
+            "ChannelUnit",
+            "ChannelLabel",
+            "ControlUnit",
+            "ControlLabel",
+            "VectorUnit",
+            "VectorLabel",
+            "VectorLength",
         ]
-        
+
         for attr_name in magic_mock_attrs:
             attr = getattr(self, attr_name, None)
             if attr and isinstance(attr, MagicMock):
@@ -155,109 +184,108 @@ class MockVibrationVIEW:
     def Connect(self):
         """Mock Connect method"""
         self._connected = True
-        self._log_call('Connect')
+        self._log_call("Connect")
         return True
 
     def Disconnect(self):
         """Mock Disconnect method"""
         self._connected = False
-        self._log_call('Disconnect')
+        self._log_call("Disconnect")
         return True
 
     def IsConnected(self):
         """Mock IsConnected method"""
-        self._log_call('IsConnected')
+        self._log_call("IsConnected")
         return self._connected
 
     def GetSoftwareVersion(self):
         """Mock GetSoftwareVersion method"""
-        self._log_call('GetSoftwareVersion')
+        self._log_call("GetSoftwareVersion")
         return self._software_version
 
     def GetHardwareSerial(self):
         """Mock GetHardwareSerial method"""
-        self._log_call('GetHardwareSerial')
+        self._log_call("GetHardwareSerial")
         return self._hardware_serial
 
     def GetTestType(self):
         """Mock GetTestType method"""
-        self._log_call('GetTestType')
+        self._log_call("GetTestType")
         return self._test_type
 
     def SetTestType(self, test_type: int):
         """Mock SetTestType method"""
         self._test_type = test_type
-        self._log_call('SetTestType', test_type)
+        self._log_call("SetTestType", test_type)
         return True
 
     def LoadTestFile(self, filename: str):
         """Mock LoadTestFile method"""
         self._current_test_file = filename
-        self._log_call('LoadTestFile', filename)
+        self._log_call("LoadTestFile", filename)
         return True
 
     def GetCurrentTestFile(self):
         """Mock GetCurrentTestFile method"""
-        self._log_call('GetCurrentTestFile')
+        self._log_call("GetCurrentTestFile")
         return self._current_test_file
 
     def SetSineFrequency(self, frequency: float):
         """Mock SetSineFrequency method"""
         self._sine_frequency = frequency
-        self._log_call('SetSineFrequency', frequency)
+        self._log_call("SetSineFrequency", frequency)
         return True
 
     def GetSineFrequency(self):
         """Mock GetSineFrequency method"""
-        self._log_call('GetSineFrequency')
+        self._log_call("GetSineFrequency")
         return self._sine_frequency
 
     def SetSweepMultiplier(self, multiplier: float):
         """Mock SetSweepMultiplier method"""
         self._sweep_multiplier = multiplier
-        self._log_call('SetSweepMultiplier', multiplier)
+        self._log_call("SetSweepMultiplier", multiplier)
         return True
 
     def GetSweepMultiplier(self):
         """Mock GetSweepMultiplier method"""
-        self._log_call('GetSweepMultiplier')
+        self._log_call("GetSweepMultiplier")
         return self._sweep_multiplier
 
     def SetSystemCheckFrequency(self, frequency: float):
         """Mock SetSystemCheckFrequency method"""
         self._system_check_frequency = frequency
-        self._log_call('SetSystemCheckFrequency', frequency)
+        self._log_call("SetSystemCheckFrequency", frequency)
         return True
 
     def GetSystemCheckFrequency(self):
         """Mock GetSystemCheckFrequency method"""
-        self._log_call('GetSystemCheckFrequency')
+        self._log_call("GetSystemCheckFrequency")
         return self._system_check_frequency
 
     def SetSystemCheckOutputVoltage(self, voltage: float):
         """Mock SetSystemCheckOutputVoltage method"""
         self._system_check_output_voltage = voltage
-        self._log_call('SetSystemCheckOutputVoltage', voltage)
+        self._log_call("SetSystemCheckOutputVoltage", voltage)
         return True
 
     def GetSystemCheckOutputVoltage(self):
         """Mock GetSystemCheckOutputVoltage method"""
-        self._log_call('GetSystemCheckOutputVoltage')
+        self._log_call("GetSystemCheckOutputVoltage")
         return self._system_check_output_voltage
 
     def GetStatus(self):
         """Mock GetStatus method"""
-        self._log_call('GetStatus')
+        self._log_call("GetStatus")
         return self._status.copy()
 
     def GetReportField(self, field_name: str):
         """Mock GetReportField method"""
-        self._log_call('GetReportField', field_name)
+        self._log_call("GetReportField", field_name)
         return self._report_fields.get(field_name, "")
-
 
     def SetReportField(self, field_name: str, value: str):
         """Mock SetReportField method"""
         self._report_fields[field_name] = value
-        self._log_call('SetReportField', field_name, value)
+        self._log_call("SetReportField", field_name, value)
         return True

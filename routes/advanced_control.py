@@ -7,11 +7,13 @@ Test Control Routes - 1:1 VibrationVIEW COM Interface Mapping
 Advanced test control operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
 import logging
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 advanced_control_bp = Blueprint("advanced_control", __name__)
@@ -31,9 +33,7 @@ def get_documentation():
                 "GET|POST /testtype": {
                     "description": "Get/Set test type",
                     "com_method": "TestType() or TestType(value)",
-                    "parameters": {
-                        "value": "int - Test type value (POST URL parameter only)"
-                    },
+                    "parameters": {"value": "int - Test type value (POST URL parameter only)"},
                     "returns": "int - Current test type",
                     "example": "POST /api/v1/testtype?value=1",
                 },
@@ -67,18 +67,12 @@ def test_type(vv_instance):
     """
     if request.method == "GET":
         result = vv_instance.TestType()
-        return jsonify(
-            success_response({"result": result}, f"TestType retrieved: {result}")
-        )
+        return jsonify(success_response({"result": result}, f"TestType retrieved: {result}"))
     else:
         value = request.args.get("value", type=int)
         if value is None:
             return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
-                    )
-                ),
+                jsonify(error_response("Missing required URL parameter: value", "MISSING_PARAMETER")),
                 400,
             )
 

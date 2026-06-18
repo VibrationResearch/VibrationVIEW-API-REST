@@ -7,11 +7,13 @@ Sine Advanced Control Routes - 1:1 VibrationVIEW COM Interface Mapping
 Sine-specific advanced test control operations matching exact COM method signatures
 """
 
-from flask import Blueprint, request, jsonify
-from utils.vv_manager import with_vibrationview
-from utils.response_helpers import success_response, error_response
-from utils.decorators import handle_errors
 import logging
+
+from flask import Blueprint, jsonify, request
+
+from utils.decorators import handle_errors
+from utils.response_helpers import error_response, success_response
+from utils.vv_manager import with_vibrationview
 
 # Create blueprint
 advanced_control_sine_bp = Blueprint("advanced_control_sine", __name__)
@@ -24,9 +26,7 @@ def get_documentation():
     """Get sine advanced control module documentation"""
     docs = {
         "module": "advanced_control_sine",
-        "description": (
-            "1:1 mapping of VibrationVIEW COM sine-specific advanced control methods"
-        ),
+        "description": ("1:1 mapping of VibrationVIEW COM sine-specific advanced control methods"),
         "com_object": "VibrationVIEW.Application",
         "endpoints": {
             "Sine Sweep Control": {
@@ -71,29 +71,21 @@ def get_documentation():
                 "GET|POST /demandmultiplier": {
                     "description": "Get/Set demand output multiplier (dB)",
                     "com_method": "DemandMultiplier() or DemandMultiplier(value)",
-                    "parameters": {
-                        "value": (
-                            "float - Multiplier value in dB (POST URL parameter only)"
-                        )
-                    },
+                    "parameters": {"value": ("float - Multiplier value in dB (POST URL parameter only)")},
                     "returns": "float - Current multiplier value",
                     "example": "POST /api/v1/demandmultiplier?value=6.0 or /api/v1/demandmultiplier?6.0",
                 },
                 "GET|POST /sweepmultiplier": {
                     "description": "Get/Set sine sweep multiplier (linear)",
                     "com_method": "SweepMultiplier() or SweepMultiplier(value)",
-                    "parameters": {
-                        "value": "float - Multiplier value (POST URL parameter only)"
-                    },
+                    "parameters": {"value": "float - Multiplier value (POST URL parameter only)"},
                     "returns": "float - Current multiplier value",
                     "example": "POST /api/v1/sweepmultiplier?value=1.5 or /api/v1/sweepmultiplier?1.5",
                 },
                 "GET|POST /sinefrequency": {
                     "description": "Get/Set sine frequency",
                     "com_method": "SineFrequency() or SineFrequency(value)",
-                    "parameters": {
-                        "value": "float - Frequency value (POST URL parameter only)"
-                    },
+                    "parameters": {"value": "float - Frequency value (POST URL parameter only)"},
                     "returns": "float - Current frequency",
                     "example": "POST /api/v1/sinefrequency?value=100.0 or /api/v1/sinefrequency?30",
                 },
@@ -103,10 +95,7 @@ def get_documentation():
             "All sweep methods work specifically with sine test types",
             "These methods control sweep behavior during active sine tests",
             "GET requests return current parameter value",
-            (
-                'POST requests with "value" URL parameter set parameter and '
-                "return new value"
-            ),
+            ('POST requests with "value" URL parameter set parameter and return new value'),
             "COM interface uses 0-based indexing for all arrays",
         ],
     }
@@ -258,23 +247,19 @@ def demand_multiplier(vv_instance):
     """
     if request.method == "GET":
         result = vv_instance.DemandMultiplier()
-        return jsonify(
-            success_response(
-                {"result": result}, f"DemandMultiplier retrieved: {result} dB"
-            )
-        )
+        return jsonify(success_response({"result": result}, f"DemandMultiplier retrieved: {result} dB"))
     else:
         value = request.args.get("value", type=float)
-        
+
         # If no 'value' parameter, try to get the first unnamed parameter
         if value is None:
             args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
+            if args and args[0].replace(".", "").replace("-", "").isdigit():
                 try:
                     value = float(args[0])
                 except ValueError:
                     pass
-        
+
         if value is None:
             return (
                 jsonify(
@@ -311,21 +296,19 @@ def sweep_multiplier(vv_instance):
     """
     if request.method == "GET":
         result = vv_instance.SweepMultiplier()
-        return jsonify(
-            success_response({"result": result}, f"SweepMultiplier retrieved: {result}")
-        )
+        return jsonify(success_response({"result": result}, f"SweepMultiplier retrieved: {result}"))
     else:
         value = request.args.get("value", type=float)
-        
+
         # If no 'value' parameter, try to get the first unnamed parameter
         if value is None:
             args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
+            if args and args[0].replace(".", "").replace("-", "").isdigit():
                 try:
                     value = float(args[0])
                 except ValueError:
                     pass
-        
+
         if value is None:
             return (
                 jsonify(
@@ -362,23 +345,19 @@ def sine_frequency(vv_instance):
     """
     if request.method == "GET":
         result = vv_instance.SineFrequency()
-        return jsonify(
-            success_response(
-                {"result": result}, f"SineFrequency retrieved: {result} Hz"
-            )
-        )
+        return jsonify(success_response({"result": result}, f"SineFrequency retrieved: {result} Hz"))
     else:
         value = request.args.get("value", type=float)
-        
+
         # If no 'value' parameter, try to get the first unnamed parameter
         if value is None:
             args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
+            if args and args[0].replace(".", "").replace("-", "").isdigit():
                 try:
                     value = float(args[0])
                 except ValueError:
                     pass
-        
+
         if value is None:
             return (
                 jsonify(

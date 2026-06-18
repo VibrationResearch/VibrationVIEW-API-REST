@@ -7,20 +7,21 @@ Test cases for path validation security functionality
 Ensures that file path restrictions prevent path traversal attacks
 """
 
-import pytest
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
+from config import Config
 from utils.path_validator import (
     PathValidationError,
     get_authorized_directories,
-    normalize_path,
     is_path_within_authorized_directories,
+    normalize_path,
+    secure_path_join,
     validate_file_path,
     validate_output_path,
-    secure_path_join
 )
-from config import Config
 
 
 class TestPathValidation:
@@ -29,19 +30,17 @@ class TestPathValidation:
     @pytest.fixture
     def mock_config(self):
         """Mock configuration with test directories"""
-        with patch.object(Config, 'REPORT_FOLDER', 'C:\\VibrationVIEW\\Reports'), \
-             patch.object(Config, 'PROFILE_FOLDER', 'C:\\VibrationVIEW\\Profiles'), \
-             patch.object(Config, 'DATA_FOLDER', 'C:\\VibrationVIEW\\Data'):
+        with (
+            patch.object(Config, "REPORT_FOLDER", "C:\\VibrationVIEW\\Reports"),
+            patch.object(Config, "PROFILE_FOLDER", "C:\\VibrationVIEW\\Profiles"),
+            patch.object(Config, "DATA_FOLDER", "C:\\VibrationVIEW\\Data"),
+        ):
             yield
 
     def test_get_authorized_directories(self, mock_config):
         """Test getting authorized directories from config"""
         directories = get_authorized_directories()
-        expected = [
-            'C:\\VibrationVIEW\\Reports',
-            'C:\\VibrationVIEW\\Profiles',
-            'C:\\VibrationVIEW\\Data'
-        ]
+        expected = ["C:\\VibrationVIEW\\Reports", "C:\\VibrationVIEW\\Profiles", "C:\\VibrationVIEW\\Data"]
         assert set(directories) == set(expected)
 
     def test_normalize_path(self):
@@ -142,7 +141,7 @@ class TestPathValidation:
 
     def test_validate_output_path_no_report_folder(self):
         """Test output path validation when REPORT_FOLDER not configured"""
-        with patch.object(Config, 'REPORT_FOLDER', None):
+        with patch.object(Config, "REPORT_FOLDER", None):
             with pytest.raises(PathValidationError, match="No REPORT_FOLDER configured"):
                 validate_output_path("test.pdf", "test operation")
 
@@ -175,9 +174,11 @@ class TestReportGenerationSecurity:
     @pytest.fixture
     def mock_config(self):
         """Mock configuration for testing"""
-        with patch.object(Config, 'REPORT_FOLDER', 'C:\\VibrationVIEW\\Reports'), \
-             patch.object(Config, 'PROFILE_FOLDER', 'C:\\VibrationVIEW\\Profiles'), \
-             patch.object(Config, 'DATA_FOLDER', 'C:\\VibrationVIEW\\Data'):
+        with (
+            patch.object(Config, "REPORT_FOLDER", "C:\\VibrationVIEW\\Reports"),
+            patch.object(Config, "PROFILE_FOLDER", "C:\\VibrationVIEW\\Profiles"),
+            patch.object(Config, "DATA_FOLDER", "C:\\VibrationVIEW\\Data"),
+        ):
             yield
 
     def test_path_validation_integration(self, mock_config):
@@ -201,7 +202,7 @@ class TestReportGenerationSecurity:
         malicious_paths = [
             "C:\\Windows\\System32\\evil.exe",
             "../../../etc/passwd",
-            "C:\\VibrationVIEW\\Reports\\..\\..\\Windows\\System32\\cmd.exe"
+            "C:\\VibrationVIEW\\Reports\\..\\..\\Windows\\System32\\cmd.exe",
         ]
 
         for malicious_path in malicious_paths:
@@ -227,10 +228,11 @@ class TestReportGenerationSecurity:
     def test_directory_configuration_edge_cases(self):
         """Test behavior when directories are not configured"""
         # Test when no directories are configured
-        with patch.object(Config, 'REPORT_FOLDER', None), \
-             patch.object(Config, 'PROFILE_FOLDER', None), \
-             patch.object(Config, 'DATA_FOLDER', None):
-
+        with (
+            patch.object(Config, "REPORT_FOLDER", None),
+            patch.object(Config, "PROFILE_FOLDER", None),
+            patch.object(Config, "DATA_FOLDER", None),
+        ):
             directories = get_authorized_directories()
             assert directories == []
 
