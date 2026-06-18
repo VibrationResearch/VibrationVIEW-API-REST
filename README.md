@@ -77,10 +77,13 @@ start-api.bat --debug            # enable debug mode
 **Option B: Using Python directly**
 ```bash
 # Development mode
-python app.py --host 0.0.0.0 --port 5000 --debug
+python app.py --host 127.0.0.1 --port 5000 --debug
 
 # Production mode
-python app.py --host 0.0.0.0 --port 5000
+python app.py --host 127.0.0.1 --port 5000
+
+# Custom thread count (default: 4, Waitress worker threads)
+python app.py --host 127.0.0.1 --port 5000 --threads 8
 ```
 
 ### 5. Access Documentation
