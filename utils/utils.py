@@ -3,6 +3,8 @@ import math
 import os
 import re
 import subprocess
+import sys
+import threading
 import uuid
 from urllib.parse import unquote
 
@@ -12,6 +14,26 @@ from werkzeug.utils import secure_filename
 import config
 
 logger = logging.getLogger(__name__)
+
+def get_system_info():
+    """Return a dict of Python runtime diagnostics for diagnostic endpoints."""
+    return {
+        "python_version": sys.version,
+        "python_architecture": "64-bit" if sys.maxsize > 2**32 else "32-bit",
+        "thread_id": threading.get_ident(),
+    }
+
+
+def get_hardware_info(vv_instance):
+    """Return a dict of VibrationVIEW hardware and version info."""
+    return {
+        "version": vv_instance.GetSoftwareVersion(),
+        "hardware_inputs": vv_instance.GetHardwareInputChannels(),
+        "hardware_outputs": vv_instance.GetHardwareOutputChannels(),
+        "serial_number": hex(int(vv_instance.GetHardwareSerialNumber()) & 0xFFFFFFFF),
+        "is_ready": vv_instance.IsReady(),
+    }
+
 
 PROFILE_EXTENSIONS = {"vrp", "vrpj", "vasor", "vkp", "vkpj", "vsp", "vspj", "vdp", "vdpj", "vyp"}
 

@@ -17,10 +17,11 @@ import config
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
-from utils.vv_error_codes import format_com_error
 from utils.utils import (
     detect_file_upload,
     get_filename_from_request,
+    get_hardware_info,
+    get_system_info,
     handle_binary_upload,
     is_default_template_filename,
 )
@@ -616,40 +617,9 @@ def test_com_connection(vv_instance):
 
     Tests VibrationVIEW connection using the official thread-safe API.
     """
-    results = {"connection": {"success": False, "error": None}, "system_info": {}}
-
-    # Test VibrationVIEW connection
-    try:
-        # Test basic connection
-        version = vv_instance.GetSoftwareVersion()
-        hardware_inputs = vv_instance.GetHardwareInputChannels()
-        hardware_outputs = vv_instance.GetHardwareOutputChannels()
-        serial_number = vv_instance.GetHardwareSerialNumber()
-        is_ready = vv_instance.IsReady()
-
-        results["connection"] = {
-            "success": True,
-            "version": version,
-            "hardware_inputs": hardware_inputs,
-            "hardware_outputs": hardware_outputs,
-            "serial_number": hex(serial_number) if isinstance(serial_number, int) else serial_number,
-            "is_ready": is_ready,
-        }
-    except Exception as e:
-        results["connection"].update(format_com_error(e))
-
-    # System info
-    try:
-        import sys
-        import threading
-
-        results["system_info"] = {
-            "python_version": sys.version,
-            "python_architecture": "64-bit" if sys.maxsize > 2**32 else "32-bit",
-            "thread_id": threading.get_ident(),
-            "vibrationview_api_available": True,
-        }
-    except Exception as e:
-        results["system_info"]["error"] = str(e)
+    results = {
+        **get_hardware_info(vv_instance),
+        "system_info": get_system_info(),
+    }
 
     return jsonify(success_response(results, "COM connection diagnostic completed"))

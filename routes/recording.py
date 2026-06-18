@@ -14,6 +14,7 @@ from flask import Blueprint, jsonify
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
+from utils.utils import get_system_info
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -146,18 +147,11 @@ def test_recording_connection(vv_instance):
 
     Tests recording-related VibrationVIEW methods for connectivity and availability.
     """
-    import sys
-    import threading
-
     filename = vv_instance.RecordGetFilename()
     results = {
         "RecordGetFilename_available": True,
         "last_filename": filename,
-        "system_info": {
-            "python_version": sys.version,
-            "thread_id": threading.get_ident(),
-            "timestamp": datetime.now().isoformat(),
-        },
+        "system_info": get_system_info(),
     }
 
     return jsonify(success_response(results, "Recording connection diagnostic completed"))

@@ -212,12 +212,9 @@ def create_app(config_class=Config):
         connection = {"success": False, "error": None}
         if vv is not None:
             try:
-                connection = {
-                    "success": True,
-                    "is_ready": vv.IsReady(),
-                    "hardware_serial_number": hex(vv.GetHardwareSerialNumber()),
-                    "version": f"{vv.GetSoftwareVersion():.4f}",
-                }
+                from utils.utils import get_hardware_info
+
+                connection = get_hardware_info(vv)
             except Exception as e:
                 from utils.vv_error_codes import format_com_error
 
