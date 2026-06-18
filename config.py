@@ -13,22 +13,25 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+_DEV_SECRET_KEY = "dev-secret-key-change-in-production"
+_PLACEHOLDER_API_KEY = "replace-with-generated-key"
+
 
 class Config:
-    """Base configuration"""
+    """Application configuration"""
 
     # API Settings
     API_VERSION = os.environ.get("API_VERSION") or "1.0.0"
     SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
 
+    # API Key Authentication
+    # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
+    API_KEY = os.environ.get("API_KEY") or ""
+
     # CORS Settings — controls which browser origins may make cross-origin
     # requests to the API.  Set to http://127.0.0.1 to block unexpected browser
     # access.
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS") or "http://127.0.0.1"
-
-    # API Key Authentication
-    # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
-    API_KEY = os.environ.get("API_KEY") or ""
 
     # Allow GET requests on state-changing endpoints (start, stop, save, etc.).
     # Set to true for backward compatibility or demonstrations only.
@@ -65,19 +68,21 @@ class Config:
     TESTING = False
     DEBUG = False
 
-
-class DevelopmentConfig(Config):
-    """Development configuration"""
-
-    DEBUG = True
-    LOG_LEVEL = "DEBUG"
-
-
-class ProductionConfig(Config):
-    """Production configuration"""
-
-    DEBUG = False
-    LOG_LEVEL = "WARNING"
+    @classmethod
+    def validate(cls):
+        """Reject insecure defaults that must be overridden before production use."""
+        if cls.SECRET_KEY == _DEV_SECRET_KEY:
+            raise RuntimeError(
+                "SECRET_KEY is still set to the development default. "
+                "Set a secure value in your .env file before running in production. "
+                'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
+            )
+        if cls.API_KEY == _PLACEHOLDER_API_KEY:
+            raise RuntimeError(
+                "API_KEY is still the placeholder value. "
+                "Set a strong, unique API_KEY in your .env file before running in production. "
+                'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
+            )
 
 
 class TestingConfig(Config):
@@ -88,11 +93,3 @@ class TestingConfig(Config):
     LOG_LEVEL = "DEBUG"
     ALLOW_GET_WRITE = True
     API_KEY = ""  # Disable auth — must be set before create_app() registers the before_request hook
-
-
-config = {
-    "development": DevelopmentConfig,
-    "production": ProductionConfig,
-    "testing": TestingConfig,
-    "default": DevelopmentConfig,
-}

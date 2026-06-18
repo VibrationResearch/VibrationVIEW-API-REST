@@ -108,6 +108,7 @@ def reset_vv_instance():
 
 def create_app(config_class=Config):
     """Application factory"""
+
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -147,11 +148,16 @@ def create_app(config_class=Config):
     # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
     # easier extensibility for multiple keys or roles.
     # tradeoff: custom implementation avoids extra dependencies and is straightforward for single-key use case.
+    from config import _DEV_SECRET_KEY, _PLACEHOLDER_API_KEY
+
+    if app.config.get("SECRET_KEY") == _DEV_SECRET_KEY:
+        logger.warning("\033[91mSECRET_KEY is the development default. Set a secure value in .env before deploying.\033[0m")
+
     api_key = app.config.get("API_KEY", "")
     if not api_key:
         logger.warning("\033[91mAPI_KEY is not set. Set a strong, unique API_KEY in .env before deploying.\033[0m")
     if api_key:
-        if api_key == "replace-with-generated-key":
+        if api_key == _PLACEHOLDER_API_KEY:
             logger.warning(
                 "\033[91mUsing placeholder API key for authentication. "
                 "Replace with a strong, unique key before deploying.\033[0m"
@@ -370,27 +376,28 @@ def create_app(config_class=Config):
 
 
 if __name__ == "__main__":
-    # Create app (early binding happens in create_app)
-    # print() used here because logging is not configured until create_app() runs.
-    print("Starting Flask server...")
-    try:
-        app = create_app()
-    except RuntimeError as e:
-        print(f"Failed to initialize: {e}")
-        exit(-1)
-
     import argparse
 
     parser = argparse.ArgumentParser(description="VibrationVIEW Flask REST API")
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", type=int, default=5000, help="Port number")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument("--config", default="development", help="Configuration environment")
 
     args = parser.parse_args()
 
+    # Validate configuration before starting in production mode.
+    # print() used here because logging is not configured until create_app() runs.
+    if not args.debug:
+        try:
+            Config.validate()
+        except RuntimeError as e:
+            print(f"Failed to initialize: {e}")
+            exit(-1)
+
+    print("Starting Flask server...")
+    app = create_app()
+
     logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
-    logger.info(f"Configuration: {args.config}")
     logger.info(f"API documentation: http://{args.host}:{args.port}/api/v1/docs")
     logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/v1/docs/basic_control")
 
