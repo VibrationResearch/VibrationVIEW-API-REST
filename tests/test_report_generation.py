@@ -12,9 +12,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from app import create_app, reset_vv_instance, set_vv_instance
+from app import create_app
 from config import TestingConfig
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+from utils.vv_manager import reset_vv_instance, set_vv_instance
 
 
 class TestReportGeneration:

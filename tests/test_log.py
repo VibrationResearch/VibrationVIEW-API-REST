@@ -10,7 +10,7 @@ import json
 
 import pytest
 
-from app import get_vv_instance
+from utils.vv_manager import get_vv_instance
 
 
 class TestLogRoutes:

@@ -42,14 +42,7 @@ from routes import (
     vectors_legacy_bp,
     virtual_channels_bp,
 )
-
-# Re-export singleton API from vv_manager so existing imports
-# (e.g. ``from app import get_vv_instance``) continue to work.
-from utils.vv_manager import (  # noqa: E402, F401
-    get_vv_instance,
-    reset_vv_instance,
-    set_vv_instance,
-)
+from utils.vv_manager import get_vv_instance, reset_vv_instance
 
 
 def create_app(config_class=Config):

@@ -3,14 +3,14 @@
 # ============================================================================
 import json
 
-from app import reset_vv_instance, set_vv_instance
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW  # Add this line
+from utils.vv_manager import reset_vv_instance, set_vv_instance
 
 
 class TestSimple:
     def test_debug_singleton_behavior(self, client):
         """Debug test to understand what's happening with the singleton"""
-        from app import _vv_instance, get_vv_instance
+        from utils.vv_manager import _vv_instance, get_vv_instance
 
         print(f"Initial singleton instance: {_vv_instance}")
 
@@ -63,7 +63,7 @@ class TestSimple:
             print(f"Default value: {data1['data']['result']}")
 
         # Check the singleton state
-        from app import _vv_instance
+        from utils.vv_manager import _vv_instance
 
         print(f"Singleton after first call: {type(_vv_instance) if _vv_instance else None}")
 
@@ -89,7 +89,7 @@ class TestSimple:
         reset_vv_instance()
 
         # Verify it's actually reset
-        from app import _vv_instance
+        from utils.vv_manager import _vv_instance
 
         print(f"After reset: {_vv_instance}")
 
@@ -99,7 +99,7 @@ class TestSimple:
         set_vv_instance(mock_instance)
 
         # Verify our mock is set
-        from app import get_vv_instance
+        from utils.vv_manager import get_vv_instance
 
         instance = get_vv_instance()
         print(f"Instance after setting mock: {type(instance)}")

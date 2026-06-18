@@ -10,8 +10,8 @@ import json
 
 import pytest
 
-from app import reset_vv_instance, set_vv_instance
 from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
+from utils.vv_manager import reset_vv_instance, set_vv_instance
 
 # All route modules that should have documentation endpoints
 ROUTE_MODULES = [

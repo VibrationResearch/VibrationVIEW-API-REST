@@ -8,8 +8,9 @@ Tests for API key authentication and public endpoint exemptions.
 
 import pytest
 
-from app import create_app, reset_vv_instance, set_vv_instance
+from app import create_app
 from config import TestingConfig
+from utils.vv_manager import reset_vv_instance, set_vv_instance
 
 
 class AuthTestConfig(TestingConfig):

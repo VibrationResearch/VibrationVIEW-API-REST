@@ -12,7 +12,7 @@ JSON 413 response regardless of which endpoint is targeted.
 
 import pytest
 
-from app import get_vv_instance
+from utils.vv_manager import get_vv_instance
 
 
 class TestUploadSizeLimit:

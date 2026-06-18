@@ -94,8 +94,6 @@ def mock_vv_manager_with_api(monkeypatch, mock_vibrationview):
 
     patch_targets = [
         ("vibrationviewapi.VibrationVIEW", mock_vibrationview_class),
-        ("utils.vv_manager.VibrationVIEW", mock_vibrationview_class),
-        ("utils.vv_manager.get_vv_instance", lambda *args, **kwargs: mock_vibrationview),
         ("utils.vv_manager.create_vv_instance", lambda *args, **kwargs: mock_vibrationview),
         ("utils.vv_manager.with_vibrationview", mock_with_vibrationview),
     ]
@@ -143,7 +141,7 @@ def app(mock_vv_manager_with_api):
 
     # CRITICAL: Set the mock instance BEFORE create_app() because early binding
     # calls get_vv_instance() inside create_app()
-    from app import reset_vv_instance, set_vv_instance
+    from utils.vv_manager import reset_vv_instance, set_vv_instance
 
     set_vv_instance(mock_vv_manager_with_api)
 

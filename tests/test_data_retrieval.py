@@ -12,7 +12,7 @@ import json
 
 import pytest
 
-from app import get_vv_instance
+from utils.vv_manager import get_vv_instance
 
 
 class TestDataRetrieval:
@@ -72,7 +72,7 @@ class TestDataRetrieval:
 
     def test_debug_singleton_behavior(self, client):
         """Debug test to understand singleton behavior"""
-        from app import _vv_instance, get_vv_instance
+        from utils.vv_manager import _vv_instance, get_vv_instance
 
         print(f"Current singleton instance: {_vv_instance}")
         print(f"Retrieved instance: {get_vv_instance()}")
