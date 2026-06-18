@@ -7,6 +7,7 @@ VibrationVIEW manager using the app singleton
 """
 
 import logging
+import threading
 from functools import wraps
 
 logger = logging.getLogger(__name__)
@@ -17,25 +18,36 @@ class VibrationVIEWManager:
 
     @classmethod
     def get_instance(cls):
-        """Get VibrationVIEW instance from app singleton"""
-        try:
-            # Import here to avoid circular imports
-            from app import get_vv_instance
+        """Get VibrationVIEW instance from app singleton.
 
+        If the cached instance is stale (VibrationVIEW was restarted or
+        crashed), resets the singleton and retries the connection.
+        """
+        from app import get_vv_instance, reset_vv_instance
+
+        instance = get_vv_instance()
+        if instance is None:
+            raise RuntimeError(
+                "VibrationVIEW is not connected. "
+                "Possible causes: (1) VibrationVIEW is not running, "
+                "(2) the Automation Interface option (VR9604) is not licensed, "
+                "(3) the IO box is not connected or powered on."
+            )
+
+        # Verify the COM object is still alive
+        try:
+            instance.vv  # noqa: B018 — access the property to trigger thread-local check
+        except Exception:
+            logger.warning("VibrationVIEW COM object is stale, reconnecting...")
+            reset_vv_instance()
             instance = get_vv_instance()
             if instance is None:
-                logger.error("Failed to get VibrationVIEW instance from app singleton")
-                raise Exception("VibrationVIEW instance not available")
+                raise RuntimeError(
+                    "VibrationVIEW connection lost and reconnection failed. "
+                    "Ensure VibrationVIEW is running."
+                )
 
-            logger.debug("VibrationVIEW instance retrieved from app singleton")
-            return instance
-
-        except ImportError as e:
-            logger.error(f"Failed to import get_vv_instance from app: {e}")
-            raise
-        except Exception as e:
-            logger.error(f"Failed to get VibrationVIEW instance: {e}")
-            raise
+        return instance
 
     @classmethod
     def release_instance(cls):
@@ -52,54 +64,22 @@ class VibrationVIEWManager:
             logger.error(f"Error releasing VibrationVIEW instance: {e}")
 
 
+_com_lock = threading.Lock()
+
+
 def with_vibrationview(func):
     """
-    Decorator that provides VibrationVIEW instance to route functions
-    Now uses the app singleton for consistent testing
-    """
+    Decorator that provides VibrationVIEW instance to route functions.
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # Get the VibrationVIEW instance from app singleton
-        vv = VibrationVIEWManager.get_instance()
-
-        # If your API requires connection, ensure it's connected
-        if hasattr(vv, "is_connected") and not vv.is_connected():
-            if hasattr(vv, "connect"):
-                vv.connect()
-
-        # Call the decorated function — let exceptions propagate to @handle_errors
-        return func(vv, *args, **kwargs)
-
-    return wrapper
-
-
-def with_vibrationview_safe(func):
-    """
-    Decorator with built-in error handling and ready check
-    Now uses the app singleton for consistent testing
+    Acquires a module-level lock so that COM calls are serialized even when
+    Waitress (or another WSGI server) dispatches requests on multiple threads.
     """
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         vv = VibrationVIEWManager.get_instance()
 
-        # Ensure connection if needed
-        if hasattr(vv, "is_connected") and not vv.is_connected():
-            if hasattr(vv, "connect"):
-                if not vv.connect():
-                    return {"success": False, "error": "Failed to connect to VibrationVIEW", "data": None}
-
-        # Check if VibrationVIEW is ready
-        if hasattr(vv, "IsReady") and not vv.IsReady():
-            return {"success": False, "error": "VibrationVIEW is not ready", "data": None}
-
-        result = func(vv, *args, **kwargs)
-
-        # Ensure result is in proper format
-        if isinstance(result, dict) and "success" in result:
-            return result
-        else:
-            return {"success": True, "data": {"result": result}, "error": None}
+        with _com_lock:
+            return func(vv, *args, **kwargs)
 
     return wrapper

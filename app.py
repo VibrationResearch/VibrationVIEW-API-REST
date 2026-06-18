@@ -78,9 +78,11 @@ def get_vv_instance():
             logger.error(f"Could not import VibrationVIEW API: {e}")
             return None
         except Exception as e:
-            logger.error(
+            logger.critical(
                 f"Error connecting to VibrationVIEW: {e}. "
-                "Verify VibrationVIEW is running and the Automation Interface option (VR9604) is licensed."
+                "Possible causes: (1) VibrationVIEW is not running, "
+                "(2) the Automation Interface option (VR9604) is not licensed, "
+                "(3) the IO box is not connected or powered on."
             )
             return None
 
@@ -210,11 +212,16 @@ def create_app(config_class=Config):
         """Health check endpoint"""
         vv = get_vv_instance()
         connection = {"success": False, "error": None}
+        # Cannot use @with_vibrationview — health must return 200 even when
+        # VibrationVIEW is unavailable.  Acquire _com_lock explicitly instead.
         if vv is not None:
+            from utils.vv_manager import _com_lock
+
             try:
                 from utils.utils import get_hardware_info
 
-                connection = get_hardware_info(vv)
+                with _com_lock:
+                    connection = get_hardware_info(vv)
             except Exception as e:
                 from utils.vv_error_codes import format_com_error
 
@@ -358,13 +365,17 @@ def create_app(config_class=Config):
             {"success": False, "error": "Internal server error", "message": "An unexpected error occurred"}
         ), 500
 
-    # Early binding: Create VibrationVIEW instance at startup
-    logger.info("Initializing VibrationVIEW connection (early binding)...")
+    # Attempt early connection — warn but don't crash if VibrationVIEW is unavailable.
+    # The with_vibrationview decorator will retry on each request.
+    logger.info("Attempting VibrationVIEW connection...")
     vv = get_vv_instance()
     if vv is None:
-        logger.error("Failed to connect to VibrationVIEW at startup")
-        raise RuntimeError("Failed to connect to VibrationVIEW - ensure VibrationVIEW is running")
-    logger.info("VibrationVIEW connection established successfully")
+        logger.warning(
+            "VibrationVIEW not available at startup. "
+            "The API will attempt to connect on each request."
+        )
+    else:
+        logger.info("VibrationVIEW connection established successfully")
 
     return app
 
@@ -386,6 +397,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=5000, help="Port number")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument("--config", default="development", help="Configuration environment")
+    parser.add_argument("--threads", type=int, default=4, help="Number of Waitress worker threads")
 
     args = parser.parse_args()
 
@@ -401,7 +413,7 @@ if __name__ == "__main__":
             from waitress import serve
 
             logger.info(f"Serving with Waitress on http://{args.host}:{args.port}")
-            serve(app, host=args.host, port=args.port, threads=1)
+            serve(app, host=args.host, port=args.port, threads=args.threads)
     except KeyboardInterrupt:
         logger.info("Shutting down...")
     except Exception as e:

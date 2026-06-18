@@ -54,7 +54,17 @@ def handle_errors(func):
             error_msg = str(e)
 
             # Check for specific COM errors
-            if "CoInitialize has not been called" in error_msg:
+            if "has no attribute 'vv_object'" in error_msg:
+                logger.error(f"COM thread-local error in {func.__name__}: {error_msg}")
+                return jsonify(
+                    error_response(
+                        "VibrationVIEW COM object not available on this worker thread. "
+                        "The COM connection may need to be re-established.",
+                        "COM_THREAD_ERROR",
+                    )
+                ), 503
+
+            elif "CoInitialize has not been called" in error_msg:
                 logger.error(f"COM initialization error in {func.__name__}: {error_msg}")
                 return jsonify(
                     error_response(
