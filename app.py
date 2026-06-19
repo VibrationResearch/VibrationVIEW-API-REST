@@ -12,7 +12,7 @@ import hmac
 import logging
 import os
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Flask, jsonify
 from flask import request as flask_request
@@ -225,7 +225,7 @@ def create_app(config_class=Config):
                 "success": True,
                 "message": "VibrationVIEW API is running",
                 "version": app.config.get("API_VERSION", "1.0.0"),
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "vibrationview_connection": connection,
                 "modules": [
                     "basic_control",

@@ -6,7 +6,7 @@
 Response formatting utilities for consistent API responses
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 
@@ -21,7 +21,7 @@ def success_response(data: Any = None, message: str = "Operation completed succe
     Returns:
         Dict: Standardized success response
     """
-    response = {"success": True, "message": message, "timestamp": datetime.now().isoformat()}
+    response = {"success": True, "message": message, "timestamp": datetime.now(timezone.utc).isoformat()}
 
     if data is not None:
         response["data"] = data
@@ -44,7 +44,7 @@ def error_response(message: str, error_code: str = "GENERIC_ERROR", details: Opt
     response = {
         "success": False,
         "error": {"code": error_code, "message": message},
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
     if details:
