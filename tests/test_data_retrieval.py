@@ -448,8 +448,8 @@ class TestDataRetrieval:
             assert response.status_code == 400, f"Expected 400 for channelnum={channel}, got {response.status_code}"
             data = json.loads(response.data)
             assert data["success"] is False, f"Expected success=False for channelnum={channel}"
-            assert "must be >= 1" in data["error"]["message"], (
-                f"Expected error message to mention 'must be >= 1' for channelnum={channel}"
+            assert "must be >= 1" in data["error"]["message"] or "must be an integer" in data["error"]["message"], (
+                f"Expected validation error for channelnum={channel}"
             )
 
         print("✓ Invalid channel validation works!")

@@ -14,7 +14,7 @@ from flask import Blueprint, jsonify, request
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
 from utils.teds_formatter import format_single_channel_teds, format_teds_data
-from utils.utils import is_valid_urn
+from utils.utils import convert_channel_to_com_index, is_valid_urn
 from utils.vv_error_codes import VVIEW_E_MISMATCH, format_com_error, is_vview_error
 from utils.vv_manager import with_vibrationview
 
@@ -203,34 +203,26 @@ def get_input_teds_channel(vv_instance):
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    try:
-        channel_1based = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+    channel_com, err, status = convert_channel_to_com_index(query_args[0])
+    if err:
+        return jsonify(err), status
 
-    # Validate 1-based channel number
-    if channel_1based < 1:
-        return jsonify(
-            error_response(f"Channel must be >= 1 (1-based indexing), got {channel_1based}", "INVALID_CHANNEL")
-        ), 400
-
-    # Convert from 1-based to 0-based for COM interface
-    channel_0based = channel_1based - 1
+    channel_1based = int(query_args[0])
 
     # Validate channel range
     num_channels = vv_instance.GetHardwareInputChannels()
-    if channel_0based >= num_channels:
+    if channel_com >= num_channels:
         return jsonify(
             error_response(
                 f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)", "CHANNEL_OUT_OF_RANGE"
             )
         ), 400
 
-    teds_info = vv_instance.Teds(channel_0based)
+    teds_info = vv_instance.Teds(channel_com)
 
     return jsonify(
         success_response(
-            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_0based, "success": True},
+            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_com, "success": True},
             f"TEDS information retrieved for channel {channel_1based} (1-based)",
         )
     )
@@ -258,23 +250,15 @@ def teds(vv_instance):
 
     if query_args:
         # Channel specified - get specific channel TEDS (1-based)
-        try:
-            channel_1based = int(query_args[0])
-        except (ValueError, IndexError):
-            return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+        channel_com, err, status = convert_channel_to_com_index(query_args[0])
+        if err:
+            return jsonify(err), status
 
-        # Validate 1-based channel number
-        if channel_1based < 1:
-            return jsonify(
-                error_response(f"Channel must be >= 1 (1-based indexing), got {channel_1based}", "INVALID_CHANNEL")
-            ), 400
-
-        # Convert from 1-based to 0-based
-        channel_0based = channel_1based - 1
+        channel_1based = int(query_args[0])
 
         # Validate channel range
         num_channels = vv_instance.GetHardwareInputChannels()
-        if channel_0based >= num_channels:
+        if channel_com >= num_channels:
             return jsonify(
                 error_response(
                     f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)",
@@ -282,10 +266,10 @@ def teds(vv_instance):
                 )
             ), 400
 
-        teds_info = vv_instance.Teds(channel_0based)
+        teds_info = vv_instance.Teds(channel_com)
 
         # Format the single channel data using the single channel formatter
-        formatted_channel = format_single_channel_teds(teds_info, channel_0based)
+        formatted_channel = format_single_channel_teds(teds_info, channel_com)
 
         # Prepare result data based on whether we got a transducer or error
         if "transducer" in formatted_channel:
