@@ -244,10 +244,16 @@ class TestReportGeneration:
 
         for template_name in templates_to_test:
             with (
+                patch("routes.report_generation.handle_binary_upload") as mock_upload,
                 patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
                 patch("routes.report_generation.os.path.exists") as mock_exists,
                 patch("routes.report_generation.send_file") as mock_send_file,
             ):
+                mock_upload.return_value = (
+                    {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
+                    None,
+                    200,
+                )
                 mock_generated_path = f"C:\\VibrationVIEW\\Reports\\output_{template_name.replace(' ', '_')}.pdf"
                 mock_generate.return_value = mock_generated_path
                 mock_exists.return_value = True
@@ -280,10 +286,16 @@ class TestReportGeneration:
         output_name = "test_report_2025-09-22_final.pdf"
 
         with (
+            patch("routes.report_generation.handle_binary_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
+            mock_upload.return_value = (
+                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
+                None,
+                200,
+            )
             mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_2025-09-22_final.pdf"
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
