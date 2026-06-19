@@ -364,6 +364,10 @@ def create_app(config_class=Config):
             {"success": False, "error": "Internal server error", "message": "An unexpected error occurred"}
         ), 500
 
+    # Warn about missing paths (runs in all modes including flask run).
+    for warning in Config.validate_paths():
+        logger.warning(f"\033[93m{warning}\033[0m")
+
     # Early binding: Create VibrationVIEW instance at startup
     logger.info("Initializing VibrationVIEW connection (early binding)...")
     vv = get_vv_instance()
@@ -396,10 +400,6 @@ if __name__ == "__main__":
         except RuntimeError as e:
             print(f"Failed to initialize: {e}")
             exit(-1)
-
-    # Check paths in all modes (warnings only, does not block startup).
-    for warning in Config.validate_paths():
-        print(f"\033[93mWARNING: {warning}\033[0m")
 
     print("Starting Flask server...")
     app = create_app()
