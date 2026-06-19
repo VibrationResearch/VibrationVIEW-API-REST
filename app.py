@@ -397,6 +397,10 @@ if __name__ == "__main__":
             print(f"Failed to initialize: {e}")
             exit(-1)
 
+    # Check paths in all modes (warnings only, does not block startup).
+    for warning in Config.validate_paths():
+        print(f"\033[93mWARNING: {warning}\033[0m")
+
     print("Starting Flask server...")
     app = create_app()
 

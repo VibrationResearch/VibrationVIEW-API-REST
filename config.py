@@ -84,6 +84,20 @@ class Config:
                 'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
             )
 
+    @classmethod
+    def validate_paths(cls):
+        """Check that configured paths exist. Returns list of warning strings."""
+        warnings = []
+        if not os.path.isfile(cls.EXE_NAME):
+            warnings.append(f"EXE_NAME not found: {cls.EXE_NAME}")
+        if not os.path.isdir(cls.VIBRATIONVIEW_FOLDER):
+            warnings.append(f"VIBRATIONVIEW_FOLDER not found: {cls.VIBRATIONVIEW_FOLDER}")
+        for name in ("PROFILE_FOLDER", "DATA_FOLDER", "REPORT_FOLDER"):
+            path = getattr(cls, name)
+            if not os.path.isdir(path):
+                warnings.append(f"{name} not found: {path}")
+        return warnings
+
 
 class TestingConfig(Config):
     """Testing configuration"""

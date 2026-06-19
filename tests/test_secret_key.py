@@ -63,3 +63,32 @@ class TestDebugDefaults:
         monkeypatch.setattr(Config, "LOG_LEVEL", "DEBUG")
         assert Config.DEBUG is True
         assert Config.LOG_LEVEL == "DEBUG"
+
+
+class TestValidatePaths:
+    """Verify Config.validate_paths() detects missing paths."""
+
+    def test_warns_on_missing_exe(self, monkeypatch):
+        monkeypatch.setattr(Config, "EXE_NAME", r"C:\nonexistent\VibrationVIEW.exe")
+        warnings = Config.validate_paths()
+        assert any("EXE_NAME" in w for w in warnings)
+
+    def test_warns_on_missing_vibrationview_folder(self, monkeypatch):
+        monkeypatch.setattr(Config, "VIBRATIONVIEW_FOLDER", r"C:\nonexistent")
+        warnings = Config.validate_paths()
+        assert any("VIBRATIONVIEW_FOLDER" in w for w in warnings)
+
+    def test_warns_on_missing_data_folder(self, monkeypatch):
+        monkeypatch.setattr(Config, "DATA_FOLDER", r"C:\nonexistent\Data")
+        warnings = Config.validate_paths()
+        assert any("DATA_FOLDER" in w for w in warnings)
+
+    def test_no_warnings_when_paths_exist(self, monkeypatch, tmp_path):
+        exe = tmp_path / "VibrationVIEW.exe"
+        exe.touch()
+        monkeypatch.setattr(Config, "EXE_NAME", str(exe))
+        monkeypatch.setattr(Config, "VIBRATIONVIEW_FOLDER", str(tmp_path))
+        monkeypatch.setattr(Config, "PROFILE_FOLDER", str(tmp_path))
+        monkeypatch.setattr(Config, "DATA_FOLDER", str(tmp_path))
+        monkeypatch.setattr(Config, "REPORT_FOLDER", str(tmp_path))
+        assert Config.validate_paths() == []
