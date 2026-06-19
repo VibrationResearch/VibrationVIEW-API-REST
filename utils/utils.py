@@ -1,5 +1,4 @@
 import logging
-import math
 import os
 import re
 import subprocess
@@ -14,6 +13,7 @@ from werkzeug.utils import secure_filename
 from config import Config
 
 logger = logging.getLogger(__name__)
+
 
 def get_system_info():
     """Return a dict of Python runtime diagnostics for diagnostic endpoints."""
@@ -347,25 +347,6 @@ def is_valid_urn(value):
     if not isinstance(value, str):
         return False
     return bool(URN_PATTERN.match(value.strip()))
-
-
-def sanitize_nan(value):
-    """
-    Replace NaN and Inf float values with None for JSON serialization.
-
-    Args:
-        value: A value that may be a float NaN/Inf, list, tuple, or other type
-
-    Returns:
-        The value with NaN/Inf replaced by None, recursively for lists/tuples
-    """
-    if isinstance(value, float):
-        if math.isnan(value) or math.isinf(value):
-            return None
-        return value
-    elif isinstance(value, (list, tuple)):
-        return [sanitize_nan(v) for v in value]
-    return value
 
 
 def detect_file_upload():

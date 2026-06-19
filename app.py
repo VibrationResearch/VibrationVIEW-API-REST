@@ -10,12 +10,14 @@ Entry point for the modular VibrationVIEW automation interface.
 
 import hmac
 import logging
+import math
 import os
 import threading
 from datetime import datetime
 
 from flask import Flask, jsonify
 from flask import request as flask_request
+from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
 
 # Module-level logger
@@ -106,9 +108,31 @@ def reset_vv_instance():
         _vv_instance = None
 
 
+def _sanitize_nan(value):
+    """Replace NaN and Inf float values with None for JSON serialization."""
+    if isinstance(value, float):
+        if math.isnan(value) or math.isinf(value):
+            return None
+        return value
+    elif isinstance(value, dict):
+        return {k: _sanitize_nan(v) for k, v in value.items()}
+    elif isinstance(value, (list, tuple)):
+        return [_sanitize_nan(v) for v in value]
+    return value
+
+
+class _NaNSafeJSONProvider(DefaultJSONProvider):
+    """JSON provider that converts NaN and Inf floats to null."""
+
+    def dumps(self, obj, **kwargs):
+        return super().dumps(_sanitize_nan(obj), **kwargs)
+
+
 def create_app(config_class=Config):
     """Application factory"""
     app = Flask(__name__)
+    app.json_provider_class = _NaNSafeJSONProvider
+    app.json = _NaNSafeJSONProvider(app)
     app.config.from_object(config_class)
 
     # Initialize CORS
