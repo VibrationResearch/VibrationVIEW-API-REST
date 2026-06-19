@@ -69,7 +69,7 @@ class Config:
     DEBUG = False
 
     @classmethod
-    def validate(cls):
+    def validate_production(cls):
         """Reject insecure defaults that must be overridden before production use."""
         if cls.SECRET_KEY == _DEV_SECRET_KEY:
             raise RuntimeError(

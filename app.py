@@ -392,7 +392,7 @@ if __name__ == "__main__":
         Config.LOG_LEVEL = "DEBUG"
     else:
         try:
-            Config.validate()
+            Config.validate_production()
         except RuntimeError as e:
             print(f"Failed to initialize: {e}")
             exit(-1)
