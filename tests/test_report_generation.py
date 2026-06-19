@@ -309,6 +309,30 @@ class TestReportGeneration:
             assert gen_call_args[2] == output_name
 
 
+class TestGenerateReportFromVVLocal:
+    """Regression test for utils.utils.GenerateReportFromVV (issue #9).
+
+    The local copy previously referenced config.EXE_NAME (module attribute)
+    instead of Config.EXE_NAME (class attribute), raising AttributeError.
+    """
+
+    @patch("utils.utils.subprocess.run")
+    @patch("utils.utils.os.makedirs")
+    def test_builds_command_with_config_exe_name(self, _mock_makedirs, mock_run):
+        """GenerateReportFromVV uses Config.EXE_NAME without AttributeError"""
+        from config import Config
+        from utils.utils import GenerateReportFromVV
+
+        mock_run.return_value = MagicMock(returncode=0)
+
+        result = GenerateReportFromVV("input.vrd", "template.vvtemplate", "output.pdf")
+
+        cmd = mock_run.call_args[0][0]
+        assert cmd[0] == Config.EXE_NAME
+        assert "/savereport" in cmd
+        assert result.endswith("output.pdf")
+
+
 class TestDatafileRoute:
     """Test datafile endpoint path validation security"""
 

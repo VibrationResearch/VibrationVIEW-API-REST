@@ -11,7 +11,7 @@ from urllib.parse import unquote
 from flask import request
 from werkzeug.utils import secure_filename
 
-import config
+from config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -71,17 +71,17 @@ def get_folder_for_extension(filename_or_ext):
         ext = filename_or_ext.lower()
 
     if ext in PROFILE_EXTENSIONS:
-        return config.Config.PROFILE_FOLDER
+        return Config.PROFILE_FOLDER
     elif ext in DATA_EXTENSIONS:
-        return config.Config.DATA_FOLDER
+        return Config.DATA_FOLDER
     elif ext in TEMPLATE_EXTENSIONS:
-        return config.Config.NEW_TEST_DEFAULTS_FOLDER
+        return Config.NEW_TEST_DEFAULTS_FOLDER
     elif ext in INPUTCONFIG_EXTENSIONS:
-        return config.Config.INPUTCONFIG_FOLDER
+        return Config.INPUTCONFIG_FOLDER
     elif ext in REPORT_EXTENSIONS:
-        return config.Config.REPORT_FOLDER
+        return Config.REPORT_FOLDER
     else:
-        return config.Config.VIBRATIONVIEW_FOLDER
+        return Config.VIBRATIONVIEW_FOLDER
 
 
 def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
@@ -211,7 +211,7 @@ def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> s
     outPath = os.path.join(reportFolder, outputName)
 
     # Build and run report generation command
-    command = [config.EXE_NAME, "/savereport", filePath, "/template", templateName, "/output", outPath]
+    command = [Config.EXE_NAME, "/savereport", filePath, "/template", templateName, "/output", outPath]
 
     result = subprocess.run(command, capture_output=True, text=True)
 
@@ -291,7 +291,7 @@ def get_new_test_defaults_path():
     Returns:
         str: Path to the New Test Defaults folder
     """
-    return config.Config.NEW_TEST_DEFAULTS_FOLDER
+    return Config.NEW_TEST_DEFAULTS_FOLDER
 
 
 # Pre-computed lowercase default template filenames for performance
