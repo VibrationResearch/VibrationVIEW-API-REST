@@ -387,7 +387,10 @@ if __name__ == "__main__":
 
     # Validate configuration before starting in production mode.
     # print() used here because logging is not configured until create_app() runs.
-    if not args.debug:
+    if args.debug:
+        Config.DEBUG = True
+        Config.LOG_LEVEL = "DEBUG"
+    else:
         try:
             Config.validate()
         except RuntimeError as e:
