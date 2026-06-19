@@ -13,7 +13,7 @@ from urllib.parse import unquote
 
 from flask import Blueprint, jsonify, request
 
-import config
+from config import Config
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
@@ -588,7 +588,7 @@ def save_data(vv_instance):
 
     # If filename has no path separators, prepend DATA_FOLDER
     if not os.path.dirname(filename):
-        file_path = os.path.join(config.Config.DATA_FOLDER, filename)
+        file_path = os.path.join(Config.DATA_FOLDER, filename)
     else:
         file_path = filename
 
