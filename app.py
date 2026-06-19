@@ -366,7 +366,7 @@ def create_app(config_class=Config):
 
     # Warn about missing paths (runs in all modes including flask run).
     for warning in Config.validate_paths():
-        logger.warning(f"\033[93m{warning}\033[0m")
+        logger.warning(f"\033[91m{warning}\033[0m")
 
     # Early binding: Create VibrationVIEW instance at startup
     logger.info("Initializing VibrationVIEW connection (early binding)...")
