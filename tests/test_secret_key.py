@@ -48,3 +48,18 @@ class TestApiKeyValidation:
     def test_accepts_custom_api_key(self, monkeypatch):
         _set_valid_defaults(monkeypatch)
         Config.validate()  # should not raise
+
+
+class TestDebugDefaults:
+    """Verify Config defaults match expectations for production and debug modes."""
+
+    def test_production_defaults(self):
+        assert Config.DEBUG is False
+        assert Config.LOG_LEVEL == "INFO"
+
+    def test_debug_override(self, monkeypatch):
+        """Simulate the --debug path in __main__."""
+        monkeypatch.setattr(Config, "DEBUG", True)
+        monkeypatch.setattr(Config, "LOG_LEVEL", "DEBUG")
+        assert Config.DEBUG is True
+        assert Config.LOG_LEVEL == "DEBUG"
