@@ -13,7 +13,6 @@ from flask import Blueprint, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
-from utils.utils import sanitize_nan
 from utils.vv_error_codes import VVIEW_E_ALREADY_RUNNING, VVIEW_E_NO_DATA, is_vview_error
 from utils.vv_manager import with_vibrationview
 
@@ -435,7 +434,6 @@ def report_vector(vv_instance):
         return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
 
     result = vv_instance.ReportVector(vectors_string)
-    result = sanitize_nan(result)
 
     return jsonify(
         success_response({"result": result, "vectors": vectors_string}, f"ReportVector executed for: {vectors_string}")
@@ -570,7 +568,6 @@ def report_vector_history(vv_instance):
                 )
             )
         raise
-    results = sanitize_nan(results)
 
     # Convert results to list for JSON serialization
     results_list = []
