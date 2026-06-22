@@ -70,6 +70,9 @@ class MockVibrationVIEW:
         self.TedsRead = MagicMock(return_value=[])
         self.GetHardwareInputChannels = MagicMock(return_value=4)
         self.GetHardwareOutputChannels = MagicMock(return_value=2)
+        self.HardwareSupportsCapacitorCoupled = MagicMock(return_value=True)
+        self.HardwareSupportsAccelPowerSource = MagicMock(return_value=True)
+        self.HardwareSupportsDifferential = MagicMock(return_value=True)
 
         # Add missing basic control methods
         self.OpenTest = MagicMock(return_value=True)

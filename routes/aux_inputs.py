@@ -13,6 +13,7 @@ from flask import Blueprint, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
+from utils.utils import convert_channel_to_com_index
 from utils.vv_manager import with_vibrationview
 
 auxinputs_bp = Blueprint("auxinputs", __name__, url_prefix="/api")
@@ -67,34 +68,24 @@ def rear_input(vv_instance):
 def rear_input_unit(vv_instance):
     """Get units for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
-    channel_1based = request.args.get("channel", type=int)
-
-    # If no 'channel' parameter, try to get the first unnamed parameter
-    if channel_1based is None:
+    channel_raw = request.args.get("channel")
+    if channel_raw is None:
         args = list(request.args.keys())
-        if args and args[0].replace("-", "").isdigit():
-            try:
-                channel_1based = int(args[0])
-            except ValueError:
-                pass
+        if args:
+            channel_raw = args[0]
 
-    if channel_1based is None:
+    if channel_raw is None:
         return jsonify(
             {"success": False, "error": "Missing required parameter: channel (or unnamed numeric parameter)"}
         ), 400
 
-    # Validate 1-based channel number
-    if channel_1based < 1:
-        return jsonify(
-            {"success": False, "error": f"channel must be >= 1 (1-based indexing), got {channel_1based}"}
-        ), 400
+    channel_com, err, status = convert_channel_to_com_index(channel_raw)
+    if err:
+        return jsonify(err), status
 
-    # Convert from 1-based to 0-based
-    channel_0based = channel_1based - 1
+    result = vv_instance.RearInputUnit(channel_com)
 
-    result = vv_instance.RearInputUnit(channel_0based)
-
-    return jsonify(success_response({"result": result, "channel": channel_1based, "internal_channel": channel_0based}))
+    return jsonify(success_response({"result": result, "channel": int(channel_raw), "internal_channel": channel_com}))
 
 
 @auxinputs_bp.route("/rearinputlabel", methods=["GET"])
@@ -103,31 +94,21 @@ def rear_input_unit(vv_instance):
 def rear_input_label(vv_instance):
     """Get label for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
-    channel_1based = request.args.get("channel", type=int)
-
-    # If no 'channel' parameter, try to get the first unnamed parameter
-    if channel_1based is None:
+    channel_raw = request.args.get("channel")
+    if channel_raw is None:
         args = list(request.args.keys())
-        if args and args[0].replace("-", "").isdigit():
-            try:
-                channel_1based = int(args[0])
-            except ValueError:
-                pass
+        if args:
+            channel_raw = args[0]
 
-    if channel_1based is None:
+    if channel_raw is None:
         return jsonify(
             {"success": False, "error": "Missing required parameter: channel (or unnamed numeric parameter)"}
         ), 400
 
-    # Validate 1-based channel number
-    if channel_1based < 1:
-        return jsonify(
-            {"success": False, "error": f"channel must be >= 1 (1-based indexing), got {channel_1based}"}
-        ), 400
+    channel_com, err, status = convert_channel_to_com_index(channel_raw)
+    if err:
+        return jsonify(err), status
 
-    # Convert from 1-based to 0-based
-    channel_0based = channel_1based - 1
+    result = vv_instance.RearInputLabel(channel_com)
 
-    result = vv_instance.RearInputLabel(channel_0based)
-
-    return jsonify(success_response({"result": result, "channel": channel_1based, "internal_channel": channel_0based}))
+    return jsonify(success_response({"result": result, "channel": int(channel_raw), "internal_channel": channel_com}))

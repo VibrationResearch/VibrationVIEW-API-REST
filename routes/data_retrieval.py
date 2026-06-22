@@ -24,7 +24,7 @@ from flask import Blueprint, jsonify, request, send_file
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
-from utils.utils import get_last_data_file
+from utils.utils import convert_channel_to_com_index, get_last_data_file
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -219,33 +219,22 @@ def channel_unit(vv_instance):
     Example:
         GET /api/v1/channelunit?3
     """
-    # Get channelnum from query parameters (first parameter)
+    # Get channelnum from named parameter or first positional key
     if not request.args:
         return jsonify(error_response("Missing required query parameter: channelnum", "MISSING_PARAMETER")), 400
 
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'channelnum' parameter first, then fall back to first key
-        channelnum = request.args.get("channelnum", type=int)
-        if channelnum is None:
-            # If no 'channelnum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            channelnum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response("channelnum must be an integer", "INVALID_PARAMETER")), 400
+    channelnum_raw = request.args.get("channelnum")
+    if channelnum_raw is None:
+        channelnum_raw = list(request.args.keys())[0]
 
-    # Convert from 1-based to 0-based
-    if channelnum < 1:
-        return jsonify(
-            error_response(f"channelnum must be >= 1 (1-based indexing), got {channelnum}", "INVALID_PARAMETER")
-        ), 400
+    channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
+    if err:
+        return jsonify(err), status
 
-    channel_num_0based = channelnum - 1
-
-    result = vv_instance.ChannelUnit(channel_num_0based)
+    result = vv_instance.ChannelUnit(channel_com)
 
     return jsonify(
-        success_response({"result": result, "channelnum": channelnum, "internal_channelnum": channel_num_0based})
+        success_response({"result": result, "channelnum": int(channelnum_raw), "internal_channelnum": channel_com})
     )
 
 
@@ -265,33 +254,22 @@ def channel_label(vv_instance):
     Example:
         GET /api/v1/channellabel?1
     """
-    # Get channelnum from query parameters (first parameter)
+    # Get channelnum from named parameter or first positional key
     if not request.args:
         return jsonify(error_response("Missing required query parameter: channelnum", "MISSING_PARAMETER")), 400
 
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'channelnum' parameter first, then fall back to first key
-        channelnum = request.args.get("channelnum", type=int)
-        if channelnum is None:
-            # If no 'channelnum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            channelnum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response("channelnum must be an integer", "INVALID_PARAMETER")), 400
+    channelnum_raw = request.args.get("channelnum")
+    if channelnum_raw is None:
+        channelnum_raw = list(request.args.keys())[0]
 
-    # Convert from 1-based to 0-based
-    if channelnum < 1:
-        return jsonify(
-            error_response(f"channelnum must be >= 1 (1-based indexing), got {channelnum}", "INVALID_PARAMETER")
-        ), 400
+    channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
+    if err:
+        return jsonify(err), status
 
-    channel_num_0based = channelnum - 1
-
-    result = vv_instance.ChannelLabel(channel_num_0based)
+    result = vv_instance.ChannelLabel(channel_com)
 
     return jsonify(
-        success_response({"result": result, "channelnum": channelnum, "internal_channelnum": channel_num_0based})
+        success_response({"result": result, "channelnum": int(channelnum_raw), "internal_channelnum": channel_com})
     )
 
 

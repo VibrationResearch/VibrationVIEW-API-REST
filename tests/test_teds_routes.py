@@ -120,8 +120,8 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
 
         assert data["success"] is False
-        assert data["error"]["message"] == "Channel must be >= 1 (1-based indexing), got 0"
-        assert data["error"]["code"] == "INVALID_CHANNEL"
+        assert "must be >= 1" in data["error"]["message"]
+        assert data["error"]["code"] == "INVALID_PARAMETER"
 
         print("✓ GET /Teds rejects channel 0 correctly!")
 
@@ -136,8 +136,8 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
 
         assert data["success"] is False
-        assert data["error"]["message"] == "Channel must be >= 1 (1-based indexing), got -1"
-        assert data["error"]["code"] == "INVALID_CHANNEL"
+        assert "must be >= 1" in data["error"]["message"]
+        assert data["error"]["code"] == "INVALID_PARAMETER"
 
         print("✓ GET /Teds rejects negative channels correctly!")
 
@@ -219,8 +219,8 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
 
         assert data["success"] is False
-        assert data["error"]["message"] == "Channel must be >= 1 (1-based indexing), got 0"
-        assert data["error"]["code"] == "INVALID_CHANNEL"
+        assert "must be >= 1" in data["error"]["message"]
+        assert data["error"]["code"] == "INVALID_PARAMETER"
 
         print("✓ GET /inputtedschannel rejects channel 0 correctly!")
 

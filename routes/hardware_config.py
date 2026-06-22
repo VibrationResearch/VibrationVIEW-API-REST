@@ -13,6 +13,7 @@ from flask import Blueprint, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
+from utils.utils import convert_channel_to_com_index
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -79,9 +80,9 @@ def get_documentation():
         "notes": [
             "GET requests return current parameter value for get/set endpoints",
             "POST requests with JSON body parameters perform operations",
-            "Channel numbers are 0-based (first channel is 0)",
+            "Channel numbers are 1-based (first channel is 1)",
             "Hardware capability checks help determine available features",
-            "COM interface uses 0-based indexing for all arrays",
+            "COM interface uses 0-based indexing internally; the API converts automatically",
             "Input-specific endpoints moved to input_config module: /api/v1/docs/input_config",
         ],
     }
@@ -161,7 +162,7 @@ def hardware_supports_capacitor_coupled(vv_instance):
     Checks if the hardware supports capacitor coupled for the specified channel.
 
     Query Parameters:
-        channel: Input channel number (0-based) - first positional parameter
+        channel: Input channel number (1-based) - first positional parameter
 
     Example: GET /api/v1/hardwaresupportscapacitorcoupled?1
     """
@@ -170,16 +171,16 @@ def hardware_supports_capacitor_coupled(vv_instance):
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+    channel_com, err, status = convert_channel_to_com_index(query_args[0])
+    if err:
+        return jsonify(err), status
 
-    result = vv_instance.HardwareSupportsCapacitorCoupled(channel)
+    result = vv_instance.HardwareSupportsCapacitorCoupled(channel_com)
 
     return jsonify(
         success_response(
-            {"result": result, "channel": channel}, f"Channel {channel} capacitor coupled support: {result}"
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
+            f"Channel {query_args[0]} capacitor coupled support: {result}",
         )
     )
 
@@ -195,7 +196,7 @@ def hardware_supports_accel_power_source(vv_instance):
     Checks if the hardware supports accelerometer power source for the specified channel.
 
     Query Parameters:
-        channel: Input channel number (0-based) - first positional parameter
+        channel: Input channel number (1-based) - first positional parameter
 
     Example: GET /api/v1/hardwaresupportsaccelpowersource?1
     """
@@ -204,16 +205,16 @@ def hardware_supports_accel_power_source(vv_instance):
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+    channel_com, err, status = convert_channel_to_com_index(query_args[0])
+    if err:
+        return jsonify(err), status
 
-    result = vv_instance.HardwareSupportsAccelPowerSource(channel)
+    result = vv_instance.HardwareSupportsAccelPowerSource(channel_com)
 
     return jsonify(
         success_response(
-            {"result": result, "channel": channel}, f"Channel {channel} accel power source support: {result}"
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
+            f"Channel {query_args[0]} accel power source support: {result}",
         )
     )
 
@@ -229,7 +230,7 @@ def hardware_supports_differential(vv_instance):
     Checks if the hardware supports differential for the specified channel.
 
     Query Parameters:
-        channel: Input channel number (0-based) - first positional parameter
+        channel: Input channel number (1-based) - first positional parameter
 
     Example: GET /api/v1/hardwaresupportsdifferential?1
     """
@@ -238,13 +239,15 @@ def hardware_supports_differential(vv_instance):
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")), 400
+    channel_com, err, status = convert_channel_to_com_index(query_args[0])
+    if err:
+        return jsonify(err), status
 
-    result = vv_instance.HardwareSupportsDifferential(channel)
+    result = vv_instance.HardwareSupportsDifferential(channel_com)
 
     return jsonify(
-        success_response({"result": result, "channel": channel}, f"Channel {channel} differential support: {result}")
+        success_response(
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
+            f"Channel {query_args[0]} differential support: {result}",
+        )
     )
