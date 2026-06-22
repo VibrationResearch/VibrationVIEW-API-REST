@@ -258,3 +258,9 @@ class TestSecureFilenameValidation:
             result, error, status = handle_binary_upload("test\u6d4b\u8bd5_file.vyp", b"data")
             assert status == 200
             assert error is None
+
+    def test_accepts_filename_with_temporary_file(self, tmp_path):
+        with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
+            result, error, status = handle_binary_upload("valid.vyp", b"data", usetemporaryfile=True)
+            assert status == 200
+            assert error is None
