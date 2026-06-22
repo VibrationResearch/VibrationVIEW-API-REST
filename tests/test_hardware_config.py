@@ -46,6 +46,8 @@ class TestHardwareSupportsChannelIndexing:
         data = response.get_json()
         assert data["data"]["channel"] == 1
 
+        assert data["data"]["internal_channel"] == 0
+
         # Verify COM was called with 0-based index
         mock_method = getattr(mock_vv, method)
         mock_method.assert_called_once_with(0)

@@ -179,7 +179,7 @@ def hardware_supports_capacitor_coupled(vv_instance):
 
     return jsonify(
         success_response(
-            {"result": result, "channel": int(query_args[0])},
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
             f"Channel {query_args[0]} capacitor coupled support: {result}",
         )
     )
@@ -213,7 +213,7 @@ def hardware_supports_accel_power_source(vv_instance):
 
     return jsonify(
         success_response(
-            {"result": result, "channel": int(query_args[0])},
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
             f"Channel {query_args[0]} accel power source support: {result}",
         )
     )
@@ -247,7 +247,7 @@ def hardware_supports_differential(vv_instance):
 
     return jsonify(
         success_response(
-            {"result": result, "channel": int(query_args[0])},
+            {"result": result, "channel": int(query_args[0]), "internal_channel": channel_com},
             f"Channel {query_args[0]} differential support: {result}",
         )
     )
