@@ -350,23 +350,18 @@ def get_datafiles(vv_instance):
 
     Example: GET /api/v1/datafiles
     """
-    # Get the list of data files from VibrationVIEW history using ReportFieldsHistory
-    # ReportFieldsHistory returns a 2D array: (parameter, value1, value2, ...)
-    # Using 'LastData' to get the history of data files
-    # if more than one data file, an additional row with LastData is always added to the top
-    # when only one data file, it returns just fields without additional row
-    fields_history = vv_instance.ReportFieldsHistory("LastData,StopCode,RunTime,Time")
+    # Get file paths from VibrationVIEW history.
+    fields_history = vv_instance.ReportFieldsHistory("LastData")
     if not fields_history or len(fields_history) == 0:
         return jsonify(error_response("No data files found in VibrationVIEW history", "NO_DATA_FILES")), 404
 
-    # Extract file paths from the history (skip first element which is the field name)
-    # fields_history format: [['LastDataFile', 'file1.vrd', 'file2.vrd', ...]]
+    # Extract file paths (LastData report field) from the first row (skip element 0 which is the label)
     file_paths = []
-    for row in fields_history:
-        # Skip the first element (field name) and collect file paths
-        for file_path in row[1:]:
-            if file_path and os.path.exists(file_path):
-                file_paths.append(file_path)
+    for file_path in fields_history[0][1:]:
+        if file_path and os.path.isfile(file_path):
+            file_paths.append(file_path)
+        elif file_path:
+            logger.warning("Data file from history not found on disk: %s", file_path)
 
     if not file_paths:
         return jsonify(error_response("No valid data files found in VibrationVIEW history", "NO_FILES_FOUND")), 404
