@@ -74,6 +74,13 @@ Once running, access the API documentation at:
 - **Docs**: `http://localhost:5000/api/v1/docs`
 - **Health check**: `http://localhost:5000/api/v1/health`
 
+## Breaking Changes
+
+- **UTC timestamps**: All API response timestamps now use UTC with an explicit
+  `+00:00` offset (e.g., `2026-06-19T18:30:00+00:00`). Previously, timestamps
+  used local time without a timezone indicator. Update any client-side parsing
+  that assumes local time.
+
 ## Troubleshooting
 
 - **"Python not found"**: Ensure Python 3.x is installed and added to PATH.
