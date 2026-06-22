@@ -131,7 +131,6 @@ class _NaNSafeJSONProvider(DefaultJSONProvider):
 def create_app(config_class=Config):
     """Application factory"""
     app = Flask(__name__)
-    app.json_provider_class = _NaNSafeJSONProvider
     app.json = _NaNSafeJSONProvider(app)
     app.config.from_object(config_class)
 

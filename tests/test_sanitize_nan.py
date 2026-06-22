@@ -66,40 +66,31 @@ class TestNaNSafeJSONProvider:
     """The Flask app JSON provider converts NaN/Inf to null in responses."""
 
     @pytest.fixture
-    def client(self):
-        from app import create_app, set_vv_instance
+    def app(self):
+        from app import create_app, reset_vv_instance, set_vv_instance
         from tests.mocks.mock_vibrationviewapi import MockVibrationVIEW
 
         mock_vv = MockVibrationVIEW()
         set_vv_instance(mock_vv)
         app = create_app()
         app.config["TESTING"] = True
-        with app.test_client() as client:
-            yield client
-        from app import reset_vv_instance
-
+        yield app
         reset_vv_instance()
 
-    def test_nan_in_response_becomes_null(self, client):
+    def test_nan_in_response_becomes_null(self, app):
         """Verify jsonify converts NaN to null via the custom provider."""
         from flask import jsonify
 
-        from app import create_app
-
-        app = create_app()
         with app.app_context():
             response = jsonify({"value": float("nan"), "normal": 1.0})
             data = response.get_json()
             assert data["value"] is None
             assert data["normal"] == 1.0
 
-    def test_inf_in_response_becomes_null(self, client):
+    def test_inf_in_response_becomes_null(self, app):
         """Verify jsonify converts Inf to null via the custom provider."""
         from flask import jsonify
 
-        from app import create_app
-
-        app = create_app()
         with app.app_context():
             response = jsonify({"value": float("inf")})
             data = response.get_json()
