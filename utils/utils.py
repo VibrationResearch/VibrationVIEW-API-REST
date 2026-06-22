@@ -99,11 +99,14 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
 
     if usetemporaryfile:
         unique_id = uuid.uuid4().hex
-        base, ext = os.path.splitext(filename)
-        filename = f"{base}_{unique_id}{ext}"
+        base, base_ext = os.path.splitext(filename)
+        filename = f"{base}_{unique_id}{base_ext}"
 
     safe_filename = secure_filename(filename)
-    safe_filename = safe_filename.lstrip("/\\")
+    if not safe_filename or safe_filename.count(".") != 1:
+        return None, {"Error": "Filename is not valid after sanitization"}, 400
+    if safe_filename.rsplit(".", 1)[1].lower() != ext:
+        return None, {"Error": "File extension changed during sanitization"}, 400
     file_path = os.path.join(temp_folder, safe_filename)
 
     with open(file_path, "wb") as f:

@@ -225,3 +225,42 @@ class TestBinaryUploadAcceptance:
         assert status == 400
         assert result is None
         assert "Invalid file extension" in error["Error"]
+
+
+class TestSecureFilenameValidation:
+    """handle_binary_upload rejects filenames that become empty or extensionless after sanitization."""
+
+    @pytest.mark.parametrize(
+        "filename",
+        [
+            "",  # empty string
+            "...",  # only dots
+            "///",  # only slashes
+            "\u6d4b\u8bd5.vyp",  # non-ASCII chars only in base name
+            "@@#$%.vyp",  # only special characters in base name
+            "test.exe.vyp",  # double extension
+        ],
+    )
+    def test_rejects_unsafe_filename(self, filename):
+        result, error, status = handle_binary_upload(filename, b"data")
+        assert status == 400
+        assert result is None
+
+    def test_accepts_ascii_filename(self, tmp_path):
+        with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
+            result, error, status = handle_binary_upload("valid_test.vyp", b"data")
+            assert status == 200
+            assert error is None
+
+    def test_accepts_mixed_ascii_non_ascii_filename(self, tmp_path):
+        """secure_filename keeps ASCII portion, so mixed names survive."""
+        with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
+            result, error, status = handle_binary_upload("test\u6d4b\u8bd5_file.vyp", b"data")
+            assert status == 200
+            assert error is None
+
+    def test_accepts_filename_with_temporary_file(self, tmp_path):
+        with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
+            result, error, status = handle_binary_upload("valid.vyp", b"data", usetemporaryfile=True)
+            assert status == 200
+            assert error is None
