@@ -518,35 +518,50 @@ class TestDatafilesRoute:
 
     def test_datafiles_returns_zip_when_files_exist(self, client, mock_vv):
         """Test that datafiles returns a zip file when history has files"""
-        # ReportFieldsHistory returns 2D array: [['LastData', 'file1.vrd', 'file2.vrd'], ...]
         mock_history = [["LastData", "C:\\VibrationVIEW\\Data\\file1.vrd", "C:\\VibrationVIEW\\Data\\file2.vrd"]]
         mock_vv.ReportFieldsHistory.return_value = mock_history
 
         with (
-            patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.os.path.isfile") as mock_isfile,
             patch("routes.report_generation.zipfile.ZipFile") as mock_zipfile,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
-            mock_exists.return_value = True
             mock_isfile.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            # Mock ZipFile context manager
             mock_zip_instance = MagicMock()
             mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
             client.get("/api/v1/datafiles")
 
-            # Verify ReportFieldsHistory was called
-            mock_vv.ReportFieldsHistory.assert_called_once()
+            mock_vv.ReportFieldsHistory.assert_called_once_with("LastData")
 
-            # Verify send_file was called
             mock_send_file.assert_called_once()
             call_args = mock_send_file.call_args
             assert call_args.kwargs["mimetype"] == "application/zip"
             assert call_args.kwargs["as_attachment"] is True
             assert call_args.kwargs["download_name"].endswith(".zip")
+
+    def test_datafiles_returns_zip_for_single_file(self, client, mock_vv):
+        """Test that datafiles works when history contains only one file"""
+        mock_history = [["LastData", "C:\\VibrationVIEW\\Data\\file1.vrd"]]
+        mock_vv.ReportFieldsHistory.return_value = mock_history
+
+        with (
+            patch("routes.report_generation.os.path.isfile") as mock_isfile,
+            patch("routes.report_generation.zipfile.ZipFile") as mock_zipfile,
+            patch("routes.report_generation.send_file") as mock_send_file,
+        ):
+            mock_isfile.return_value = True
+            mock_send_file.return_value = MagicMock()
+
+            mock_zip_instance = MagicMock()
+            mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
+
+            client.get("/api/v1/datafiles")
+
+            mock_send_file.assert_called_once()
+            assert mock_send_file.call_args.kwargs["download_name"] == "file1.zip"
 
     def test_datafiles_returns_error_when_no_history(self, client, mock_vv):
         """Test that datafiles returns error when no history available"""
@@ -564,8 +579,8 @@ class TestDatafilesRoute:
         mock_history = [["LastData", "C:\\NonExistent\\file1.vrd"]]
         mock_vv.ReportFieldsHistory.return_value = mock_history
 
-        with patch("routes.report_generation.os.path.exists") as mock_exists:
-            mock_exists.return_value = False
+        with patch("routes.report_generation.os.path.isfile") as mock_isfile:
+            mock_isfile.return_value = False
 
             response = client.get("/api/v1/datafiles")
 
