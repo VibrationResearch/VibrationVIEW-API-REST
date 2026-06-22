@@ -78,10 +78,20 @@ class TestValidatePaths:
         warnings = Config.validate_paths()
         assert any("VIBRATIONVIEW_FOLDER" in w for w in warnings)
 
+    def test_warns_on_missing_profile_folder(self, monkeypatch):
+        monkeypatch.setattr(Config, "PROFILE_FOLDER", r"C:\nonexistent\Profiles")
+        warnings = Config.validate_paths()
+        assert any("PROFILE_FOLDER" in w for w in warnings)
+
     def test_warns_on_missing_data_folder(self, monkeypatch):
         monkeypatch.setattr(Config, "DATA_FOLDER", r"C:\nonexistent\Data")
         warnings = Config.validate_paths()
         assert any("DATA_FOLDER" in w for w in warnings)
+
+    def test_warns_on_missing_report_folder(self, monkeypatch):
+        monkeypatch.setattr(Config, "REPORT_FOLDER", r"C:\nonexistent\Reports")
+        warnings = Config.validate_paths()
+        assert any("REPORT_FOLDER" in w for w in warnings)
 
     def test_no_warnings_when_paths_exist(self, monkeypatch, tmp_path):
         exe = tmp_path / "VibrationVIEW.exe"
