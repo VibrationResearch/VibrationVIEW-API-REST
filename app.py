@@ -143,6 +143,10 @@ def create_app(config_class=Config):
         handlers=[RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count), logging.StreamHandler()],
     )
 
+    # Warn about missing paths (runs in all modes including flask run).
+    for warning in Config.validate_paths():
+        logger.warning(f"\033[91m{warning}\033[0m")
+
     # API key authentication — uses @app.before_request for global Bearer token check.
     # Alternative: Flask-HTTPAuth (pip install Flask-HTTPAuth) provides a cleaner
     # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
@@ -364,10 +368,6 @@ def create_app(config_class=Config):
             {"success": False, "error": "Internal server error", "message": "An unexpected error occurred"}
         ), 500
 
-    # Warn about missing paths (runs in all modes including flask run).
-    for warning in Config.validate_paths():
-        logger.warning(f"\033[91m{warning}\033[0m")
-
     # Early binding: Create VibrationVIEW instance at startup
     logger.info("Initializing VibrationVIEW connection (early binding)...")
     vv = get_vv_instance()
@@ -391,6 +391,9 @@ if __name__ == "__main__":
 
     # Validate configuration before starting in production mode.
     # print() used here because logging is not configured until create_app() runs.
+    # Mutate Config class attributes before create_app() so the factory
+    # picks up debug settings.  Only runs from the CLI entry point;
+    # tests use TestingConfig and are unaffected.
     if args.debug:
         Config.DEBUG = True
         Config.LOG_LEVEL = "DEBUG"

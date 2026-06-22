@@ -22,7 +22,7 @@ class Config:
 
     # API Settings
     API_VERSION = os.environ.get("API_VERSION") or "1.0.0"
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
+    SECRET_KEY = os.environ.get("SECRET_KEY") or _DEV_SECRET_KEY
 
     # API Key Authentication
     # Generate a key with: python -c "import secrets; print(secrets.token_hex(32))"
