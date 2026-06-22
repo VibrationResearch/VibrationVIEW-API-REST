@@ -130,6 +130,7 @@ class _NaNSafeJSONProvider(DefaultJSONProvider):
 
 def create_app(config_class=Config):
     """Application factory"""
+
     app = Flask(__name__)
     app.json = _NaNSafeJSONProvider(app)
     app.config.from_object(config_class)
@@ -165,16 +166,25 @@ def create_app(config_class=Config):
         handlers=[RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count), logging.StreamHandler()],
     )
 
+    # Warn about missing paths (runs in all modes including flask run).
+    for warning in Config.validate_paths():
+        logger.warning(f"\033[91m{warning}\033[0m")
+
     # API key authentication — uses @app.before_request for global Bearer token check.
     # Alternative: Flask-HTTPAuth (pip install Flask-HTTPAuth) provides a cleaner
     # decorator-based approach (HTTPTokenAuth) with built-in Bearer parsing and
     # easier extensibility for multiple keys or roles.
     # tradeoff: custom implementation avoids extra dependencies and is straightforward for single-key use case.
+    from config import _DEV_SECRET_KEY, _PLACEHOLDER_API_KEY
+
+    if app.config.get("SECRET_KEY") == _DEV_SECRET_KEY:
+        logger.warning("\033[91mSECRET_KEY is the development default. Set a secure value in .env before deploying.\033[0m")
+
     api_key = app.config.get("API_KEY", "")
     if not api_key:
         logger.warning("\033[91mAPI_KEY is not set. Set a strong, unique API_KEY in .env before deploying.\033[0m")
     if api_key:
-        if api_key == "replace-with-generated-key":
+        if api_key == _PLACEHOLDER_API_KEY:
             logger.warning(
                 "\033[91mUsing placeholder API key for authentication. "
                 "Replace with a strong, unique key before deploying.\033[0m"
@@ -393,27 +403,34 @@ def create_app(config_class=Config):
 
 
 if __name__ == "__main__":
-    # Create app (early binding happens in create_app)
-    # print() used here because logging is not configured until create_app() runs.
-    print("Starting Flask server...")
-    try:
-        app = create_app()
-    except RuntimeError as e:
-        print(f"Failed to initialize: {e}")
-        exit(-1)
-
     import argparse
 
     parser = argparse.ArgumentParser(description="VibrationVIEW Flask REST API")
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", type=int, default=5000, help="Port number")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument("--config", default="development", help="Configuration environment")
 
     args = parser.parse_args()
 
+    # Validate configuration before starting in production mode.
+    # print() used here because logging is not configured until create_app() runs.
+    # Mutate Config class attributes before create_app() so the factory
+    # picks up debug settings.  Only runs from the CLI entry point;
+    # tests use TestingConfig and are unaffected.
+    if args.debug:
+        Config.DEBUG = True
+        Config.LOG_LEVEL = "DEBUG"
+    else:
+        try:
+            Config.validate_production()
+        except RuntimeError as e:
+            print(f"Failed to initialize: {e}")
+            exit(-1)
+
+    print("Starting Flask server...")
+    app = create_app()
+
     logger.info(f"Starting VibrationVIEW API server on {args.host}:{args.port}")
-    logger.info(f"Configuration: {args.config}")
     logger.info(f"API documentation: http://{args.host}:{args.port}/api/v1/docs")
     logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/v1/docs/basic_control")
 

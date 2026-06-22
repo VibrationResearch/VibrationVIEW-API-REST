@@ -26,7 +26,15 @@ Both scripts create a virtual environment and install all dependencies from the
 bundled `vendor/` folder. No internet access is required. A `.env` file is
 created automatically from `.env.example` if one does not already exist.
 
-3. Edit `.env` to match your environment (paths, connection settings, etc.).
+3. Edit `.env` to match your environment (paths, connection settings, security
+   keys, etc.).  At minimum, generate secure values for `SECRET_KEY` and
+   `API_KEY`:
+
+   ```cmd
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+
+   Copy the output into `.env` for each key. The server will refuse to start in production mode if `SECRET_KEY` is still the development default or if `API_KEY` is still the placeholder value.
 4. Start the server:
 
 **Option A: Using the batch file**
@@ -60,6 +68,8 @@ Key settings in `.env`:
 
 | Variable | Description |
 |---|---|
+| `SECRET_KEY` | Cryptographic signing key used by Flask. Generate with `python -c "import secrets; print(secrets.token_hex(32))"`. **Required** in production. |
+| `API_KEY` | Bearer token for API authentication. Generate the same way. Leave empty to disable authentication (not recommended). |
 | `VIBRATIONVIEW_FOLDER` | Root folder for VibrationVIEW data (e.g. `C:\VibrationVIEW`) |
 | `EXE_NAME` | Full path to VibrationVIEW executable |
 | `VV_CONNECTION_TIMEOUT` | COM connection timeout in seconds |
