@@ -99,8 +99,8 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
 
     if usetemporaryfile:
         unique_id = uuid.uuid4().hex
-        base, ext = os.path.splitext(filename)
-        filename = f"{base}_{unique_id}{ext}"
+        base, base_ext = os.path.splitext(filename)
+        filename = f"{base}_{unique_id}{base_ext}"
 
     safe_filename = secure_filename(filename)
     if not safe_filename or safe_filename.count(".") != 1:
