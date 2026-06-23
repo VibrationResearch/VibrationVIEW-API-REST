@@ -74,7 +74,7 @@ class TestReportGeneration:
 
             # Make the request (filename required for binary upload detection)
             response = client.post(
-                f'/api/v1/generatereport?filename=test.vrd&template_name={template_name}&output_name={output_name}',
+                f'/api/v1/generatereport?filename=test.vrd&templatename={template_name}&outputname={output_name}',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(file_size),
@@ -109,7 +109,7 @@ class TestReportGeneration:
             vrd_content = f.read()
 
         response = client.post(
-            '/api/v1/generatereport?filename=test.vrd&output_name=test_report.pdf',  # Missing template_name
+            '/api/v1/generatereport?filename=test.vrd&outputname=test_report.pdf',  # Missing template_name
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -120,7 +120,7 @@ class TestReportGeneration:
         assert response.status_code == 400
         data = response.get_json()
         assert data['success'] is False
-        assert 'Upload mode requires template_name query parameter' in data['error']['message']
+        assert 'Upload mode requires templatename query parameter' in data['error']['message']
         assert data['error']['code'] == 'MISSING_PARAMETER'
 
     def test_generatereport_missing_output_name(self, client, mock_vv, sample_vrd_path):
@@ -144,7 +144,7 @@ class TestReportGeneration:
 
             # output_name is now derived from uploaded filename when not provided
             response = client.post(
-                '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate',
+                '/api/v1/generatereport?filename=test.vrd&templatename=Test Report.vvtemplate',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(len(vrd_content)),
@@ -162,7 +162,7 @@ class TestReportGeneration:
         mock_vv.ReportField.return_value = None
 
         response = client.post(
-            '/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf',
+            '/api/v1/generatereport?templatename=Test Report.vvtemplate&outputname=test.pdf',
             data=b'',  # Empty content
             headers={
                 'Content-Length': '0',
@@ -184,7 +184,7 @@ class TestReportGeneration:
         large_content = b'x' * (11 * 1024 * 1024)  # 11MB
 
         response = client.post(
-            '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate&output_name=test.pdf',
+            '/api/v1/generatereport?filename=test.vrd&templatename=Test Report.vvtemplate&outputname=test.pdf',
             data=large_content,
             headers={
                 'Content-Length': str(len(large_content)),
@@ -209,7 +209,7 @@ class TestReportGeneration:
             mock_generate.side_effect = Exception("Report generation failed")
 
             response = client.post(
-                '/api/v1/generatereport?filename=test.vrd&template_name=Test Report.vvtemplate&output_name=test.pdf',
+                '/api/v1/generatereport?filename=test.vrd&templatename=Test Report.vvtemplate&outputname=test.pdf',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(len(vrd_content)),
@@ -236,7 +236,7 @@ class TestReportGeneration:
         malicious_output = "..\\..\\Windows\\System32\\evil.exe"
 
         response = client.post(
-            f'/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name={malicious_output}',
+            f'/api/v1/generatereport?templatename=Test Report.vvtemplate&outputname={malicious_output}',
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -275,7 +275,7 @@ class TestReportGeneration:
                 mock_send_file.return_value = MagicMock()
 
                 response = client.post(
-                    f'/api/v1/generatereport?template_name={template_name}&output_name=output.pdf',
+                    f'/api/v1/generatereport?templatename={template_name}&outputname=output.pdf',
                     data=vrd_content,
                     headers={
                         'Content-Length': str(len(vrd_content)),
@@ -315,7 +315,7 @@ class TestReportGeneration:
             mock_send_file.return_value = MagicMock()
 
             response = client.post(
-                f'/api/v1/generatereport?template_name={template_name}&output_name={output_name}',
+                f'/api/v1/generatereport?templatename={template_name}&outputname={output_name}',
                 data=vrd_content,
                 headers={
                     'Content-Length': str(len(vrd_content)),
@@ -362,7 +362,7 @@ class TestDatafileRoute:
 
     def test_datafile_rejects_path_traversal_dotdot(self, client, mock_vv):
         """Test that datafile rejects path traversal with .."""
-        response = client.get('/api/v1/datafile?file_path=..\\..\\Windows\\System32\\config\\sam')
+        response = client.get('/api/v1/datafile?filepath=..\\..\\Windows\\System32\\config\\sam')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -372,7 +372,7 @@ class TestDatafileRoute:
 
     def test_datafile_rejects_absolute_path_outside_authorized(self, client, mock_vv):
         """Test that datafile rejects absolute paths outside authorized directories"""
-        response = client.get('/api/v1/datafile?file_path=C:\\Windows\\System32\\cmd.exe')
+        response = client.get('/api/v1/datafile?filepath=C:\\Windows\\System32\\cmd.exe')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -382,7 +382,7 @@ class TestDatafileRoute:
 
     def test_datafile_rejects_unix_path_traversal(self, client, mock_vv):
         """Test that datafile rejects Unix-style path traversal"""
-        response = client.get('/api/v1/datafile?file_path=/../../../etc/passwd')
+        response = client.get('/api/v1/datafile?filepath=/../../../etc/passwd')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -392,7 +392,7 @@ class TestDatafileRoute:
     def test_datafile_rejects_encoded_path_traversal(self, client, mock_vv):
         """Test that datafile rejects encoded path traversal attempts"""
         # URL encoded ..
-        response = client.get('/api/v1/datafile?file_path=%2e%2e%5c%2e%2e%5cWindows%5cSystem32%5ccmd.exe')
+        response = client.get('/api/v1/datafile?filepath=%2e%2e%5c%2e%2e%5cWindows%5cSystem32%5ccmd.exe')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -401,7 +401,7 @@ class TestDatafileRoute:
 
     def test_datafile_rejects_multiple_colons(self, client, mock_vv):
         """Test that datafile rejects paths with multiple colons (potential ADS or injection)"""
-        response = client.get('/api/v1/datafile?file_path=C:\\data\\file.vrd:hidden:$DATA')
+        response = client.get('/api/v1/datafile?filepath=C:\\data\\file.vrd:hidden:$DATA')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -423,7 +423,7 @@ class TestDatafileRoute:
         with patch('os.path.exists') as mock_exists:
             mock_exists.return_value = False  # File doesn't exist but path should be validated
 
-            response = client.get(f'/api/v1/datafile?file_path={test_file_path}')
+            response = client.get(f'/api/v1/datafile?filepath={test_file_path}')
 
             # Should pass path validation but fail on file not found
             assert response.status_code == 404
@@ -454,7 +454,7 @@ class TestDatafileRoute:
         """Test that datafile POST also rejects path traversal"""
         response = client.post(
             '/api/v1/datafile',
-            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+            json={'filepath': '..\\..\\Windows\\System32\\config\\sam'}
         )
 
         assert response.status_code == 403
@@ -478,7 +478,7 @@ class TestDatafileRoute:
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            response = client.get(f'/api/v1/datafile?file_path={test_file_path}')
+            response = client.get(f'/api/v1/datafile?filepath={test_file_path}')
 
             # send_file should have been called with the validated path
             mock_send_file.assert_called_once()
@@ -608,7 +608,7 @@ class TestGenerateReportPathValidation:
 
     def test_generatereport_rejects_path_traversal_dotdot(self, client, mock_vv):
         """Test that generatereport rejects path traversal with .."""
-        response = client.get('/api/v1/generatereport?file_path=..\\..\\Windows\\System32\\config\\sam')
+        response = client.get('/api/v1/generatereport?filepath=..\\..\\Windows\\System32\\config\\sam')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -618,7 +618,7 @@ class TestGenerateReportPathValidation:
 
     def test_generatereport_rejects_absolute_path_outside_authorized(self, client, mock_vv):
         """Test that generatereport rejects absolute paths outside authorized directories"""
-        response = client.get('/api/v1/generatereport?file_path=C:\\Windows\\System32\\cmd.exe')
+        response = client.get('/api/v1/generatereport?filepath=C:\\Windows\\System32\\cmd.exe')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -628,7 +628,7 @@ class TestGenerateReportPathValidation:
 
     def test_generatereport_rejects_unix_path_traversal(self, client, mock_vv):
         """Test that generatereport rejects Unix-style path traversal"""
-        response = client.get('/api/v1/generatereport?file_path=/../../../etc/passwd')
+        response = client.get('/api/v1/generatereport?filepath=/../../../etc/passwd')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -637,7 +637,7 @@ class TestGenerateReportPathValidation:
 
     def test_generatereport_rejects_multiple_colons(self, client, mock_vv):
         """Test that generatereport rejects paths with multiple colons"""
-        response = client.get('/api/v1/generatereport?file_path=C:\\data\\file.vrd:hidden:$DATA')
+        response = client.get('/api/v1/generatereport?filepath=C:\\data\\file.vrd:hidden:$DATA')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -648,7 +648,7 @@ class TestGenerateReportPathValidation:
         """Test that generatereport POST also rejects path traversal"""
         response = client.post(
             '/api/v1/generatereport',
-            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+            json={'filepath': '..\\..\\Windows\\System32\\config\\sam'}
         )
 
         assert response.status_code == 403
@@ -669,7 +669,7 @@ class TestGenerateReportPathValidation:
             mock_exists.return_value = True  # File exists, so we get to output validation
 
             response = client.get(
-                f'/api/v1/generatereport?file_path={valid_input}&output_name=..\\..\\Windows\\evil.exe'
+                f'/api/v1/generatereport?filepath={valid_input}&outputname=..\\..\\Windows\\evil.exe'
             )
 
             assert response.status_code == 403
@@ -703,7 +703,7 @@ class TestGenerateTxtPathValidation:
 
     def test_generatetxt_rejects_path_traversal_dotdot(self, client, mock_vv):
         """Test that generatetxt rejects path traversal with .."""
-        response = client.get('/api/v1/generatetxt?file_path=..\\..\\Windows\\System32\\config\\sam')
+        response = client.get('/api/v1/generatetxt?filepath=..\\..\\Windows\\System32\\config\\sam')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -713,7 +713,7 @@ class TestGenerateTxtPathValidation:
 
     def test_generatetxt_rejects_absolute_path_outside_authorized(self, client, mock_vv):
         """Test that generatetxt rejects absolute paths outside authorized directories"""
-        response = client.get('/api/v1/generatetxt?file_path=C:\\Windows\\System32\\cmd.exe')
+        response = client.get('/api/v1/generatetxt?filepath=C:\\Windows\\System32\\cmd.exe')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -723,7 +723,7 @@ class TestGenerateTxtPathValidation:
 
     def test_generatetxt_rejects_unix_path_traversal(self, client, mock_vv):
         """Test that generatetxt rejects Unix-style path traversal"""
-        response = client.get('/api/v1/generatetxt?file_path=/../../../etc/passwd')
+        response = client.get('/api/v1/generatetxt?filepath=/../../../etc/passwd')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -732,7 +732,7 @@ class TestGenerateTxtPathValidation:
 
     def test_generatetxt_rejects_multiple_colons(self, client, mock_vv):
         """Test that generatetxt rejects paths with multiple colons"""
-        response = client.get('/api/v1/generatetxt?file_path=C:\\data\\file.vrd:hidden:$DATA')
+        response = client.get('/api/v1/generatetxt?filepath=C:\\data\\file.vrd:hidden:$DATA')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -743,7 +743,7 @@ class TestGenerateTxtPathValidation:
         """Test that generatetxt POST also rejects path traversal"""
         response = client.post(
             '/api/v1/generatetxt',
-            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+            json={'filepath': '..\\..\\Windows\\System32\\config\\sam'}
         )
 
         assert response.status_code == 403
@@ -764,7 +764,7 @@ class TestGenerateTxtPathValidation:
             mock_exists.return_value = True  # File exists, so we get to output validation
 
             response = client.get(
-                f'/api/v1/generatetxt?file_path={valid_input}&output_name=..\\..\\Windows\\evil.txt'
+                f'/api/v1/generatetxt?filepath={valid_input}&outputname=..\\..\\Windows\\evil.txt'
             )
 
             assert response.status_code == 403
@@ -798,7 +798,7 @@ class TestGenerateUffPathValidation:
 
     def test_generateuff_rejects_path_traversal_dotdot(self, client, mock_vv):
         """Test that generateuff rejects path traversal with .."""
-        response = client.get('/api/v1/generateuff?file_path=..\\..\\Windows\\System32\\config\\sam')
+        response = client.get('/api/v1/generateuff?filepath=..\\..\\Windows\\System32\\config\\sam')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -808,7 +808,7 @@ class TestGenerateUffPathValidation:
 
     def test_generateuff_rejects_absolute_path_outside_authorized(self, client, mock_vv):
         """Test that generateuff rejects absolute paths outside authorized directories"""
-        response = client.get('/api/v1/generateuff?file_path=C:\\Windows\\System32\\cmd.exe')
+        response = client.get('/api/v1/generateuff?filepath=C:\\Windows\\System32\\cmd.exe')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -818,7 +818,7 @@ class TestGenerateUffPathValidation:
 
     def test_generateuff_rejects_unix_path_traversal(self, client, mock_vv):
         """Test that generateuff rejects Unix-style path traversal"""
-        response = client.get('/api/v1/generateuff?file_path=/../../../etc/passwd')
+        response = client.get('/api/v1/generateuff?filepath=/../../../etc/passwd')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -827,7 +827,7 @@ class TestGenerateUffPathValidation:
 
     def test_generateuff_rejects_multiple_colons(self, client, mock_vv):
         """Test that generateuff rejects paths with multiple colons"""
-        response = client.get('/api/v1/generateuff?file_path=C:\\data\\file.vrd:hidden:$DATA')
+        response = client.get('/api/v1/generateuff?filepath=C:\\data\\file.vrd:hidden:$DATA')
 
         assert response.status_code == 403
         data = response.get_json()
@@ -838,7 +838,7 @@ class TestGenerateUffPathValidation:
         """Test that generateuff POST also rejects path traversal"""
         response = client.post(
             '/api/v1/generateuff',
-            json={'file_path': '..\\..\\Windows\\System32\\config\\sam'}
+            json={'filepath': '..\\..\\Windows\\System32\\config\\sam'}
         )
 
         assert response.status_code == 403
@@ -859,7 +859,7 @@ class TestGenerateUffPathValidation:
             mock_exists.return_value = True  # File exists, so we get to output validation
 
             response = client.get(
-                f'/api/v1/generateuff?file_path={valid_input}&output_name=..\\..\\Windows\\evil.uff'
+                f'/api/v1/generateuff?filepath={valid_input}&outputname=..\\..\\Windows\\evil.uff'
             )
 
             assert response.status_code == 403

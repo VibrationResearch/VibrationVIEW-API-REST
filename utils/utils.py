@@ -451,16 +451,20 @@ def get_query_param(name, type_fn=int, required=True):
     return None, None, None
 
 
-def get_query_param_string(name, required=True):
+def get_query_param_string(name, required=True, json_data=None):
     """
     Extract a string query parameter with unnamed positional fallback.
 
     Checks ``?name=value`` first, then falls back to treating the raw
-    query string as a bare positional value (e.g. ``?myfile.vrd``).
+    query string as a bare positional value (e.g. ``?myfile.vrd``) when
+    it does not contain ``=`` (which would indicate named parameters).
+    Optionally checks a pre-parsed JSON body dict as a final fallback.
 
     Args:
         name: Parameter name to look for
         required: When *True* (default) return an error tuple if absent
+        json_data: Optional dict from ``request.get_json()`` to check
+                   after query parameters
 
     Returns:
         tuple: (value, None, None) on success
@@ -473,10 +477,17 @@ def get_query_param_string(name, required=True):
     if value is not None:
         return value, None, None
 
-    # Unnamed positional fallback
+    # Unnamed positional fallback – only when the query string looks
+    # like a bare value (no '=' sign indicating named parameters).
     query_string = request.query_string.decode("utf-8")
-    if query_string:
+    if query_string and "=" not in query_string:
         return unquote(query_string), None, None
+
+    # Fallback – JSON body
+    if json_data is not None:
+        value = json_data.get(name)
+        if value is not None:
+            return str(value), None, None
 
     if required:
         return None, _error(
