@@ -79,7 +79,7 @@ class TestDataRetrieval:
         self.mock_vv.ChannelUnit.return_value = "debug_unit"
         
         # Test the route with GET request
-        response = client.get('/api/v1/channelunit?channelnum=1')
+        response = client.get('/api/v1/channelunit?channel=1')
         
         print(f"Response status: {response.status_code}")
         if response.status_code == 200:
@@ -403,7 +403,7 @@ class TestDataRetrieval:
         channel_1based = 3
         expected_channel_0based = 2  # 3-1=2
         
-        response = client.get(f'/api/v1/channelunit?channelnum={channel_1based}')
+        response = client.get(f'/api/v1/channelunit?channel={channel_1based}')
         
         if response.status_code == 404:
             pytest.skip("Route /api/v1/channelunit not found - blueprint may not be registered")
@@ -414,8 +414,8 @@ class TestDataRetrieval:
         # Verify response structure
         assert data['success'] is True
         assert data['data']['result'] == "g"
-        assert data['data']['channelnum'] == channel_1based
-        assert data['data']['internal_channelnum'] == expected_channel_0based
+        assert data['data']['channel'] == channel_1based
+        assert data['data']['internal_channel'] == expected_channel_0based
         
         # Verify VibrationVIEW was called with 0-based index
         assert self.mock_vv.ChannelUnit.called, "ChannelUnit method was not called"
@@ -431,7 +431,7 @@ class TestDataRetrieval:
         endpoint = '/api/v1/channelunit'
 
         # Check if route is registered
-        response = client.get(f'{endpoint}?channelnum=0')
+        response = client.get(f'{endpoint}?channel=0')
         if response.status_code == 404:
             pytest.skip(f"Route {endpoint} not found - blueprint may not be registered")
 
@@ -439,7 +439,7 @@ class TestDataRetrieval:
         invalid_channels = [0, -1]
 
         for channel in invalid_channels:
-            response = client.get(f'{endpoint}?channelnum={channel}')
+            response = client.get(f'{endpoint}?channel={channel}')
             assert response.status_code == 400, f"Expected 400 for channelnum={channel}, got {response.status_code}"
             data = json.loads(response.data)
             assert data['success'] is False, f"Expected success=False for channelnum={channel}"
@@ -457,7 +457,7 @@ class TestDataRetrieval:
         channel_1based = 1
         expected_channel_0based = 0  # 1-1=0
         
-        response = client.get(f'/api/v1/channellabel?channelnum={channel_1based}')
+        response = client.get(f'/api/v1/channellabel?channel={channel_1based}')
         
         if response.status_code == 404:
             pytest.skip("Route /api/v1/channellabel not found - blueprint may not be registered")
@@ -467,8 +467,8 @@ class TestDataRetrieval:
         
         assert data['success'] is True
         assert data['data']['result'] == "Accel X"
-        assert data['data']['channelnum'] == channel_1based
-        assert data['data']['internal_channelnum'] == expected_channel_0based
+        assert data['data']['channel'] == channel_1based
+        assert data['data']['internal_channel'] == expected_channel_0based
         
         # Verify VibrationVIEW was called with 0-based index
         assert self.mock_vv.ChannelLabel.called, "ChannelLabel method was not called"
@@ -489,7 +489,7 @@ class TestDataRetrieval:
                 assert response.status_code == 400, f"{endpoint} did not return 400 for missing channelnum"
                 data = json.loads(response.data)
                 assert data['success'] is False, f"{endpoint} did not set success to False"
-                assert 'channelnum' in data['error']['message'], f"{endpoint} error message missing 'channelnum'"
+                assert 'channel' in data['error']['message'], f"{endpoint} error message missing 'channel'"
 
         print("✓ Channel parameter validation works!")
     
@@ -506,7 +506,7 @@ class TestDataRetrieval:
         loop_1based = 4
         expected_loop_0based = 3  # 4-1=3
         
-        response = client.get(f'/api/v1/controllabel?loopnum={loop_1based}')
+        response = client.get(f'/api/v1/controllabel?loop={loop_1based}')
         
         if response.status_code == 404:
             pytest.skip("Route /api/v1/controllabel not found - blueprint may not be registered")
@@ -516,8 +516,8 @@ class TestDataRetrieval:
         
         assert data['success'] is True
         assert data['data']['result'] == "Control Loop 1"
-        assert data['data']['loopnum'] == loop_1based
-        assert data['data']['internal_loopnum'] == expected_loop_0based
+        assert data['data']['loop'] == loop_1based
+        assert data['data']['internal_loop'] == expected_loop_0based
         
         # Verify VibrationVIEW was called with 0-based index
         assert self.mock_vv.ControlLabel.called, "ControlLabel method was not called"
@@ -536,7 +536,7 @@ class TestDataRetrieval:
         ]
 
         for endpoint, loopnum in test_cases:
-            response = client.get(f'{endpoint}?loopnum={loopnum}')
+            response = client.get(f'{endpoint}?loop={loopnum}')
             if response.status_code != 404:
                 assert response.status_code == 400, f"{endpoint} did not return 400 for loopnum={loopnum}"
                 data = json.loads(response.data)
@@ -594,7 +594,7 @@ class TestDataRetrieval:
     def test_end_to_end_workflow(self, client):
         """Test a complete workflow using multiple endpoints"""
         # Skip if any route is not available
-        test_routes = ['/api/v1/demand', '/api/v1/vector?vectorenum=1', '/api/v1/channelunit?channelnum=1']
+        test_routes = ['/api/v1/demand', '/api/v1/vector?vectorenum=1', '/api/v1/channelunit?channel=1']
         
         for route in test_routes:
             response = client.get(route)
@@ -625,7 +625,7 @@ class TestDataRetrieval:
         assert vector_data['success'] is True
         
         # Step 3: Get channel unit information
-        response3 = client.get('/api/v1/channelunit?channelnum=1')
+        response3 = client.get('/api/v1/channelunit?channel=1')
         assert response3.status_code == 200
         channel_data = json.loads(response3.data)
         assert channel_data['success'] is True
@@ -672,8 +672,8 @@ class TestDataRetrieval:
 
         # Channel endpoints - missing parameters
         channel_endpoints = [
-            ('/api/v1/channelunit', 'channelnum'),
-            ('/api/v1/channellabel', 'channelnum'),
+            ('/api/v1/channelunit', 'channel'),
+            ('/api/v1/channellabel', 'channel'),
         ]
 
         for endpoint, param in channel_endpoints:
@@ -687,10 +687,10 @@ class TestDataRetrieval:
         # Test invalid values
         invalid_tests = [
             ('/api/v1/vector?vectorenum=1&columns=0', 'columns must be >= 1'),
-            ('/api/v1/channelunit?channelnum=0', 'must be >= 1'),
-            ('/api/v1/channelunit?channelnum=-1', 'must be >= 1'),
-            ('/api/v1/controllabel?loopnum=0', 'must be >= 1'),
-            ('/api/v1/controllabel?loopnum=-5', 'must be >= 1'),
+            ('/api/v1/channelunit?channel=0', 'must be >= 1'),
+            ('/api/v1/channelunit?channel=-1', 'must be >= 1'),
+            ('/api/v1/controllabel?loop=0', 'must be >= 1'),
+            ('/api/v1/controllabel?loop=-5', 'must be >= 1'),
         ]
 
         for endpoint, expected_error in invalid_tests:
@@ -724,12 +724,12 @@ class TestDataRetrieval:
         self.mock_vv.ChannelUnit.reset_mock()
         self.mock_vv.ChannelUnit.return_value = "m/s²"
         
-        response = client.get('/api/v1/channelunit?channelnum=1000')
+        response = client.get('/api/v1/channelunit?channel=1000')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
-            assert data['data']['channelnum'] == 1000
-            assert data['data']['internal_channelnum'] == 999  # 1000-1=999
+            assert data['data']['channel'] == 1000
+            assert data['data']['internal_channel'] == 999  # 1000-1=999
             
             # Verify correct conversion
             calls = self.mock_vv.ChannelUnit.call_args_list
@@ -745,12 +745,12 @@ class TestDataRetrieval:
         self.mock_vv.ChannelLabel.reset_mock()
         self.mock_vv.ChannelLabel.return_value = "Channel 1"
         
-        response = client.get('/api/v1/channellabel?channelnum=1')
+        response = client.get('/api/v1/channellabel?channel=1')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
-            assert data['data']['channelnum'] == 1
-            assert data['data']['internal_channelnum'] == 0  # 1-1=0
+            assert data['data']['channel'] == 1
+            assert data['data']['internal_channel'] == 0  # 1-1=0
             
             calls = self.mock_vv.ChannelLabel.call_args_list
             if calls:
@@ -760,12 +760,12 @@ class TestDataRetrieval:
         self.mock_vv.ControlLabel.reset_mock()
         self.mock_vv.ControlLabel.return_value = "Loop 1"
         
-        response = client.get('/api/v1/controllabel?loopnum=1')
+        response = client.get('/api/v1/controllabel?loop=1')
         if response.status_code != 404:
             assert response.status_code == 200
             data = json.loads(response.data)
-            assert data['data']['loopnum'] == 1
-            assert data['data']['internal_loopnum'] == 0  # 1-1=0
+            assert data['data']['loop'] == 1
+            assert data['data']['internal_loop'] == 0  # 1-1=0
             
             calls = self.mock_vv.ControlLabel.call_args_list
             if calls:
@@ -835,7 +835,7 @@ class TestDataRetrieval:
         test_requests = [
             ('/api/v1/channel', None),
             ('/api/v1/vectorlabel?vectorenum=5', None),
-            ('/api/v1/controlunit?loopnum=2', None),
+            ('/api/v1/controlunit?loop=2', None),
             ('/api/v1/channel', None),  # Repeat to test consistency
         ]
         
@@ -903,10 +903,10 @@ class TestDataRetrieval:
             ('GET', '/api/v1/vectorunit?vectorenum=2', {'vectorenum': 2}, 'VectorUnit'),
             ('GET', '/api/v1/vectorlabel?vectorenum=3', {'vectorenum': 3}, 'VectorLabel'),
             ('GET', '/api/v1/vectorlength?vectorenum=4', {'vectorenum': 4}, 'VectorLength'),
-            ('GET', '/api/v1/channelunit?channelnum=5', {'channelnum': 5, 'internal_channelnum': 4}, 'ChannelUnit'),
-            ('GET', '/api/v1/channellabel?channelnum=6', {'channelnum': 6, 'internal_channelnum': 5}, 'ChannelLabel'),
-            ('GET', '/api/v1/controlunit?loopnum=7', {'loopnum': 7, 'internal_loopnum': 6}, 'ControlUnit'),
-            ('GET', '/api/v1/controllabel?loopnum=8', {'loopnum': 8, 'internal_loopnum': 7}, 'ControlLabel'),
+            ('GET', '/api/v1/channelunit?channel=5', {'channel': 5, 'internal_channel': 4}, 'ChannelUnit'),
+            ('GET', '/api/v1/channellabel?channel=6', {'channel': 6, 'internal_channel': 5}, 'ChannelLabel'),
+            ('GET', '/api/v1/controlunit?loop=7', {'loop': 7, 'internal_loop': 6}, 'ControlUnit'),
+            ('GET', '/api/v1/controllabel?loop=8', {'loop': 8, 'internal_loop': 7}, 'ControlLabel'),
         ]
         
         results = {}
