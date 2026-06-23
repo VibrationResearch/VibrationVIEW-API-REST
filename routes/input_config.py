@@ -483,25 +483,17 @@ def input_mode(vv_instance):
     required_params = ['channel', 'powersource', 'capcoupled', 'differential']
 
     # Try query parameters first, then JSON body
-    if request.args:
-        data = {
-            'channel': request.args.get('channel'),
-            'powersource': request.args.get('powersource'),
-            'capcoupled': request.args.get('capcoupled'),
-            'differential': request.args.get('differential')
-        }
-        # Convert string booleans to actual booleans
-        for key in ['powersource', 'capcoupled', 'differential']:
-            if data[key] is not None:
-                data[key] = data[key].lower() == 'true'
-    else:
-        data = request.get_json(silent=True)
+    json_data = request.get_json(silent=True) or {}
 
-    if not data:
-        return jsonify(error_response(
-            'Missing parameters (provide query params or JSON body)',
-            'MISSING_PARAMETERS'
-        )), 400
+    data = {}
+    for param in required_params:
+        val, _, _ = get_query_param_string(param, required=False, json_data=json_data)
+        data[param] = val
+
+    # Convert string booleans to actual booleans
+    for key in ['powersource', 'capcoupled', 'differential']:
+        if data[key] is not None:
+            data[key] = str(data[key]).lower() == 'true'
 
     missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
@@ -556,22 +548,14 @@ def input_calibration(vv_instance):
         POST /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
     """
     # Try query parameters first, then JSON body
-    if request.args:
-        data = {
-            'channel': request.args.get('channel'),
-            'sensitivity': request.args.get('sensitivity'),
-            'serialnumber': request.args.get('serialnumber'),
-            'caldate': request.args.get('caldate')
-        }
-    else:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify(error_response(
-                'Missing parameters (provide query params or JSON body)',
-                'MISSING_PARAMETERS'
-            )), 400
+    json_data = request.get_json(silent=True) or {}
 
     required_params = ['channel', 'sensitivity', 'serialnumber', 'caldate']
+    data = {}
+    for param in required_params:
+        val, _, _ = get_query_param_string(param, required=False, json_data=json_data)
+        data[param] = val
+
     missing_params = [param for param in required_params if not data.get(param)]
     if missing_params:
         return jsonify(error_response(

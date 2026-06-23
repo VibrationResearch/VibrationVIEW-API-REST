@@ -387,6 +387,9 @@ def detect_file_upload():
 
     elif is_binary_content_type:
         # Raw binary mode - get filename from query parameter
+        # Uses request.args directly (not get_query_param_string) because the
+        # raw query string fallback here intentionally grabs the entire query
+        # string as a filename, even when it contains '='.
         filename = request.args.get("filename")
 
         if filename is None:

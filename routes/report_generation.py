@@ -203,8 +203,8 @@ def generate_report(vv_instance):
 
         if filename is not None:
             # File upload detected - save file
-            template_name = request.args.get('templatename')
-            output_name = request.args.get('outputname')
+            template_name, _, _ = get_query_param_string("templatename", required=False)
+            output_name, _, _ = get_query_param_string("outputname", required=False)
 
             if not template_name:
                 return jsonify(error_response(
@@ -585,7 +585,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
         if filename is not None:
             # File upload detected - save file
-            output_name = request.args.get('outputname')
+            output_name, _, _ = get_query_param_string("outputname", required=False)
 
             # If no output_name provided, derive from uploaded filename
             if not output_name:
