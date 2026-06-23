@@ -373,14 +373,14 @@ def get_data_file(vv_instance):
     Uses the same parameter scheme as generatetxt for consistency.
 
     Request Body (JSON, optional) or Query Parameters:
-        filepath: string - Path to specific VibrationVIEW data file (optional - uses last data file if not specified)
+        filename: string - Path to specific VibrationVIEW data file (optional - uses last data file if not specified)
 
     Note: Returns the raw .vrd file as binary data, not JSON.
           Use Content-Type: application/octet-stream for binary download.
 
     Example: GET /api/v1/getdatafile (uses last data file)
-             GET /api/v1/getdatafile?filepath=specific_file.vrd
-             POST /api/v1/getdatafile with JSON body: {"filepath": "specific_file.vrd"}
+             GET /api/v1/getdatafile?filename=specific_file.vrd
+             POST /api/v1/getdatafile with JSON body: {"filename": "specific_file.vrd"}
     """
     # Get parameters from JSON body (optional) or query parameters
     try:
@@ -388,15 +388,15 @@ def get_data_file(vv_instance):
     except Exception:
         json_data = {}
 
-    filepath, _, _ = get_query_param_string("filepath", required=False, json_data=json_data)
+    filename, _, _ = get_query_param_string("filename", required=False, json_data=json_data)
 
-    # If filepath is not provided, use the last data file from VibrationVIEW
-    if not filepath:
+    # If filename is not provided, use the last data file from VibrationVIEW
+    if not filename:
         try:
-            filepath = vv_instance.ReportField('LastDataFile')
-            if not filepath:
+            filename = vv_instance.ReportField('LastDataFile')
+            if not filename:
                 return jsonify(error_response(
-                    'No filepath provided and no last data file available in VibrationVIEW',
+                    'No filename provided and no last data file available in VibrationVIEW',
                     'NO_DATA_FILE_AVAILABLE'
                 )), 400
         except Exception as e:
@@ -405,9 +405,9 @@ def get_data_file(vv_instance):
                 'LAST_DATA_FILE_ERROR'
             )), 500
 
-    # Validate filepath security and existence
+    # Validate filename security and existence
     try:
-        validated_path = validate_file_path(filepath, "data file retrieval")
+        validated_path = validate_file_path(filename, "data file retrieval")
     except PathValidationError as e:
         return jsonify(error_response(
             str(e),
