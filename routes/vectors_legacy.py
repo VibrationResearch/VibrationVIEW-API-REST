@@ -18,6 +18,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import get_query_param
 import logging
 
 # Create blueprint
@@ -233,15 +234,9 @@ def vector(vv_instance):
 
     # Handle GET request
     if request.method == 'GET':
-        vectorenum = request.args.get('vectorenum', type=int)
-        # If no 'vectorenum' parameter, use the first query parameter key as the value
-        if vectorenum is None and request.args:
-            first_key = list(request.args.keys())[0]
-            try:
-                vectorenum = int(first_key)
-            except ValueError:
-                pass
-        columns = request.args.get('columns', type=int, default=1)
+        vectorenum, _, _ = get_query_param("vectorenum", int, required=False)
+        columns_val, _, _ = get_query_param("columns", int, required=False)
+        columns = columns_val if columns_val is not None else 1
 
     # Handle POST request
     else:
@@ -304,26 +299,9 @@ def vector_unit(vv_instance):
     Example:
         GET /api/v1/vectorunit?1
     """
-    # Get vectorenum from query parameters (first parameter)
-    if not request.args:
-        return jsonify(error_response(
-            'Missing required query parameter: vectorenum',
-            'MISSING_PARAMETER'
-        )), 400
-
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'vectorenum' parameter first, then fall back to first key
-        vectorenum = request.args.get('vectorenum', type=int)
-        if vectorenum is None:
-            # If no 'vectorenum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            vectorenum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'vectorenum must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
+    vectorenum, err, status = get_query_param("vectorenum", int)
+    if err:
+        return jsonify(err), status
 
     result = vv_instance.VectorUnit(vectorenum)
 
@@ -350,26 +328,9 @@ def vector_label(vv_instance):
     Example:
         GET /api/v1/vectorlabel?2
     """
-    # Get vectorenum from query parameters (first parameter)
-    if not request.args:
-        return jsonify(error_response(
-            'Missing required query parameter: vectorenum',
-            'MISSING_PARAMETER'
-        )), 400
-
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'vectorenum' parameter first, then fall back to first key
-        vectorenum = request.args.get('vectorenum', type=int)
-        if vectorenum is None:
-            # If no 'vectorenum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            vectorenum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'vectorenum must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
+    vectorenum, err, status = get_query_param("vectorenum", int)
+    if err:
+        return jsonify(err), status
 
     result = vv_instance.VectorLabel(vectorenum)
 
@@ -396,26 +357,9 @@ def vector_length(vv_instance):
     Example:
         GET /api/v1/vectorlength?3
     """
-    # Get vectorenum from query parameters (first parameter)
-    if not request.args:
-        return jsonify(error_response(
-            'Missing required query parameter: vectorenum',
-            'MISSING_PARAMETER'
-        )), 400
-
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'vectorenum' parameter first, then fall back to first key
-        vectorenum = request.args.get('vectorenum', type=int)
-        if vectorenum is None:
-            # If no 'vectorenum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            vectorenum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'vectorenum must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
+    vectorenum, err, status = get_query_param("vectorenum", int)
+    if err:
+        return jsonify(err), status
 
     result = vv_instance.VectorLength(vectorenum)
 

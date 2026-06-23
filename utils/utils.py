@@ -407,6 +407,86 @@ def detect_file_upload():
     return (None, None, None)
 
 
+def get_query_param(name, type_fn=int, required=True):
+    """
+    Extract a typed query parameter with unnamed positional fallback.
+
+    Checks for ``?name=value`` first, then falls back to treating the first
+    key of the query string as a bare positional value (e.g. ``?3``).
+
+    Args:
+        name: Parameter name to look for
+        type_fn: Callable used to coerce the raw string (default ``int``)
+        required: When *True* (default) return an error tuple if absent
+
+    Returns:
+        tuple: (value, None, None) on success
+               (None, error_dict, status_code) on failure
+               (None, None, None) when not required and absent
+    """
+    from utils.response_helpers import error_response as _error
+
+    value = request.args.get(name, type=type_fn)
+    if value is not None:
+        return value, None, None
+
+    # Unnamed positional fallback – first query-string key with no ``=``
+    if request.args:
+        first_key = list(request.args.keys())[0]
+        try:
+            value = type_fn(first_key)
+            return value, None, None
+        except (ValueError, TypeError):
+            return None, _error(
+                f"{name} must be a valid {type_fn.__name__}",
+                "INVALID_PARAMETER",
+            ), 400
+
+    if required:
+        return None, _error(
+            f"Missing required parameter: {name}",
+            "MISSING_PARAMETER",
+        ), 400
+
+    return None, None, None
+
+
+def get_query_param_string(name, required=True):
+    """
+    Extract a string query parameter with unnamed positional fallback.
+
+    Checks ``?name=value`` first, then falls back to treating the raw
+    query string as a bare positional value (e.g. ``?myfile.vrd``).
+
+    Args:
+        name: Parameter name to look for
+        required: When *True* (default) return an error tuple if absent
+
+    Returns:
+        tuple: (value, None, None) on success
+               (None, error_dict, status_code) on failure
+               (None, None, None) when not required and absent
+    """
+    from utils.response_helpers import error_response as _error
+
+    value = request.args.get(name)
+    if value is not None:
+        return value, None, None
+
+    # Unnamed positional fallback
+    query_string = request.query_string.decode("utf-8")
+    if query_string:
+        return unquote(query_string), None, None
+
+    if required:
+        return None, _error(
+            f"Missing required parameter: {name}",
+            "MISSING_PARAMETER",
+        ), 400
+
+    return None, None, None
+
+
 def get_filename_from_request():
     """
     Extract filename from request query parameters.
@@ -414,11 +494,5 @@ def get_filename_from_request():
     Returns:
         str: The filename, or None if not found
     """
-    filename = request.args.get("filename")
-
-    if filename is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            filename = unquote(query_string)
-
-    return filename
+    value, _, _ = get_query_param_string("filename", required=False)
+    return value

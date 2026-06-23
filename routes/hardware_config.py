@@ -11,6 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import get_query_param
 import logging
 from datetime import datetime
 
@@ -175,24 +176,12 @@ def hardware_supports_capacitor_coupled(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/v1/hardwaresupportscapacitorcoupled?1
+    Example: GET /api/v1/hardwaresupportscapacitorcoupled?channel=1 or GET /api/v1/hardwaresupportscapacitorcoupled?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+    channel, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
     result = vv_instance.HardwareSupportsCapacitorCoupled(channel)
     
     return jsonify(success_response(
@@ -213,24 +202,12 @@ def hardware_supports_accel_power_source(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/v1/hardwaresupportsaccelpowersource?1
+    Example: GET /api/v1/hardwaresupportsaccelpowersource?channel=1 or GET /api/v1/hardwaresupportsaccelpowersource?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+    channel, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
     result = vv_instance.HardwareSupportsAccelPowerSource(channel)
     
     return jsonify(success_response(
@@ -251,24 +228,12 @@ def hardware_supports_differential(vv_instance):
     Query Parameters:
         channel: Input channel number (0-based) - first positional parameter
     
-    Example: GET /api/v1/hardwaresupportsdifferential?1
+    Example: GET /api/v1/hardwaresupportsdifferential?channel=1 or GET /api/v1/hardwaresupportsdifferential?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    try:
-        channel = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+    channel, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
     result = vv_instance.HardwareSupportsDifferential(channel)
     
     return jsonify(success_response(

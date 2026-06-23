@@ -329,7 +329,7 @@ class TestBasicControl:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
-        assert "Missing required query parameter: profilename" in data["error"]["message"]
+        assert "Missing required parameter: profilename" in data["error"]["message"]
 
     def test_closetab_get_success(self, client):
         """Test GET /closetab with successful tab close"""
@@ -406,7 +406,7 @@ class TestBasicControl:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
-        assert "Missing required query parameter: tabindex" in data["error"]["message"]
+        assert "Missing required parameter: tabindex" in data["error"]["message"]
         assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_closetab_invalid_parameter(self, client):
@@ -416,8 +416,8 @@ class TestBasicControl:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
-        assert "Invalid tab index" in data["error"]["message"]
-        assert "Must be an integer" in data["error"]["message"]
+        assert "tabindex" in data["error"]["message"]
+        assert "int" in data["error"]["message"]
 
     def test_listopentests_success_with_tests(self, client):
         """Test GET /listopentests with multiple open tests"""

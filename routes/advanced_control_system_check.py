@@ -11,6 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import get_query_param
 import logging
 
 # Create blueprint
@@ -86,7 +87,6 @@ def system_check_frequency(vv_instance):
     Example: POST /api/v1/systemcheckfrequency?value=120.0 or POST /api/v1/systemcheckfrequency?120.0
     """
     if request.method == "GET" and not request.args:
-        # GET without parameters - return current value
         result = vv_instance.SystemCheckFrequency()
         return jsonify(
             success_response(
@@ -94,27 +94,9 @@ def system_check_frequency(vv_instance):
             )
         )
     else:
-        # Set frequency from parameters
-        value = request.args.get("value", type=float)
-        
-        # If no 'value' parameter, try to get the first unnamed parameter
-        if value is None:
-            args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
-                try:
-                    value = float(args[0])
-                except ValueError:
-                    pass
-        
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", float)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.SystemCheckFrequency(value)
         return jsonify(
@@ -140,7 +122,6 @@ def system_check_output_voltage(vv_instance):
     Example: POST /api/v1/systemcheckoutputvoltage?value=5.0 or POST /api/v1/systemcheckoutputvoltage?5.0
     """
     if request.method == "GET" and not request.args:
-        # GET without parameters - return current value
         result = vv_instance.SystemCheckOutputVoltage()
         return jsonify(
             success_response(
@@ -148,27 +129,9 @@ def system_check_output_voltage(vv_instance):
             )
         )
     else:
-        # Set voltage from parameters
-        value = request.args.get("value", type=float)
-        
-        # If no 'value' parameter, try to get the first unnamed parameter
-        if value is None:
-            args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
-                try:
-                    value = float(args[0])
-                except ValueError:
-                    pass
-        
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", float)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.SystemCheckOutputVoltage(value)
         return jsonify(

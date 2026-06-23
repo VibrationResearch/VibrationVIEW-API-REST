@@ -12,7 +12,7 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.teds_formatter import format_teds_data, format_single_channel_teds
-from utils.utils import is_valid_urn
+from utils.utils import is_valid_urn, get_query_param
 from utils.vv_error_codes import DISP_E_EXCEPTION
 import logging
 from datetime import datetime
@@ -196,23 +196,11 @@ def get_input_teds_channel(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/v1/inputtedschannel?3 (gets channel 3, 1-based)
+    Example: GET /api/v1/inputtedschannel?channel=3 or GET /api/v1/inputtedschannel?3 (gets channel 3, 1-based)
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    try:
-        channel_1based = int(query_args[0])
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
+    channel_1based, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
     
     # Validate 1-based channel number
     if channel_1based < 1:
@@ -264,31 +252,21 @@ def teds(vv_instance):
     Query Parameters:
         channel: Optional input channel number (1-based) - first positional parameter
     
-    Examples: 
+    Examples:
         GET /api/v1/teds (all channels)
-        GET /api/v1/teds?3 (channel 3, 1-based)
+        GET /api/v1/teds?channel=3 or GET /api/v1/teds?3 (channel 3, 1-based)
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    
-    if query_args:
-        # Channel specified - get specific channel TEDS (1-based)
-        try:
-            channel_1based = int(query_args[0])
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'Invalid channel parameter - must be an integer',
-                'INVALID_PARAMETER'
-            )), 400
-        
-        # Validate 1-based channel number
+    channel_1based, err, status = get_query_param("channel", int, required=False)
+    if err:
+        return jsonify(err), status
+
+    if channel_1based is not None:
         if channel_1based < 1:
             return jsonify(error_response(
                 f'Channel must be >= 1 (1-based indexing), got {channel_1based}',
                 'INVALID_CHANNEL'
             )), 400
-        
-        # Convert from 1-based to 0-based
+
         channel_0based = channel_1based - 1
         
         # Validate channel range
@@ -331,7 +309,7 @@ def teds(vv_instance):
                 f'Failed to retrieve TEDS for channel {channel_1based}: {str(e)}',
                 'TEDS_READ_ERROR'
             )), 500
-    
+
     else:
         # No channel specified - get all TEDS data with formatting
         try:
