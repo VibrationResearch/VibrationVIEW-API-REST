@@ -3,51 +3,38 @@
 # ============================================================================
 
 """
-VibrationVIEW manager using the app singleton
+VibrationVIEW manager — imports the singleton from utils.vv_singleton
+so there is no circular dependency with app.py.
 """
 
 import logging
 from functools import wraps
 
+from utils.vv_singleton import get_vv_instance, reset_vv_instance
+
 logger = logging.getLogger(__name__)
 
 
 class VibrationVIEWManager:
-    """Manager for VibrationVIEW instances using app singleton"""
+    """Manager for VibrationVIEW instances using the singleton"""
 
     @classmethod
     def get_instance(cls):
-        """Get VibrationVIEW instance from app singleton"""
-        try:
-            # Import here to avoid circular imports
-            from app import get_vv_instance
+        """Get VibrationVIEW instance from singleton"""
+        instance = get_vv_instance()
+        if instance is None:
+            logger.error("Failed to get VibrationVIEW instance")
+            raise Exception("VibrationVIEW instance not available")
 
-            instance = get_vv_instance()
-            if instance is None:
-                logger.error("Failed to get VibrationVIEW instance from app singleton")
-                raise Exception("VibrationVIEW instance not available")
-
-            logger.debug("VibrationVIEW instance retrieved from app singleton")
-            return instance
-
-        except ImportError as e:
-            logger.error(f"Failed to import get_vv_instance from app: {e}")
-            raise
-        except Exception as e:
-            logger.error(f"Failed to get VibrationVIEW instance: {e}")
-            raise
+        logger.debug("VibrationVIEW instance retrieved")
+        return instance
 
     @classmethod
     def release_instance(cls):
         """Release the VibrationVIEW instance"""
         try:
-            # Import here to avoid circular imports
-            from app import reset_vv_instance
-
             reset_vv_instance()
-            logger.info("VibrationVIEW instance released via app singleton")
-        except ImportError:
-            logger.warning("Could not import reset_vv_instance from app")
+            logger.info("VibrationVIEW instance released")
         except Exception as e:
             logger.error(f"Error releasing VibrationVIEW instance: {e}")
 

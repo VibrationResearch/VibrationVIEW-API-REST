@@ -12,7 +12,6 @@ import hmac
 import logging
 import math
 import os
-import threading
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify
@@ -23,8 +22,7 @@ from flask_cors import CORS
 # Module-level logger
 logger = logging.getLogger(__name__)
 
-# Import route modules - clean imports using __init__.py
-# Import configuration
+# Import route modules and configuration
 from config import Config
 from routes import (
     advanced_control_bp,
@@ -45,67 +43,7 @@ from routes import (
     vectors_legacy_bp,
     virtual_channels_bp,
 )
-
-# Global singleton instance and lock
-_vv_instance = None
-_vv_lock = threading.Lock()
-
-
-def get_vv_instance():
-    """Get VibrationVIEW instance - thread-safe singleton"""
-    global _vv_instance
-
-    if _vv_instance is not None:
-        return _vv_instance
-
-    with _vv_lock:
-        # Double-check locking pattern
-        if _vv_instance is not None:
-            return _vv_instance
-
-        try:
-            from vibrationviewapi import VibrationVIEW
-
-            vv_instance = VibrationVIEW()
-
-            if vv_instance.vv is None:
-                logger.error("Failed to connect to VibrationVIEW")
-                return None
-
-            _vv_instance = vv_instance
-            logger.info("VibrationVIEW singleton instance created successfully")
-            return _vv_instance
-
-        except ImportError as e:
-            logger.error(f"Could not import VibrationVIEW API: {e}")
-            return None
-        except Exception as e:
-            logger.error(
-                f"Error connecting to VibrationVIEW: {e}. "
-                "Verify VibrationVIEW is running and the Automation Interface option (VR9604) is licensed."
-            )
-            return None
-
-
-def set_vv_instance(instance):
-    """Set the VibrationVIEW instance - useful for testing"""
-    global _vv_instance
-    with _vv_lock:
-        _vv_instance = instance
-
-
-def reset_vv_instance():
-    """Reset the VibrationVIEW instance - releases COM object and clears singleton"""
-    global _vv_instance
-    with _vv_lock:
-        if _vv_instance is not None:
-            try:
-                # Delete instance - lets Python/COM release the object
-                del _vv_instance
-                logger.info("VibrationVIEW COM object released")
-            except Exception as e:
-                logger.error(f"Error releasing VibrationVIEW COM object: {e}")
-        _vv_instance = None
+from utils.vv_singleton import get_vv_instance, reset_vv_instance, set_vv_instance  # noqa: F401
 
 
 def _sanitize_nan(value):
@@ -391,13 +329,14 @@ def create_app(config_class=Config):
             {"success": False, "error": "Internal server error", "message": "An unexpected error occurred"}
         ), 500
 
-    # Early binding: Create VibrationVIEW instance at startup
-    logger.info("Initializing VibrationVIEW connection (early binding)...")
+    # Try to connect at startup, but allow the app to start without VibrationVIEW.
+    # The singleton will retry on each request via get_vv_instance().
+    logger.info("Attempting VibrationVIEW connection...")
     vv = get_vv_instance()
     if vv is None:
-        logger.error("Failed to connect to VibrationVIEW at startup")
-        raise RuntimeError("Failed to connect to VibrationVIEW - ensure VibrationVIEW is running")
-    logger.info("VibrationVIEW connection established successfully")
+        logger.warning("VibrationVIEW not available at startup — will retry on first request")
+    else:
+        logger.info("VibrationVIEW connection established successfully")
 
     return app
 
