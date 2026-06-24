@@ -4,7 +4,6 @@
 
 """
 VibrationVIEW manager — imports the singleton from utils.vv_singleton
-so there is no circular dependency with app.py.
 """
 
 import logging
