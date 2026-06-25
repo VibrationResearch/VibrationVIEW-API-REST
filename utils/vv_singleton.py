@@ -37,6 +37,10 @@ def get_vv_instance():
 
             vv_instance = VibrationVIEW()
 
+            if not vv_instance.IsReady():
+                logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
+                return None
+
             _vv_instance = vv_instance
             logger.info("VibrationVIEW singleton instance created successfully")
             return _vv_instance
