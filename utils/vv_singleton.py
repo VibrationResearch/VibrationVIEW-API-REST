@@ -24,8 +24,14 @@ def get_vv_instance():
     """Get VibrationVIEW instance - thread-safe singleton"""
     global _vv_instance
 
-    if _vv_instance is not None:
-        return _vv_instance
+    with _vv_lock:
+        instance = _vv_instance
+
+    if instance is not None:
+        if not instance.IsReady():
+            logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
+            return None
+        return instance
 
     with _vv_lock:
         # Double-check locking pattern
