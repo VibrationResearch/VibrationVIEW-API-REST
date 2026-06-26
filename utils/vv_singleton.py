@@ -1,9 +1,9 @@
 # ============================================================================
-# FILE: utils/vv_singleton.py (VibrationVIEW Singleton Management)
+# FILE: utils/vv_singleton.py (VibrationVIEW Instance Management)
 # ============================================================================
 
 """
-Thread-safe singleton for the VibrationVIEW COM instance.
+Global VibrationVIEW COM instance.
 
 This module owns the single VibrationVIEW connection shared across the
 application.  Both app.py and utils/vv_manager.py import from here,
@@ -16,50 +16,38 @@ import threading
 
 logger = logging.getLogger(__name__)
 
-# Global singleton instance and lock
+# Global instance and creation lock
 _vv_instance = None
 _vv_lock = threading.Lock()
 
+
 def get_vv_instance():
-    """Get VibrationVIEW instance - thread-safe singleton"""
+    """Return the VibrationVIEW instance, creating it on first call."""
     global _vv_instance
 
-    with _vv_lock:
-        instance = _vv_instance
+    if _vv_instance is None:
+        with _vv_lock:
+            if _vv_instance is None:
+                try:
+                    from vibrationviewapi import VibrationVIEW
 
-    if instance is not None:
-        if not instance.IsReady():
-            logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
-            return None
-        return instance
+                    _vv_instance = VibrationVIEW()
+                    logger.info("VibrationVIEW instance created successfully")
+                except ImportError as e:
+                    logger.error(f"Could not import VibrationVIEW API: {e}")
+                    return None
+                except Exception as e:
+                    logger.error(
+                        f"Error connecting to VibrationVIEW: {e}. "
+                        "Verify VibrationVIEW is running and the Automation Interface option (VR9604) is licensed."
+                    )
+                    return None
 
-    with _vv_lock:
-        # Double-check locking pattern
-        if _vv_instance is not None:
-            return _vv_instance
+    if not _vv_instance.IsReady():
+        logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
+        return None
 
-        try:
-            from vibrationviewapi import VibrationVIEW
-
-            vv_instance = VibrationVIEW()
-
-            if not vv_instance.IsReady():
-                logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
-                return None
-
-            _vv_instance = vv_instance
-            logger.info("VibrationVIEW singleton instance created successfully")
-            return _vv_instance
-
-        except ImportError as e:
-            logger.error(f"Could not import VibrationVIEW API: {e}")
-            return None
-        except Exception as e:
-            logger.error(
-                f"Error connecting to VibrationVIEW: {e}. "
-                "Verify VibrationVIEW is running and the Automation Interface option (VR9604) is licensed."
-            )
-            return None
+    return _vv_instance
 
 
 def set_vv_instance(instance):
