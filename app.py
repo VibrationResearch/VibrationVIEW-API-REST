@@ -373,6 +373,11 @@ if __name__ == "__main__":
     logger.info(f"API documentation: http://{args.host}:{args.port}/api/v1/docs")
     logger.info(f"Basic control docs: http://{args.host}:{args.port}/api/v1/docs/basic_control")
 
+    def shutdown():
+        logger.info("Shutting down — releasing VibrationVIEW COM object...")
+        reset_vv_instance()
+        logger.info("Shutdown complete.")
+
     try:
         if args.debug:
             app.run(host=args.host, port=args.port, debug=True, threaded=False)
@@ -382,7 +387,9 @@ if __name__ == "__main__":
             logger.info(f"Serving with Waitress on http://{args.host}:{args.port}")
             serve(app, host=args.host, port=args.port, threads=1)
     except KeyboardInterrupt:
-        logger.info("Shutting down...")
+        logger.info("Ctrl+C received.")
     except Exception as e:
         logger.error(f"Server error: {e}")
         raise
+    finally:
+        shutdown()
