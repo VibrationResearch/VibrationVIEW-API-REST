@@ -43,11 +43,12 @@ def get_vv_instance():
                     )
                     return None
 
-    if not _vv_instance.IsReady():
+    inst = _vv_instance
+    if inst is None or not inst.IsReady():
         logger.info("VibrationVIEW hardware not ready - check if the controller is connected and powered on")
         return None
 
-    return _vv_instance
+    return inst
 
 
 def set_vv_instance(instance):
