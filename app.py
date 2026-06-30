@@ -13,7 +13,7 @@ import logging
 import math
 import os
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 from flask import Flask, Response, jsonify
 from flask import request as flask_request
@@ -132,7 +132,7 @@ def create_app(config_class=Config) -> Flask:
             )
 
         @app.before_request
-        def require_api_key():
+        def require_api_key() -> Optional[Response]:
             # Allow health and docs endpoints without authentication
             parts = flask_request.path.rstrip("/").split("/")
             # parts: ['', 'api', 'vN', '<resource>', ...]
