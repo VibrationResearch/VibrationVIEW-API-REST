@@ -8,6 +8,7 @@ VibrationVIEW manager — imports the singleton from utils.vv_singleton
 
 import logging
 from functools import wraps
+from typing import Any, Callable
 
 from utils.vv_singleton import get_vv_instance, reset_vv_instance
 
@@ -18,7 +19,7 @@ class VibrationVIEWManager:
     """Manager for VibrationVIEW instances using the singleton"""
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls) -> Any:
         """Get VibrationVIEW instance from singleton"""
         instance = get_vv_instance()
         if instance is None:
@@ -29,7 +30,7 @@ class VibrationVIEWManager:
         return instance
 
     @classmethod
-    def release_instance(cls):
+    def release_instance(cls) -> None:
         """Release the VibrationVIEW instance"""
         try:
             reset_vv_instance()
@@ -38,7 +39,7 @@ class VibrationVIEWManager:
             logger.error(f"Error releasing VibrationVIEW instance: {e}")
 
 
-def with_vibrationview(func):
+def with_vibrationview(func: Callable) -> Callable:
     """
     Decorator that provides VibrationVIEW instance to route functions
     Now uses the app singleton for consistent testing
@@ -60,7 +61,7 @@ def with_vibrationview(func):
     return wrapper
 
 
-def with_vibrationview_safe(func):
+def with_vibrationview_safe(func: Callable) -> Callable:
     """
     Decorator with built-in error handling and ready check
     Now uses the app singleton for consistent testing

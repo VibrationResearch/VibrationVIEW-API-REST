@@ -66,7 +66,7 @@ class _NaNSafeJSONProvider(DefaultJSONProvider):
         return super().dumps(_sanitize_nan(obj), **kwargs)
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config) -> Flask:
     """Application factory"""
 
     app = Flask(__name__)
