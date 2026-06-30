@@ -433,6 +433,13 @@ def get_query_param(name, type_fn=int, required=True):
     if value is not None:
         return value, None, None
 
+    # Named key exists but type conversion failed (e.g. ?channel=abc with type_fn=int)
+    if name in request.args:
+        return None, _error(
+            f"{name} must be a valid {type_fn.__name__}",
+            "INVALID_PARAMETER",
+        ), 400
+
     # Unnamed positional fallback – first query-string key with no ``=``
     if request.args:
         first_key = list(request.args.keys())[0]
@@ -478,6 +485,11 @@ def get_query_param_string(name, required=True, json_data=None):
 
     value = request.args.get(name)
     if value is not None:
+        if not value and required:
+            return None, _error(
+                f"Missing required parameter: {name}",
+                "MISSING_PARAMETER",
+            ), 400
         return value, None, None
 
     # Unnamed positional fallback – only when the query string looks
