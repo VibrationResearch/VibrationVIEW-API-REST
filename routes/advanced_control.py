@@ -8,8 +8,9 @@ Advanced test control operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @advanced_control_bp.route("/docs/advanced_control", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get test control module documentation"""
     docs = {
         "module": "advanced_control",
@@ -53,7 +54,7 @@ def get_documentation():
 @advanced_control_bp.route("/testtype", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def test_type(vv_instance):
+def test_type(vv_instance: Any) -> Response:
     """
     Get/Set Test Type
 

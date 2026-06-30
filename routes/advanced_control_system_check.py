@@ -8,8 +8,9 @@ System check operations for frequency and output voltage control
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @advanced_control_system_check_bp.route("/docs/advanced_control_system_check", methods=["GET"])
-def get_docs():
+def get_docs() -> Response:
     """Documentation for System Check Routes"""
     return jsonify(
         {
@@ -74,7 +75,7 @@ def get_docs():
 @advanced_control_system_check_bp.route("/systemcheckfrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_frequency(vv_instance):
+def system_check_frequency(vv_instance: Any) -> Response:
     """
     Get/Set System Check Frequency
 
@@ -124,7 +125,7 @@ def system_check_frequency(vv_instance):
 @advanced_control_system_check_bp.route("/systemcheckoutputvoltage", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_output_voltage(vv_instance):
+def system_check_output_voltage(vv_instance: Any) -> Response:
     """
     Get/Set System Check Output Voltage
 

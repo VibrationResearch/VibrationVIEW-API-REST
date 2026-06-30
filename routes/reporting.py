@@ -8,8 +8,9 @@ Report data retrieval operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @reporting_bp.route("/docs/reporting", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get reporting control module documentation"""
     docs = {
         "module": "reporting",
@@ -122,7 +123,7 @@ def get_documentation():
 @reporting_bp.route("/reportfield", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def report_field(vv_instance):
+def report_field(vv_instance: Any) -> Response:
     """
     Get Report Field Value
 
@@ -164,7 +165,7 @@ def report_field(vv_instance):
 @reporting_bp.route("/reportfields", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields(vv_instance):
+def report_fields(vv_instance: Any) -> Response:
     """
     Get Multiple Report Field Values
 
@@ -297,7 +298,7 @@ def report_fields(vv_instance):
 @reporting_bp.route("/reportfieldshistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields_history(vv_instance):
+def report_fields_history(vv_instance: Any) -> Response:
     """
     Get Report Field Values for All Data Files from Most Recent Test
 
@@ -389,7 +390,7 @@ def report_fields_history(vv_instance):
 @reporting_bp.route("/reportvector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector(vv_instance):
+def report_vector(vv_instance: Any) -> Response:
     """
     Get Report Vector Data
 
@@ -443,7 +444,7 @@ def report_vector(vv_instance):
 @reporting_bp.route("/reportvectorheader", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_header(vv_instance):
+def report_vector_header(vv_instance: Any) -> Response:
     """
     Get Report Vector Header Information
 
@@ -499,7 +500,7 @@ def report_vector_header(vv_instance):
 @reporting_bp.route("/reportvectorhistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_history(vv_instance):
+def report_vector_history(vv_instance: Any) -> Response:
     """
     Get Report Vector Data for All Data Files from Most Recent Test
 
@@ -593,7 +594,7 @@ def report_vector_history(vv_instance):
 @reporting_bp.route("/formfields", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def form_fields(vv_instance):
+def form_fields(vv_instance: Any) -> Response:
     """
     Get Form Field Values
 
@@ -633,7 +634,7 @@ def form_fields(vv_instance):
 @reporting_bp.route("/formfields", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def post_form_fields(vv_instance):
+def post_form_fields(vv_instance: Any) -> Response:
     """
     Post Form Field Values
 

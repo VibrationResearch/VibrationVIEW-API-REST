@@ -8,8 +8,9 @@ Virtual channel management operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @virtual_channels_bp.route("/docs/virtual_channels", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get virtual channels module documentation"""
     docs = {
         "module": "virtual_channels",
@@ -78,7 +79,7 @@ def get_documentation():
 @virtual_channels_bp.route("/removeallvirtualchannels", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def remove_all_virtual_channels(vv_instance):
+def remove_all_virtual_channels(vv_instance: Any) -> Response:
     """
     Remove All Virtual Channels
 
@@ -95,7 +96,7 @@ def remove_all_virtual_channels(vv_instance):
 @virtual_channels_bp.route("/importvirtualchannels", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def import_virtual_channels(vv_instance):
+def import_virtual_channels(vv_instance: Any) -> Response:
     """
     Import Virtual Channels from File
 
@@ -162,7 +163,5 @@ def import_virtual_channels(vv_instance):
     vv_instance.ImportVirtualChannels(filename)
 
     return jsonify(
-        success_response(
-            {"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}"
-        )
+        success_response({"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}")
     )

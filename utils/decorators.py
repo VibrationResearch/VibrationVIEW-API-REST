@@ -8,6 +8,7 @@ Decorators for error handling and COM exception management
 
 import functools
 import logging
+from typing import Any, Callable
 
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
@@ -19,16 +20,16 @@ from utils.vv_error_codes import classify_vview_error, get_description_from_exce
 logger = logging.getLogger(__name__)
 
 
-def handle_errors(func):
+def handle_errors(func: Callable) -> Callable:
     """
     Decorator to handle COM errors and general exceptions
 
-    Automatically catches and formats COM exceptions and other errors into standardized API responses.  
-	Known VibrationVIEW HRESULT codes are mapped to specific HTTP status codes and error codes - vv_error_codes.classify_vview_error().
+    Automatically catches and formats COM exceptions and other errors into standardized API responses.
+        Known VibrationVIEW HRESULT codes are mapped to specific HTTP status codes and error codes - vv_error_codes.classify_vview_error().
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
 
@@ -93,7 +94,7 @@ def handle_errors(func):
     return wrapper
 
 
-def require_vv_connection(func):
+def require_vv_connection(func: Callable) -> Callable:
     """
     Decorator to ensure VibrationVIEW connection is available
 
@@ -101,7 +102,7 @@ def require_vv_connection(func):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             # This could be expanded to pre-validate connection
             return func(*args, **kwargs)

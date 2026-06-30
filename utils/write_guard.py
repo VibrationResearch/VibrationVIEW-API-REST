@@ -7,7 +7,9 @@ When ALLOW_GET_WRITE is false, registers a before_request hook that returns
 405 for GET requests to state-changing endpoints.
 """
 
-from flask import jsonify, request
+from typing import Optional
+
+from flask import Flask, Response, jsonify, request
 
 WRITE_ENDPOINTS = {
     "starttest",
@@ -38,12 +40,12 @@ WRITE_ENDPOINTS = {
 }
 
 
-def register_write_guard(app, prefix="/api/v1"):
+def register_write_guard(app: Flask, prefix: str = "/api/v1") -> None:
     """Register a before_request hook that blocks GET on write endpoints."""
     blocked = {f"{prefix}/{ep}" for ep in WRITE_ENDPOINTS}
 
     @app.before_request
-    def block_get_on_write_endpoints():
+    def block_get_on_write_endpoints() -> Optional[Response]:
         if request.method == "GET" and request.path in blocked:
             return jsonify(
                 {

@@ -5,6 +5,7 @@ import subprocess
 import sys
 import threading
 import uuid
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import unquote
 
 from flask import request
@@ -15,7 +16,7 @@ from config import Config
 logger = logging.getLogger(__name__)
 
 
-def get_system_info():
+def get_system_info() -> Dict[str, str]:
     """Return a dict of Python runtime diagnostics for diagnostic endpoints."""
     return {
         "python_version": sys.version,
@@ -24,7 +25,7 @@ def get_system_info():
     }
 
 
-def get_hardware_info(vv_instance):
+def get_hardware_info(vv_instance: Any) -> Dict[str, Any]:
     """Return a dict of VibrationVIEW hardware and version info."""
     return {
         "version": vv_instance.GetSoftwareVersion(),
@@ -63,7 +64,7 @@ ALLOWED_EXTENSIONS = (
 )
 
 
-def get_folder_for_extension(filename_or_ext):
+def get_folder_for_extension(filename_or_ext: str) -> str:
     """Return the appropriate folder for a given filename or extension."""
     if "." in filename_or_ext:
         ext = filename_or_ext.rsplit(".", 1)[1].lower()
@@ -84,7 +85,9 @@ def get_folder_for_extension(filename_or_ext):
         return Config.VIBRATIONVIEW_FOLDER
 
 
-def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
+def handle_binary_upload(
+    filename: str, binary_data: bytes, usetemporaryfile: bool = False
+) -> Tuple[Optional[Dict], Optional[Dict], int]:
     if not filename or "." not in filename:
         return None, {"Error": "Missing or invalid filename"}, 400
 
@@ -117,7 +120,7 @@ def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
     return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}, None, 200
 
 
-def ParseVvTable(tsv_text: str):
+def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
     try:
         lines = tsv_text.strip().splitlines()
         if len(lines) < 2:
@@ -139,7 +142,7 @@ def ParseVvTable(tsv_text: str):
         return [{"Error": f"Error parsing TSV: {e}"}]
 
 
-def DecodeStatusColor(status):
+def DecodeStatusColor(status: Dict[str, int]) -> str:
     color_map = {0: "healthy", 1: "yellow", 2: "critical"}
     # Convert string to integer if needed
 
@@ -147,7 +150,7 @@ def DecodeStatusColor(status):
     return color_map.get(return_color_code, "unknown")
 
 
-def get_channel_data(vv_instance, field_keys):
+def get_channel_data(vv_instance: Any, field_keys: List[str]) -> Optional[List[Dict[str, Any]]]:
     """
     Common function to get channel data for multiple routes
 
@@ -175,7 +178,7 @@ def get_channel_data(vv_instance, field_keys):
     return channels
 
 
-def get_last_data_file(vv_instance):
+def get_last_data_file(vv_instance: Any) -> str:
     """Get the last data file path from VibrationVIEW.
 
     Raises APIError(400) if no file is available.
@@ -224,7 +227,7 @@ def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> s
     return outPath
 
 
-def GetVectorData(vvInstance, vector):
+def GetVectorData(vvInstance: Any, vector: int) -> Dict[str, list]:
     try:
         cols = vvInstance.GetHardwareInputChannels() + 1
         dataList = []
@@ -244,7 +247,7 @@ def GetVectorData(vvInstance, vector):
         raise RuntimeError(f"Error retrieving vector data: {e}")
 
 
-def convert_channel_to_com_index(channel_user):
+def convert_channel_to_com_index(channel_user: Any) -> Tuple[Optional[int], Optional[Dict], Optional[int]]:
     """
     Convert user-provided 1-based channel number to 0-based COM index
 
@@ -270,7 +273,7 @@ def convert_channel_to_com_index(channel_user):
         return None, error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER"), 400
 
 
-def is_template_file(filename):
+def is_template_file(filename: str) -> bool:
     """
     Check if a file has a template extension
 
@@ -287,7 +290,7 @@ def is_template_file(filename):
     return ext in TEMPLATE_EXTENSIONS
 
 
-def get_new_test_defaults_path():
+def get_new_test_defaults_path() -> str:
     """
     Get the New Test Defaults folder path from configuration
 
@@ -314,7 +317,7 @@ DEFAULT_TEMPLATE_FILENAMES = {
 }
 
 
-def is_default_template_filename(filename):
+def is_default_template_filename(filename: str) -> bool:
     """
     Check if filename matches one of the default VibrationVIEW template files
     that should be copied but not opened with automation command
@@ -332,7 +335,7 @@ def is_default_template_filename(filename):
 URN_PATTERN = re.compile(r"^[0-9A-Fa-f]{16}$")
 
 
-def is_valid_urn(value):
+def is_valid_urn(value: Any) -> bool:
     """
     Check if a value is a valid TEDS URN (16-digit hex string).
 
@@ -352,7 +355,7 @@ def is_valid_urn(value):
     return bool(URN_PATTERN.match(value.strip()))
 
 
-def detect_file_upload():
+def detect_file_upload() -> Tuple[Any, Any, Any]:
     """
     Detect if the current request contains a file upload.
 
@@ -427,7 +430,7 @@ def detect_file_upload():
     return (None, None, None)
 
 
-def get_filename_from_request():
+def get_filename_from_request() -> Optional[str]:
     """
     Extract filename from request query parameters.
 

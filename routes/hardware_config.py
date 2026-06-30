@@ -8,8 +8,9 @@ Hardware and input configuration operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @hardware_config_bp.route("/docs/hardware_config", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get hardware configuration module documentation"""
     docs = {
         "module": "hardware_config",
@@ -93,7 +94,7 @@ def get_documentation():
 @hardware_config_bp.route("/gethardwareinputchannels", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_hardware_input_channels(vv_instance):
+def get_hardware_input_channels(vv_instance: Any) -> Response:
     """
     Get Hardware Input Channels
 
@@ -108,7 +109,7 @@ def get_hardware_input_channels(vv_instance):
 @hardware_config_bp.route("/gethardwareoutputchannels", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_hardware_output_channels(vv_instance):
+def get_hardware_output_channels(vv_instance: Any) -> Response:
     """
     Get Hardware Output Channels
 
@@ -123,7 +124,7 @@ def get_hardware_output_channels(vv_instance):
 @hardware_config_bp.route("/gethardwareserialnumber", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_hardware_serial_number(vv_instance):
+def get_hardware_serial_number(vv_instance: Any) -> Response:
     """
     Get Hardware Serial Number
 
@@ -138,7 +139,7 @@ def get_hardware_serial_number(vv_instance):
 @hardware_config_bp.route("/getsoftwareversion", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_software_version(vv_instance):
+def get_software_version(vv_instance: Any) -> Response:
     """
     Get Software Version
 
@@ -154,7 +155,7 @@ def get_software_version(vv_instance):
 @hardware_config_bp.route("/hardwaresupportscapacitorcoupled", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_capacitor_coupled(vv_instance):
+def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response:
     """
     Hardware Supports Capacitor Coupled
 
@@ -188,7 +189,7 @@ def hardware_supports_capacitor_coupled(vv_instance):
 @hardware_config_bp.route("/hardwaresupportsaccelpowersource", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_accel_power_source(vv_instance):
+def hardware_supports_accel_power_source(vv_instance: Any) -> Response:
     """
     Hardware Supports Accelerometer Power Source
 
@@ -222,7 +223,7 @@ def hardware_supports_accel_power_source(vv_instance):
 @hardware_config_bp.route("/hardwaresupportsdifferential", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_differential(vv_instance):
+def hardware_supports_differential(vv_instance: Any) -> Response:
     """
     Hardware Supports Differential
 

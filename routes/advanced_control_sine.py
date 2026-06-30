@@ -8,8 +8,9 @@ Sine-specific advanced test control operations matching exact COM method signatu
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @advanced_control_sine_bp.route("/docs/advanced_control_sine", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get sine advanced control module documentation"""
     docs = {
         "module": "advanced_control_sine",
@@ -106,7 +107,7 @@ def get_documentation():
 @advanced_control_sine_bp.route("/sweepup", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_up(vv_instance):
+def sweep_up(vv_instance: Any) -> Response:
     """
     Sine Sweep Up
 
@@ -127,7 +128,7 @@ def sweep_up(vv_instance):
 @advanced_control_sine_bp.route("/sweepdown", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_down(vv_instance):
+def sweep_down(vv_instance: Any) -> Response:
     """
     Sine Sweep Down
 
@@ -148,7 +149,7 @@ def sweep_down(vv_instance):
 @advanced_control_sine_bp.route("/sweepstepup", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_step_up(vv_instance):
+def sweep_step_up(vv_instance: Any) -> Response:
     """
     Sine Sweep Step Up
 
@@ -169,7 +170,7 @@ def sweep_step_up(vv_instance):
 @advanced_control_sine_bp.route("/sweepstepdown", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_step_down(vv_instance):
+def sweep_step_down(vv_instance: Any) -> Response:
     """
     Sine Sweep Step Down
 
@@ -190,7 +191,7 @@ def sweep_step_down(vv_instance):
 @advanced_control_sine_bp.route("/sweephold", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_hold(vv_instance):
+def sweep_hold(vv_instance: Any) -> Response:
     """
     Sine Hold Sweep Frequency
 
@@ -211,7 +212,7 @@ def sweep_hold(vv_instance):
 @advanced_control_sine_bp.route("/sweepresonancehold", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def sweep_resonance_hold(vv_instance):
+def sweep_resonance_hold(vv_instance: Any) -> Response:
     """
     Sine Hold Resonance
 
@@ -233,7 +234,7 @@ def sweep_resonance_hold(vv_instance):
 @advanced_control_sine_bp.route("/demandmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def demand_multiplier(vv_instance):
+def demand_multiplier(vv_instance: Any) -> Response:
     """
     Get/Set Demand Output Multiplier
 
@@ -282,7 +283,7 @@ def demand_multiplier(vv_instance):
 @advanced_control_sine_bp.route("/sweepmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sweep_multiplier(vv_instance):
+def sweep_multiplier(vv_instance: Any) -> Response:
     """
     Get/Set Sine Sweep Multiplier
 
@@ -331,7 +332,7 @@ def sweep_multiplier(vv_instance):
 @advanced_control_sine_bp.route("/sinefrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sine_frequency(vv_instance):
+def sine_frequency(vv_instance: Any) -> Response:
     """
     Get/Set Sine Frequency
 

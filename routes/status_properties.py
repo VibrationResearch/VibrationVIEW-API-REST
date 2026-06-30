@@ -8,8 +8,9 @@ System status checking and monitoring operations matching exact COM method signa
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, Response, jsonify
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @status_properties_bp.route("/docs/status_properties", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get status properties module documentation"""
     docs = {
         "module": "status_properties",
@@ -103,7 +104,7 @@ def get_documentation():
 @status_properties_bp.route("/status", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def status(vv_instance):
+def status(vv_instance: Any) -> Response:
     """
     Get VibrationVIEW Status
 
@@ -118,7 +119,7 @@ def status(vv_instance):
 @status_properties_bp.route("/isready", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_ready(vv_instance):
+def is_ready(vv_instance: Any) -> Response:
     """
     Check if Ethernet Box is running
 
@@ -140,7 +141,7 @@ def is_ready(vv_instance):
 @status_properties_bp.route("/isrunning", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_running(vv_instance):
+def is_running(vv_instance: Any) -> Response:
     """
     Check if test is running
 
@@ -155,7 +156,7 @@ def is_running(vv_instance):
 @status_properties_bp.route("/isstarting", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_starting(vv_instance):
+def is_starting(vv_instance: Any) -> Response:
     """
     Check if test is starting but not at level
 
@@ -170,7 +171,7 @@ def is_starting(vv_instance):
 @status_properties_bp.route("/ischanginglevel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_changing_level(vv_instance):
+def is_changing_level(vv_instance: Any) -> Response:
     """
     Check if test schedule is changing levels
 
@@ -187,7 +188,7 @@ def is_changing_level(vv_instance):
 @status_properties_bp.route("/isholdlevel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_hold_level(vv_instance):
+def is_hold_level(vv_instance: Any) -> Response:
     """
     Check if schedule timer is in hold
 
@@ -207,7 +208,7 @@ def is_hold_level(vv_instance):
 @status_properties_bp.route("/isopenloop", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_open_loop(vv_instance):
+def is_open_loop(vv_instance: Any) -> Response:
     """
     Check if test is open loop
 
@@ -224,7 +225,7 @@ def is_open_loop(vv_instance):
 @status_properties_bp.route("/isaborted", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_aborted(vv_instance):
+def is_aborted(vv_instance: Any) -> Response:
     """
     Check if test has aborted
 
@@ -246,7 +247,7 @@ def is_aborted(vv_instance):
 @status_properties_bp.route("/canresumetest", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def can_resume_test(vv_instance):
+def can_resume_test(vv_instance: Any) -> Response:
     """
     Check if test may be resumed
 
@@ -261,7 +262,7 @@ def can_resume_test(vv_instance):
 @status_properties_bp.route("/allstatus", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def test_com_connection(vv_instance):
+def test_com_connection(vv_instance: Any) -> Response:
     """
     Test COM Connection (Diagnostic Endpoint)
 

@@ -15,8 +15,9 @@ Includes:
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 @vectors_legacy_bp.route("/docs/vectors_legacy", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get vectors_legacy module documentation"""
     docs = {
         "module": "vectors_legacy",
@@ -87,7 +88,7 @@ def get_documentation():
 
 # fmt: off
 @vectors_legacy_bp.route("/docs/vector_enums", methods=["GET"])
-def get_vector_enumerations():
+def get_vector_enumerations() -> Response:
     """Get complete vector enumeration reference"""
     enums = {
         "module": "vector_enumerations",
@@ -206,7 +207,7 @@ def get_vector_enumerations():
 @vectors_legacy_bp.route("/vector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def vector(vv_instance):
+def vector(vv_instance: Any) -> Response:
     """
     Get raw data vector
 
@@ -283,7 +284,7 @@ def vector(vv_instance):
 @vectors_legacy_bp.route("/vectorunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_unit(vv_instance):
+def vector_unit(vv_instance: Any) -> Response:
     """
     Get units for raw data vector
 
@@ -321,7 +322,7 @@ def vector_unit(vv_instance):
 @vectors_legacy_bp.route("/vectorlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_label(vv_instance):
+def vector_label(vv_instance: Any) -> Response:
     """
     Get label for raw data vector
 
@@ -359,7 +360,7 @@ def vector_label(vv_instance):
 @vectors_legacy_bp.route("/vectorlength", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_length(vv_instance):
+def vector_length(vv_instance: Any) -> Response:
     """
     Get required array length for Raw Data Vector Array
 

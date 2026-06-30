@@ -9,7 +9,9 @@ Auxiliary input properties and metadata methods
 - Rear input channel metadata (1-based indexing)
 """
 
-from flask import Blueprint, jsonify, request
+from typing import Any
+
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
@@ -20,7 +22,7 @@ auxinputs_bp = Blueprint("auxinputs", __name__, url_prefix="/api")
 
 
 @auxinputs_bp.route("/docs/auxinputs", methods=["GET"])
-def auxinputs_docs():
+def auxinputs_docs() -> Response:
     """Documentation for auxiliary inputs endpoints"""
     docs = {
         "module": "auxinputs",
@@ -49,7 +51,7 @@ def auxinputs_docs():
 @auxinputs_bp.route("/rearinput", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input(vv_instance):
+def rear_input(vv_instance: Any) -> Response:
     """
     Get Rear Input Values for All Channels
 
@@ -65,7 +67,7 @@ def rear_input(vv_instance):
 @auxinputs_bp.route("/rearinputunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_unit(vv_instance):
+def rear_input_unit(vv_instance: Any) -> Response:
     """Get units for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")
@@ -91,7 +93,7 @@ def rear_input_unit(vv_instance):
 @auxinputs_bp.route("/rearinputlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_label(vv_instance):
+def rear_input_label(vv_instance: Any) -> Response:
     """Get label for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")

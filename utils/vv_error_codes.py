@@ -16,6 +16,8 @@ Success codes (SEVERITY_SUCCESS): 0x00040000 | code
 Values are represented as signed 32-bit integers for Python compatibility.
 """
 
+from typing import Dict, Optional, Tuple, Union
+
 # fmt: off
 # DISP_E_EXCEPTION - wrapper error when COM raises an exception
 DISP_E_EXCEPTION = -2147352567                 # 0x80020009
@@ -98,7 +100,7 @@ _VVIEW_ERROR_CLASSIFICATION = {
 }
 
 
-def classify_vview_error(scode):
+def classify_vview_error(scode: int) -> Tuple[int, str, str]:
     """Map a VibrationVIEW HRESULT/scode to (http_status, error_code, message).
 
     Returns a default 500 classification for unrecognized codes.
@@ -108,7 +110,7 @@ def classify_vview_error(scode):
     return (500, "COM_ERROR", f"VibrationVIEW COM error (scode={scode})")
 
 
-def _get_excepinfo(e):
+def _get_excepinfo(e: Exception) -> Optional[tuple]:
     """Extract the excepinfo tuple from a COM exception, or None."""
     if hasattr(e, "args") and len(e.args) >= 3:
         exc_info = e.args[2]
@@ -117,7 +119,7 @@ def _get_excepinfo(e):
     return None
 
 
-def get_scode_from_exception(e):
+def get_scode_from_exception(e: Exception) -> Optional[int]:
     """Extract scode from a COM exception if available"""
     exc_info = _get_excepinfo(e)
     if exc_info is not None:
@@ -125,7 +127,7 @@ def get_scode_from_exception(e):
     return None
 
 
-def get_description_from_exception(e):
+def get_description_from_exception(e: Exception) -> Optional[str]:
     """Extract human-readable description from a COM exception if available."""
     exc_info = _get_excepinfo(e)
     if exc_info is not None and exc_info[2]:
@@ -133,13 +135,13 @@ def get_description_from_exception(e):
     return None
 
 
-def is_vview_error(e, error_code):
+def is_vview_error(e: Exception, error_code: int) -> bool:
     """Check if exception matches a specific VibrationVIEW error code"""
     scode = get_scode_from_exception(e)
     return scode == error_code
 
 
-def get_error_info(e):
+def get_error_info(e: Exception) -> Optional[Dict[str, Union[int, str]]]:
     """Get error code and name from a COM exception"""
     scode = get_scode_from_exception(e)
     if scode is not None:
@@ -148,7 +150,7 @@ def get_error_info(e):
     return None
 
 
-def format_com_error(e):
+def format_com_error(e: Exception) -> Dict[str, str]:
     """Format a COM exception into a dict with message and error_code.
 
     Returns a dict with 'error' and 'error_code' keys if the exception

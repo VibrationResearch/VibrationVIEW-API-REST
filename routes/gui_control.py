@@ -8,8 +8,9 @@ GUI and window management operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @gui_control_bp.route("/docs/gui_control", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get GUI control module documentation"""
     docs = {
         "module": "gui_control",
@@ -101,7 +102,7 @@ def get_documentation():
 @gui_control_bp.route("/edittest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def edit_test(vv_instance):
+def edit_test(vv_instance: Any) -> Response:
     """
     Edit VibrationVIEW Test
 
@@ -170,7 +171,7 @@ def edit_test(vv_instance):
 @gui_control_bp.route("/abortedit", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def abort_edit(vv_instance):
+def abort_edit(vv_instance: Any) -> Response:
     """
     Abort Edit Session
 
@@ -188,7 +189,7 @@ def abort_edit(vv_instance):
 @gui_control_bp.route("/minimize", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def minimize(vv_instance):
+def minimize(vv_instance: Any) -> Response:
     """
     Minimize VibrationVIEW
 
@@ -205,7 +206,7 @@ def minimize(vv_instance):
 @gui_control_bp.route("/restore", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def restore(vv_instance):
+def restore(vv_instance: Any) -> Response:
     """
     Restore VibrationVIEW
 
@@ -222,7 +223,7 @@ def restore(vv_instance):
 @gui_control_bp.route("/maximize", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def maximize(vv_instance):
+def maximize(vv_instance: Any) -> Response:
     """
     Maximize VibrationVIEW
 
@@ -239,7 +240,7 @@ def maximize(vv_instance):
 @gui_control_bp.route("/activate", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def activate(vv_instance):
+def activate(vv_instance: Any) -> Response:
     """
     Activate VibrationVIEW
 
