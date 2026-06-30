@@ -440,10 +440,10 @@ class TestDataRetrieval:
 
         for channel in invalid_channels:
             response = client.get(f'{endpoint}?channel={channel}')
-            assert response.status_code == 400, f"Expected 400 for channelnum={channel}, got {response.status_code}"
+            assert response.status_code == 400, f"Expected 400 for channel={channel}, got {response.status_code}"
             data = json.loads(response.data)
-            assert data['success'] is False, f"Expected success=False for channelnum={channel}"
-            assert 'must be >= 1' in data['error']['message'], f"Expected error message to mention 'must be >= 1' for channelnum={channel}"
+            assert data['success'] is False, f"Expected success=False for channel={channel}"
+            assert 'must be >= 1' in data['error']['message'], f"Expected error message to mention 'must be >= 1' for channel={channel}"
 
         print("✓ Invalid channel validation works!")
     
@@ -486,7 +486,7 @@ class TestDataRetrieval:
         for endpoint in endpoints:
             response = client.get(endpoint)
             if response.status_code != 404:
-                assert response.status_code == 400, f"{endpoint} did not return 400 for missing channelnum"
+                assert response.status_code == 400, f"{endpoint} did not return 400 for missing channel"
                 data = json.loads(response.data)
                 assert data['success'] is False, f"{endpoint} did not set success to False"
                 assert 'channel' in data['error']['message'], f"{endpoint} error message missing 'channel'"
@@ -538,10 +538,10 @@ class TestDataRetrieval:
         for endpoint, loopnum in test_cases:
             response = client.get(f'{endpoint}?loop={loopnum}')
             if response.status_code != 404:
-                assert response.status_code == 400, f"{endpoint} did not return 400 for loopnum={loopnum}"
+                assert response.status_code == 400, f"{endpoint} did not return 400 for loop={loopnum}"
                 data = json.loads(response.data)
-                assert data['success'] is False, f"{endpoint} did not set success to False for loopnum={loopnum}"
-                assert 'must be >= 1' in data['error']['message'], f"{endpoint} error message missing 'must be >= 1' for loopnum={loopnum}"
+                assert data['success'] is False, f"{endpoint} did not set success to False for loop={loopnum}"
+                assert 'must be >= 1' in data['error']['message'], f"{endpoint} error message missing 'must be >= 1' for loop={loopnum}"
 
         print("✓ Control parameter validation works!")
     
@@ -647,7 +647,7 @@ class TestDataRetrieval:
         assert vector_calls[0] == ((1, 1),)  # vectorenum=1, columns=1
         
         assert len(channel_calls) == 1
-        assert channel_calls[0] == ((0,),)  # channelnum=1 converted to 0-based
+        assert channel_calls[0] == ((0,),)  # channel=1 converted to 0-based
         
         print("✓ End-to-end workflow test completed successfully!")
     
@@ -858,7 +858,7 @@ class TestDataRetrieval:
         if self.mock_vv.ControlUnit.called:
             calls = self.mock_vv.ControlUnit.call_args_list
             assert len(calls) == 1
-            assert calls[0] == ((1,),)  # loopnum=2 converted to 0-based 1
+            assert calls[0] == ((1,),)  # loop=2 converted to 0-based 1
         
         print("✓ Mixed endpoint requests handled correctly!")
     
