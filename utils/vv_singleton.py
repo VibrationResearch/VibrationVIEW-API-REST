@@ -13,6 +13,7 @@ imports inside function bodies.
 
 import logging
 import threading
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ _vv_instance = None
 _vv_lock = threading.Lock()
 
 
-def get_vv_instance():
+def get_vv_instance() -> Optional[Any]:
     """Return the VibrationVIEW instance, creating it on first call."""
     global _vv_instance
 
@@ -51,14 +52,14 @@ def get_vv_instance():
     return inst
 
 
-def set_vv_instance(instance):
+def set_vv_instance(instance: Any) -> None:
     """Set the VibrationVIEW instance - useful for testing"""
     global _vv_instance
     with _vv_lock:
         _vv_instance = instance
 
 
-def reset_vv_instance():
+def reset_vv_instance() -> None:
     """Reset the VibrationVIEW instance - releases COM object and clears singleton"""
     global _vv_instance
     with _vv_lock:
