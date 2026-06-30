@@ -163,7 +163,5 @@ def import_virtual_channels(vv_instance: Any) -> Response:
     vv_instance.ImportVirtualChannels(filename)
 
     return jsonify(
-        success_response(
-            {"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}"
-        )
+        success_response({"result": True, "filepath": filename}, f"ImportVirtualChannels command executed: {filename}")
     )
