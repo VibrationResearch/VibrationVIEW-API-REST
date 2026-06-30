@@ -457,8 +457,10 @@ def get_query_param(name: str, type_fn: Callable = int, required: bool = True) -
             400,
         )
 
-    # Unnamed positional fallback – first query-string key with no ``=``
-    if request.args:
+    # Unnamed positional fallback – only when the query string looks
+    # like a bare value (no '=' sign indicating named parameters).
+    query_string = request.query_string.decode("utf-8")
+    if query_string and "=" not in query_string:
         first_key = list(request.args.keys())[0]
         try:
             value = type_fn(first_key)
