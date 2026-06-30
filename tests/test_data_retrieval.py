@@ -394,7 +394,7 @@ class TestDataRetrieval:
     # ============================================================================
     
     def test_channel_unit_base1_conversion(self, client):
-        """Test that channelnum is converted from base-1 to base-0"""
+        """Test that channel is converted from base-1 to base-0"""
         # Configure mock
         self.mock_vv.ChannelUnit.reset_mock()
         self.mock_vv.ChannelUnit.return_value = "g"
@@ -479,7 +479,7 @@ class TestDataRetrieval:
         print("✓ ChannelLabel base-1 conversion works!")
     
     def test_channel_missing_parameters(self, client):
-        """Test channel endpoints with missing channelnum parameter"""
+        """Test channel endpoints with missing channel parameter"""
 
         endpoints = ['/api/v1/channelunit', '/api/v1/channellabel']
 
@@ -528,20 +528,20 @@ class TestDataRetrieval:
         print("✓ ControlLabel base-1 conversion works!")
     
     def test_control_invalid_parameters(self, client):
-        """Test control endpoints with invalid loopnum parameters"""
+        """Test control endpoints with invalid loop parameters"""
 
         test_cases = [
             ('/api/v1/controlunit', 0),
             ('/api/v1/controllabel', -1),
         ]
 
-        for endpoint, loopnum in test_cases:
-            response = client.get(f'{endpoint}?loop={loopnum}')
+        for endpoint, loop in test_cases:
+            response = client.get(f'{endpoint}?loop={loop}')
             if response.status_code != 404:
-                assert response.status_code == 400, f"{endpoint} did not return 400 for loop={loopnum}"
+                assert response.status_code == 400, f"{endpoint} did not return 400 for loop={loop}"
                 data = json.loads(response.data)
-                assert data['success'] is False, f"{endpoint} did not set success to False for loop={loopnum}"
-                assert 'must be >= 1' in data['error']['message'], f"{endpoint} error message missing 'must be >= 1' for loop={loopnum}"
+                assert data['success'] is False, f"{endpoint} did not set success to False for loop={loop}"
+                assert 'must be >= 1' in data['error']['message'], f"{endpoint} error message missing 'must be >= 1' for loop={loop}"
 
         print("✓ Control parameter validation works!")
     

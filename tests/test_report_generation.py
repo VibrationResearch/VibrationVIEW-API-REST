@@ -96,11 +96,11 @@ class TestReportGeneration:
             # Check that a temporary file path was used
             temp_file_path = gen_call_args[0]
             assert temp_file_path.endswith('.vrd')
-            assert gen_call_args[1] == template_name  # template_name
-            assert gen_call_args[2] == output_name    # output_name
+            assert gen_call_args[1] == template_name  # templatename
+            assert gen_call_args[2] == output_name    # outputname
 
-    def test_generatereport_missing_template_name(self, client, mock_vv, sample_vrd_path):
-        """Test PUT /generatereport with missing template_name parameter"""
+    def test_generatereport_missing_templatename(self, client, mock_vv, sample_vrd_path):
+        """Test PUT /generatereport with missing templatename parameter"""
 
         if not os.path.exists(sample_vrd_path):
             pytest.skip(f"Sample VRD file not found: {sample_vrd_path}")
@@ -109,7 +109,7 @@ class TestReportGeneration:
             vrd_content = f.read()
 
         response = client.post(
-            '/api/v1/generatereport?filename=test.vrd&outputname=test_report.pdf',  # Missing template_name
+            '/api/v1/generatereport?filename=test.vrd&outputname=test_report.pdf',  # Missing templatename
             data=vrd_content,
             headers={
                 'Content-Length': str(len(vrd_content)),
@@ -123,8 +123,8 @@ class TestReportGeneration:
         assert 'Upload mode requires templatename query parameter' in data['error']['message']
         assert data['error']['code'] == 'MISSING_PARAMETER'
 
-    def test_generatereport_missing_output_name(self, client, mock_vv, sample_vrd_path):
-        """Test POST /generatereport with missing output_name parameter - output_name is derived from uploaded filename"""
+    def test_generatereport_missing_outputname(self, client, mock_vv, sample_vrd_path):
+        """Test POST /generatereport with missing outputname parameter - outputname is derived from uploaded filename"""
 
         if not os.path.exists(sample_vrd_path):
             pytest.skip(f"Sample VRD file not found: {sample_vrd_path}")
@@ -142,7 +142,7 @@ class TestReportGeneration:
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
 
-            # output_name is now derived from uploaded filename when not provided
+            # outputname is now derived from uploaded filename when not provided
             response = client.post(
                 '/api/v1/generatereport?filename=test.vrd&templatename=Test Report.vvtemplate',
                 data=vrd_content,
@@ -152,7 +152,7 @@ class TestReportGeneration:
                 }
             )
 
-            # Should succeed - output_name derived from filename
+            # Should succeed - outputname derived from filename
             mock_send_file.assert_called_once()
 
     def test_generatereport_empty_file_content(self, client, mock_vv):
@@ -171,7 +171,7 @@ class TestReportGeneration:
         )
 
         # Empty content with Content-Length 0 should be handled as file path mode
-        # Since no file_path provided and no last data file, should return 400
+        # Since no filename provided and no last data file, should return 400
         assert response.status_code == 400
         data = response.get_json()
         assert data['success'] is False
@@ -224,7 +224,7 @@ class TestReportGeneration:
             assert data['error']['code'] == 'REPORT_GENERATION_ERROR'
 
     def test_generatereport_path_validation_security(self, client, mock_vv, sample_vrd_path):
-        """Test POST /generatereport with path validation for output_name"""
+        """Test POST /generatereport with path validation for outputname"""
 
         if not os.path.exists(sample_vrd_path):
             pytest.skip(f"Sample VRD file not found: {sample_vrd_path}")
@@ -289,7 +289,7 @@ class TestReportGeneration:
                 # Verify the correct template was used in the call
                 mock_generate.assert_called_once()
                 call_args = mock_generate.call_args[0]
-                assert call_args[1] == template_name  # template_name parameter
+                assert call_args[1] == template_name  # templatename parameter
 
 
 
