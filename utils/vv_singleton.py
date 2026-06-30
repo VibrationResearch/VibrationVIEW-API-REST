@@ -64,8 +64,7 @@ def reset_vv_instance():
     with _vv_lock:
         if _vv_instance is not None:
             try:
-                # Delete instance - lets Python/COM release the object
-                del _vv_instance
+                _vv_instance.close()
                 logger.info("VibrationVIEW COM object released")
             except Exception as e:
                 logger.error(f"Error releasing VibrationVIEW COM object: {e}")
