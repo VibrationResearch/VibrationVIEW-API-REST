@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, is_default_template_filename, detect_file_upload, get_filename_from_request
+from utils.utils import handle_binary_upload, is_default_template_filename, detect_file_upload, get_filename_from_request, get_query_param_string, get_query_param
 from utils.path_validator import validate_file_path, PathValidationError
 
 import logging
@@ -476,21 +476,9 @@ def close_test(vv_instance):
 
     Example: GET /api/v1/closetest?profilename=test1.vsp or POST /api/v1/closetest?test1.vsp
     """
-    # Get profile name from parameters - check named parameter first, then unnamed
-    profile_name = request.args.get("profilename")
-
-    # If no 'profilename' parameter, try to get the first unnamed parameter
-    if profile_name is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            # URL decode the query string to handle special characters
-            profile_name = unquote(query_string)
-
-    if not profile_name:
-        return jsonify(error_response(
-            'Missing required query parameter: profilename (or unnamed profile name parameter)',
-            'MISSING_PARAMETER'
-        )), 400
+    profile_name, err, status = get_query_param_string("profilename")
+    if err:
+        return jsonify(err), status
 
     # Call CloseTest method
     test_was_closed = vv_instance.CloseTest(profile_name)
@@ -525,29 +513,9 @@ def close_tab(vv_instance):
     Example: GET /api/v1/closetab?tabindex=0 or POST /api/v1/closetab?tabindex=1
              GET /api/v1/closetab?0 or POST /api/v1/closetab?2 (unnamed parameter)
     """
-    # Get tab index from parameters - check named parameter first, then unnamed
-    tab_index_str = request.args.get("tabindex")
-
-    # If no 'tabindex' parameter, try to get the first unnamed parameter
-    if tab_index_str is None:
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            # URL decode the query string to handle special characters
-            tab_index_str = unquote(query_string)
-
-    if not tab_index_str:
-        return jsonify(error_response(
-            'Missing required query parameter: tabindex (or unnamed tab index parameter)',
-            'MISSING_PARAMETER'
-        )), 400
-
-    try:
-        tab_index = int(tab_index_str)
-    except ValueError:
-        return jsonify(error_response(
-            f'Invalid tab index: {tab_index_str}. Must be an integer.',
-            'INVALID_PARAMETER'
-        )), 400
+    tab_index, err, status = get_query_param("tabindex", int)
+    if err:
+        return jsonify(err), status
 
     # Call CloseTab method
     test_was_closed = vv_instance.CloseTab(tab_index)
@@ -636,12 +604,9 @@ def save_data(vv_instance):
         POST /api/v1/savedata?filename=savefile.vsd (saves to DATA_FOLDER/savefile.vsd)
         POST /api/v1/savedata?filename=C:\\Custom\\Path\\savefile.vsd (saves to specified path)
     """
-    filename = request.args.get('filename')
-    if not filename:
-        return jsonify(error_response(
-            'Missing required query parameter: filename',
-            'MISSING_PARAMETER'
-        )), 400
+    filename, err, status = get_query_param_string("filename")
+    if err:
+        return jsonify(err), status
 
     # If filename has no path separators, prepend DATA_FOLDER
     if not os.path.dirname(filename):

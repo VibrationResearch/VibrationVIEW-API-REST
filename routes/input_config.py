@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import convert_channel_to_com_index, handle_binary_upload, detect_file_upload, get_filename_from_request
+from utils.utils import convert_channel_to_com_index, handle_binary_upload, detect_file_upload, get_filename_from_request, get_query_param, get_query_param_string
 import logging
 from datetime import datetime
 import config
@@ -208,21 +208,16 @@ def input_cal_date(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/v1/inputcaldate?1
+    Example: GET /api/v1/inputcaldate?channel=1 or GET /api/v1/inputcaldate?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
+
     result = vv_instance.InputCalDate(channel_com)
     
     return jsonify(success_response(
@@ -243,21 +238,16 @@ def input_serial_number(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/v1/inputserialnumber?1
+    Example: GET /api/v1/inputserialnumber?channel=1 or GET /api/v1/inputserialnumber?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
+
     result = vv_instance.InputSerialNumber(channel_com)
     
     return jsonify(success_response(
@@ -278,21 +268,16 @@ def input_sensitivity(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/v1/inputsensitivity?1
+    Example: GET /api/v1/inputsensitivity?channel=1 or GET /api/v1/inputsensitivity?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
+
     result = vv_instance.InputSensitivity(channel_com)
     
     return jsonify(success_response(
@@ -313,21 +298,16 @@ def input_engineering_scale(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
     
-    Example: GET /api/v1/inputengineeringscale?1
+    Example: GET /api/v1/inputengineeringscale?channel=1 or GET /api/v1/inputengineeringscale?1
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
+
     result = vv_instance.InputEngineeringScale(channel_com)
     
     return jsonify(success_response(
@@ -347,43 +327,37 @@ def input_capacitor_coupled(vv_instance):
     Gets or sets the capacitor coupled setting for the specified input channel.
     
     GET Query Parameters:
-        channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/v1/inputcapacitorcoupled?1
-    
+        channel: Input channel number (1-based)
+        Example: GET /api/v1/inputcapacitorcoupled?channel=1 or GET /api/v1/inputcapacitorcoupled?1
+
     POST Query Parameters for setting:
-        channel: Input channel number (1-based) - first positional parameter
-        value: Coupling setting (true/false) - second positional parameter
-        Example: POST /api/v1/inputcapacitorcoupled?1&true
+        channel: Input channel number (1-based)
+        value: Coupling setting (true/false)
+        Example: POST /api/v1/inputcapacitorcoupled?channel=1&value=true or POST /api/v1/inputcapacitorcoupled?1&true
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
-    
-    if request.method == 'GET' or len(query_args) < 2:
+
+    # Check for value parameter (named or second positional)
+    value_str = request.args.get("value")
+    if value_str is None:
+        query_args = list(request.args.keys())
+        if len(query_args) >= 2:
+            value_str = query_args[1]
+
+    if request.method == 'GET' or value_str is None:
         result = vv_instance.InputCapacitorCoupled(channel_com)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user},
             f"Channel {channel_user} capacitor coupled: {result}"
         ))
     else:
-        try:
-            value = query_args[1].lower() == 'true'
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'Invalid value parameter - must be true or false',
-                'INVALID_PARAMETER'
-            )), 400
-        
+        value = value_str.lower() == 'true'
         result = vv_instance.InputCapacitorCoupled(channel_com, value)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user, 'value_set': value},
@@ -401,43 +375,36 @@ def input_accel_power_source(vv_instance):
     Gets or sets the accelerometer power source for the specified input channel.
     
     GET Query Parameters:
-        channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/v1/inputaccelpowersource?1
-    
+        channel: Input channel number (1-based)
+        Example: GET /api/v1/inputaccelpowersource?channel=1 or GET /api/v1/inputaccelpowersource?1
+
     POST Query Parameters for setting:
-        channel: Input channel number (1-based) - first positional parameter
-        value: Power source setting (true/false) - second positional parameter
-        Example: POST /api/v1/inputaccelpowersource?1&true
+        channel: Input channel number (1-based)
+        value: Power source setting (true/false)
+        Example: POST /api/v1/inputaccelpowersource?channel=1&value=true or POST /api/v1/inputaccelpowersource?1&true
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
-    
-    if request.method == 'GET' or len(query_args) < 2:
+
+    value_str = request.args.get("value")
+    if value_str is None:
+        query_args = list(request.args.keys())
+        if len(query_args) >= 2:
+            value_str = query_args[1]
+
+    if request.method == 'GET' or value_str is None:
         result = vv_instance.InputAccelPowerSource(channel_com)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user},
             f"Channel {channel_user} accel power source: {result}"
         ))
     else:
-        try:
-            value = query_args[1].lower() == 'true'
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'Invalid value parameter - must be true or false',
-                'INVALID_PARAMETER'
-            )), 400
-        
+        value = value_str.lower() == 'true'
         result = vv_instance.InputAccelPowerSource(channel_com, value)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user, 'value_set': value},
@@ -455,43 +422,36 @@ def input_differential(vv_instance):
     Gets or sets the differential setting for the specified input channel.
     
     GET Query Parameters:
-        channel: Input channel number (1-based) - first positional parameter
-        Example: GET /api/v1/inputdifferential?1
-    
+        channel: Input channel number (1-based)
+        Example: GET /api/v1/inputdifferential?channel=1 or GET /api/v1/inputdifferential?1
+
     POST Query Parameters for setting:
-        channel: Input channel number (1-based) - first positional parameter
-        value: Differential setting (true/false) - second positional parameter
-        Example: POST /api/v1/inputdifferential?1&true
+        channel: Input channel number (1-based)
+        value: Differential setting (true/false)
+        Example: POST /api/v1/inputdifferential?channel=1&value=true or POST /api/v1/inputdifferential?1&true
     """
-    # Get channel from query parameters (first parameter after ?)
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
-    
-    channel_user = int(query_args[0])  # Keep original for response
-    
-    if request.method == 'GET' or len(query_args) < 2:
+
+    value_str = request.args.get("value")
+    if value_str is None:
+        query_args = list(request.args.keys())
+        if len(query_args) >= 2:
+            value_str = query_args[1]
+
+    if request.method == 'GET' or value_str is None:
         result = vv_instance.InputDifferential(channel_com)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user},
             f"Channel {channel_user} differential: {result}"
         ))
     else:
-        try:
-            value = query_args[1].lower() == 'true'
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'Invalid value parameter - must be true or false',
-                'INVALID_PARAMETER'
-            )), 400
-        
+        value = value_str.lower() == 'true'
         result = vv_instance.InputDifferential(channel_com, value)
         return jsonify(success_response(
             {'result': result, 'channel': channel_user, 'value_set': value},
@@ -523,25 +483,17 @@ def input_mode(vv_instance):
     required_params = ['channel', 'powersource', 'capcoupled', 'differential']
 
     # Try query parameters first, then JSON body
-    if request.args:
-        data = {
-            'channel': request.args.get('channel'),
-            'powersource': request.args.get('powersource'),
-            'capcoupled': request.args.get('capcoupled'),
-            'differential': request.args.get('differential')
-        }
-        # Convert string booleans to actual booleans
-        for key in ['powersource', 'capcoupled', 'differential']:
-            if data[key] is not None:
-                data[key] = data[key].lower() == 'true'
-    else:
-        data = request.get_json(silent=True)
+    json_data = request.get_json(silent=True) or {}
 
-    if not data:
-        return jsonify(error_response(
-            'Missing parameters (provide query params or JSON body)',
-            'MISSING_PARAMETERS'
-        )), 400
+    data = {}
+    for param in required_params:
+        val, _, _ = get_query_param_string(param, required=False, json_data=json_data)
+        data[param] = val
+
+    # Convert string booleans to actual booleans
+    for key in ['powersource', 'capcoupled', 'differential']:
+        if data[key] is not None:
+            data[key] = str(data[key]).lower() == 'true'
 
     missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
@@ -596,22 +548,14 @@ def input_calibration(vv_instance):
         POST /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
     """
     # Try query parameters first, then JSON body
-    if request.args:
-        data = {
-            'channel': request.args.get('channel'),
-            'sensitivity': request.args.get('sensitivity'),
-            'serialnumber': request.args.get('serialnumber'),
-            'caldate': request.args.get('caldate')
-        }
-    else:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify(error_response(
-                'Missing parameters (provide query params or JSON body)',
-                'MISSING_PARAMETERS'
-            )), 400
+    json_data = request.get_json(silent=True) or {}
 
     required_params = ['channel', 'sensitivity', 'serialnumber', 'caldate']
+    data = {}
+    for param in required_params:
+        val, _, _ = get_query_param_string(param, required=False, json_data=json_data)
+        data[param] = val
+
     missing_params = [param for param in required_params if not data.get(param)]
     if missing_params:
         return jsonify(error_response(
@@ -750,20 +694,16 @@ def is_channel_different_database(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: GET /api/v1/ischanneldifferentdatabase?1
+    Example: GET /api/v1/ischanneldifferentdatabase?channel=1 or GET /api/v1/ischanneldifferentdatabase?1
     """
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
 
-    channel_user = int(query_args[0])
     result = vv_instance.IsChannelDifferentThanDatabase(channel_com)
 
     return jsonify(success_response(
@@ -785,20 +725,16 @@ def channel_database_ids(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: GET /api/v1/channeldatabaseids?1
+    Example: GET /api/v1/channeldatabaseids?channel=1 or GET /api/v1/channeldatabaseids?1
     """
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
 
-    channel_user = int(query_args[0])
     result = vv_instance.ChannelDatabaseIDs(channel_com)
 
     return jsonify(success_response(
@@ -820,20 +756,16 @@ def update_channel_config_from_database(vv_instance):
     Query Parameters:
         channel: Input channel number (1-based) - first positional parameter
 
-    Example: POST /api/v1/updatechannelconfigfromdatabase?1
+    Example: POST /api/v1/updatechannelconfigfromdatabase?channel=1 or POST /api/v1/updatechannelconfigfromdatabase?1
     """
-    query_args = list(request.args.keys())
-    if not query_args:
-        return jsonify(error_response(
-            'Missing required query parameter: channel',
-            'MISSING_PARAMETER'
-        )), 400
+    channel_user, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
+    channel_com, error_resp, status_code = convert_channel_to_com_index(channel_user)
     if error_resp:
         return jsonify(error_resp), status_code
 
-    channel_user = int(query_args[0])
     result = vv_instance.UpdateChannelConfigFromDatabase(channel_com)
 
     return jsonify(success_response(
@@ -857,12 +789,9 @@ def transducer_database_record(vv_instance):
 
     Example: GET /api/v1/transducerdatabaserecord?guid={guid-string}
     """
-    guid = request.args.get('guid')
-    if not guid:
-        return jsonify(error_response(
-            'Missing required query parameter: guid',
-            'MISSING_PARAMETER'
-        )), 400
+    guid, err, status = get_query_param_string("guid")
+    if err:
+        return jsonify(err), status
 
     result = vv_instance.TransducerDatabaseRecord(guid)
 

@@ -11,6 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import get_query_param
 import logging
 
 # Create blueprint
@@ -264,26 +265,9 @@ def demand_multiplier(vv_instance):
             )
         )
     else:
-        value = request.args.get("value", type=float)
-        
-        # If no 'value' parameter, try to get the first unnamed parameter
-        if value is None:
-            args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
-                try:
-                    value = float(args[0])
-                except ValueError:
-                    pass
-        
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", float)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.DemandMultiplier(value)
         return jsonify(
@@ -315,26 +299,9 @@ def sweep_multiplier(vv_instance):
             success_response({"result": result}, f"SweepMultiplier retrieved: {result}")
         )
     else:
-        value = request.args.get("value", type=float)
-        
-        # If no 'value' parameter, try to get the first unnamed parameter
-        if value is None:
-            args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
-                try:
-                    value = float(args[0])
-                except ValueError:
-                    pass
-        
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", float)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.SweepMultiplier(value)
         return jsonify(
@@ -368,26 +335,9 @@ def sine_frequency(vv_instance):
             )
         )
     else:
-        value = request.args.get("value", type=float)
-        
-        # If no 'value' parameter, try to get the first unnamed parameter
-        if value is None:
-            args = list(request.args.keys())
-            if args and args[0].replace('.', '').replace('-', '').isdigit():
-                try:
-                    value = float(args[0])
-                except ValueError:
-                    pass
-        
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", float)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.SineFrequency(value)
         return jsonify(

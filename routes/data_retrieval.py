@@ -21,6 +21,7 @@ from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
 from utils.path_validator import validate_file_path, PathValidationError
+from utils.utils import get_query_param, get_query_param_string
 import logging
 import os
 
@@ -70,37 +71,37 @@ def get_documentation():
             'Channel Metadata (1-based indexing)': {
                 'GET /channelunit': {
                     'description': 'Get channel units',
-                    'com_method': 'ChannelUnit(channelnum - 1)',
-                    'parameters': {'channelnum': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
+                    'com_method': 'ChannelUnit(channel - 1)',
+                    'parameters': {'channel': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
                     'returns': 'str - Units for the channel',
-                    'example': 'GET /api/v1/channelunit?channelnum=3'
+                    'example': 'GET /api/v1/channelunit?channel=3'
                 },
                 'GET /channellabel': {
                     'description': 'Get channel label',
-                    'com_method': 'ChannelLabel(channelnum - 1)',
-                    'parameters': {'channelnum': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
+                    'com_method': 'ChannelLabel(channel - 1)',
+                    'parameters': {'channel': 'integer - Channel number (1-based, converted to 0-based internally, query parameter)'},
                     'returns': 'str - Label for the channel',
-                    'example': 'GET /api/v1/channellabel?channelnum=1'
+                    'example': 'GET /api/v1/channellabel?channel=1'
                 }
             },
             'Control Metadata (1-based indexing)': {
                 'GET /controlunit': {
                     'description': 'Get control loop units',
-                    'com_method': 'ControlUnit(loopnum - 1)',
+                    'com_method': 'ControlUnit(loop - 1)',
                     'parameters': {
-                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
+                        'loop': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Units for the control loop',
-                    'example': 'GET /api/v1/controlunit (defaults to loop 1) or GET /api/v1/controlunit?loopnum=2'
+                    'example': 'GET /api/v1/controlunit (defaults to loop 1) or GET /api/v1/controlunit?loop=2'
                 },
                 'GET /controllabel': {
                     'description': 'Get control loop label',
-                    'com_method': 'ControlLabel(loopnum - 1)',
+                    'com_method': 'ControlLabel(loop - 1)',
                     'parameters': {
-                        'loopnum': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
+                        'loop': 'integer - Loop number (1-based, converted to 0-based internally, query parameter, defaults to 1)'
                     },
                     'returns': 'str - Label for the control loop',
-                    'example': 'GET /api/v1/controllabel (defaults to loop 1) or GET /api/v1/controllabel?loopnum=2'
+                    'example': 'GET /api/v1/controllabel (defaults to loop 1) or GET /api/v1/controllabel?loop=2'
                 }
             }
         },
@@ -206,51 +207,34 @@ def channel_unit(vv_instance):
     """
     Get the channel unit associated with channel number (1-based)
     
-    COM Method: ChannelUnit(channelnum - 1)
+    COM Method: ChannelUnit(channel - 1)
     Channel numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
-    
+
     Query Parameters:
-        channelnum (no parameter name required)
-    
+        channel (no parameter name required)
+
     Example:
         GET /api/v1/channelunit?3
     """
-    # Get channelnum from query parameters (first parameter)
-    if not request.args:
-        return jsonify(error_response(
-            'Missing required query parameter: channelnum',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'channelnum' parameter first, then fall back to first key
-        channelnum = request.args.get('channelnum', type=int)
-        if channelnum is None:
-            # If no 'channelnum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            channelnum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'channelnum must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+    channel, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
     # Convert from 1-based to 0-based
-    if channelnum < 1:
+    if channel < 1:
         return jsonify(error_response(
-            f'channelnum must be >= 1 (1-based indexing), got {channelnum}',
+            f'channel must be >= 1 (1-based indexing), got {channel}',
             'INVALID_PARAMETER'
         )), 400
-    
-    channel_num_0based = channelnum - 1
-    
-    result = vv_instance.ChannelUnit(channel_num_0based)
-    
+
+    channel_0based = channel - 1
+
+    result = vv_instance.ChannelUnit(channel_0based)
+
     return jsonify(success_response({
         'result': result,
-        'channelnum': channelnum,
-        'internal_channelnum': channel_num_0based
+        'channel': channel,
+        'internal_channel': channel_0based
     }))
 
 @data_retrieval_bp.route('/channellabel', methods=['GET'])
@@ -260,51 +244,34 @@ def channel_label(vv_instance):
     """
     Get the channel unit label associated with channel number (1-based)
     
-    COM Method: ChannelLabel(channelnum - 1)
+    COM Method: ChannelLabel(channel - 1)
     Channel numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
-    
+
     Query Parameters:
-        channelnum (no parameter name required)
-    
+        channel (no parameter name required)
+
     Example:
         GET /api/v1/channellabel?1
     """
-    # Get channelnum from query parameters (first parameter)
-    if not request.args:
-        return jsonify(error_response(
-            'Missing required query parameter: channelnum',
-            'MISSING_PARAMETER'
-        )), 400
-    
-    # Get first query parameter (key or value)
-    try:
-        # Try to get 'channelnum' parameter first, then fall back to first key
-        channelnum = request.args.get('channelnum', type=int)
-        if channelnum is None:
-            # If no 'channelnum' parameter, try the first key as the value
-            first_key = list(request.args.keys())[0]
-            channelnum = int(first_key)
-    except (ValueError, IndexError):
-        return jsonify(error_response(
-            'channelnum must be an integer',
-            'INVALID_PARAMETER'
-        )), 400
-    
+    channel, err, status = get_query_param("channel", int)
+    if err:
+        return jsonify(err), status
+
     # Convert from 1-based to 0-based
-    if channelnum < 1:
+    if channel < 1:
         return jsonify(error_response(
-            f'channelnum must be >= 1 (1-based indexing), got {channelnum}',
+            f'channel must be >= 1 (1-based indexing), got {channel}',
             'INVALID_PARAMETER'
         )), 400
-    
-    channel_num_0based = channelnum - 1
-    
-    result = vv_instance.ChannelLabel(channel_num_0based)
-    
+
+    channel_0based = channel - 1
+
+    result = vv_instance.ChannelLabel(channel_0based)
+
     return jsonify(success_response({
         'result': result,
-        'channelnum': channelnum,
-        'internal_channelnum': channel_num_0based
+        'channel': channel,
+        'internal_channel': channel_0based
     }))
 
 # ============================================================================
@@ -318,48 +285,37 @@ def control_unit(vv_instance):
     """
     Get control loop units
     
-    COM Method: ControlUnit(loopnum - 1)
+    COM Method: ControlUnit(loop - 1)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
-    
+
     Query Parameters:
-        loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
-    
+        loop: integer - Loop number (1-based, defaults to 1 if no parameters)
+
     Examples:
         GET /api/v1/controlunit (defaults to loop 1)
-        GET /api/v1/controlunit?loopnum=2
+        GET /api/v1/controlunit?loop=2
         GET /api/v1/controlunit?2
     """
-    # Determine loop number - default to 1 if no parameters
-    if not request.args:
-        loopnum = 1
-    else:
-        try:
-            # Try to get 'loopnum' parameter first, then fall back to first key
-            loopnum = request.args.get('loopnum', type=int)
-            if loopnum is None:
-                # If no 'loopnum' parameter, try the first key as the value
-                first_key = list(request.args.keys())[0]
-                loopnum = int(first_key)
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'loopnum must be an integer',
-                'INVALID_PARAMETER'
-            )), 400
-    
+    loop, err, status = get_query_param("loop", int, required=False)
+    if err:
+        return jsonify(err), status
+    if loop is None:
+        loop = 1
+
     # Convert from 1-based to 0-based
-    if loopnum < 1:
+    if loop < 1:
         return jsonify(error_response(
-            f'loopnum must be >= 1 (1-based indexing), got {loopnum}',
+            f'loop must be >= 1 (1-based indexing), got {loop}',
             'INVALID_PARAMETER'
         )), 400
-    
-    loop_num_0based = loopnum - 1
-    
-    result = vv_instance.ControlUnit(loop_num_0based)
+
+    loop_0based = loop - 1
+
+    result = vv_instance.ControlUnit(loop_0based)
     return jsonify(success_response({
         'result': result,
-        'loopnum': loopnum,
-    }, f"ControlUnit retrieved for loop {loopnum}: {result}"))
+        'loop': loop,
+    }, f"ControlUnit retrieved for loop {loop}: {result}"))
 
 @data_retrieval_bp.route('/controllabel', methods=['GET'])
 @handle_errors
@@ -368,49 +324,38 @@ def control_label(vv_instance):
     """
     Get control loop label
     
-    COM Method: ControlLabel(loopnum - 1)
+    COM Method: ControlLabel(loop - 1)
     Loop numbers are 1-based for user convenience but converted to 0-based for VibrationVIEW COM interface.
-    
+
     Query Parameters:
-        loopnum: integer - Loop number (1-based, defaults to 1 if no parameters)
-    
+        loop: integer - Loop number (1-based, defaults to 1 if no parameters)
+
     Examples:
         GET /api/v1/controllabel (defaults to loop 1)
-        GET /api/v1/controllabel?loopnum=2
+        GET /api/v1/controllabel?loop=2
         GET /api/v1/controllabel?2
     """
-    # Determine loop number - default to 1 if no parameters
-    if not request.args:
-        loopnum = 1
-    else:
-        try:
-            # Try to get 'loopnum' parameter first, then fall back to first key
-            loopnum = request.args.get('loopnum', type=int)
-            if loopnum is None:
-                # If no 'loopnum' parameter, try the first key as the value
-                first_key = list(request.args.keys())[0]
-                loopnum = int(first_key)
-        except (ValueError, IndexError):
-            return jsonify(error_response(
-                'loopnum must be an integer',
-                'INVALID_PARAMETER'
-            )), 400
-    
+    loop, err, status = get_query_param("loop", int, required=False)
+    if err:
+        return jsonify(err), status
+    if loop is None:
+        loop = 1
+
     # Convert from 1-based to 0-based
-    if loopnum < 1:
+    if loop < 1:
         return jsonify(error_response(
-            f'loopnum must be >= 1 (1-based indexing), got {loopnum}',
+            f'loop must be >= 1 (1-based indexing), got {loop}',
             'INVALID_PARAMETER'
         )), 400
-    
-    loop_num_0based = loopnum - 1
-    
-    result = vv_instance.ControlLabel(loop_num_0based)
+
+    loop_0based = loop - 1
+
+    result = vv_instance.ControlLabel(loop_0based)
     return jsonify(success_response({
         'result': result,
-        'loopnum': loopnum,
-        'internal_loopnum': loop_num_0based
-    }, f"ControlLabel retrieved for loop {loopnum}: {result}"))
+        'loop': loop,
+        'internal_loop': loop_0based
+    }, f"ControlLabel retrieved for loop {loop}: {result}"))
 
 
 # ============================================================================
@@ -428,31 +373,30 @@ def get_data_file(vv_instance):
     Uses the same parameter scheme as generatetxt for consistency.
 
     Request Body (JSON, optional) or Query Parameters:
-        file_path: string - Path to specific VibrationVIEW data file (optional - uses last data file if not specified)
+        filename: string - Path to specific VibrationVIEW data file (optional - uses last data file if not specified)
 
     Note: Returns the raw .vrd file as binary data, not JSON.
           Use Content-Type: application/octet-stream for binary download.
 
     Example: GET /api/v1/getdatafile (uses last data file)
-             GET /api/v1/getdatafile?file_path=specific_file.vrd
-             POST /api/v1/getdatafile with JSON body: {"file_path": "specific_file.vrd"}
+             GET /api/v1/getdatafile?filename=specific_file.vrd
+             POST /api/v1/getdatafile with JSON body: {"filename": "specific_file.vrd"}
     """
     # Get parameters from JSON body (optional) or query parameters
     try:
-        request_data = request.get_json() or {}
+        json_data = request.get_json() or {}
     except Exception:
-        # If JSON parsing fails, use empty dict and fall back to query parameters
-        request_data = {}
+        json_data = {}
 
-    file_path = request_data.get('file_path') or request.args.get('file_path')
+    filename, _, _ = get_query_param_string("filename", required=False, json_data=json_data)
 
-    # If file_path is not provided, use the last data file from VibrationVIEW
-    if not file_path:
+    # If filename is not provided, use the last data file from VibrationVIEW
+    if not filename:
         try:
-            file_path = vv_instance.ReportField('LastDataFile')
-            if not file_path:
+            filename = vv_instance.ReportField('LastDataFile')
+            if not filename:
                 return jsonify(error_response(
-                    'No file_path provided and no last data file available in VibrationVIEW',
+                    'No filename provided and no last data file available in VibrationVIEW',
                     'NO_DATA_FILE_AVAILABLE'
                 )), 400
         except Exception as e:
@@ -461,32 +405,26 @@ def get_data_file(vv_instance):
                 'LAST_DATA_FILE_ERROR'
             )), 500
 
-    # Validate file_path security and existence
+    # Validate filename security and existence
     try:
-        validated_file_path = validate_file_path(file_path, "data file retrieval")
+        validated_path = validate_file_path(filename, "data file retrieval")
     except PathValidationError as e:
         return jsonify(error_response(
             str(e),
             'PATH_VALIDATION_ERROR'
         )), 403
 
-    if not os.path.exists(validated_file_path):
+    if not os.path.exists(validated_path):
         return jsonify(error_response(
-            f'File not found: {validated_file_path}',
+            f'File not found: {validated_path}',
             'FILE_NOT_FOUND'
         )), 404
 
-    # Use validated path
-    file_path = validated_file_path
-
     try:
-        # Get file info
-        file_size = os.path.getsize(file_path)
-        file_name = os.path.basename(file_path)
+        file_name = os.path.basename(validated_path)
 
-        # Return raw file as binary download
         return send_file(
-            file_path,
+            validated_path,
             as_attachment=True,
             download_name=file_name,
             mimetype='application/octet-stream'

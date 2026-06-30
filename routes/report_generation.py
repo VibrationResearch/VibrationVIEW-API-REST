@@ -10,7 +10,7 @@ File generation operations using VibrationVIEW command line interface
 from flask import Blueprint, request, jsonify, send_file
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import handle_binary_upload, detect_file_upload
+from utils.utils import handle_binary_upload, detect_file_upload, get_query_param_string
 from utils.vv_manager import with_vibrationview
 from utils.path_validator import validate_file_path, validate_output_path, PathValidationError
 from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUFFFromVV
@@ -38,24 +38,24 @@ def get_documentation():
                 'function': 'GenerateReportFromVV(filePath, templateName, outputName)',
                 'modes': {
                     'upload': 'Upload .vrd file in body with query parameters',
-                    'filepath': 'Specify existing file path via JSON body or query parameters'
+                    'filename': 'Specify existing file path via JSON body or query parameters'
                 },
                 'upload_parameters': {
-                    'template_name': 'string - Query parameter with report template name (required for upload)',
-                    'output_name': 'string - Query parameter with desired output filename (required for upload)',
+                    'templatename': 'string - Query parameter with report template name (required for upload)',
+                    'outputname': 'string - Query parameter with desired output filename (required for upload)',
                     'body': 'binary - VibrationVIEW data file content (.vrd)',
                     'headers': 'Content-Length required, Content-Type: application/octet-stream recommended'
                 },
-                'filepath_parameters': {
-                    'file_path': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
-                    'template_name': 'string - Name of the report template to use (optional - uses "Test Report.rtf" if not specified)',
-                    'output_name': 'string - Desired name of the generated report file (optional - auto-generated with same extension as template_name if not specified)'
+                'filename_parameters': {
+                    'filename': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
+                    'templatename': 'string - Name of the report template to use (optional - uses "Test Report.rtf" if not specified)',
+                    'outputname': 'string - Desired name of the generated report file (optional - auto-generated with same extension as templatename if not specified)'
                 },
                 'returns': 'object - Success status, path to generated report file, and file content (text or base64-encoded binary)',
                 'note': 'Returns file content directly in response. Text files (HTML, TXT, CSV) returned as text, binary files (PDF, DOC) returned as base64',
                 'examples': {
-                    'upload': 'POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)',
-                    'filepath': 'POST /api/v1/generatereport with JSON body: {"file_path": "test.vrd", "template_name": "Standard Report", "output_name": "report.pdf"} or query params'
+                    'upload': 'POST /api/v1/generatereport?templatename=Standard%20Report&outputname=report.pdf (with .vrd file in body)',
+                    'filename': 'POST /api/v1/generatereport with JSON body: {"filename": "test.vrd", "templatename": "Standard Report", "outputname": "report.pdf"} or query params'
                 }
             },
             'POST /generatetxt': {
@@ -63,22 +63,22 @@ def get_documentation():
                 'function': 'GenerateTXTFromVV(filePath, outputName)',
                 'modes': {
                     'upload': 'Upload .vrd file in body with query parameters',
-                    'filepath': 'Specify existing file path via JSON body or query parameters'
+                    'filename': 'Specify existing file path via JSON body or query parameters'
                 },
                 'upload_parameters': {
-                    'output_name': 'string - Query parameter with desired output filename (required for upload)',
+                    'outputname': 'string - Query parameter with desired output filename (required for upload)',
                     'body': 'binary - VibrationVIEW data file content (.vrd)',
                     'headers': 'Content-Length required, Content-Type: application/octet-stream recommended'
                 },
-                'filepath_parameters': {
-                    'file_path': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
-                    'output_name': 'string - Base name for generated text files (optional - auto-generated if not specified)'
+                'filename_parameters': {
+                    'filename': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
+                    'outputname': 'string - Base name for generated text files (optional - auto-generated if not specified)'
                 },
                 'returns': 'object - Success status, paths to all generated text files (basename-1.txt, basename-2.txt, etc.), and combined file contents',
                 'note': 'Creates multiple files with pattern basename-N.txt where N corresponds to each plot in the VibrationVIEW data file',
                 'examples': {
-                    'upload': 'POST /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)',
-                    'filepath': 'POST /api/v1/generatetxt with JSON body: {"file_path": "test.vrd", "output_name": "data.txt"} or query params'
+                    'upload': 'POST /api/v1/generatetxt?outputname=data.txt (with .vrd file in body)',
+                    'filename': 'POST /api/v1/generatetxt with JSON body: {"filename": "test.vrd", "outputname": "data.txt"} or query params'
                 }
             },
             'POST /generateuff': {
@@ -86,32 +86,32 @@ def get_documentation():
                 'function': 'GenerateUFFFromVV(filePath, outputName)',
                 'modes': {
                     'upload': 'Upload .vrd file in body with query parameters',
-                    'filepath': 'Specify existing file path via JSON body or query parameters'
+                    'filename': 'Specify existing file path via JSON body or query parameters'
                 },
                 'upload_parameters': {
-                    'output_name': 'string - Query parameter with desired output filename (required for upload)',
+                    'outputname': 'string - Query parameter with desired output filename (required for upload)',
                     'body': 'binary - VibrationVIEW data file content (.vrd)',
                     'headers': 'Content-Length required, Content-Type: application/octet-stream recommended'
                 },
-                'filepath_parameters': {
-                    'file_path': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
-                    'output_name': 'string - Base name for generated UFF files (optional - auto-generated with .uff extension if not specified)'
+                'filename_parameters': {
+                    'filename': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)',
+                    'outputname': 'string - Base name for generated UFF files (optional - auto-generated with .uff extension if not specified)'
                 },
                 'returns': 'object - Success status, paths to all generated UFF files (basename-1.uff, basename-2.uff, etc.), and combined file contents',
                 'note': 'Creates multiple files with pattern basename-N.uff where N corresponds to each plot in the VibrationVIEW data file',
                 'examples': {
-                    'upload': 'POST /api/v1/generateuff?output_name=data.uff (with .vrd file in body)',
-                    'filepath': 'POST /api/v1/generateuff with JSON body: {"file_path": "test.vrd", "output_name": "data.uff"} or query params'
+                    'upload': 'POST /api/v1/generateuff?outputname=data.uff (with .vrd file in body)',
+                    'filename': 'POST /api/v1/generateuff with JSON body: {"filename": "test.vrd", "outputname": "data.uff"} or query params'
                 }
             },
             'GET /datafile': {
                 'description': 'Get the raw VibrationVIEW data file (.vrd) content without any processing',
                 'parameters': {
-                    'file_path': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)'
+                    'filename': 'string - Path to VibrationVIEW data file (optional - uses last data file if not specified)'
                 },
                 'returns': 'binary - Raw .vrd file content as binary data',
                 'note': 'Returns the unprocessed data file directly as binary. Useful for downloading or transferring raw test data.',
-                'example': 'GET /api/v1/datafile or GET /api/v1/datafile?file_path=test.vrd'
+                'example': 'GET /api/v1/datafile or GET /api/v1/datafile?filename=test.vrd'
             },
             'GET /datafiles': {
                 'description': 'Get all data files generated during the completed test as a zip archive',
@@ -124,14 +124,14 @@ def get_documentation():
                 'description': 'Upload VibrationVIEW data file and generate a text file',
                 'function': 'GenerateTXTFromVV(filePath, outputName)',
                 'parameters': {
-                    'output_name': 'string - Query parameter with desired output filename (required)',
+                    'outputname': 'string - Query parameter with desired output filename (required)',
                     'body': 'binary - VibrationVIEW data file content (.vrd)'
                 },
                 'headers': {
                     'Content-Length': 'required - File size in bytes'
                 },
                 'returns': 'object - Success status, path to generated text file, and file content',
-                'example': 'PUT /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)'
+                'example': 'PUT /api/v1/generatetxt?outputname=data.txt (with .vrd file in body)'
             },
         },
         'notes': [
@@ -143,9 +143,9 @@ def get_documentation():
             'TXT and UFF generation work with VibrationVIEW data files (.vrd)',
             'TXT and UFF generation creates one file per plot in the VibrationVIEW data file',
             'Multiple files are generated with naming pattern: basename-1.txt, basename-2.txt, etc.',
-            'If output_name contains a path, that path will be used; otherwise files go to temporary folder',
+            'If outputname contains a path, that path will be used; otherwise files go to temporary folder',
             'POST endpoints work with existing files by file path or use last data file if not specified',
-            'If file_path is not provided in POST requests, uses VibrationVIEW.GetReportField("LastDataFile")'
+            'If filename is not provided in POST requests, uses VibrationVIEW.GetReportField("LastDataFile")'
         ]
     }
     return jsonify(docs)
@@ -168,8 +168,8 @@ def generate_report(vv_instance):
 
     File Upload Mode:
         Query Parameters:
-            template_name: string - Name of the report template to use (required for upload mode)
-            output_name: string - Desired name of the generated report file (optional - derived from uploaded filename)
+            templatename: string - Name of the report template to use (required for upload mode)
+            outputname: string - Desired name of the generated report file (optional - derived from uploaded filename)
         Headers:
             Content-Length: Required for upload mode - File size in bytes
             Content-Type: application/octet-stream (for binary upload)
@@ -177,16 +177,16 @@ def generate_report(vv_instance):
 
     File Path Mode:
         Request Body (JSON, optional) or Query Parameters:
-            file_path: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
-            template_name: string - Name of the report template to use (optional - uses default template if not specified)
-            output_name: string - Desired name of the generated report file (optional - auto-generated if not specified)
+            filename: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
+            templatename: string - Name of the report template to use (optional - uses default template if not specified)
+            outputname: string - Desired name of the generated report file (optional - auto-generated if not specified)
 
-    Example Upload Mode: POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (with .vrd file in body)
+    Example Upload Mode: POST /api/v1/generatereport?templatename=Standard%20Report&outputname=report.pdf (with .vrd file in body)
     Example File Path Mode: POST /api/v1/generatereport
-             Body: {"file_path": "test.vrd", "template_name": "Standard Report", "output_name": "report.pdf"}
-             Or:   {"template_name": "Standard Report", "output_name": "report.pdf"} (uses last data file)
+             Body: {"filename": "test.vrd", "templatename": "Standard Report", "outputname": "report.pdf"}
+             Or:   {"templatename": "Standard Report", "outputname": "report.pdf"} (uses last data file)
              Or:   POST /api/v1/generatereport (uses last data file, default template, and auto-generated filename)
-             Or:   POST /api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf (query parameters)
+             Or:   POST /api/v1/generatereport?templatename=Standard%20Report&outputname=report.pdf (query parameters)
     """
     file_path = None
     template_name = None
@@ -203,12 +203,12 @@ def generate_report(vv_instance):
 
         if filename is not None:
             # File upload detected - save file
-            template_name = request.args.get('template_name')
-            output_name = request.args.get('output_name')
+            template_name, _, _ = get_query_param_string("templatename", required=False)
+            output_name, _, _ = get_query_param_string("outputname", required=False)
 
             if not template_name:
                 return jsonify(error_response(
-                    'Upload mode requires template_name query parameter',
+                    'Upload mode requires templatename query parameter',
                     'MISSING_PARAMETER'
                 )), 400
 
@@ -242,21 +242,21 @@ def generate_report(vv_instance):
     # No file upload - use existing file by path
     if file_path is None:
         try:
-            request_data = request.get_json() or {}
+            json_data = request.get_json() or {}
         except Exception:
-            request_data = {}
+            json_data = {}
 
-        file_path = request_data.get('file_path') or request.args.get('file_path')
-        template_name = request_data.get('template_name') or request.args.get('template_name')
-        output_name = request_data.get('output_name') or request.args.get('output_name')
+        file_path, _, _ = get_query_param_string("filename", required=False, json_data=json_data)
+        template_name, _, _ = get_query_param_string("templatename", required=False, json_data=json_data)
+        output_name, _, _ = get_query_param_string("outputname", required=False, json_data=json_data)
 
-        # If file_path is not provided, use the last data file from VibrationVIEW
+        # If filename is not provided, use the last data file from VibrationVIEW
         if not file_path:
             try:
                 file_path = vv_instance.ReportField('LastDataFile')
                 if not file_path:
                     return jsonify(error_response(
-                        'No file_path provided and no last data file available in VibrationVIEW',
+                        'No filename provided and no last data file available in VibrationVIEW',
                         'NO_DATA_FILE_AVAILABLE'
                     )), 400
             except Exception as e:
@@ -335,29 +335,29 @@ def get_datafile(vv_instance):
     No report generation or format conversion is performed.
 
     Query Parameters:
-        file_path: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
+        filename: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
 
     Returns:
         Binary .vrd file content as base64-encoded data
 
     Example: GET /api/v1/datafile
-             GET /api/v1/datafile?file_path=test.vrd
-             POST /api/v1/datafile with JSON body: {"file_path": "test.vrd"}
+             GET /api/v1/datafile?filename=test.vrd
+             POST /api/v1/datafile with JSON body: {"filename": "test.vrd"}
     """
     try:
-        request_data = request.get_json() or {}
+        json_data = request.get_json() or {}
     except Exception:
-        request_data = {}
+        json_data = {}
 
-    file_path = request_data.get('file_path') or request.args.get('file_path')
+    file_path, _, _ = get_query_param_string("filename", required=False, json_data=json_data)
 
-    # If file_path is not provided, use the last data file from VibrationVIEW
+    # If filename is not provided, use the last data file from VibrationVIEW
     if not file_path:
         try:
             file_path = vv_instance.ReportField('LastDataFile')
             if not file_path:
                 return jsonify(error_response(
-                    'No file_path provided and no last data file available in VibrationVIEW',
+                    'No filename provided and no last data file available in VibrationVIEW',
                     'NO_DATA_FILE_AVAILABLE'
                 )), 400
         except Exception as e:
@@ -490,7 +490,7 @@ def generate_txt(vv_instance):
 
     File Upload Mode:
         Query Parameters:
-            output_name: string - Desired name of the generated text file (required for upload)
+            outputname: string - Desired name of the generated text file (required for upload)
         Headers:
             Content-Length: Required for upload mode - File size in bytes (max 100MB)
             Content-Type: application/octet-stream (for binary upload)
@@ -498,19 +498,19 @@ def generate_txt(vv_instance):
 
     File Path Mode:
         Request Body (JSON, optional) or Query Parameters:
-            file_path: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
-            output_name: string - Base name for generated text files (optional - auto-generated if not specified)
+            filename: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
+            outputname: string - Base name for generated text files (optional - auto-generated if not specified)
 
     Note: Generates multiple files with pattern basename-1.txt, basename-2.txt, etc.
           where each file corresponds to a plot in the VibrationVIEW data file.
           Returns file content directly in response as text (TXT files are text-based).
 
-    Example Upload Mode: POST /api/v1/generatetxt?output_name=data.txt (with .vrd file in body)
+    Example Upload Mode: POST /api/v1/generatetxt?outputname=data.txt (with .vrd file in body)
     Example File Path Mode: POST /api/v1/generatetxt
-             Body: {"file_path": "test.vrd", "output_name": "data.txt"}
-             Or:   {"output_name": "data.txt"} (uses last data file)
+             Body: {"filename": "test.vrd", "outputname": "data.txt"}
+             Or:   {"outputname": "data.txt"} (uses last data file)
              Or:   POST /api/v1/generatetxt (uses last data file and auto-generated filename)
-             Or:   POST /api/v1/generatetxt?output_name=data.txt (query parameters)
+             Or:   POST /api/v1/generatetxt?outputname=data.txt (query parameters)
     """
     return _generate_files_common(vv_instance, 'TXT', GenerateTXTFromVV, 'text')
 
@@ -532,7 +532,7 @@ def generate_uff(vv_instance):
 
     File Upload Mode:
         Query Parameters:
-            output_name: string - Desired name of the generated UFF file (required for upload)
+            outputname: string - Desired name of the generated UFF file (required for upload)
         Headers:
             Content-Length: Required for upload mode - File size in bytes (max 100MB)
             Content-Type: application/octet-stream (for binary upload)
@@ -540,19 +540,19 @@ def generate_uff(vv_instance):
 
     File Path Mode:
         Request Body (JSON, optional) or Query Parameters:
-            file_path: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
-            output_name: string - Base name for generated UFF files (optional - auto-generated if not specified)
+            filename: string - Path to VibrationVIEW data file (optional - uses last data file if not specified)
+            outputname: string - Base name for generated UFF files (optional - auto-generated if not specified)
 
     Note: Generates multiple files with pattern basename-1.uff, basename-2.uff, etc.
           where each file corresponds to a plot in the VibrationVIEW data file.
           Returns file content directly in response as text (UFF files are text-based).
 
-    Example Upload Mode: POST /api/v1/generateuff?output_name=data.uff (with .vrd file in body)
+    Example Upload Mode: POST /api/v1/generateuff?outputname=data.uff (with .vrd file in body)
     Example File Path Mode: POST /api/v1/generateuff
-             Body: {"file_path": "test.vrd", "output_name": "data.uff"}
-             Or:   {"output_name": "data.uff"} (uses last data file)
+             Body: {"filename": "test.vrd", "outputname": "data.uff"}
+             Or:   {"outputname": "data.uff"} (uses last data file)
              Or:   POST /api/v1/generateuff (uses last data file and auto-generated filename)
-             Or:   POST /api/v1/generateuff?output_name=data.uff (query parameters)
+             Or:   POST /api/v1/generateuff?outputname=data.uff (query parameters)
     """
     return _generate_files_common(vv_instance, 'UFF', GenerateUFFFromVV, 'UFF')
 
@@ -585,7 +585,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
 
         if filename is not None:
             # File upload detected - save file
-            output_name = request.args.get('output_name')
+            output_name, _, _ = get_query_param_string("outputname", required=False)
 
             # If no output_name provided, derive from uploaded filename
             if not output_name:
@@ -613,20 +613,20 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
     # No file upload - use existing file by path
     if file_path is None:
         try:
-            request_data = request.get_json() or {}
+            json_data = request.get_json() or {}
         except Exception:
-            request_data = {}
+            json_data = {}
 
-        file_path = request_data.get('file_path') or request.args.get('file_path')
-        output_name = request_data.get('output_name') or request.args.get('output_name')
+        file_path, _, _ = get_query_param_string("filename", required=False, json_data=json_data)
+        output_name, _, _ = get_query_param_string("outputname", required=False, json_data=json_data)
 
-        # If file_path is not provided, use the last data file from VibrationVIEW
+        # If filename is not provided, use the last data file from VibrationVIEW
         if not file_path:
             try:
                 file_path = vv_instance.ReportField('LastDataFile')
                 if not file_path:
                     return jsonify(error_response(
-                        'No file_path provided and no last data file available in VibrationVIEW',
+                        'No filename provided and no last data file available in VibrationVIEW',
                         'NO_DATA_FILE_AVAILABLE'
                     )), 400
             except Exception as e:
@@ -635,7 +635,7 @@ def _generate_files_common(vv_instance, file_type, generate_func, description):
                     'LAST_DATA_FILE_ERROR'
                 )), 500
 
-        # Validate file_path security and existence
+        # Validate filename security and existence
         try:
             validated_file_path = validate_file_path(file_path, f"{description} generation")
         except PathValidationError as e:

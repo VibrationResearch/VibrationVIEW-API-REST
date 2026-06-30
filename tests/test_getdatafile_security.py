@@ -69,7 +69,7 @@ class TestGetDataFileSecurity:
                 mock_auth.return_value = True
                 mock_send.return_value = "mock file response"
 
-                response = client.get(f'/api/v1/getdatafile?file_path={data_folder_path}')
+                response = client.get(f'/api/v1/getdatafile?filename={data_folder_path}')
 
                 assert response.status_code == 200
                 mock_send.assert_called_once()
@@ -85,7 +85,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile rejects paths outside authorized directories"""
         malicious_path = "C:\\Windows\\System32\\evil.exe"
 
-        response = client.get(f'/api/v1/getdatafile?file_path={malicious_path}')
+        response = client.get(f'/api/v1/getdatafile?filename={malicious_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -97,7 +97,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile prevents path traversal attacks"""
         traversal_path = "C:\\VibrationVIEW\\Data\\..\\..\\Windows\\System32\\cmd.exe"
 
-        response = client.get(f'/api/v1/getdatafile?file_path={traversal_path}')
+        response = client.get(f'/api/v1/getdatafile?filename={traversal_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -109,7 +109,7 @@ class TestGetDataFileSecurity:
         """Test /getdatafile rejects relative path attacks"""
         relative_path = "../../../etc/passwd"
 
-        response = client.get(f'/api/v1/getdatafile?file_path={relative_path}')
+        response = client.get(f'/api/v1/getdatafile?filename={relative_path}')
 
         assert response.status_code == 403
         data = json.loads(response.data)
@@ -122,13 +122,13 @@ class TestGetDataFileSecurity:
         # Setup mock to return no last data file
         mock_vv.ReportField.return_value = None
 
-        response = client.get('/api/v1/getdatafile?file_path=')
+        response = client.get('/api/v1/getdatafile?filename=')
 
         # Should try to get last data file, which returns None
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data['success'] is False
-        assert 'No file_path provided and no last data file available' in data['error']['message']
+        assert 'No filename provided and no last data file available' in data['error']['message']
         assert data['error']['code'] == 'NO_DATA_FILE_AVAILABLE'
 
     def test_getdatafile_no_path_uses_last_data_file(self, client, mock_vv, mock_config):
@@ -183,7 +183,7 @@ class TestGetDataFileSecurity:
             mock_send.return_value = "mock file response"
 
             response = client.post('/api/v1/getdatafile',
-                                 json={'file_path': data_folder_path},
+                                 json={'filename': data_folder_path},
                                  content_type='application/json')
 
             assert response.status_code == 200
@@ -194,7 +194,7 @@ class TestGetDataFileSecurity:
         malicious_path = "C:\\Windows\\System32\\evil.exe"
 
         response = client.post('/api/v1/getdatafile',
-                             json={'file_path': malicious_path},
+                             json={'filename': malicious_path},
                              content_type='application/json')
 
         assert response.status_code == 403
@@ -211,7 +211,7 @@ class TestGetDataFileSecurity:
         with patch('utils.path_validator.is_path_within_authorized_directories') as mock_auth:
             mock_auth.return_value = True
 
-            response = client.get(f'/api/v1/getdatafile?file_path={valid_but_missing_path}')
+            response = client.get(f'/api/v1/getdatafile?filename={valid_but_missing_path}')
 
             assert response.status_code == 404
             data = json.loads(response.data)

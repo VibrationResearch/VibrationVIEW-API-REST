@@ -11,7 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
-from utils.utils import sanitize_nan
+from utils.utils import sanitize_nan, get_query_param
 from utils.vv_error_codes import VVIEW_E_NO_DATA, VVIEW_E_ALREADY_RUNNING, is_vview_error
 
 import logging
@@ -139,19 +139,9 @@ def report_field(vv_instance):
         GET /api/v1/reportfield?field=TestName
         GET /api/v1/reportfield?TestName
     """
-    # Get field name from query string, use first parameter if 'field' is missing
-    field_name = request.args.get('field')
-    
-    if not field_name:
-        # Use the first query parameter if 'field' is missing
-        if request.args:
-            field_name = list(request.args.keys())[0]
-
-        if not field_name:
-            return jsonify(error_response(
-                'Missing query parameter: either "field" or provide any query parameter',
-                'MISSING_PARAMETER'
-            )), 400
+    field_name, err, status = get_query_param("field", str)
+    if err:
+        return jsonify(err), status
     
     result = vv_instance.ReportField(field_name)
     

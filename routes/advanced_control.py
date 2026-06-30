@@ -11,6 +11,7 @@ from flask import Blueprint, request, jsonify
 from utils.vv_manager import with_vibrationview
 from utils.response_helpers import success_response, error_response
 from utils.decorators import handle_errors
+from utils.utils import get_query_param
 import logging
 
 # Create blueprint
@@ -71,16 +72,9 @@ def test_type(vv_instance):
             success_response({"result": result}, f"TestType retrieved: {result}")
         )
     else:
-        value = request.args.get("value", type=int)
-        if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
-            )
+        value, err, status = get_query_param("value", int)
+        if err:
+            return jsonify(err), status
 
         result = vv_instance.TestType(value)
         return jsonify(

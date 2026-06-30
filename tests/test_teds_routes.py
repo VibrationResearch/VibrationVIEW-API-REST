@@ -173,7 +173,8 @@ class TestTEDSRoutes:
         data = json.loads(response.data)
         
         assert data['success'] is False
-        assert data['error']['message'] == 'Invalid channel parameter - must be an integer'
+        assert 'channel' in data['error']['message']
+        assert 'int' in data['error']['message']
         assert data['error']['code'] == 'INVALID_PARAMETER'
         
         print("✓ GET /Teds handles non-numeric channels correctly!")
