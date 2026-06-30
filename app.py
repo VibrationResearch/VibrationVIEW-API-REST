@@ -117,7 +117,9 @@ def create_app(config_class=Config) -> Flask:
     from config import _DEV_SECRET_KEY, _PLACEHOLDER_API_KEY
 
     if app.config.get("SECRET_KEY") == _DEV_SECRET_KEY:
-        logger.warning("\033[91mSECRET_KEY is the development default. Set a secure value in .env before deploying.\033[0m")
+        logger.warning(
+            "\033[91mSECRET_KEY is the development default. Set a secure value in .env before deploying.\033[0m"
+        )
 
     api_key = app.config.get("API_KEY", "")
     if not api_key:

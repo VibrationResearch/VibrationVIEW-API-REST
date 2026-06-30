@@ -24,8 +24,8 @@ def handle_errors(func: Callable) -> Callable:
     """
     Decorator to handle COM errors and general exceptions
 
-    Automatically catches and formats COM exceptions and other errors into standardized API responses.  
-	Known VibrationVIEW HRESULT codes are mapped to specific HTTP status codes and error codes - vv_error_codes.classify_vview_error().
+    Automatically catches and formats COM exceptions and other errors into standardized API responses.
+        Known VibrationVIEW HRESULT codes are mapped to specific HTTP status codes and error codes - vv_error_codes.classify_vview_error().
     """
 
     @functools.wraps(func)
