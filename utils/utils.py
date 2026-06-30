@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import os
 import re
 import subprocess
 import uuid
 import math
+from typing import Any, Callable
 
 import logging
 from flask import request
@@ -410,7 +413,7 @@ def detect_file_upload():
     return (None, None, None)
 
 
-def get_query_param(name, type_fn=int, required=True):
+def get_query_param(name: str, type_fn: Callable = int, required: bool = True) -> tuple[Any, dict | None, int | None]:
     """
     Extract a typed query parameter with unnamed positional fallback.
 
@@ -461,7 +464,7 @@ def get_query_param(name, type_fn=int, required=True):
     return None, None, None
 
 
-def get_query_param_string(name, required=True, json_data=None):
+def get_query_param_string(name: str, required: bool = True, json_data: dict | None = None) -> tuple[str | None, dict | None, int | None]:
     """
     Extract a string query parameter with unnamed positional fallback.
 
