@@ -46,7 +46,7 @@ def with_vibrationview(func: Callable) -> Callable:
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         # Get the VibrationVIEW instance from app singleton
         vv = VibrationVIEWManager.get_instance()
 
@@ -68,7 +68,7 @@ def with_vibrationview_safe(func: Callable) -> Callable:
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         vv = VibrationVIEWManager.get_instance()
 
         # Ensure connection if needed

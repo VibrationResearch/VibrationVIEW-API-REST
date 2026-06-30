@@ -8,7 +8,7 @@ Decorators for error handling and COM exception management
 
 import functools
 import logging
-from typing import Callable
+from typing import Any, Callable
 
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
@@ -29,7 +29,7 @@ def handle_errors(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
 
@@ -102,7 +102,7 @@ def require_vv_connection(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             # This could be expanded to pre-validate connection
             return func(*args, **kwargs)

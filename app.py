@@ -13,8 +13,9 @@ import logging
 import math
 import os
 from datetime import datetime, timezone
+from typing import Any
 
-from flask import Flask, jsonify
+from flask import Flask, Response, jsonify
 from flask import request as flask_request
 from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
@@ -46,7 +47,7 @@ from routes import (
 from utils.vv_singleton import get_vv_instance, reset_vv_instance, set_vv_instance  # noqa: F401
 
 
-def _sanitize_nan(value):
+def _sanitize_nan(value: Any) -> Any:
     """Replace NaN and Inf float values with None for JSON serialization."""
     if isinstance(value, float):
         if math.isnan(value) or math.isinf(value):
@@ -62,7 +63,7 @@ def _sanitize_nan(value):
 class _NaNSafeJSONProvider(DefaultJSONProvider):
     """JSON provider that converts NaN and Inf floats to null."""
 
-    def dumps(self, obj, **kwargs):
+    def dumps(self, obj: Any, **kwargs: Any) -> str:
         return super().dumps(_sanitize_nan(obj), **kwargs)
 
 
@@ -177,7 +178,7 @@ def create_app(config_class=Config) -> Flask:
 
     # Health check endpoint
     @app.route("/api/v1/health", methods=["GET"])
-    def health_check():
+    def health_check() -> Response:
         """Health check endpoint"""
         vv = get_vv_instance()
         connection = {"success": False, "error": None}
@@ -228,7 +229,7 @@ def create_app(config_class=Config) -> Flask:
 
     # Testing helper endpoint (only in debug mode)
     @app.route("/api/v1/test/reset-instance", methods=["POST"])
-    def reset_instance():
+    def reset_instance() -> Response:
         """Reset VibrationVIEW instance - for testing only"""
         if not app.debug:
             return jsonify({"success": False, "error": "Not available in production mode"}), 403
@@ -238,7 +239,7 @@ def create_app(config_class=Config) -> Flask:
 
     # Main API documentation endpoint
     @app.route("/api/v1/docs", methods=["GET"])
-    def api_documentation():
+    def api_documentation() -> Response:
         """Get comprehensive API documentation"""
         from flask import request
 
@@ -288,7 +289,7 @@ def create_app(config_class=Config) -> Flask:
 
     # Error handlers
     @app.errorhandler(404)
-    def not_found(error):
+    def not_found(error: Exception) -> Response:
         return jsonify(
             {
                 "success": False,
@@ -299,7 +300,7 @@ def create_app(config_class=Config) -> Flask:
         ), 404
 
     @app.errorhandler(405)
-    def method_not_allowed(error):
+    def method_not_allowed(error: Exception) -> Response:
         return jsonify(
             {
                 "success": False,
@@ -309,11 +310,11 @@ def create_app(config_class=Config) -> Flask:
         ), 405
 
     @app.errorhandler(400)
-    def bad_request(error):
+    def bad_request(error: Exception) -> Response:
         return jsonify({"success": False, "error": "Bad request", "message": "Invalid request parameters"}), 400
 
     @app.errorhandler(413)
-    def request_entity_too_large(error):
+    def request_entity_too_large(error: Exception) -> Response:
         max_mb = app.config.get("MAX_CONTENT_LENGTH", 0) // (1024 * 1024)
         return jsonify(
             {
@@ -324,7 +325,7 @@ def create_app(config_class=Config) -> Flask:
         ), 413
 
     @app.errorhandler(500)
-    def internal_error(error):
+    def internal_error(error: Exception) -> Response:
         return jsonify(
             {"success": False, "error": "Internal server error", "message": "An unexpected error occurred"}
         ), 500
