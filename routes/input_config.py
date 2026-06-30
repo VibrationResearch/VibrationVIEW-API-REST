@@ -8,8 +8,9 @@ Input channel properties, settings, and configuration operations matching exact 
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 @input_config_bp.route("/docs/input_config", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get input configuration module documentation"""
     docs = {
         "module": "input_config",
@@ -187,7 +188,7 @@ def get_documentation():
 @input_config_bp.route("/inputcaldate", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_cal_date(vv_instance):
+def input_cal_date(vv_instance: Any) -> Response:
     """
     Get Input Calibration Date
 
@@ -221,7 +222,7 @@ def input_cal_date(vv_instance):
 @input_config_bp.route("/inputserialnumber", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_serial_number(vv_instance):
+def input_serial_number(vv_instance: Any) -> Response:
     """
     Get Input Serial Number
 
@@ -253,7 +254,7 @@ def input_serial_number(vv_instance):
 @input_config_bp.route("/inputsensitivity", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_sensitivity(vv_instance):
+def input_sensitivity(vv_instance: Any) -> Response:
     """
     Get Input Sensitivity
 
@@ -285,7 +286,7 @@ def input_sensitivity(vv_instance):
 @input_config_bp.route("/inputengineeringscale", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_engineering_scale(vv_instance):
+def input_engineering_scale(vv_instance: Any) -> Response:
     """
     Get Input Engineering Scale
 
@@ -320,7 +321,7 @@ def input_engineering_scale(vv_instance):
 @input_config_bp.route("/inputcapacitorcoupled", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_capacitor_coupled(vv_instance):
+def input_capacitor_coupled(vv_instance: Any) -> Response:
     """
     Get/Set Input Capacitor Coupled
 
@@ -372,7 +373,7 @@ def input_capacitor_coupled(vv_instance):
 @input_config_bp.route("/inputaccelpowersource", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_accel_power_source(vv_instance):
+def input_accel_power_source(vv_instance: Any) -> Response:
     """
     Get/Set Input Accelerometer Power Source
 
@@ -424,7 +425,7 @@ def input_accel_power_source(vv_instance):
 @input_config_bp.route("/inputdifferential", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_differential(vv_instance):
+def input_differential(vv_instance: Any) -> Response:
     """
     Get/Set Input Differential
 
@@ -477,7 +478,7 @@ def input_differential(vv_instance):
 @input_config_bp.route("/inputmode", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_mode(vv_instance):
+def input_mode(vv_instance: Any) -> Response:
     """
     Set Input Mode
 
@@ -549,7 +550,7 @@ def input_mode(vv_instance):
 @input_config_bp.route("/inputcalibration", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_calibration(vv_instance):
+def input_calibration(vv_instance: Any) -> Response:
     """
     Set Input Calibration
 
@@ -620,7 +621,7 @@ def input_calibration(vv_instance):
 @input_config_bp.route("/inputconfigurationfile", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def input_configuration_file(vv_instance):
+def input_configuration_file(vv_instance: Any) -> Response:
     """
     Set Input Configuration File
 
@@ -686,7 +687,7 @@ def input_configuration_file(vv_instance):
 @input_config_bp.route("/ischanneldifferentdatabase", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_channel_different_database(vv_instance):
+def is_channel_different_database(vv_instance: Any) -> Response:
     """
     Check if Channel Configuration Differs from Database
 
@@ -720,7 +721,7 @@ def is_channel_different_database(vv_instance):
 @input_config_bp.route("/channeldatabaseids", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_database_ids(vv_instance):
+def channel_database_ids(vv_instance: Any) -> Response:
     """
     Get Channel Database IDs
 
@@ -751,7 +752,7 @@ def channel_database_ids(vv_instance):
 @input_config_bp.route("/updatechannelconfigfromdatabase", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def update_channel_config_from_database(vv_instance):
+def update_channel_config_from_database(vv_instance: Any) -> Response:
     """
     Update Channel Configuration from Database
 
@@ -785,7 +786,7 @@ def update_channel_config_from_database(vv_instance):
 @input_config_bp.route("/transducerdatabaserecord", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def transducer_database_record(vv_instance):
+def transducer_database_record(vv_instance: Any) -> Response:
     """
     Get Transducer Database Record
 

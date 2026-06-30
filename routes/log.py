@@ -8,8 +8,9 @@ Event log retrieval operations matching exact COM method signatures
 """
 
 import logging
+from typing import Any
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, Response, jsonify
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @log_bp.route("/docs/log", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get log module documentation"""
     docs = {
         "module": "log",
@@ -49,7 +50,7 @@ def get_documentation():
 @log_bp.route("/log", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def log(vv_instance):
+def log(vv_instance: Any) -> Response:
     """
     Get Event Log
 

@@ -7,6 +7,7 @@ Configuration settings for VibrationVIEW API
 """
 
 import os
+from typing import List
 
 from dotenv import load_dotenv
 
@@ -69,7 +70,7 @@ class Config:
     DEBUG = False
 
     @classmethod
-    def validate_production(cls):
+    def validate_production(cls) -> None:
         """Reject insecure defaults that must be overridden before production use."""
         if cls.SECRET_KEY == _DEV_SECRET_KEY:
             raise RuntimeError(
@@ -85,7 +86,7 @@ class Config:
             )
 
     @classmethod
-    def validate_paths(cls):
+    def validate_paths(cls) -> List[str]:
         """Check that configured paths exist. Returns list of warning strings."""
         warnings = []
         if not os.path.isfile(cls.EXE_NAME):

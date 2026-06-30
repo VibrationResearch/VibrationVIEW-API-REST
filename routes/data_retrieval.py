@@ -18,8 +18,9 @@ Note: Vector data retrieval has been moved to vectors_legacy.py
 
 import logging
 import os
+from typing import Any
 
-from flask import Blueprint, jsonify, request, send_file
+from flask import Blueprint, Response, jsonify, request, send_file
 
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 @data_retrieval_bp.route("/docs/data_retrieval", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get data retrieval module documentation"""
     docs = {
         "module": "data_retrieval",
@@ -136,7 +137,7 @@ def get_documentation():
 @data_retrieval_bp.route("/demand", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def demand(vv_instance):
+def demand(vv_instance: Any) -> Response:
     """
     Get demand values for all loops
 
@@ -152,7 +153,7 @@ def demand(vv_instance):
 @data_retrieval_bp.route("/control", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control(vv_instance):
+def control(vv_instance: Any) -> Response:
     """
     Get control values for all loops
 
@@ -168,7 +169,7 @@ def control(vv_instance):
 @data_retrieval_bp.route("/channel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel(vv_instance):
+def channel(vv_instance: Any) -> Response:
     """
     Get channel values for all channels
 
@@ -185,7 +186,7 @@ def channel(vv_instance):
 @data_retrieval_bp.route("/output", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def output(vv_instance):
+def output(vv_instance: Any) -> Response:
     """
     Get output values for all loops
 
@@ -206,7 +207,7 @@ def output(vv_instance):
 @data_retrieval_bp.route("/channelunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_unit(vv_instance):
+def channel_unit(vv_instance: Any) -> Response:
     """
     Get the channel unit associated with channel number (1-based)
 
@@ -241,7 +242,7 @@ def channel_unit(vv_instance):
 @data_retrieval_bp.route("/channellabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_label(vv_instance):
+def channel_label(vv_instance: Any) -> Response:
     """
     Get the channel unit label associated with channel number (1-based)
 
@@ -281,7 +282,7 @@ def channel_label(vv_instance):
 @data_retrieval_bp.route("/controlunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_unit(vv_instance):
+def control_unit(vv_instance: Any) -> Response:
     """
     Get control loop units
 
@@ -333,7 +334,7 @@ def control_unit(vv_instance):
 @data_retrieval_bp.route("/controllabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_label(vv_instance):
+def control_label(vv_instance: Any) -> Response:
     """
     Get control loop label
 
@@ -387,7 +388,7 @@ def control_label(vv_instance):
 @data_retrieval_bp.route("/getdatafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_data_file(vv_instance):
+def get_data_file(vv_instance: Any) -> Response:
     """
     Get Raw VibrationVIEW Data File
 

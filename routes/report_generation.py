@@ -11,8 +11,9 @@ import io
 import logging
 import os
 import zipfile
+from typing import Any
 
-from flask import Blueprint, jsonify, request, send_file
+from flask import Blueprint, Response, jsonify, request, send_file
 from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUFFFromVV
 
 from utils.decorators import handle_errors
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 @report_generation_bp.route("/docs/report_generation", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get report generation module documentation"""
     docs = {
         "module": "report_generation",
@@ -153,7 +154,7 @@ def get_documentation():
 @report_generation_bp.route("/generatereport", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_report(vv_instance):
+def generate_report(vv_instance: Any) -> Response:
     """
     Generate Report File from VibrationVIEW Data
 
@@ -295,7 +296,7 @@ def generate_report(vv_instance):
 @report_generation_bp.route("/datafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_datafile(vv_instance):
+def get_datafile(vv_instance: Any) -> Response:
     """
     Get Raw VibrationVIEW Data File
 
@@ -338,7 +339,7 @@ def get_datafile(vv_instance):
 @report_generation_bp.route("/datafiles", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_datafiles(vv_instance):
+def get_datafiles(vv_instance: Any) -> Response:
     """
     Get All Data Files from most recently run test as Zip Archive
 
@@ -401,7 +402,7 @@ def get_datafiles(vv_instance):
 @report_generation_bp.route("/generatetxt", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_txt(vv_instance):
+def generate_txt(vv_instance: Any) -> Response:
     """
     Generate Text Files from VibrationVIEW Data
 
@@ -443,7 +444,7 @@ def generate_txt(vv_instance):
 @report_generation_bp.route("/generateuff", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_uff(vv_instance):
+def generate_uff(vv_instance: Any) -> Response:
     """
     Generate UFF Files from VibrationVIEW Data
 
@@ -482,7 +483,7 @@ def generate_uff(vv_instance):
     return _generate_files_common(vv_instance, "UFF", GenerateUFFFromVV, "UFF")
 
 
-def _generate_files_common(vv_instance, file_type, generate_func, description):
+def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any, description: str) -> Response:
     """
     Common implementation for generateuff and generatetxt endpoints
 

@@ -9,8 +9,9 @@ Recording operations matching exact COM method signatures
 
 import logging
 from datetime import datetime
+from typing import Any
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, Response, jsonify
 
 from utils.decorators import handle_errors
 from utils.response_helpers import success_response
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @recording_bp.route("/docs/recording", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get recording control module documentation"""
     docs = {
         "module": "recording",
@@ -74,7 +75,7 @@ def get_documentation():
 @recording_bp.route("/recordstart", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def record_start(vv_instance):
+def record_start(vv_instance: Any) -> Response:
     """
     Start Recording Data
 
@@ -91,7 +92,7 @@ def record_start(vv_instance):
 @recording_bp.route("/recordstop", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def record_stop(vv_instance):
+def record_stop(vv_instance: Any) -> Response:
     """
     Stop Recording Data
 
@@ -107,7 +108,7 @@ def record_stop(vv_instance):
 @recording_bp.route("/recordpause", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def record_pause(vv_instance):
+def record_pause(vv_instance: Any) -> Response:
     """
     Pause Recording Data
 
@@ -124,7 +125,7 @@ def record_pause(vv_instance):
 @recording_bp.route("/recordgetfilename", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def record_get_filename(vv_instance):
+def record_get_filename(vv_instance: Any) -> Response:
     """
     Get Last Recording Filename
 
@@ -141,7 +142,7 @@ def record_get_filename(vv_instance):
 @recording_bp.route("/testrecording", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def test_recording_connection(vv_instance):
+def test_recording_connection(vv_instance: Any) -> Response:
     """
     Test Recording Methods (Diagnostic Endpoint)
 

@@ -9,9 +9,10 @@ Core test control operations matching exact COM method signatures
 
 import logging
 import os
+from typing import Any
 from urllib.parse import unquote
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from config import Config
 from utils.decorators import handle_errors
@@ -34,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 @basic_control_bp.route("/docs/basic_control", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get basic control module documentation"""
     docs = {
         "module": "basic_control",
@@ -195,7 +196,7 @@ def get_documentation():
 @basic_control_bp.route("/starttest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def start_test(vv_instance):
+def start_test(vv_instance: Any) -> Response:
     """
     Start Currently Loaded VibrationVIEW Test
 
@@ -212,7 +213,7 @@ def start_test(vv_instance):
 @basic_control_bp.route("/runtest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def run_test(vv_instance):
+def run_test(vv_instance: Any) -> Response:
     """
     Run Complete Test (Open + Start)
 
@@ -283,7 +284,7 @@ def run_test(vv_instance):
 @basic_control_bp.route("/stoptest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def stop_test(vv_instance):
+def stop_test(vv_instance: Any) -> Response:
     """
     Stop Currently Running Test
 
@@ -299,7 +300,7 @@ def stop_test(vv_instance):
 @basic_control_bp.route("/resumetest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def resume_test(vv_instance):
+def resume_test(vv_instance: Any) -> Response:
     """
     Resume Paused Test
 
@@ -315,7 +316,7 @@ def resume_test(vv_instance):
 @basic_control_bp.route("/opentest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def open_test(vv_instance):
+def open_test(vv_instance: Any) -> Response:
     """
     Open Test Profile File
 
@@ -406,7 +407,7 @@ def open_test(vv_instance):
 @basic_control_bp.route("/closetest", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_test(vv_instance):
+def close_test(vv_instance: Any) -> Response:
     """
     Close Test Profile by Name
 
@@ -453,7 +454,7 @@ def close_test(vv_instance):
 @basic_control_bp.route("/closetab", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_tab(vv_instance):
+def close_tab(vv_instance: Any) -> Response:
     """
     Close Test Tab by Index
 
@@ -517,7 +518,7 @@ def close_tab(vv_instance):
 @basic_control_bp.route("/listopentests", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def list_open_tests(vv_instance):
+def list_open_tests(vv_instance: Any) -> Response:
     """
     List All Open Test Profiles
 
@@ -566,7 +567,7 @@ def list_open_tests(vv_instance):
 @basic_control_bp.route("/savedata", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def save_data(vv_instance):
+def save_data(vv_instance: Any) -> Response:
     """
     Save Current Test Data
 
@@ -611,7 +612,7 @@ def save_data(vv_instance):
 @basic_control_bp.route("/testcom", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def test_com_connection(vv_instance):
+def test_com_connection(vv_instance: Any) -> Response:
     """
     Test COM Connection (Diagnostic Endpoint)
 

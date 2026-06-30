@@ -8,8 +8,9 @@ TEDS (Transducer Electronic Data Sheet) operations matching exact COM method sig
 """
 
 import logging
+from typing import Any, Dict, List, Optional
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 @teds_bp.route("/docs/teds", methods=["GET"])
-def get_documentation():
+def get_documentation() -> Response:
     """Get TEDS module documentation"""
     docs = {
         "module": "teds",
@@ -93,7 +94,7 @@ def get_documentation():
 @teds_bp.route("/inputteds", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_input_teds_all(vv_instance):
+def get_input_teds_all(vv_instance: Any) -> Response:
     """
     Get TEDS Information for All Channels
 
@@ -186,7 +187,7 @@ def get_input_teds_all(vv_instance):
 @teds_bp.route("/inputtedschannel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_input_teds_channel(vv_instance):
+def get_input_teds_channel(vv_instance: Any) -> Response:
     """
     Get TEDS Information for Specific Channel (1-based indexing)
 
@@ -231,7 +232,7 @@ def get_input_teds_channel(vv_instance):
 @teds_bp.route("/teds", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def teds(vv_instance):
+def teds(vv_instance: Any) -> Response:
     """
     Get TEDS Information for Specific Channel or All Channels (1-based indexing)
 
@@ -305,7 +306,7 @@ def teds(vv_instance):
 # ---------------------------------------------------------------------------
 
 
-def _teds_read_channel_status(vv_instance, expected_urns):
+def _teds_read_channel_status(vv_instance: Any, expected_urns: List[str]) -> List[Dict[str, Any]]:
     """!
     @brief Read TEDS from hardware and return per-channel status compared to expected URNs.
 
@@ -351,7 +352,7 @@ def _teds_read_channel_status(vv_instance, expected_urns):
     return channels
 
 
-def _format_result_as_channels(result, expected_urns=None):
+def _format_result_as_channels(result: Any, expected_urns: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """!
     @brief Format a TedsReadAndApply/TedsVerifyAndApply result list into per-channel status.
 
@@ -386,7 +387,7 @@ def _format_result_as_channels(result, expected_urns=None):
 @teds_bp.route("/tedsreadandapply", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def teds_read_and_apply(vv_instance):
+def teds_read_and_apply(vv_instance: Any) -> Response:
     """
     Read and Apply TEDS Information for All Channels
 
@@ -438,7 +439,7 @@ def teds_read_and_apply(vv_instance):
 @teds_bp.route("/tedsverifyandapply", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def teds_verify_and_apply(vv_instance):
+def teds_verify_and_apply(vv_instance: Any) -> Response:
     """
     Verify and Apply TEDS Information for Specified URNs
 
@@ -499,7 +500,7 @@ def teds_verify_and_apply(vv_instance):
 @teds_bp.route("/tedsread", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def teds_read(vv_instance):
+def teds_read(vv_instance: Any) -> Response:
     """
     Read TEDS Information from Hardware
 
