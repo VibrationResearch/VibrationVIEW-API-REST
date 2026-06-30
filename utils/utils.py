@@ -1,38 +1,54 @@
 from __future__ import annotations
 
+import logging
+import math
 import os
 import re
 import subprocess
 import uuid
-import math
 from typing import Any, Callable
-
-import logging
-from flask import request
 from urllib.parse import unquote
+
+from flask import request
 from vibrationviewapi import ExtractComErrorInfo
-import config
 from werkzeug.utils import secure_filename
+
+import config
 
 logger = logging.getLogger(__name__)
 
-PROFILE_EXTENSIONS = {'vrp', 'vrpj', 'vasor', 'vkp', 'vkpj', 'vsp', 'vspj', 'vdp', 'vdpj', 'vyp'}
+PROFILE_EXTENSIONS = {"vrp", "vrpj", "vasor", "vkp", "vkpj", "vsp", "vspj", "vdp", "vdpj", "vyp"}
 
-DATA_EXTENSIONS = {'vrd', 'vkd', 'vsd', 'vdd', 'vyd'}  # v?d pattern
+DATA_EXTENSIONS = {"vrd", "vkd", "vsd", "vdd", "vyd"}  # v?d pattern
 
-TEMPLATE_EXTENSIONS = {'vsyscheckt', 'vsinet', 'vrandomt', 'vsort', 'vrort', 'vsorort',
-                       'vsost', 'vanalyzert', 'vshockt', 'vudtt', 'vsrst', 'vtransientt'}
+TEMPLATE_EXTENSIONS = {
+    "vsyscheckt",
+    "vsinet",
+    "vrandomt",
+    "vsort",
+    "vrort",
+    "vsorort",
+    "vsost",
+    "vanalyzert",
+    "vshockt",
+    "vudtt",
+    "vsrst",
+    "vtransientt",
+}
 
-INPUTCONFIG_EXTENSIONS = {'vic', 'vchan', 'inputconfig'}
+INPUTCONFIG_EXTENSIONS = {"vic", "vchan", "inputconfig"}
 
-REPORT_EXTENSIONS = {'vvtemplate', 'rtf', 'txt', 'xlsx', 'xlsm', 'xls', 'csv', 'html', 'htm', 'pdf'}
+REPORT_EXTENSIONS = {"vvtemplate", "rtf", "txt", "xlsx", "xlsm", "xls", "csv", "html", "htm", "pdf"}
 
-ALLOWED_EXTENSIONS = PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS | REPORT_EXTENSIONS
+ALLOWED_EXTENSIONS = (
+    PROFILE_EXTENSIONS | DATA_EXTENSIONS | TEMPLATE_EXTENSIONS | INPUTCONFIG_EXTENSIONS | REPORT_EXTENSIONS
+)
+
 
 def get_folder_for_extension(filename_or_ext):
     """Return the appropriate folder for a given filename or extension."""
-    if '.' in filename_or_ext:
-        ext = filename_or_ext.rsplit('.', 1)[1].lower()
+    if "." in filename_or_ext:
+        ext = filename_or_ext.rsplit(".", 1)[1].lower()
     else:
         ext = filename_or_ext.lower()
 
@@ -51,102 +67,92 @@ def get_folder_for_extension(filename_or_ext):
 
 
 def handle_binary_upload(filename, binary_data, usetemporaryfile=False):
-    if not filename or '.' not in filename:
-        return None, {'Error': 'Missing or invalid filename'}, 400
+    if not filename or "." not in filename:
+        return None, {"Error": "Missing or invalid filename"}, 400
 
-    ext = filename.rsplit('.', 1)[1].lower()
+    ext = filename.rsplit(".", 1)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        return None, {'Error': f'Invalid file extension: .{ext}'}, 400
+        return None, {"Error": f"Invalid file extension: .{ext}"}, 400
 
     base_folder = get_folder_for_extension(ext)
-    temp_folder = os.path.join(base_folder, 'Uploads')
-    
+    temp_folder = os.path.join(base_folder, "Uploads")
+
     os.makedirs(temp_folder, exist_ok=True)
 
     if usetemporaryfile:
         unique_id = uuid.uuid4().hex
         base, ext = os.path.splitext(filename)
-        filename = f'{base}_{unique_id}{ext}'
+        filename = f"{base}_{unique_id}{ext}"
 
     safe_filename = secure_filename(filename)
-    safe_filename = safe_filename.lstrip('/\\')
+    safe_filename = safe_filename.lstrip("/\\")
     file_path = os.path.join(temp_folder, safe_filename)
 
-    with open(file_path, 'wb') as f:
+    with open(file_path, "wb") as f:
         f.write(binary_data)
 
     logger.info(f"Binary file saved: {file_path}")
 
-    return {
-        'FilePath': file_path,
-        'Filename': filename,
-        'Size': os.path.getsize(file_path)
-    }, None, 200
+    return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}, None, 200
+
 
 def ParseVvTable(tsv_text: str):
     try:
         lines = tsv_text.strip().splitlines()
         if len(lines) < 2:
-            return [{'RawText': tsv_text}]
+            return [{"RawText": tsv_text}]
 
-        headers = lines[0].split('\t')
+        headers = lines[0].split("\t")
         data = []
 
         for line in lines[1:]:
-            values = line.split('\t')
+            values = line.split("\t")
             if len(values) == len(headers):
                 data.append(dict(zip(headers, values)))
             else:
-                logger.warning(f'Skipping malformed line: {line}')
+                logger.warning(f"Skipping malformed line: {line}")
 
         return data
 
     except Exception as e:
-        return [{'Error': f'Error parsing TSV: {e}'}]
+        return [{"Error": f"Error parsing TSV: {e}"}]
+
 
 def DecodeStatusColor(status):
-    color_map = {
-        0: 'healthy',
-        1: 'yellow',
-        2: 'critical'
-    }
-        # Convert string to integer if needed
+    color_map = {0: "healthy", 1: "yellow", 2: "critical"}
+    # Convert string to integer if needed
 
-    return_color_code = status['stop_code_index'] >> 12
-    return color_map.get(return_color_code, 'unknown')
+    return_color_code = status["stop_code_index"] >> 12
+    return color_map.get(return_color_code, "unknown")
 
 
 def get_channel_data(vv_instance, field_keys):
     """
     Common function to get channel data for multiple routes
-    
+
     Args:
         vv_instance: VibrationVIEW instance
         field_keys: List of field keys to retrieve for each channel
-        
+
     Returns:
         List of dictionaries with channel data
     """
     if not vv_instance:
         return None
-        
+
     channel_count = vv_instance.GetHardwareInputChannels()
-    
+
     # Collect all fields per channel
-    field_data = {
-        key: [vv_instance.ReportField(f'{key}{i + 1}') for i in range(channel_count)]
-        for key in field_keys
-    }
+    field_data = {key: [vv_instance.ReportField(f"{key}{i + 1}") for i in range(channel_count)] for key in field_keys}
 
     # Combine into list of dictionaries per channel
     channels = []
     for i in range(channel_count):
-        channel_info = {
-            key: field_data[key][i] for key in field_keys
-        }
+        channel_info = {key: field_data[key][i] for key in field_keys}
         channels.append(channel_info)
-        
+
     return channels
+
 
 def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> str:
     """
@@ -164,29 +170,23 @@ def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> s
 
     # Prepare report output directory based on output file extension
     base_folder = get_folder_for_extension(outputName)
-    reportFolder = os.path.join(base_folder, 'Temporary')
+    reportFolder = os.path.join(base_folder, "Temporary")
     os.makedirs(reportFolder, exist_ok=True)
 
     outPath = os.path.join(reportFolder, outputName)
 
     # Build and run report generation command
-    command = [
-        config.EXE_NAME,
-        '/savereport', filePath,
-        '/template', templateName,
-        '/output', outPath
-    ]
+    command = [config.EXE_NAME, "/savereport", filePath, "/template", templateName, "/output", outPath]
 
     result = subprocess.run(command, capture_output=True, text=True)
 
     if result.returncode != 0:
-        raise RuntimeError(
-            f'Report generation failed.\nCommand: {" ".join(command)}\nStderr: {result.stderr.strip()}'
-        )
+        raise RuntimeError(f"Report generation failed.\nCommand: {' '.join(command)}\nStderr: {result.stderr.strip()}")
 
     return outPath
 
-def GetVectorData(vvInstance,vector):
+
+def GetVectorData(vvInstance, vector):
     try:
         cols = vvInstance.GetHardwareInputChannels() + 1
         dataList = []
@@ -194,16 +194,17 @@ def GetVectorData(vvInstance,vector):
 
         headers = [vvInstance.VectorLabel(vector)]
         for i in range(cols - 1):
-            field = f'CH{i+1}NAME'
+            field = f"CH{i + 1}NAME"
             headers.append(vvInstance.ReportField(field))
             dataList.append(vvInstance.Vector(vector + i))
 
         units = [vvInstance.VectorUnit(vector + i) for i in range(cols)]
 
-        return {'headers': headers, 'units': units, 'columns': dataList}
+        return {"headers": headers, "units": units, "columns": dataList}
 
     except Exception as e:
-        raise RuntimeError(f'Error retrieving vector data: {e}')
+        raise RuntimeError(f"Error retrieving vector data: {e}")
+
 
 def extract_com_error_info(exception):
     """
@@ -216,13 +217,14 @@ def extract_com_error_info(exception):
         # Fallback if ExtractComErrorInfo fails
         return str(exception)
 
+
 def convert_channel_to_com_index(channel_user):
     """
     Convert user-provided 1-based channel number to 0-based COM index
-    
+
     Args:
         channel_user: User-provided channel number (1-based)
-        
+
     Returns:
         tuple: (channel_com, error_response, status_code)
                - channel_com: 0-based channel for COM calls (None if error)
@@ -233,58 +235,58 @@ def convert_channel_to_com_index(channel_user):
         channel = int(channel_user)
         if channel < 1:
             from utils.response_helpers import error_response
-            return None, error_response(
-                'Channel parameter must be >= 1',
-                'INVALID_PARAMETER'
-            ), 400
+
+            return None, error_response("Channel parameter must be >= 1", "INVALID_PARAMETER"), 400
         return channel - 1, None, None
     except (ValueError, TypeError):
         from utils.response_helpers import error_response
-        return None, error_response(
-            'Invalid channel parameter - must be an integer',
-            'INVALID_PARAMETER'
-        ), 400
+
+        return None, error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER"), 400
+
 
 def is_template_file(filename):
     """
     Check if a file has a template extension
-    
+
     Args:
         filename: The filename to check
-        
+
     Returns:
         bool: True if the file is a template file, False otherwise
     """
-    if not filename or '.' not in filename:
+    if not filename or "." not in filename:
         return False
-    
-    ext = filename.rsplit('.', 1)[1].lower()
+
+    ext = filename.rsplit(".", 1)[1].lower()
     return ext in TEMPLATE_EXTENSIONS
+
 
 def get_new_test_defaults_path():
     """
     Get the New Test Defaults folder path from configuration
-    
+
     Returns:
         str: Path to the New Test Defaults folder
     """
     return config.Config.NEW_TEST_DEFAULTS_FOLDER
 
+
 # Pre-computed lowercase default template filenames for performance
 DEFAULT_TEMPLATE_FILENAMES = {
-    'random.vrandomt',
-    'sine.vsinet', 
-    'shock.vshockt',
-    'fdr.vfdrt',
-    'sor.vsort',
-    'sos.vsost',
-    'ror.vrort',
-    'sororor.vsorort',
-    'srs.vsrst',
-    'user-defined transient.vudtt',
-    'transient.vtransientt',
-    'analyzer.vanalyzert'
+    "random.vrandomt",
+    "sine.vsinet",
+    "shock.vshockt",
+    "fdr.vfdrt",
+    "sor.vsort",
+    "sos.vsost",
+    "ror.vrort",
+    "sororor.vsorort",
+    "srs.vsrst",
+    "user-defined transient.vudtt",
+    "transient.vtransientt",
+    "analyzer.vanalyzert",
 }
+
 
 def is_default_template_filename(filename):
     """
@@ -301,7 +303,7 @@ def is_default_template_filename(filename):
 
 
 # URN pattern: exactly 16 hexadecimal characters (e.g., "3C00000186B96114")
-URN_PATTERN = re.compile(r'^[0-9A-Fa-f]{16}$')
+URN_PATTERN = re.compile(r"^[0-9A-Fa-f]{16}$")
 
 
 def is_valid_urn(value):
@@ -343,7 +345,6 @@ def sanitize_nan(value):
     return value
 
 
-
 def detect_file_upload():
     """
     Detect if the current request contains a file upload.
@@ -357,21 +358,24 @@ def detect_file_upload():
         - multipart/form-data with any file field name
         - Raw binary body with filename in query parameter
     """
-    content_type = request.content_type or ''
+    content_type = request.content_type or ""
 
-    logger.debug(f"detect_file_upload: method={request.method}, content_type={content_type}, "
-                  f"content_length={request.content_length}, files={list(request.files.keys())}")
+    logger.debug(
+        f"detect_file_upload: method={request.method}, content_type={content_type}, "
+        f"content_length={request.content_length}, files={list(request.files.keys())}"
+    )
 
     # Check for multipart file upload (any field name)
     has_multipart_file = len(request.files) > 0
 
     # Check for raw binary upload (exclude json, form, multipart)
     is_binary_content_type = (
-        request.content_length and request.content_length > 0 and
-        not has_multipart_file and
-        'multipart' not in content_type and
-        'application/json' not in content_type and
-        'application/x-www-form-urlencoded' not in content_type
+        request.content_length
+        and request.content_length > 0
+        and not has_multipart_file
+        and "multipart" not in content_type
+        and "application/json" not in content_type
+        and "application/x-www-form-urlencoded" not in content_type
     )
 
     if has_multipart_file:
@@ -381,10 +385,12 @@ def detect_file_upload():
         filename = uploaded_file.filename
         binary_data = uploaded_file.read()
         content_length = len(binary_data)
-        logger.debug(f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}")
+        logger.debug(
+            f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}"
+        )
 
         if not filename:
-            return ({'Error': 'Multipart file field has no filename'}, 400, None)
+            return ({"Error": "Multipart file field has no filename"}, 400, None)
 
         return (filename, binary_data, content_length)
 
@@ -396,12 +402,16 @@ def detect_file_upload():
         filename = request.args.get("filename")
 
         if filename is None:
-            query_string = request.query_string.decode('utf-8')
+            query_string = request.query_string.decode("utf-8")
             if query_string:
                 filename = unquote(query_string)
 
         if not filename:
-            return ({'Error': 'Missing filename: provide via multipart/form-data file field or query parameter'}, 400, None)
+            return (
+                {"Error": "Missing filename: provide via multipart/form-data file field or query parameter"},
+                400,
+                None,
+            )
 
         content_length = request.content_length
         binary_data = request.get_data()
@@ -438,10 +448,14 @@ def get_query_param(name: str, type_fn: Callable = int, required: bool = True) -
 
     # Named key exists but type conversion failed (e.g. ?channel=abc with type_fn=int)
     if name in request.args:
-        return None, _error(
-            f"{name} must be a valid {type_fn.__name__}",
-            "INVALID_PARAMETER",
-        ), 400
+        return (
+            None,
+            _error(
+                f"{name} must be a valid {type_fn.__name__}",
+                "INVALID_PARAMETER",
+            ),
+            400,
+        )
 
     # Unnamed positional fallback – first query-string key with no ``=``
     if request.args:
@@ -450,21 +464,31 @@ def get_query_param(name: str, type_fn: Callable = int, required: bool = True) -
             value = type_fn(first_key)
             return value, None, None
         except (ValueError, TypeError):
-            return None, _error(
-                f"{name} must be a valid {type_fn.__name__}",
-                "INVALID_PARAMETER",
-            ), 400
+            return (
+                None,
+                _error(
+                    f"{name} must be a valid {type_fn.__name__}",
+                    "INVALID_PARAMETER",
+                ),
+                400,
+            )
 
     if required:
-        return None, _error(
-            f"Missing required parameter: {name}",
-            "MISSING_PARAMETER",
-        ), 400
+        return (
+            None,
+            _error(
+                f"Missing required parameter: {name}",
+                "MISSING_PARAMETER",
+            ),
+            400,
+        )
 
     return None, None, None
 
 
-def get_query_param_string(name: str, required: bool = True, json_data: dict | None = None) -> tuple[str | None, dict | None, int | None]:
+def get_query_param_string(
+    name: str, required: bool = True, json_data: dict | None = None
+) -> tuple[str | None, dict | None, int | None]:
     """
     Extract a string query parameter with unnamed positional fallback.
 
@@ -489,10 +513,14 @@ def get_query_param_string(name: str, required: bool = True, json_data: dict | N
     value = request.args.get(name)
     if value is not None:
         if not value and required:
-            return None, _error(
-                f"Missing required parameter: {name}",
-                "MISSING_PARAMETER",
-            ), 400
+            return (
+                None,
+                _error(
+                    f"Missing required parameter: {name}",
+                    "MISSING_PARAMETER",
+                ),
+                400,
+            )
         return value, None, None
 
     # Unnamed positional fallback – only when the query string looks
@@ -508,10 +536,14 @@ def get_query_param_string(name: str, required: bool = True, json_data: dict | N
             return str(value), None, None
 
     if required:
-        return None, _error(
-            f"Missing required parameter: {name}",
-            "MISSING_PARAMETER",
-        ), 400
+        return (
+            None,
+            _error(
+                f"Missing required parameter: {name}",
+                "MISSING_PARAMETER",
+            ),
+            400,
+        )
 
     return None, None, None
 
