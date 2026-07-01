@@ -238,6 +238,9 @@ def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
             if error:
                 return jsonify(error), status_code
 
+            if result is None:
+                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
+
             file_path = result["FilePath"]
             vv_instance.RunTest(file_path)
             result = vv_instance.IsRunning()
@@ -342,6 +345,9 @@ def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
 
             if error:
                 return jsonify(error), status_code
+
+            if result is None:
+                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
 
             file_path = result["FilePath"]
 
