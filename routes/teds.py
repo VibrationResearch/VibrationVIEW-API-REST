@@ -281,8 +281,13 @@ def teds(vv_instance: Any) -> Response | tuple[Response, int]:
             }
             message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
         else:  # 'error' in formatted_channel
-            result_data = {"error": formatted_channel["error"], "channel": channel_1based, "success": False}
-            message = f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}"
+            return jsonify(
+                error_response(
+                    f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}",
+                    "TEDS_ERROR",
+                    {"channel": channel_1based},
+                )
+            ), 400
 
         return jsonify(success_response(result_data, message))
 
