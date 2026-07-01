@@ -67,10 +67,16 @@ class TestReportGeneration:
         mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_output.pdf"
 
         with (
+            patch("routes.report_generation.handle_binary_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
+            mock_upload.return_value = (
+                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": file_size},
+                None,
+                200,
+            )
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
@@ -93,9 +99,7 @@ class TestReportGeneration:
             mock_generate.assert_called_once()
             gen_call_args = mock_generate.call_args[0]
 
-            # Check that a temporary file path was used
-            temp_file_path = gen_call_args[0]
-            assert temp_file_path.endswith(".vrd")
+            assert gen_call_args[0] == "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd"
             assert gen_call_args[1] == template_name  # template_name
             assert gen_call_args[2] == output_name  # output_name
 
@@ -132,10 +136,16 @@ class TestReportGeneration:
         mock_generated_path = "C:\\VibrationVIEW\\Reports\\test.vvtemplate"
 
         with (
+            patch("routes.report_generation.handle_binary_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
+            mock_upload.return_value = (
+                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
+                None,
+                200,
+            )
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
