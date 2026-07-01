@@ -484,7 +484,9 @@ def generate_uff(vv_instance: Any) -> Response | tuple[Response, int]:
     return _generate_files_common(vv_instance, "UFF", GenerateUFFFromVV, "UFF")
 
 
-def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any, description: str) -> Response | tuple[Response, int]:
+def _generate_files_common(
+    vv_instance: Any, file_type: str, generate_func: Any, description: str
+) -> Response | tuple[Response, int]:
     """
     Common implementation for generateuff and generatetxt endpoints
 

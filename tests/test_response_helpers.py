@@ -8,7 +8,7 @@ Tests for response helper utilities (issue #18).
 Verifies that all response timestamps are UTC with explicit timezone.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from utils.response_helpers import error_response, success_response
 

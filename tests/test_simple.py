@@ -23,7 +23,9 @@ class TestSimple:
 
         # Set the singleton
         set_vv_instance(mock_instance)
-        print(f"After set_vv_instance, _vv_instance: {id(_singleton._vv_instance) if _singleton._vv_instance else None}")
+        print(
+            f"After set_vv_instance, _vv_instance: {id(_singleton._vv_instance) if _singleton._vv_instance else None}"
+        )
 
         # Test get_vv_instance directly
         retrieved_instance = get_vv_instance()

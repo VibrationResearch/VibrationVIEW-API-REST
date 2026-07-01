@@ -134,4 +134,3 @@ class TestThreadedAccess:
             t.join(timeout=10)
 
         assert not none_results, f"Threads got None: {none_results}"
-

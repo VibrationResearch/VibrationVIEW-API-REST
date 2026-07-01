@@ -8,7 +8,7 @@ Tests for production startup validation (issue #19).
 
 import pytest
 
-from config import Config, _DEV_SECRET_KEY, _PLACEHOLDER_API_KEY
+from config import _DEV_SECRET_KEY, _PLACEHOLDER_API_KEY, Config
 
 
 def _set_valid_defaults(monkeypatch):
