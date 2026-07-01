@@ -75,7 +75,7 @@ def get_docs() -> Response:
 @advanced_control_system_check_bp.route("/systemcheckfrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_frequency(vv_instance: Any) -> Response:
+def system_check_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set System Check Frequency
 
@@ -125,7 +125,7 @@ def system_check_frequency(vv_instance: Any) -> Response:
 @advanced_control_system_check_bp.route("/systemcheckoutputvoltage", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_output_voltage(vv_instance: Any) -> Response:
+def system_check_output_voltage(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set System Check Output Voltage
 

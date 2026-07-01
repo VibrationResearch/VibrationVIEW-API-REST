@@ -54,7 +54,7 @@ def get_documentation() -> Response:
 @advanced_control_bp.route("/testtype", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def test_type(vv_instance: Any) -> Response:
+def test_type(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Test Type
 

@@ -207,7 +207,7 @@ def get_vector_enumerations() -> Response:
 @vectors_legacy_bp.route("/vector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def vector(vv_instance: Any) -> Response:
+def vector(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get raw data vector
 
@@ -284,7 +284,7 @@ def vector(vv_instance: Any) -> Response:
 @vectors_legacy_bp.route("/vectorunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_unit(vv_instance: Any) -> Response:
+def vector_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get units for raw data vector
 
@@ -322,7 +322,7 @@ def vector_unit(vv_instance: Any) -> Response:
 @vectors_legacy_bp.route("/vectorlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_label(vv_instance: Any) -> Response:
+def vector_label(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get label for raw data vector
 
@@ -360,7 +360,7 @@ def vector_label(vv_instance: Any) -> Response:
 @vectors_legacy_bp.route("/vectorlength", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_length(vv_instance: Any) -> Response:
+def vector_length(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get required array length for Raw Data Vector Array
 
