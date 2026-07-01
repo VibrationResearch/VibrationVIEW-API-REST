@@ -499,6 +499,7 @@ def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
     required_params = ["channel", "powersource", "capcoupled", "differential"]
 
     # Try query parameters first, then JSON body
+    data: dict[str, Any] | None = None
     if request.args:
         data = {
             "channel": request.args.get("channel"),
@@ -509,7 +510,7 @@ def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
         # Convert string booleans to actual booleans
         for key in ["powersource", "capcoupled", "differential"]:
             if data[key] is not None:
-                data[key] = data[key].lower() == "true"
+                data[key] = str(data[key]).lower() == "true"
     else:
         data = request.get_json(silent=True)
 
@@ -568,6 +569,7 @@ def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
         POST /api/v1/inputcalibration?channel=1&sensitivity=100&serialnumber=SN123&caldate=1/1/2024
     """
     # Try query parameters first, then JSON body
+    data: dict[str, Any] | None = None
     if request.args:
         data = {
             "channel": request.args.get("channel"),
@@ -659,6 +661,7 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
         if error:
             return jsonify(error), status_code
 
+        assert result is not None
         file_path = result["FilePath"]
 
         vv_instance.SetInputConfigurationFile(file_path)

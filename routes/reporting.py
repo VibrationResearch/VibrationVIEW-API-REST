@@ -243,7 +243,7 @@ def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
     results = vv_instance.ReportFields(fields_string)
 
     # Convert results to list for JSON serialization and parse delimited data
-    results_list = []
+    results_list: list[Any] = []
     if results is not None:
         for item in results:
             if isinstance(item, (list, tuple)):
@@ -298,7 +298,7 @@ def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportfieldshistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields_history(vv_instance: Any) -> Response:
+def report_fields_history(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Report Field Values for All Data Files from Most Recent Test
 
