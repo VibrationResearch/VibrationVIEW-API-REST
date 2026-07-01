@@ -588,12 +588,13 @@ class TestDataRetrieval:
         assert response.status_code == 200
         data = json.loads(response.data)
 
-        assert "module" in data
-        assert data["module"] == "vector_enumerations"
-        assert "waveform_enums" in data
-        assert "frequency_enums" in data
-        assert "time_history_enums" in data
-        assert "usage_examples" in data
+        assert data["success"] is True
+        assert "data" in data
+        assert data["data"]["module"] == "vector_enumerations"
+        assert "waveform_enums" in data["data"]
+        assert "frequency_enums" in data["data"]
+        assert "time_history_enums" in data["data"]
+        assert "usage_examples" in data["data"]
 
         print("✓ Vector enumerations documentation endpoint works!")
 
