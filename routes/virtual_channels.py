@@ -46,7 +46,7 @@ def get_documentation() -> Response:
                         "Option 1 (multipart/form-data)": "any file field (filename auto-detected)",
                         "Option 2 (raw binary)": "filename query parameter required, binary body",
                     },
-                    "Without file content": "Same as GET - filename query parameter required",
+                    "Without file content": "filename query parameter required",
                 },
                 "returns": "object - Status, file path",
                 "examples": [
