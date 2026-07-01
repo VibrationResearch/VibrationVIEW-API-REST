@@ -38,16 +38,6 @@ def get_documentation() -> Response:
                 "returns": "bool - Success status",
                 "example": "POST /api/v1/removeallvirtualchannels",
             },
-            "GET /importvirtualchannels": {
-                "description": "Import virtual channels from an existing configuration file by path",
-                "com_method": "ImportVirtualChannels(filepath)",
-                "parameters": {
-                    "filename": "string - Virtual channels configuration filename (named parameter)",
-                    "OR unnamed parameter": "string - Filename as first URL parameter",
-                },
-                "returns": "Result from ImportVirtualChannels()",
-                "example": "GET /api/v1/importvirtualchannels?filename=channels.vvc",
-            },
             "POST|PUT /importvirtualchannels": {
                 "description": "Upload and import a virtual channels file, OR import existing file by path",
                 "com_method": "ImportVirtualChannels(filepath)",

@@ -57,12 +57,12 @@ def get_documentation() -> Response:
                         "GET /api/v1/teds?3 (channel 3, 1-based - single transducer object)",
                     ],
                 },
-                "GET|POST /tedsreadandapply": {
+                "POST /tedsreadandapply": {
                     "description": "Read and apply TEDS information for all channels",
                     "com_method": "TedsReadAndApply()",
                     "parameters": "None",
                     "returns": "object - Success status and operation result",
-                    "example": "GET /api/v1/tedsreadandapply or POST /api/v1/tedsreadandapply",
+                    "example": "POST /api/v1/tedsreadandapply",
                 },
                 "POST /tedsverifyandapply": {
                     "description": "Verify and apply TEDS information for specified URNs",
@@ -71,12 +71,12 @@ def get_documentation() -> Response:
                     "returns": "object - Success status and operation result",
                     "example": 'POST /api/v1/tedsverifyandapply with JSON body: {"urns": ["urn1", "urn2"]}',
                 },
-                "GET|POST /tedsread": {
+                "POST /tedsread": {
                     "description": "Read TEDS information from hardware and expand valid URNs",
                     "com_method": "TedsRead() + TedsFromURN(urn) for valid URNs",
                     "parameters": "None",
                     "returns": "object - channels list with raw_value and transducer data for valid URNs",
-                    "example": "GET /api/v1/tedsread or POST /api/v1/tedsread",
+                    "example": "POST /api/v1/tedsread",
                 },
             }
         },

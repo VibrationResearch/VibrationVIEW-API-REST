@@ -32,13 +32,6 @@ def get_documentation() -> Response:
         "com_object": "VibrationVIEW.Application",
         "endpoints": {
             "Test Editing": {
-                "GET /edittest": {
-                    "description": "Edit existing test by path",
-                    "com_method": "EditTest(szTestName)",
-                    "parameters": {"filename": "string - Test filename as query parameter"},
-                    "returns": "Success status",
-                    "example": "GET /api/v1/edittest?filename=test1.vsp",
-                },
                 "POST|PUT /edittest": {
                     "description": "Upload and edit test file, OR edit existing by path",
                     "com_method": "EditTest(szTestName)",
@@ -53,7 +46,7 @@ def get_documentation() -> Response:
                         "POST /api/v1/edittest?filename=test.vsp (edit existing)",
                     ],
                 },
-                "GET /abortedit": {
+                "POST /abortedit": {
                     "description": "Abort any open Edit session",
                     "com_method": "AbortEdit()",
                     "parameters": "None",
@@ -61,25 +54,25 @@ def get_documentation() -> Response:
                 },
             },
             "Window Management": {
-                "GET /minimize": {
+                "POST /minimize": {
                     "description": "Minimize VibrationVIEW",
                     "com_method": "Minimize()",
                     "parameters": "None",
                     "returns": "HRESULT - Success status from COM method",
                 },
-                "GET /restore": {
+                "POST /restore": {
                     "description": "Restore VibrationVIEW",
                     "com_method": "Restore()",
                     "parameters": "None",
                     "returns": "HRESULT - Success status from COM method",
                 },
-                "GET /maximize": {
+                "POST /maximize": {
                     "description": "Maximize VibrationVIEW",
                     "com_method": "Maximize()",
                     "parameters": "None",
                     "returns": "HRESULT - Success status from COM method",
                 },
-                "GET /activate": {
+                "POST /activate": {
                     "description": "Activate VibrationVIEW",
                     "com_method": "Activate()",
                     "parameters": "None",
@@ -88,7 +81,7 @@ def get_documentation() -> Response:
             },
         },
         "notes": [
-            "GET requests with parameters use URL query strings",
+            "POST/PUT requests with parameters use URL query strings",
             "All methods return HRESULT status codes",
             "EditTest requires valid test file name",
             "Window management methods affect VibrationVIEW main window",
