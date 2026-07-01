@@ -298,13 +298,14 @@ def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
         GET /api/v1/controlunit?2
     """
     # Determine loop number - default to 1 if no parameters
-    if not request.args:
-        loopnum = 1
-    else:
+    loopnum: int = 1
+    if request.args:
         try:
             # Try to get 'loopnum' parameter first, then fall back to first key
-            loopnum = request.args.get("loopnum", type=int)
-            if loopnum is None:
+            loopnum_param = request.args.get("loopnum", type=int)
+            if loopnum_param is not None:
+                loopnum = loopnum_param
+            else:
                 # If no 'loopnum' parameter, try the first key as the value
                 first_key = list(request.args.keys())[0]
                 loopnum = int(first_key)
@@ -334,7 +335,7 @@ def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @data_retrieval_bp.route("/controllabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_label(vv_instance: Any) -> Response:
+def control_label(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get control loop label
 
@@ -350,13 +351,14 @@ def control_label(vv_instance: Any) -> Response:
         GET /api/v1/controllabel?2
     """
     # Determine loop number - default to 1 if no parameters
-    if not request.args:
-        loopnum = 1
-    else:
+    loopnum: int = 1
+    if request.args:
         try:
             # Try to get 'loopnum' parameter first, then fall back to first key
-            loopnum = request.args.get("loopnum", type=int)
-            if loopnum is None:
+            loopnum_param = request.args.get("loopnum", type=int)
+            if loopnum_param is not None:
+                loopnum = loopnum_param
+            else:
                 # If no 'loopnum' parameter, try the first key as the value
                 first_key = list(request.args.keys())[0]
                 loopnum = int(first_key)
