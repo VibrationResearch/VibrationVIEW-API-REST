@@ -41,14 +41,16 @@ def error_response(message: str, error_code: str = "GENERIC_ERROR", details: Opt
     Returns:
         Dict: Standardized error response
     """
-    response = {
-        "success": False,
-        "error": {"code": error_code, "message": message},
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    }
+    error: Dict[str, Any] = {"code": error_code, "message": message}
 
     if details:
-        response["error"]["details"] = details
+        error["details"] = details
+
+    response: Dict[str, Any] = {
+        "success": False,
+        "error": error,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
 
     return response
 

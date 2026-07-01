@@ -45,7 +45,7 @@ def register_write_guard(app: Flask, prefix: str = "/api/v1") -> None:
     blocked = {f"{prefix}/{ep}" for ep in WRITE_ENDPOINTS}
 
     @app.before_request
-    def block_get_on_write_endpoints() -> Optional[Response]:
+    def block_get_on_write_endpoints() -> Optional[tuple[Response, int]]:
         if request.method == "GET" and request.path in blocked:
             return jsonify(
                 {
@@ -54,3 +54,4 @@ def register_write_guard(app: Flask, prefix: str = "/api/v1") -> None:
                     "message": "GET is not allowed on state-changing endpoints. Use POST instead.",
                 }
             ), 405
+        return None
