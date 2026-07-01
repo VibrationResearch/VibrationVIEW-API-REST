@@ -187,7 +187,7 @@ def get_input_teds_all(vv_instance: Any) -> Response:
 @teds_bp.route("/inputtedschannel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_input_teds_channel(vv_instance: Any) -> Response:
+def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get TEDS Information for Specific Channel (1-based indexing)
 
@@ -206,7 +206,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(query_args[0])
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     channel_1based = int(query_args[0])
 
@@ -232,7 +232,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response:
 @teds_bp.route("/teds", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def teds(vv_instance: Any) -> Response:
+def teds(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get TEDS Information for Specific Channel or All Channels (1-based indexing)
 
@@ -253,7 +253,7 @@ def teds(vv_instance: Any) -> Response:
         # Channel specified - get specific channel TEDS (1-based)
         channel_com, err, status = convert_channel_to_com_index(query_args[0])
         if err:
-            return jsonify(err), status
+            return jsonify(err), status or 400
 
         channel_1based = int(query_args[0])
 
@@ -270,7 +270,7 @@ def teds(vv_instance: Any) -> Response:
         teds_info = vv_instance.Teds(channel_com)
 
         # Format the single channel data using the single channel formatter
-        formatted_channel = format_single_channel_teds(teds_info, channel_com)
+        formatted_channel = format_single_channel_teds(teds_info, channel_com or 0)
 
         # Prepare result data based on whether we got a transducer or error
         if "transducer" in formatted_channel:
@@ -387,7 +387,7 @@ def _format_result_as_channels(result: Any, expected_urns: Optional[List[str]] =
 @teds_bp.route("/tedsreadandapply", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def teds_read_and_apply(vv_instance: Any) -> Response:
+def teds_read_and_apply(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Read and Apply TEDS Information for All Channels
 
@@ -439,7 +439,7 @@ def teds_read_and_apply(vv_instance: Any) -> Response:
 @teds_bp.route("/tedsverifyandapply", methods=["POST"])
 @handle_errors
 @with_vibrationview
-def teds_verify_and_apply(vv_instance: Any) -> Response:
+def teds_verify_and_apply(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Verify and Apply TEDS Information for Specified URNs
 

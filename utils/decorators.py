@@ -76,7 +76,7 @@ def handle_errors(func: Callable) -> Callable:
             # Check if it's a COM exception with a known VibrationVIEW error code
             error_info = get_error_info(e)
             if error_info:
-                http_status, error_code, default_message = classify_vview_error(error_info["code"])
+                http_status, error_code, default_message = classify_vview_error(int(error_info["code"]))
                 message = get_description_from_exception(e) or default_message
                 error_info["raw"] = str(e)
                 logger.error(f"VibrationVIEW error in {func.__name__}: {error_code} - {message}")

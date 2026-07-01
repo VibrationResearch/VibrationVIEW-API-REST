@@ -385,7 +385,7 @@ if __name__ == "__main__":
         if args.debug:
             app.run(host=args.host, port=args.port, debug=True, threaded=False)
         else:
-            from waitress import serve
+            from waitress import serve  # type: ignore[import-untyped]
 
             logger.info(f"Serving with Waitress on http://{args.host}:{args.port}")
             serve(app, host=args.host, port=args.port, threads=1)

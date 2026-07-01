@@ -234,7 +234,7 @@ def sweep_resonance_hold(vv_instance: Any) -> Response:
 @advanced_control_sine_bp.route("/demandmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def demand_multiplier(vv_instance: Any) -> Response:
+def demand_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Demand Output Multiplier
 
@@ -283,7 +283,7 @@ def demand_multiplier(vv_instance: Any) -> Response:
 @advanced_control_sine_bp.route("/sweepmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sweep_multiplier(vv_instance: Any) -> Response:
+def sweep_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Sine Sweep Multiplier
 
@@ -332,7 +332,7 @@ def sweep_multiplier(vv_instance: Any) -> Response:
 @advanced_control_sine_bp.route("/sinefrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sine_frequency(vv_instance: Any) -> Response:
+def sine_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Sine Frequency
 

@@ -5,7 +5,7 @@ Converts raw TEDS data from VibrationVIEW COM interface into structured JSON for
 """
 
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 
 def parse_numeric_value(value_str: str) -> Optional[float]:
@@ -82,7 +82,7 @@ def extract_all_teds_fields(
     Returns:
         Dictionary with all fields using normalized names, optionally including channel reference
     """
-    fields = {}
+    fields: Dict[str, Any] = {}
 
     # Only add channel if it's a valid channel index (not URN-based lookup) and requested
     if channel_index >= 0 and include_channel:
@@ -114,7 +114,7 @@ def extract_all_teds_fields(
 
 
 def format_single_transducer_teds(
-    teds_data: List[List[str]], channel_index: int, include_channel: bool = True
+    teds_data: Union[List[Any], tuple], channel_index: int, include_channel: bool = True
 ) -> Dict[str, Any]:
     """
     Format TEDS data for a single transducer.
@@ -252,7 +252,7 @@ def format_teds_data(all_teds_data: List[Any]) -> Dict[str, Any]:
     Returns:
         Formatted dictionary with transducers and errors arrays
     """
-    result = {"transducers": [], "errors": []}
+    result: Dict[str, Any] = {"transducers": [], "errors": []}
 
     for channel_index, channel_data in enumerate(all_teds_data):
         # For multi-channel list view, we need to include channel info in each transducer
@@ -263,15 +263,15 @@ def format_teds_data(all_teds_data: List[Any]) -> Dict[str, Any]:
                 result["transducers"].append(transducer)
             except Exception as e:
                 # If formatting fails, add to errors
-                error_data = {"error": f"Failed to format TEDS data: {str(e)}"}
+                err: Dict[str, Any] = {"error": f"Failed to format TEDS data: {str(e)}"}
                 if channel_index >= 0:
-                    error_data["channel"] = channel_index + 1  # Convert to 1-based
-                result["errors"].append(error_data)
+                    err["channel"] = channel_index + 1  # Convert to 1-based
+                result["errors"].append(err)
         else:
             # For errors or empty data, add to errors
-            error_data = {"error": "No TEDS data available or invalid format"}
+            err2: Dict[str, Any] = {"error": "No TEDS data available or invalid format"}
             if channel_index >= 0:
-                error_data["channel"] = channel_index + 1  # Convert to 1-based
-            result["errors"].append(error_data)
+                err2["channel"] = channel_index + 1  # Convert to 1-based
+            result["errors"].append(err2)
 
     return result

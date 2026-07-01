@@ -16,7 +16,7 @@ from config import Config
 logger = logging.getLogger(__name__)
 
 
-def get_system_info() -> Dict[str, str]:
+def get_system_info() -> Dict[str, Any]:
     """Return a dict of Python runtime diagnostics for diagnostic endpoints."""
     return {
         "python_version": sys.version,
@@ -394,7 +394,7 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
         uploaded_file = request.files[file_field]
         filename = uploaded_file.filename
         binary_data = uploaded_file.read()
-        content_length = len(binary_data)
+        content_length: Optional[int] = len(binary_data)
         logger.debug(
             f"detect_file_upload: multipart file field={file_field}, filename={filename}, size={content_length}"
         )

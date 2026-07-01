@@ -193,7 +193,7 @@ def start_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/runtest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def run_test(vv_instance: Any) -> Response:
+def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Run Complete Test (Open + Start)
 
@@ -237,6 +237,9 @@ def run_test(vv_instance: Any) -> Response:
             result, error, status_code = handle_binary_upload(filename, binary_data)
             if error:
                 return jsonify(error), status_code
+
+            if result is None:
+                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
 
             file_path = result["FilePath"]
             vv_instance.RunTest(file_path)
@@ -296,7 +299,7 @@ def resume_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/opentest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def open_test(vv_instance: Any) -> Response:
+def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Open Test Profile File
 
@@ -343,6 +346,9 @@ def open_test(vv_instance: Any) -> Response:
             if error:
                 return jsonify(error), status_code
 
+            if result is None:
+                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
+
             file_path = result["FilePath"]
 
             # Check if this is a default template filename that should only be copied
@@ -387,7 +393,7 @@ def open_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/closetest", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_test(vv_instance: Any) -> Response:
+def close_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Close Test Profile by Name
 
@@ -434,7 +440,7 @@ def close_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/closetab", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_tab(vv_instance: Any) -> Response:
+def close_tab(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Close Test Tab by Index
 
@@ -547,7 +553,7 @@ def list_open_tests(vv_instance: Any) -> Response:
 @basic_control_bp.route("/savedata", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def save_data(vv_instance: Any) -> Response:
+def save_data(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Save Current Test Data
 
