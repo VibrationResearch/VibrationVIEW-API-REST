@@ -51,7 +51,7 @@ jobs:
               pinned=$(grep -iP "^${pkg}==" requirements.txt | grep -oP '==\K[0-9.]+')
               latest=$(pip index versions "$pkg" 2>/dev/null | head -1 | grep -oP '\((\K[^)]+)')
               if [ -n "$latest" ] && [ -n "$pinned" ] && [ "$pinned" != "$latest" ]; then
-                echo "::warning file=requirements.in::$pkg is pinned at $pinned but $latest is available"
+                echo "::warning file=requirements.in::$pkg is pinned at $pinned but $latest is available. Run pip-compile requirements.in to update."
                 outdated="$outdated\n  $pkg: $pinned -> $latest"
               fi
             fi
