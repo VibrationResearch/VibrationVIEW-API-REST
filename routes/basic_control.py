@@ -42,22 +42,12 @@ def get_documentation() -> Response:
         "description": "1:1 mapping of VibrationVIEW COM basic control methods",
         "com_object": "VibrationVIEW.Application",
         "endpoints": {
-            "GET|POST|PUT /starttest": {
+            "POST|PUT /starttest": {
                 "description": "Start currently loaded VibrationVIEW test",
                 "com_method": "StartTest()",
                 "parameters": "None",
                 "returns": "Result from StartTest()",
-                "example": "GET /api/v1/starttest or POST /api/v1/starttest or PUT /api/v1/starttest",
-            },
-            "GET /runtest": {
-                "description": "Run existing test by path (combines OpenTest + StartTest)",
-                "com_method": "RunTest(filepath)",
-                "parameters": {
-                    "filename": "string - Query parameter with VibrationVIEW profile filename",
-                    "OR unnamed parameter": "string - Test filename as first URL parameter",
-                },
-                "returns": "boolean - Test running status",
-                "example": "GET /api/v1/runtest?filename=test1.vsp",
+                "example": "POST /api/v1/starttest or PUT /api/v1/starttest",
             },
             "POST|PUT /runtest": {
                 "description": "Upload and run a test file, OR run existing test by path",
@@ -79,29 +69,19 @@ def get_documentation() -> Response:
                     "POST /api/v1/runtest?filename=test.vsp (run existing file)",
                 ],
             },
-            "GET|POST|PUT /stoptest": {
+            "POST|PUT /stoptest": {
                 "description": "Stop currently running test",
                 "com_method": "StopTest()",
                 "parameters": "None",
                 "returns": "Result from StopTest()",
-                "example": "GET /api/v1/stoptest or POST /api/v1/stoptest or PUT /api/v1/stoptest",
+                "example": "POST /api/v1/stoptest or PUT /api/v1/stoptest",
             },
-            "GET|POST|PUT /resumetest": {
+            "POST|PUT /resumetest": {
                 "description": "Resume paused test",
                 "com_method": "ResumeTest()",
                 "parameters": "None",
                 "returns": "Result from ResumeTest()",
-                "example": "GET /api/v1/resumetest or POST /api/v1/resumetest or PUT /api/v1/resumetest",
-            },
-            "GET /opentest": {
-                "description": "Open existing test profile file by path",
-                "com_method": "OpenTest(filepath)",
-                "parameters": {
-                    "filename": "string - Query parameter with VibrationVIEW profile filename",
-                    "OR unnamed parameter": "string - Test filename as first URL parameter",
-                },
-                "returns": "Result from OpenTest()",
-                "example": "GET /api/v1/opentest?filename=test1.vsp",
+                "example": "POST /api/v1/resumetest or PUT /api/v1/resumetest",
             },
             "POST|PUT /opentest": {
                 "description": "Upload and open a test file, OR open existing test by path",
@@ -123,7 +103,7 @@ def get_documentation() -> Response:
                     "POST /api/v1/opentest?filename=test.vsp (open existing file)",
                 ],
             },
-            "GET|POST /closetest": {
+            "POST /closetest": {
                 "description": "Close test profile by name",
                 "com_method": "CloseTest(profile_name)",
                 "parameters": {
@@ -131,9 +111,9 @@ def get_documentation() -> Response:
                     "OR unnamed parameter": "string - Profile name as first URL parameter",
                 },
                 "returns": "boolean - test_was_closed status",
-                "example": "GET /api/v1/closetest?profilename=test1.vsp or POST /api/v1/closetest?test1.vsp",
+                "example": "POST /api/v1/closetest?profilename=test1.vsp",
             },
-            "GET|POST /closetab": {
+            "POST /closetab": {
                 "description": "Close test tab by index",
                 "com_method": "CloseTab(tab_index)",
                 "parameters": {
@@ -146,7 +126,7 @@ def get_documentation() -> Response:
                     "400": "Missing or invalid tab index parameter",
                     "405": "Tab could not be closed (may not exist or may be running a test)",
                 },
-                "example": "GET /api/v1/closetab?tabindex=0 or POST /api/v1/closetab?tabindex=1 or GET /api/v1/closetab?0",
+                "example": "POST /api/v1/closetab?tabindex=0 or POST /api/v1/closetab?tabindex=1",
             },
             "GET /listopentests": {
                 "description": "List all open test profiles with detailed information",
@@ -165,7 +145,7 @@ def get_documentation() -> Response:
                 ],
                 "example": "GET /api/v1/listopentests",
             },
-            "GET|POST /savedata": {
+            "POST /savedata": {
                 "description": "Save current test data to file",
                 "com_method": "SaveData(filename)",
                 "parameters": {

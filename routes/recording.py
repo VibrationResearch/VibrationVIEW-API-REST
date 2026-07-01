@@ -31,26 +31,26 @@ def get_documentation() -> Response:
         "description": "1:1 mapping of VibrationVIEW COM recording control methods",
         "com_object": "VibrationVIEW.Application",
         "endpoints": {
-            "GET|POST /recordstart": {
+            "POST /recordstart": {
                 "description": "Start recording data",
                 "com_method": "RecordStart()",
                 "parameters": "None",
                 "returns": "Result from RecordStart()",
-                "example": "GET /api/v1/recordstart or POST /api/v1/recordstart",
+                "example": "POST /api/v1/recordstart",
             },
-            "GET|POST /recordstop": {
+            "POST /recordstop": {
                 "description": "Stop recording data",
                 "com_method": "RecordStop()",
                 "parameters": "None",
                 "returns": "Result from RecordStop()",
-                "example": "GET /api/v1/recordstop or POST /api/v1/recordstop",
+                "example": "POST /api/v1/recordstop",
             },
-            "GET|POST /recordpause": {
+            "POST /recordpause": {
                 "description": "Pause recording data",
                 "com_method": "RecordPause()",
                 "parameters": "None",
                 "returns": "Result from RecordPause()",
-                "example": "GET /api/v1/recordpause or POST /api/v1/recordpause",
+                "example": "POST /api/v1/recordpause",
             },
             "GET /recordgetfilename": {
                 "description": "Get the last recording filename",
