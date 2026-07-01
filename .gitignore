@@ -32,7 +32,9 @@ MANIFEST
 
 # PyInstaller
 *.manifest
+# *.spec is excluded by default, but app.spec is tracked (build config)
 *.spec
+!app.spec
 
 # Installer logs
 pip-log.txt
