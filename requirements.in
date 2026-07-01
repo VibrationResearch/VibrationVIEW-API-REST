@@ -8,5 +8,5 @@ flask>=3.1
 flask-cors>=6.0
 pywin32>=311
 python-dotenv>=1.0
-vibrationview-api>=0.1.13
+vibrationview-api>=0.1.15
 waitress>=3.0
