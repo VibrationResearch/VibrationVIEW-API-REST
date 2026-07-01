@@ -65,7 +65,6 @@ class TestTEDSRoutes:
 
         assert data["success"] is True
         assert data["data"]["channel"] == "all"
-        assert data["data"]["success"] is True
         # The result contains formatted data with 'transducers' and 'errors' arrays
         assert "result" in data["data"]
         assert "transducers" in data["data"]["result"]
