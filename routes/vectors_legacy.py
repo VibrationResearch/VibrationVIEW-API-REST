@@ -195,7 +195,7 @@ def get_vector_enumerations() -> Response:
             "Vector is superseded by ReportVector in VibrationVIEW 2025.3 and later",
         ],
     }
-    return jsonify(enums)
+    return jsonify(success_response(enums))
 # fmt: on
 
 
