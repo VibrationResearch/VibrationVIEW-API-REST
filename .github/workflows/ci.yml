@@ -26,6 +26,45 @@ jobs:
       - name: Run mypy
         run: mypy routes/ utils/ --ignore-missing-imports
 
+  check-pinned-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check for outdated direct dependencies
+        run: |
+          outdated=""
+          while IFS= read -r line; do
+            # Skip comments and blank lines
+            [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+            # Extract package name from >= constraints
+            if [[ "$line" =~ ^([a-zA-Z0-9_-]+)\>= ]]; then
+              pkg="${BASH_REMATCH[1]}"
+              # Skip Windows-only packages that cannot be queried on Linux
+              [[ "$pkg" == "pywin32" ]] && continue
+              # Look up the pinned version in requirements.txt
+              pinned=$(grep -iP "^${pkg}==" requirements.txt | grep -oP '==\K[0-9.]+')
+              latest=$(pip index versions "$pkg" 2>/dev/null | head -1 | grep -oP '\((\K[^)]+)')
+              if [ -n "$latest" ] && [ -n "$pinned" ] && [ "$pinned" != "$latest" ]; then
+                echo "::warning file=requirements.in::$pkg is pinned at $pinned but $latest is available. Run pip-compile requirements.in to update."
+                outdated="$outdated\n  $pkg: $pinned -> $latest"
+              fi
+            fi
+          done < requirements.in
+          if [ -n "$outdated" ]; then
+            echo ""
+            echo -e "Outdated direct dependencies found:$outdated"
+            echo ""
+            echo "Run 'pip-compile requirements.in' to update."
+          else
+            echo "All direct dependencies are up to date."
+          fi
+
   test:
     runs-on: windows-latest
     steps:

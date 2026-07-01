@@ -1,0 +1,12 @@
+# ============================================================================
+# FILE: requirements.in (Direct Production Dependencies)
+#
+# This is the human-editable source file. Run `pip-compile requirements.in`
+# to regenerate the fully locked requirements.txt with all transitive deps.
+# ============================================================================
+flask>=3.1
+flask-cors>=6.0
+pywin32>=311
+python-dotenv>=1.0
+vibrationview-api>=0.1.13
+waitress>=3.0
