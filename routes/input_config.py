@@ -188,7 +188,7 @@ def get_documentation() -> Response:
 @input_config_bp.route("/inputcaldate", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_cal_date(vv_instance: Any) -> Response:
+def input_cal_date(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Input Calibration Date
 
@@ -207,7 +207,7 @@ def input_cal_date(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputCalDate(channel_com)
@@ -222,7 +222,7 @@ def input_cal_date(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputserialnumber", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_serial_number(vv_instance: Any) -> Response:
+def input_serial_number(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Input Serial Number
 
@@ -241,7 +241,7 @@ def input_serial_number(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputSerialNumber(channel_com)
@@ -254,7 +254,7 @@ def input_serial_number(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputsensitivity", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_sensitivity(vv_instance: Any) -> Response:
+def input_sensitivity(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Input Sensitivity
 
@@ -273,7 +273,7 @@ def input_sensitivity(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputSensitivity(channel_com)
@@ -286,7 +286,7 @@ def input_sensitivity(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputengineeringscale", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_engineering_scale(vv_instance: Any) -> Response:
+def input_engineering_scale(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Input Engineering Scale
 
@@ -305,7 +305,7 @@ def input_engineering_scale(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputEngineeringScale(channel_com)
@@ -321,7 +321,7 @@ def input_engineering_scale(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputcapacitorcoupled", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_capacitor_coupled(vv_instance: Any) -> Response:
+def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Input Capacitor Coupled
 
@@ -344,7 +344,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -373,7 +373,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputaccelpowersource", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_accel_power_source(vv_instance: Any) -> Response:
+def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Input Accelerometer Power Source
 
@@ -396,7 +396,7 @@ def input_accel_power_source(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -425,7 +425,7 @@ def input_accel_power_source(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputdifferential", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_differential(vv_instance: Any) -> Response:
+def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get/Set Input Differential
 
@@ -448,7 +448,7 @@ def input_differential(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -478,7 +478,7 @@ def input_differential(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputmode", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_mode(vv_instance: Any) -> Response:
+def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Set Input Mode
 
@@ -526,7 +526,7 @@ def input_mode(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(data["channel"])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(data["channel"])  # Keep original for response
 
@@ -550,7 +550,7 @@ def input_mode(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputcalibration", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_calibration(vv_instance: Any) -> Response:
+def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Set Input Calibration
 
@@ -591,7 +591,7 @@ def input_calibration(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(data["channel"])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(data["channel"])  # Keep original for response
 
@@ -621,7 +621,7 @@ def input_calibration(vv_instance: Any) -> Response:
 @input_config_bp.route("/inputconfigurationfile", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def input_configuration_file(vv_instance: Any) -> Response:
+def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Set Input Configuration File
 
@@ -687,7 +687,7 @@ def input_configuration_file(vv_instance: Any) -> Response:
 @input_config_bp.route("/ischanneldifferentdatabase", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_channel_different_database(vv_instance: Any) -> Response:
+def is_channel_different_database(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Check if Channel Configuration Differs from Database
 
@@ -705,7 +705,7 @@ def is_channel_different_database(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])
     result = vv_instance.IsChannelDifferentThanDatabase(channel_com)
@@ -721,7 +721,7 @@ def is_channel_different_database(vv_instance: Any) -> Response:
 @input_config_bp.route("/channeldatabaseids", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_database_ids(vv_instance: Any) -> Response:
+def channel_database_ids(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Channel Database IDs
 
@@ -739,7 +739,7 @@ def channel_database_ids(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])
     result = vv_instance.ChannelDatabaseIDs(channel_com)
@@ -752,7 +752,7 @@ def channel_database_ids(vv_instance: Any) -> Response:
 @input_config_bp.route("/updatechannelconfigfromdatabase", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def update_channel_config_from_database(vv_instance: Any) -> Response:
+def update_channel_config_from_database(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Update Channel Configuration from Database
 
@@ -770,7 +770,7 @@ def update_channel_config_from_database(vv_instance: Any) -> Response:
 
     channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
     if error_resp:
-        return jsonify(error_resp), status_code
+        return jsonify(error_resp), status_code or 400
 
     channel_user = int(query_args[0])
     result = vv_instance.UpdateChannelConfigFromDatabase(channel_com)
@@ -786,7 +786,7 @@ def update_channel_config_from_database(vv_instance: Any) -> Response:
 @input_config_bp.route("/transducerdatabaserecord", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def transducer_database_record(vv_instance: Any) -> Response:
+def transducer_database_record(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Transducer Database Record
 

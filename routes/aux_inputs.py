@@ -83,7 +83,7 @@ def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 
     channel_com, err, status = convert_channel_to_com_index(channel_raw)
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.RearInputUnit(channel_com)
 
@@ -109,7 +109,7 @@ def rear_input_label(vv_instance: Any) -> Response | tuple[Response, int]:
 
     channel_com, err, status = convert_channel_to_com_index(channel_raw)
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.RearInputLabel(channel_com)
 

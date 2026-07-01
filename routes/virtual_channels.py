@@ -86,7 +86,7 @@ def remove_all_virtual_channels(vv_instance: Any) -> Response:
 @virtual_channels_bp.route("/importvirtualchannels", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def import_virtual_channels(vv_instance: Any) -> Response:
+def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Import Virtual Channels from File
 
@@ -129,7 +129,7 @@ def import_virtual_channels(vv_instance: Any) -> Response:
             # File upload detected - save and import
             result, error, status_code = handle_binary_upload(filename, binary_data)
 
-            if error:
+            if error or result is None:
                 return jsonify(error), status_code
 
             file_path = result["FilePath"]

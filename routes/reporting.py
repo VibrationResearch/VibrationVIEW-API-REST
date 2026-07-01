@@ -123,7 +123,7 @@ def get_documentation() -> Response:
 @reporting_bp.route("/reportfield", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def report_field(vv_instance: Any) -> Response:
+def report_field(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Report Field Value
 
@@ -165,7 +165,7 @@ def report_field(vv_instance: Any) -> Response:
 @reporting_bp.route("/reportfields", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields(vv_instance: Any) -> Response:
+def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Multiple Report Field Values
 
@@ -390,7 +390,7 @@ def report_fields_history(vv_instance: Any) -> Response:
 @reporting_bp.route("/reportvector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector(vv_instance: Any) -> Response:
+def report_vector(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Report Vector Data
 
@@ -444,7 +444,7 @@ def report_vector(vv_instance: Any) -> Response:
 @reporting_bp.route("/reportvectorheader", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_header(vv_instance: Any) -> Response:
+def report_vector_header(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Report Vector Header Information
 
@@ -500,7 +500,7 @@ def report_vector_header(vv_instance: Any) -> Response:
 @reporting_bp.route("/reportvectorhistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_history(vv_instance: Any) -> Response:
+def report_vector_history(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Report Vector Data for All Data Files from Most Recent Test
 
@@ -634,7 +634,7 @@ def form_fields(vv_instance: Any) -> Response:
 @reporting_bp.route("/formfields", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def post_form_fields(vv_instance: Any) -> Response:
+def post_form_fields(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Post Form Field Values
 

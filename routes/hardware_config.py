@@ -155,7 +155,7 @@ def get_software_version(vv_instance: Any) -> Response:
 @hardware_config_bp.route("/hardwaresupportscapacitorcoupled", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response:
+def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Hardware Supports Capacitor Coupled
 
@@ -174,7 +174,7 @@ def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(query_args[0])
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.HardwareSupportsCapacitorCoupled(channel_com)
 
@@ -189,7 +189,7 @@ def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response:
 @hardware_config_bp.route("/hardwaresupportsaccelpowersource", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_accel_power_source(vv_instance: Any) -> Response:
+def hardware_supports_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Hardware Supports Accelerometer Power Source
 
@@ -208,7 +208,7 @@ def hardware_supports_accel_power_source(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(query_args[0])
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.HardwareSupportsAccelPowerSource(channel_com)
 
@@ -223,7 +223,7 @@ def hardware_supports_accel_power_source(vv_instance: Any) -> Response:
 @hardware_config_bp.route("/hardwaresupportsdifferential", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_differential(vv_instance: Any) -> Response:
+def hardware_supports_differential(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Hardware Supports Differential
 
@@ -242,7 +242,7 @@ def hardware_supports_differential(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(query_args[0])
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.HardwareSupportsDifferential(channel_com)
 

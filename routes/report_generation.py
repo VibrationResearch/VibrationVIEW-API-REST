@@ -154,7 +154,7 @@ def get_documentation() -> Response:
 @report_generation_bp.route("/generatereport", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_report(vv_instance: Any) -> Response:
+def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Generate Report File from VibrationVIEW Data
 
@@ -233,6 +233,7 @@ def generate_report(vv_instance: Any) -> Response:
             if error:
                 return jsonify(error), status_code
 
+            assert result is not None
             file_path = result["FilePath"]
 
     # No file upload - use existing file by path
@@ -296,7 +297,7 @@ def generate_report(vv_instance: Any) -> Response:
 @report_generation_bp.route("/datafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_datafile(vv_instance: Any) -> Response:
+def get_datafile(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Raw VibrationVIEW Data File
 
@@ -339,7 +340,7 @@ def get_datafile(vv_instance: Any) -> Response:
 @report_generation_bp.route("/datafiles", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_datafiles(vv_instance: Any) -> Response:
+def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get All Data Files from most recently run test as Zip Archive
 
@@ -402,7 +403,7 @@ def get_datafiles(vv_instance: Any) -> Response:
 @report_generation_bp.route("/generatetxt", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_txt(vv_instance: Any) -> Response:
+def generate_txt(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Generate Text Files from VibrationVIEW Data
 
@@ -444,7 +445,7 @@ def generate_txt(vv_instance: Any) -> Response:
 @report_generation_bp.route("/generateuff", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_uff(vv_instance: Any) -> Response:
+def generate_uff(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Generate UFF Files from VibrationVIEW Data
 
@@ -483,7 +484,7 @@ def generate_uff(vv_instance: Any) -> Response:
     return _generate_files_common(vv_instance, "UFF", GenerateUFFFromVV, "UFF")
 
 
-def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any, description: str) -> Response:
+def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any, description: str) -> Response | tuple[Response, int]:
     """
     Common implementation for generateuff and generatetxt endpoints
 
@@ -531,6 +532,7 @@ def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any,
             if error:
                 return jsonify(error), status_code
 
+            assert result is not None
             file_path = result["FilePath"]
 
     # No file upload - use existing file by path
@@ -571,6 +573,7 @@ def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any,
             return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
 
     # Generate the file
+    assert output_name is not None
     primary_file_path = generate_func(file_path, output_name)
 
     # Find the first generated file (pattern: basename-1.ext)

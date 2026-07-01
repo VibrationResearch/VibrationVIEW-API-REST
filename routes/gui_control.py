@@ -95,7 +95,7 @@ def get_documentation() -> Response:
 @gui_control_bp.route("/edittest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def edit_test(vv_instance: Any) -> Response:
+def edit_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Edit VibrationVIEW Test
 
@@ -138,8 +138,9 @@ def edit_test(vv_instance: Any) -> Response:
             # File upload detected - save and edit
             result, error, status_code = handle_binary_upload(filename, binary_data)
             if error:
-                return jsonify(error), status_code
+                return jsonify(error), status_code or 400
 
+            assert result is not None
             file_path = result["FilePath"]
             vv_instance.EditTest(file_path)
 

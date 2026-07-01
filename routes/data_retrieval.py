@@ -207,7 +207,7 @@ def output(vv_instance: Any) -> Response:
 @data_retrieval_bp.route("/channelunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_unit(vv_instance: Any) -> Response:
+def channel_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get the channel unit associated with channel number (1-based)
 
@@ -230,7 +230,7 @@ def channel_unit(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.ChannelUnit(channel_com)
 
@@ -242,7 +242,7 @@ def channel_unit(vv_instance: Any) -> Response:
 @data_retrieval_bp.route("/channellabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_label(vv_instance: Any) -> Response:
+def channel_label(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get the channel unit label associated with channel number (1-based)
 
@@ -265,7 +265,7 @@ def channel_label(vv_instance: Any) -> Response:
 
     channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
     if err:
-        return jsonify(err), status
+        return jsonify(err), status or 400
 
     result = vv_instance.ChannelLabel(channel_com)
 
@@ -282,7 +282,7 @@ def channel_label(vv_instance: Any) -> Response:
 @data_retrieval_bp.route("/controlunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_unit(vv_instance: Any) -> Response:
+def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get control loop units
 
@@ -388,7 +388,7 @@ def control_label(vv_instance: Any) -> Response:
 @data_retrieval_bp.route("/getdatafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_data_file(vv_instance: Any) -> Response:
+def get_data_file(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     Get Raw VibrationVIEW Data File
 
