@@ -223,7 +223,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
 
     return jsonify(
         success_response(
-            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_com, "success": True},
+            {"result": teds_info, "channel": channel_1based, "internal_channel": channel_com},
             f"TEDS information retrieved for channel {channel_1based} (1-based)",
         )
     )
@@ -295,7 +295,7 @@ def teds(vv_instance: Any) -> Response | tuple[Response, int]:
 
         return jsonify(
             success_response(
-                {"result": formatted_data, "channel": "all", "success": True},
+                {"result": formatted_data, "channel": "all"},
                 f"Formatted TEDS information retrieved: {len(formatted_data['transducers'])} transducers, {len(formatted_data['errors'])} errors",
             )
         )
@@ -564,7 +564,6 @@ def teds_read(vv_instance: Any) -> Response:
                 "channels": channels,
                 "transducer_count": transducer_count,
                 "channel_count": len(channels),
-                "success": True,
             },
             f"TEDS read completed: {transducer_count} transducer(s) found across {len(channels)} channel(s)",
         )
