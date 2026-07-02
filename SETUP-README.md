@@ -55,6 +55,9 @@ Once running, access the API documentation at:
 
 ## Breaking Changes
 
+See [CHANGELOG.md](CHANGELOG.md) for the full list of breaking changes,
+security updates, and improvements in each release.
+
 - **UTC timestamps**: All API response timestamps now use UTC with an explicit
   `+00:00` offset (e.g., `2026-06-19T18:30:00+00:00`). Previously, timestamps
   used local time without a timezone indicator. Update any client-side parsing
