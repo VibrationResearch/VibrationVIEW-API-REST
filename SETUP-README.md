@@ -53,7 +53,7 @@ Once running, access the API documentation at:
 - **Docs**: `http://localhost:5000/api/v1/docs`
 - **Health check**: `http://localhost:5000/api/v1/health`
 
-## Breaking Changes
+## Breaking Changes (1.1.0)
 
 See the [CHANGELOG](https://github.com/VibrationResearch/VibrationVIEW-API-REST/blob/main/CHANGELOG.md)
 for the full list of breaking changes, security updates, and improvements in
