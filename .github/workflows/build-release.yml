@@ -28,6 +28,11 @@ jobs:
       - name: Build executable
         run: pyinstaller app.spec --noconfirm
 
+      - name: Copy docs into dist
+        run: |
+          Copy-Item README.md dist/VibrationVIEW-API/
+          Copy-Item .env.example dist/VibrationVIEW-API/
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
