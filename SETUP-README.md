@@ -60,6 +60,48 @@ Once running, access the API documentation at:
   used local time without a timezone indicator. Update any client-side parsing
   that assumes local time.
 
+- **1-based channel indexing**: Hardware capability endpoints
+  (`hardwaresupportscapacitorcoupled`, `hardwaresupportsaccelpowersource`,
+  `hardwaresupportsdifferential`) now use 1-based channel indexing, consistent
+  with all other channel-based endpoints. Previously these used 0-based
+  indexing. Clients passing channel 0 must update to channel 1.
+
+- **POST-only state-changing endpoints**: Endpoints that modify state (e.g.,
+  `starttest`, `stoptest`, `savedata`) now require POST requests. GET requests
+  return 405. Set `ALLOW_GET_WRITE=true` in `.env` to restore the previous
+  behavior during migration.
+
+- **Simplified configuration**: Removed `DevelopmentConfig`, `ProductionConfig`,
+  and the config map. A single `Config` class is used for all environments; use
+  `--debug` flag to enable debug mode.
+
+- **Renamed query parameters**:
+
+  | Old Name | New Name | Endpoints |
+  |----------|----------|-----------|
+  | `channelnum` | `channel` | `/channelunit`, `/channellabel` |
+  | `loopnum` | `loop` | `/controlunit`, `/controllabel` |
+  | `file_path` | `filename` | `/getdatafile`, `/datafile`, `/generatereport`, `/generatetxt`, `/generateuff` |
+  | `template_name` | `templatename` | `/generatereport` |
+  | `output_name` | `outputname` | `/generatereport`, `/generatetxt`, `/generateuff` |
+
+- **Renamed response fields**:
+
+  | Old Field | New Field | Endpoints |
+  |-----------|-----------|-----------|
+  | `data.channelnum` | `data.channel` | `/channelunit`, `/channellabel` |
+  | `data.loopnum` | `data.loop` | `/controlunit`, `/controllabel` |
+  | `data.internal_loopnum` | `data.internal_loop` | `/controllabel` |
+
+- **Standardized error messages**: Missing-parameter errors now use the format
+  `"Missing required parameter: <name>"` instead of
+  `"Missing required query parameter: <name>"`.
+
+- **Standardized error response format**: Error responses from `/rearinputunit`
+  and `/rearinputlabel` now use the structured format
+  `"error": {"code": "...", "message": "..."}` consistent with all other
+  endpoints.
+
 ## Troubleshooting
 
 - **"VCRUNTIME" or DLL errors**: Install the
