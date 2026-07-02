@@ -1,66 +1,35 @@
-# VibrationVIEW REST API — Offline Setup Guide
+# VibrationVIEW REST API — Setup Guide
 
 ## Prerequisites
 
-- **Windows** with Python 3.x installed and on PATH
+- **Windows** machine
 - **VibrationVIEW** installed on the target machine
 
 ## Quick Start
 
-1. Extract the zip file to a folder on the target machine.
-2. Run the setup script (choose one):
-
-**Option A: Using the batch file (Command Prompt)**
-
-```cmd
-setup.bat
-```
-
-**Option B: Using PowerShell**
-
-```powershell
-.\setup.ps1
-```
-
-Both scripts create a virtual environment and install all dependencies from the
-bundled `vendor/` folder. No internet access is required. A `.env` file is
-created automatically from `.env.example` if one does not already exist.
-
-3. Edit `.env` to match your environment (paths, connection settings, security
-   keys, etc.).  At minimum, generate secure values for `SECRET_KEY` and
-   `API_KEY`:
+1. Extract the release zip to a folder on the target machine.
+2. Copy `.env.example` to `.env` and edit it to match your environment.
+   At minimum, generate secure values for `SECRET_KEY` and `API_KEY`:
 
    ```cmd
-   python -c "import secrets; print(secrets.token_hex(32))"
+   powershell -Command "[Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))"
    ```
 
-   Copy the output into `.env` for each key. The server will refuse to start in production mode if `SECRET_KEY` is still the development default or if `API_KEY` is still the placeholder value.
-4. Start the server:
+   Copy the output into `.env` for each key. The server will refuse to start
+   in production mode if `SECRET_KEY` is still the development default or if
+   `API_KEY` is still the placeholder value.
 
-**Option A: Using the batch file**
-
-```cmd
-start-api.bat
-start-api.bat --port 8080
-start-api.bat --debug
-```
-
-**Option B: Using PowerShell**
-
-```powershell
-.\venv\Scripts\Activate.ps1
-python app.py --host 127.0.0.1 --port 5000
-```
-
-**Setup and start in one step:**
+3. Run the executable:
 
 ```cmd
-setup.bat --start
+VibrationVIEW-API.exe
+VibrationVIEW-API.exe --port 8080
+VibrationVIEW-API.exe --debug
+VibrationVIEW-API.exe --host 0.0.0.0 --port 5000 --threads 8
 ```
 
-```powershell
-.\setup.ps1 -Start
-```
+No Python installation or virtual environment is required — everything is
+bundled into the executable.
 
 ## Configuration
 
@@ -68,8 +37,8 @@ Key settings in `.env`:
 
 | Variable | Description |
 |---|---|
-| `SECRET_KEY` | Cryptographic signing key used by Flask. Generate with `python -c "import secrets; print(secrets.token_hex(32))"`. **Required** in production. |
-| `API_KEY` | Bearer token for API authentication. Generate the same way. Leave empty to disable authentication (not recommended). |
+| `SECRET_KEY` | Cryptographic signing key used by Flask. **Required** in production. |
+| `API_KEY` | Bearer token for API authentication. Leave empty to disable authentication (not recommended). |
 | `VIBRATIONVIEW_FOLDER` | Root folder for VibrationVIEW data (e.g. `C:\VibrationVIEW`) |
 | `EXE_NAME` | Full path to VibrationVIEW executable |
 | `VV_CONNECTION_TIMEOUT` | COM connection timeout in seconds |
@@ -93,9 +62,10 @@ Once running, access the API documentation at:
 
 ## Troubleshooting
 
-- **"Python not found"**: Ensure Python 3.x is installed and added to PATH.
-- **Package installation fails**: The vendor packages were built for a specific
-  Python version and platform. Re-run `prepare-offline.ps1` on a machine with
-  the same Python version and Windows architecture as the target.
+- **"VCRUNTIME" or DLL errors**: Install the
+  [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+  for your platform.
 - **VibrationVIEW connection errors**: Verify VibrationVIEW is installed and
   the paths in `.env` are correct.
+- **Port already in use**: Another process is using the default port. Choose a
+  different port with `--port`.
