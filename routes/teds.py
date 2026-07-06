@@ -204,9 +204,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, err, status = convert_channel_to_com_index(query_args[0])
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_1based = int(query_args[0])
 
@@ -251,9 +249,7 @@ def teds(vv_instance: Any) -> Response | tuple[Response, int]:
 
     if query_args:
         # Channel specified - get specific channel TEDS (1-based)
-        channel_com, err, status = convert_channel_to_com_index(query_args[0])
-        if err:
-            return jsonify(err), status or 400
+        channel_com = convert_channel_to_com_index(query_args[0])
 
         channel_1based = int(query_args[0])
 

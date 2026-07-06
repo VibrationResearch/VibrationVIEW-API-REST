@@ -14,7 +14,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import convert_channel_to_com_index
 from utils.vv_manager import with_vibrationview
 
@@ -67,7 +68,7 @@ def rear_input(vv_instance: Any) -> Response:
 @auxinputs_bp.route("/rearinputunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
+def rear_input_unit(vv_instance: Any) -> Response:
     """Get units for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")
@@ -77,13 +78,9 @@ def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
             channel_raw = args[0]
 
     if channel_raw is None:
-        return jsonify(
-            error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
-        ), 400
+        raise APIError("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
 
-    channel_com, err, status = convert_channel_to_com_index(channel_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channel_raw)
 
     result = vv_instance.RearInputUnit(channel_com)
 
@@ -93,7 +90,7 @@ def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @auxinputs_bp.route("/rearinputlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_label(vv_instance: Any) -> Response | tuple[Response, int]:
+def rear_input_label(vv_instance: Any) -> Response:
     """Get label for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")
@@ -103,13 +100,9 @@ def rear_input_label(vv_instance: Any) -> Response | tuple[Response, int]:
             channel_raw = args[0]
 
     if channel_raw is None:
-        return jsonify(
-            error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
-        ), 400
+        raise APIError("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
 
-    channel_com, err, status = convert_channel_to_com_index(channel_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channel_raw)
 
     result = vv_instance.RearInputLabel(channel_com)
 

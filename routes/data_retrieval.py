@@ -228,9 +228,7 @@ def channel_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     if channelnum_raw is None:
         channelnum_raw = list(request.args.keys())[0]
 
-    channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channelnum_raw)
 
     result = vv_instance.ChannelUnit(channel_com)
 
@@ -263,9 +261,7 @@ def channel_label(vv_instance: Any) -> Response | tuple[Response, int]:
     if channelnum_raw is None:
         channelnum_raw = list(request.args.keys())[0]
 
-    channel_com, err, status = convert_channel_to_com_index(channelnum_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channelnum_raw)
 
     result = vv_instance.ChannelLabel(channel_com)
 

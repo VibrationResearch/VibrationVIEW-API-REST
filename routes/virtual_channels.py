@@ -14,7 +14,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
-from utils.utils import detect_file_upload, get_filename_from_request, handle_binary_upload
+from utils.utils import get_filename_from_request, process_file_upload
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -118,21 +118,8 @@ def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]
     """
     # Check for file upload (PUT/POST only)
     if request.method in ("PUT", "POST"):
-        upload_result = detect_file_upload()
-        filename, binary_data, content_length = upload_result
-
-        # Check if detect_file_upload returned an error
-        if isinstance(filename, dict):
-            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-        if filename is not None:
-            # File upload detected - save and import
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-
-            if error or result is None:
-                return jsonify(error), status_code
-
-            file_path = result["FilePath"]
+        file_path, filename = process_file_upload()
+        if file_path:
 
             # Import the uploaded virtual channels file
             vv_instance.ImportVirtualChannels(file_path)

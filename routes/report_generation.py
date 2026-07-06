@@ -19,7 +19,7 @@ from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUF
 from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path, validate_output_path
 from utils.response_helpers import error_response
-from utils.utils import detect_file_upload, get_last_data_file, handle_binary_upload
+from utils.utils import get_last_data_file, process_file_upload
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -194,15 +194,10 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Check for file upload using common utility
     if request.method in ("PUT", "POST"):
-        upload_result = detect_file_upload()
-        filename, binary_data, content_length = upload_result
-
-        # Check if detect_file_upload returned an error
-        if isinstance(filename, dict):
-            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-        if filename is not None:
-            # File upload detected - save file
+        file_path, filename = process_file_upload()
+        if file_path:
+            assert filename is not None
+            # File upload detected - validate parameters
             template_name = request.args.get("template_name")
             output_name = request.args.get("output_name")
 
@@ -226,15 +221,6 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
                 output_name = os.path.basename(validated_output_path)
             except PathValidationError as e:
                 return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
-
-            # Save uploaded file using handle_binary_upload
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-
-            if error:
-                return jsonify(error), status_code
-
-            assert result is not None
-            file_path = result["FilePath"]
 
     # No file upload - use existing file by path
     if file_path is None:
@@ -505,15 +491,10 @@ def _generate_files_common(
 
     # Check for file upload using common utility
     if request.method in ("PUT", "POST"):
-        upload_result = detect_file_upload()
-        filename, binary_data, content_length = upload_result
-
-        # Check if detect_file_upload returned an error
-        if isinstance(filename, dict):
-            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-        if filename is not None:
-            # File upload detected - save file
+        file_path, filename = process_file_upload()
+        if file_path:
+            assert filename is not None
+            # File upload detected - validate parameters
             output_name = request.args.get("output_name")
 
             # If no output_name provided, derive from uploaded filename
@@ -527,15 +508,6 @@ def _generate_files_common(
                 output_name = os.path.basename(validated_output_path)
             except PathValidationError as e:
                 return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
-
-            # Save uploaded file using handle_binary_upload
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-
-            if error:
-                return jsonify(error), status_code
-
-            assert result is not None
-            file_path = result["FilePath"]
 
     # No file upload - use existing file by path
     if file_path is None:

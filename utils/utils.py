@@ -12,6 +12,7 @@ from flask import request
 from werkzeug.utils import secure_filename
 
 from config import Config
+from utils.exceptions import APIError
 
 logger = logging.getLogger(__name__)
 
@@ -85,15 +86,22 @@ def get_folder_for_extension(filename_or_ext: str) -> str:
         return Config.VIBRATIONVIEW_FOLDER
 
 
-def handle_binary_upload(
-    filename: str, binary_data: bytes, usetemporaryfile: bool = False
-) -> Tuple[Optional[Dict], Optional[Dict], int]:
+def handle_binary_upload(filename: str, binary_data: bytes, usetemporaryfile: bool = False) -> Dict:
+    """Save uploaded binary data to disk.
+
+    Returns:
+        dict with FilePath, Filename, and Size keys.
+
+    Raises:
+        APIError: if the filename is missing, has a disallowed extension,
+                  or fails sanitization.
+    """
     if not filename or "." not in filename:
-        return None, {"Error": "Missing or invalid filename"}, 400
+        raise APIError("Missing or invalid filename", "UPLOAD_ERROR")
 
     ext = filename.rsplit(".", 1)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        return None, {"Error": f"Invalid file extension: .{ext}"}, 400
+        raise APIError(f"Invalid file extension: .{ext}", "UPLOAD_ERROR")
 
     base_folder = get_folder_for_extension(ext)
     temp_folder = os.path.join(base_folder, "Uploads")
@@ -107,9 +115,9 @@ def handle_binary_upload(
 
     safe_filename = secure_filename(filename)
     if not safe_filename or safe_filename.count(".") != 1:
-        return None, {"Error": "Filename is not valid after sanitization"}, 400
+        raise APIError("Filename is not valid after sanitization", "UPLOAD_ERROR")
     if safe_filename.rsplit(".", 1)[1].lower() != ext:
-        return None, {"Error": "File extension changed during sanitization"}, 400
+        raise APIError("File extension changed during sanitization", "UPLOAD_ERROR")
     file_path = os.path.join(temp_folder, safe_filename)
 
     with open(file_path, "wb") as f:
@@ -117,10 +125,41 @@ def handle_binary_upload(
 
     logger.info(f"Binary file saved: {file_path}")
 
-    return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}, None, 200
+    return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}
+
+
+def process_file_upload(
+    usetemporaryfile: bool = False,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Detect an incoming file upload, save it, and return the result.
+
+    Combines ``detect_file_upload`` and ``handle_binary_upload`` into a single
+    call so route handlers don't need to repeat the boilerplate.
+
+    Returns:
+        (file_path, filename)
+        - Upload saved:  (saved_file_path, original_filename)
+        - No upload:     (None, None)
+
+    Raises:
+        APIError: if the upload is malformed or fails validation.
+    """
+    filename, binary_data, _content_length = detect_file_upload()
+
+    if filename is None:
+        return None, None
+
+    assert binary_data is not None
+    result = handle_binary_upload(filename, binary_data, usetemporaryfile)
+    return result["FilePath"], filename
 
 
 def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
+    """Parse a TSV string (from VibrationVIEW ReportField) into a list of dicts.
+
+    Raises:
+        APIError: if the TSV text cannot be parsed.
+    """
     try:
         lines = tsv_text.strip().splitlines()
         if len(lines) < 2:
@@ -139,7 +178,7 @@ def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
         return data
 
     except Exception as e:
-        return [{"Error": f"Error parsing TSV: {e}"}]
+        raise APIError(f"Error parsing TSV: {e}", "PARSE_ERROR") from e
 
 
 def DecodeStatusColor(status: Dict[str, int]) -> str:
@@ -247,30 +286,25 @@ def GetVectorData(vvInstance: Any, vector: int) -> Dict[str, list]:
         raise RuntimeError(f"Error retrieving vector data: {e}")
 
 
-def convert_channel_to_com_index(channel_user: Any) -> Tuple[Optional[int], Optional[Dict], Optional[int]]:
-    """
-    Convert user-provided 1-based channel number to 0-based COM index
+def convert_channel_to_com_index(channel_user: Any) -> int:
+    """Convert user-provided 1-based channel number to 0-based COM index.
 
     Args:
         channel_user: User-provided channel number (1-based)
 
     Returns:
-        tuple: (channel_com, error_response, status_code)
-               - channel_com: 0-based channel for COM calls (None if error)
-               - error_response: Error dict if invalid (None if valid)
-               - status_code: HTTP status code if error (None if valid)
+        0-based channel index for COM calls.
+
+    Raises:
+        APIError: if the channel is not a positive integer.
     """
     try:
         channel = int(channel_user)
         if channel < 1:
-            from utils.response_helpers import error_response
-
-            return None, error_response("Channel parameter must be >= 1", "INVALID_PARAMETER"), 400
-        return channel - 1, None, None
+            raise APIError("Channel parameter must be >= 1", "INVALID_PARAMETER")
+        return channel - 1
     except (ValueError, TypeError):
-        from utils.response_helpers import error_response
-
-        return None, error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER"), 400
+        raise APIError("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")
 
 
 def is_template_file(filename: str) -> bool:
@@ -355,14 +389,16 @@ def is_valid_urn(value: Any) -> bool:
     return bool(URN_PATTERN.match(value.strip()))
 
 
-def detect_file_upload() -> Tuple[Any, Any, Any]:
+def detect_file_upload() -> Tuple[Optional[str], Optional[bytes], Optional[int]]:
     """
     Detect if the current request contains a file upload.
 
     Returns:
         tuple: (filename, binary_data, content_length) if file upload detected
         tuple: (None, None, None) if no file upload
-        tuple: (error_response, status_code, None) if error occurred
+
+    Raises:
+        APIError: if the upload is malformed (missing filename, etc.)
 
     Supports:
         - multipart/form-data with any file field name
@@ -400,7 +436,7 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
         )
 
         if not filename:
-            return ({"Error": "Multipart file field has no filename"}, 400, None)
+            raise APIError("Multipart file field has no filename", "UPLOAD_ERROR")
 
         return (filename, binary_data, content_length)
 
@@ -414,10 +450,8 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
                 filename = unquote(query_string)
 
         if not filename:
-            return (
-                {"Error": "Missing filename: provide via multipart/form-data file field or query parameter"},
-                400,
-                None,
+            raise APIError(
+                "Missing filename: provide via multipart/form-data file field or query parameter", "UPLOAD_ERROR"
             )
 
         content_length = request.content_length

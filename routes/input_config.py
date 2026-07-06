@@ -16,9 +16,8 @@ from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
 from utils.utils import (
     convert_channel_to_com_index,
-    detect_file_upload,
     get_filename_from_request,
-    handle_binary_upload,
+    process_file_upload,
 )
 from utils.vv_manager import with_vibrationview
 
@@ -205,9 +204,7 @@ def input_cal_date(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputCalDate(channel_com)
@@ -239,9 +236,7 @@ def input_serial_number(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputSerialNumber(channel_com)
@@ -271,9 +266,7 @@ def input_sensitivity(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputSensitivity(channel_com)
@@ -303,9 +296,7 @@ def input_engineering_scale(vv_instance: Any) -> Response | tuple[Response, int]
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
     result = vv_instance.InputEngineeringScale(channel_com)
@@ -342,9 +333,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -394,9 +383,7 @@ def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -446,9 +433,7 @@ def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])  # Keep original for response
 
@@ -525,9 +510,7 @@ def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
             error_response(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
         ), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(data["channel"])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(data["channel"])
 
     channel_user = int(data["channel"])  # Keep original for response
 
@@ -591,9 +574,7 @@ def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
             error_response(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
         ), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(data["channel"])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(data["channel"])
 
     channel_user = int(data["channel"])  # Keep original for response
 
@@ -647,23 +628,8 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
             Example: POST /api/v1/inputconfigurationfile?filename=10mv per G.vic
     """
     # POST/PUT - check for file upload first
-    upload_result = detect_file_upload()
-    filename, binary_data, content_length = upload_result
-
-    # Check if detect_file_upload returned an error
-    if isinstance(filename, dict):
-        return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-    if filename is not None:
-        # File upload detected - save and load
-        result, error, status_code = handle_binary_upload(filename, binary_data)
-
-        if error:
-            return jsonify(error), status_code
-
-        assert result is not None
-        file_path = result["FilePath"]
-
+    file_path, filename = process_file_upload()
+    if file_path:
         vv_instance.SetInputConfigurationFile(file_path)
 
         return jsonify(
@@ -706,9 +672,7 @@ def is_channel_different_database(vv_instance: Any) -> Response | tuple[Response
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])
     result = vv_instance.IsChannelDifferentThanDatabase(channel_com)
@@ -740,9 +704,7 @@ def channel_database_ids(vv_instance: Any) -> Response | tuple[Response, int]:
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])
     result = vv_instance.ChannelDatabaseIDs(channel_com)
@@ -771,9 +733,7 @@ def update_channel_config_from_database(vv_instance: Any) -> Response | tuple[Re
     if not query_args:
         return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
 
-    channel_com, error_resp, status_code = convert_channel_to_com_index(query_args[0])
-    if error_resp:
-        return jsonify(error_resp), status_code or 400
+    channel_com = convert_channel_to_com_index(query_args[0])
 
     channel_user = int(query_args[0])
     result = vv_instance.UpdateChannelConfigFromDatabase(channel_com)

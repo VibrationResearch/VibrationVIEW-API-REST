@@ -13,6 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from app import get_vv_instance
+from utils.exceptions import APIError
 
 
 class TestBasicControl:
@@ -34,17 +35,8 @@ class TestBasicControl:
         filename = "random.vrandomt"
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\random.vrandomt"
 
-        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-            # Configure the mock upload to simulate success
-            mock_upload.return_value = (
-                {
-                    "FilePath": mock_file_path,
-                    "Filename": filename,
-                    "Size": len(file_content),
-                },
-                None,
-                200,
-            )
+        with patch("routes.basic_control.process_file_upload") as mock_upload:
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance (not actually called for default templates)
             self.mock_instance.OpenTest.return_value = True
@@ -63,8 +55,7 @@ class TestBasicControl:
             assert data["data"]["result"] is True
             assert data["data"]["copied_only"] is True
 
-            # Verify that handle_binary_upload was called with the correct parameters
-            mock_upload.assert_called_once_with(filename, file_content)
+            mock_upload.assert_called_once()
 
             # Verify OpenTest was NOT called for default template files
             self.mock_instance.OpenTest.assert_not_called()
@@ -77,17 +68,8 @@ class TestBasicControl:
         filename = "custom_test.vrandomt"  # Custom name, not in default template list
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\custom_test.vrandomt"
 
-        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-            # Configure the mock upload to simulate success
-            mock_upload.return_value = (
-                {
-                    "FilePath": mock_file_path,
-                    "Filename": filename,
-                    "Size": len(file_content),
-                },
-                None,
-                200,
-            )
+        with patch("routes.basic_control.process_file_upload") as mock_upload:
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -106,8 +88,7 @@ class TestBasicControl:
             assert data["data"]["result"] is True
             assert "copied_only" not in data["data"]  # Should not have copied_only flag
 
-            # Verify that handle_binary_upload was called with the correct parameters
-            mock_upload.assert_called_once_with(filename, file_content)
+            mock_upload.assert_called_once()
 
             # Verify OpenTest WAS called for custom template files
             self.mock_instance.OpenTest.assert_called_once()
@@ -125,17 +106,8 @@ class TestBasicControl:
         filename = "test_template_custom.vrandomt"
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\test_template_custom.vrandomt"
 
-        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-            # Configure the mock upload to simulate success
-            mock_upload.return_value = (
-                {
-                    "FilePath": mock_file_path,
-                    "Filename": filename,
-                    "Size": len(file_content),
-                },
-                None,
-                200,
-            )
+        with patch("routes.basic_control.process_file_upload") as mock_upload:
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -152,8 +124,7 @@ class TestBasicControl:
             data = json.loads(response.data)
             assert data["success"] is True
 
-            # Verify that handle_binary_upload was called correctly
-            mock_upload.assert_called_once_with(filename, file_content)
+            mock_upload.assert_called_once()
 
     def test_opentest_regular_file_upload(self, client):
         """Test uploading a regular (non-template) file via PUT /opentest"""
@@ -162,17 +133,8 @@ class TestBasicControl:
         file_content = b"dummy vsp file content"
         filename = "test_regular.vsp"
 
-        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-            # Configure the mock upload to simulate success
-            mock_upload.return_value = (
-                {
-                    "FilePath": f"/regular/upload/path/{filename}",
-                    "Filename": filename,
-                    "Size": len(file_content),
-                },
-                None,
-                200,
-            )
+        with patch("routes.basic_control.process_file_upload") as mock_upload:
+            mock_upload.return_value = (f"/regular/upload/path/{filename}", filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -189,9 +151,7 @@ class TestBasicControl:
             data = json.loads(response.data)
             assert data["success"] is True
 
-            # Verify that handle_binary_upload was called with regular parameters
-            # (no special template handling)
-            mock_upload.assert_called_once_with(filename, file_content)
+            mock_upload.assert_called_once()
 
     def test_template_extension_detection(self):
         """Test the template extension detection utility function"""
@@ -228,21 +188,18 @@ class TestBasicControl:
 
         assert response.status_code == 400
         data = json.loads(response.data)
-        assert "Missing filename" in data["Error"]
+        assert data["success"] is False
+        assert "Missing filename" in data["error"]["message"]
 
     def test_opentest_upload_error_handling(self, client):
-        """Test PUT /opentest error handling from handle_binary_upload"""
+        """Test PUT /opentest error handling from process_file_upload"""
 
         file_content = b"dummy content"
         filename = "test.vrandomt"
 
-        # Mock handle_binary_upload to return an error
-        with patch("routes.basic_control.handle_binary_upload") as mock_upload:
-            mock_upload.return_value = (
-                None,  # No result
-                {"Error": "File upload failed"},  # Error
-                500,  # Status code
-            )
+        # Mock process_file_upload to raise an APIError
+        with patch("routes.basic_control.process_file_upload") as mock_upload:
+            mock_upload.side_effect = APIError("File upload failed", "UPLOAD_ERROR")
 
             response = client.put(
                 f"/api/v1/opentest?filename={filename}",
@@ -250,9 +207,10 @@ class TestBasicControl:
                 headers={"Content-Length": str(len(file_content))},
             )
 
-            assert response.status_code == 500
+            assert response.status_code == 400
             data = json.loads(response.data)
-            assert "File upload failed" in data["Error"]
+            assert data["success"] is False
+            assert "File upload failed" in data["error"]["message"]
 
     def test_closetest_get_success(self, client):
         """Test GET /closetest with successful profile close"""
