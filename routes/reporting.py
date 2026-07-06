@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.vv_error_codes import VVIEW_E_ALREADY_RUNNING, VVIEW_E_NO_DATA, is_vview_error
 from utils.vv_manager import with_vibrationview
 
@@ -123,7 +124,7 @@ def get_documentation() -> Response:
 @reporting_bp.route("/reportfield", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def report_field(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_field(vv_instance: Any) -> Response:
     """
     Get Report Field Value
 
@@ -146,11 +147,9 @@ def report_field(vv_instance: Any) -> Response | tuple[Response, int]:
             field_name = list(request.args.keys())[0]
 
         if not field_name:
-            return jsonify(
-                error_response(
-                    'Missing query parameter: either "field" or provide any query parameter', "MISSING_PARAMETER"
-                )
-            ), 400
+            raise APIError(
+                'Missing query parameter: either "field" or provide any query parameter', "MISSING_PARAMETER"
+            )
 
     result = vv_instance.ReportField(field_name)
 
@@ -165,7 +164,7 @@ def report_field(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportfields", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_fields(vv_instance: Any) -> Response:
     """
     Get Multiple Report Field Values
 
@@ -227,7 +226,7 @@ def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Validate we have fields
     if not fields_string or not fields_string.strip():
-        return jsonify(error_response("Missing required parameter: fields", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: fields", "MISSING_PARAMETER")
 
     # Expand fields for all channels if channel=all
     if channel_param == "all":
@@ -298,7 +297,7 @@ def report_fields(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportfieldshistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_fields_history(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_fields_history(vv_instance: Any) -> Response:
     """
     Get Report Field Values for All Data Files from Most Recent Test
 
@@ -348,7 +347,7 @@ def report_fields_history(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Validate we have fields
     if not fields_string or not fields_string.strip():
-        return jsonify(error_response("Missing required parameter: fields", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: fields", "MISSING_PARAMETER")
 
     # Call ReportFieldsHistory with the comma-delimited string
     try:
@@ -390,7 +389,7 @@ def report_fields_history(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportvector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_vector(vv_instance: Any) -> Response:
     """
     Get Report Vector Data
 
@@ -432,7 +431,7 @@ def report_vector(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: vectors", "MISSING_PARAMETER")
 
     result = vv_instance.ReportVector(vectors_string)
 
@@ -444,7 +443,7 @@ def report_vector(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportvectorheader", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_header(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_vector_header(vv_instance: Any) -> Response:
     """
     Get Report Vector Header Information
 
@@ -486,7 +485,7 @@ def report_vector_header(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: vectors", "MISSING_PARAMETER")
 
     result = vv_instance.ReportVectorHeader(vectors_string)
 
@@ -500,7 +499,7 @@ def report_vector_header(vv_instance: Any) -> Response | tuple[Response, int]:
 @reporting_bp.route("/reportvectorhistory", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def report_vector_history(vv_instance: Any) -> Response | tuple[Response, int]:
+def report_vector_history(vv_instance: Any) -> Response:
     """
     Get Report Vector Data for All Data Files from Most Recent Test
 
@@ -546,7 +545,7 @@ def report_vector_history(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Validate we have vectors
     if not vectors_string or not vectors_string.strip():
-        return jsonify(error_response("Missing required parameter: vectors", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: vectors", "MISSING_PARAMETER")
 
     # Call ReportVectorHistory with the comma-delimited string
     try:
@@ -634,7 +633,7 @@ def form_fields(vv_instance: Any) -> Response:
 @reporting_bp.route("/formfields", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def post_form_fields(vv_instance: Any) -> Response | tuple[Response, int]:
+def post_form_fields(vv_instance: Any) -> Response:
     """
     Post Form Field Values
 
@@ -672,16 +671,10 @@ def post_form_fields(vv_instance: Any) -> Response | tuple[Response, int]:
             fields = data["fields"]
 
     if not fields:
-        return jsonify(
-            error_response(
-                "Missing required parameter: fields (JSON array or multipart/form-data)", "MISSING_PARAMETER"
-            )
-        ), 400
+        raise APIError("Missing required parameter: fields (JSON array or multipart/form-data)", "MISSING_PARAMETER")
 
     if not isinstance(fields, list):
-        return jsonify(
-            error_response("fields must be a 2D array of [field_name, field_value] pairs", "INVALID_PARAMETER")
-        ), 400
+        raise APIError("fields must be a 2D array of [field_name, field_value] pairs", "INVALID_PARAMETER")
 
     result = vv_instance.PostFormFields(fields)
 

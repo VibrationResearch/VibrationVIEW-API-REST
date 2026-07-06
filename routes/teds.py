@@ -13,7 +13,8 @@ from typing import Any, Dict, List, Optional
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.teds_formatter import format_single_channel_teds, format_teds_data
 from utils.utils import convert_channel_to_com_index, is_valid_urn
 from utils.vv_error_codes import VVIEW_E_MISMATCH, format_com_error, is_vview_error
@@ -187,7 +188,7 @@ def get_input_teds_all(vv_instance: Any) -> Response:
 @teds_bp.route("/inputtedschannel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
+def get_input_teds_channel(vv_instance: Any) -> Response:
     """
     Get TEDS Information for Specific Channel (1-based indexing)
 
@@ -202,7 +203,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -211,11 +212,9 @@ def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
     # Validate channel range
     num_channels = vv_instance.GetHardwareInputChannels()
     if channel_com >= num_channels:
-        return jsonify(
-            error_response(
-                f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)", "CHANNEL_OUT_OF_RANGE"
-            )
-        ), 400
+        raise APIError(
+            f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)", "CHANNEL_OUT_OF_RANGE"
+        )
 
     teds_info = vv_instance.Teds(channel_com)
 
@@ -230,7 +229,7 @@ def get_input_teds_channel(vv_instance: Any) -> Response | tuple[Response, int]:
 @teds_bp.route("/teds", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def teds(vv_instance: Any) -> Response | tuple[Response, int]:
+def teds(vv_instance: Any) -> Response:
     """
     Get TEDS Information for Specific Channel or All Channels (1-based indexing)
 
@@ -256,12 +255,10 @@ def teds(vv_instance: Any) -> Response | tuple[Response, int]:
         # Validate channel range
         num_channels = vv_instance.GetHardwareInputChannels()
         if channel_com >= num_channels:
-            return jsonify(
-                error_response(
-                    f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)",
-                    "CHANNEL_OUT_OF_RANGE",
-                )
-            ), 400
+            raise APIError(
+                f"Channel {channel_1based} out of range - must be 1 to {num_channels} (1-based)",
+                "CHANNEL_OUT_OF_RANGE",
+            )
 
         teds_info = vv_instance.Teds(channel_com)
 
@@ -277,13 +274,10 @@ def teds(vv_instance: Any) -> Response | tuple[Response, int]:
             }
             message = f"Formatted TEDS information retrieved for channel {channel_1based} (1-based)"
         else:  # 'error' in formatted_channel
-            return jsonify(
-                error_response(
-                    f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}",
-                    "TEDS_ERROR",
-                    {"channel": channel_1based},
-                )
-            ), 400
+            raise APIError(
+                f"TEDS error for channel {channel_1based} (1-based): {formatted_channel['error']['error']}",
+                "TEDS_ERROR",
+            )
 
         return jsonify(success_response(result_data, message))
 
@@ -455,24 +449,22 @@ def teds_verify_and_apply(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     request_data = request.get_json(silent=True)
     if not request_data:
-        return jsonify(error_response("Missing request body - JSON required", "MISSING_BODY")), 400
+        raise APIError("Missing request body - JSON required", "MISSING_BODY")
 
     urns = request_data.get("urns")
     if urns is None:
-        return jsonify(error_response("Missing required parameter: urns", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: urns", "MISSING_PARAMETER")
 
     if not isinstance(urns, list):
-        return jsonify(error_response('Parameter "urns" must be an array', "INVALID_PARAMETER_TYPE")), 400
+        raise APIError('Parameter "urns" must be an array', "INVALID_PARAMETER_TYPE")
 
     if len(urns) == 0:
-        return jsonify(error_response('Parameter "urns" cannot be empty', "EMPTY_PARAMETER")), 400
+        raise APIError('Parameter "urns" cannot be empty', "EMPTY_PARAMETER")
 
     # Validate URNs are strings
     for i, urn in enumerate(urns):
         if not isinstance(urn, str):
-            return jsonify(
-                error_response(f"URN at index {i} must be a string, got {type(urn).__name__}", "INVALID_URN_TYPE")
-            ), 400
+            raise APIError(f"URN at index {i} must be a string, got {type(urn).__name__}", "INVALID_URN_TYPE")
 
     try:
         result = vv_instance.TedsVerifyAndApply(urns)

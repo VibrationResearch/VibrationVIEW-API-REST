@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import convert_channel_to_com_index
 from utils.vv_manager import with_vibrationview
 
@@ -155,7 +156,7 @@ def get_software_version(vv_instance: Any) -> Response:
 @hardware_config_bp.route("/hardwaresupportscapacitorcoupled", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]:
+def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response:
     """
     Hardware Supports Capacitor Coupled
 
@@ -170,7 +171,7 @@ def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response | tuple[Re
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -187,7 +188,7 @@ def hardware_supports_capacitor_coupled(vv_instance: Any) -> Response | tuple[Re
 @hardware_config_bp.route("/hardwaresupportsaccelpowersource", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int]:
+def hardware_supports_accel_power_source(vv_instance: Any) -> Response:
     """
     Hardware Supports Accelerometer Power Source
 
@@ -202,7 +203,7 @@ def hardware_supports_accel_power_source(vv_instance: Any) -> Response | tuple[R
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -219,7 +220,7 @@ def hardware_supports_accel_power_source(vv_instance: Any) -> Response | tuple[R
 @hardware_config_bp.route("/hardwaresupportsdifferential", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def hardware_supports_differential(vv_instance: Any) -> Response | tuple[Response, int]:
+def hardware_supports_differential(vv_instance: Any) -> Response:
     """
     Hardware Supports Differential
 
@@ -234,7 +235,7 @@ def hardware_supports_differential(vv_instance: Any) -> Response | tuple[Respons
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 

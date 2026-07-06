@@ -17,8 +17,8 @@ from flask import Blueprint, Response, jsonify, request, send_file
 from vibrationviewapi import GenerateReportFromVV, GenerateTXTFromVV, GenerateUFFFromVV
 
 from utils.decorators import handle_errors
+from utils.exceptions import APIError
 from utils.path_validator import PathValidationError, validate_file_path, validate_output_path
-from utils.response_helpers import error_response
 from utils.utils import get_last_data_file, process_file_upload
 from utils.vv_manager import with_vibrationview
 
@@ -154,7 +154,7 @@ def get_documentation() -> Response:
 @report_generation_bp.route("/generatereport", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
+def generate_report(vv_instance: Any) -> Response:
     """
     Generate Report File from VibrationVIEW Data
 
@@ -202,9 +202,7 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
             output_name = request.args.get("output_name")
 
             if not template_name:
-                return jsonify(
-                    error_response("Upload mode requires template_name query parameter", "MISSING_PARAMETER")
-                ), 400
+                raise APIError("Upload mode requires template_name query parameter", "MISSING_PARAMETER")
 
             # If no output_name provided, derive from uploaded filename and template extension
             if not output_name:
@@ -220,7 +218,7 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
                 validated_output_path = validate_output_path(output_name, "report generation (upload)")
                 output_name = os.path.basename(validated_output_path)
             except PathValidationError as e:
-                return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
+                raise APIError(str(e), "OUTPUT_PATH_VALIDATION_ERROR", 403)
 
     # No file upload - use existing file by path
     if file_path is None:
@@ -241,10 +239,10 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
         try:
             validated_file_path = validate_file_path(file_path, "report generation")
         except PathValidationError as e:
-            return jsonify(error_response(str(e), "PATH_VALIDATION_ERROR")), 403
+            raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
         if not os.path.exists(validated_file_path):
-            return jsonify(error_response(f"File not found: {validated_file_path}", "FILE_NOT_FOUND")), 404
+            raise APIError(f"File not found: {validated_file_path}", "FILE_NOT_FOUND", 404)
 
         file_path = validated_file_path
 
@@ -266,16 +264,14 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
         validated_output_path = validate_output_path(output_name, "report generation")
         output_name = os.path.basename(validated_output_path)
     except PathValidationError as e:
-        return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
+        raise APIError(str(e), "OUTPUT_PATH_VALIDATION_ERROR", 403)
 
     # Generate report
     generated_file_path = GenerateReportFromVV(file_path, template_name, output_name)
 
     # Check if file was actually created
     if not os.path.exists(generated_file_path):
-        return jsonify(
-            error_response(f"Generated file does not exist at path: {generated_file_path}", "FILE_NOT_FOUND")
-        ), 404
+        raise APIError(f"Generated file does not exist at path: {generated_file_path}", "FILE_NOT_FOUND", 404)
 
     return send_file(generated_file_path, as_attachment=True, download_name=os.path.basename(generated_file_path))
 
@@ -283,7 +279,7 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
 @report_generation_bp.route("/datafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_datafile(vv_instance: Any) -> Response | tuple[Response, int]:
+def get_datafile(vv_instance: Any) -> Response:
     """
     Get Raw VibrationVIEW Data File
 
@@ -315,10 +311,10 @@ def get_datafile(vv_instance: Any) -> Response | tuple[Response, int]:
     try:
         validated_file_path = validate_file_path(file_path, "datafile retrieval")
     except PathValidationError as e:
-        return jsonify(error_response(str(e), "PATH_VALIDATION_ERROR")), 403
+        raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
     if not os.path.exists(validated_file_path):
-        return jsonify(error_response(f"File not found: {validated_file_path}", "FILE_NOT_FOUND")), 404
+        raise APIError(f"File not found: {validated_file_path}", "FILE_NOT_FOUND", 404)
 
     return send_file(validated_file_path, as_attachment=True, download_name=os.path.basename(validated_file_path))
 
@@ -326,7 +322,7 @@ def get_datafile(vv_instance: Any) -> Response | tuple[Response, int]:
 @report_generation_bp.route("/datafiles", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
+def get_datafiles(vv_instance: Any) -> Response:
     """
     Get All Data Files from most recently run test as Zip Archive
 
@@ -341,7 +337,7 @@ def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get file paths from VibrationVIEW history.
     fields_history = vv_instance.ReportFieldsHistory("LastData")
     if not fields_history or len(fields_history) == 0:
-        return jsonify(error_response("No data files found in VibrationVIEW history", "NO_DATA_FILES")), 404
+        raise APIError("No data files found in VibrationVIEW history", "NO_DATA_FILES", 404)
 
     # Extract file paths (LastData report field) from the first row (skip element 0 which is the label)
     file_paths = []
@@ -352,7 +348,7 @@ def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
             logger.warning("Data file from history not found on disk: %s", file_path)
 
     if not file_paths:
-        return jsonify(error_response("No valid data files found in VibrationVIEW history", "NO_FILES_FOUND")), 404
+        raise APIError("No valid data files found in VibrationVIEW history", "NO_FILES_FOUND", 404)
 
     # Create zip file in memory
     zip_buffer = io.BytesIO()
@@ -375,7 +371,7 @@ def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
                 file_count += 1
 
     if file_count == 0:
-        return jsonify(error_response("No files could be added to the archive", "NO_FILES_ADDED")), 404
+        raise APIError("No files could be added to the archive", "NO_FILES_ADDED", 404)
 
     zip_buffer.seek(0)
 
@@ -389,7 +385,7 @@ def get_datafiles(vv_instance: Any) -> Response | tuple[Response, int]:
 @report_generation_bp.route("/generatetxt", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_txt(vv_instance: Any) -> Response | tuple[Response, int]:
+def generate_txt(vv_instance: Any) -> Response:
     """
     Generate Text Files from VibrationVIEW Data
 
@@ -431,7 +427,7 @@ def generate_txt(vv_instance: Any) -> Response | tuple[Response, int]:
 @report_generation_bp.route("/generateuff", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def generate_uff(vv_instance: Any) -> Response | tuple[Response, int]:
+def generate_uff(vv_instance: Any) -> Response:
     """
     Generate UFF Files from VibrationVIEW Data
 
@@ -470,9 +466,7 @@ def generate_uff(vv_instance: Any) -> Response | tuple[Response, int]:
     return _generate_files_common(vv_instance, "UFF", GenerateUFFFromVV, "UFF")
 
 
-def _generate_files_common(
-    vv_instance: Any, file_type: str, generate_func: Any, description: str
-) -> Response | tuple[Response, int]:
+def _generate_files_common(vv_instance: Any, file_type: str, generate_func: Any, description: str) -> Response:
     """
     Common implementation for generateuff and generatetxt endpoints
 
@@ -507,7 +501,7 @@ def _generate_files_common(
                 validated_output_path = validate_output_path(output_name, f"{description} generation (upload)")
                 output_name = os.path.basename(validated_output_path)
             except PathValidationError as e:
-                return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
+                raise APIError(str(e), "OUTPUT_PATH_VALIDATION_ERROR", 403)
 
     # No file upload - use existing file by path
     if file_path is None:
@@ -527,10 +521,10 @@ def _generate_files_common(
         try:
             validated_file_path = validate_file_path(file_path, f"{description} generation")
         except PathValidationError as e:
-            return jsonify(error_response(str(e), "PATH_VALIDATION_ERROR")), 403
+            raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
         if not os.path.exists(validated_file_path):
-            return jsonify(error_response(f"File not found: {validated_file_path}", "FILE_NOT_FOUND")), 404
+            raise APIError(f"File not found: {validated_file_path}", "FILE_NOT_FOUND", 404)
 
         file_path = validated_file_path
 
@@ -544,7 +538,7 @@ def _generate_files_common(
             validated_output_path = validate_output_path(output_name, f"{description} generation")
             output_name = os.path.basename(validated_output_path)
         except PathValidationError as e:
-            return jsonify(error_response(str(e), "OUTPUT_PATH_VALIDATION_ERROR")), 403
+            raise APIError(str(e), "OUTPUT_PATH_VALIDATION_ERROR", 403)
 
     # Generate the file
     assert output_name is not None
@@ -567,4 +561,4 @@ def _generate_files_common(
     if os.path.exists(primary_file_path):
         return send_file(primary_file_path, as_attachment=True)
 
-    return jsonify(error_response("Generated file not found", "FILE_NOT_FOUND")), 404
+    raise APIError("Generated file not found", "FILE_NOT_FOUND", 404)

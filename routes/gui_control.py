@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import get_filename_from_request, process_file_upload
 from utils.vv_manager import with_vibrationview
 
@@ -95,7 +96,7 @@ def get_documentation() -> Response:
 @gui_control_bp.route("/edittest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def edit_test(vv_instance: Any) -> Response | tuple[Response, int]:
+def edit_test(vv_instance: Any) -> Response:
     """
     Edit VibrationVIEW Test
 
@@ -142,7 +143,7 @@ def edit_test(vv_instance: Any) -> Response | tuple[Response, int]:
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: filename", "MISSING_PARAMETER")
 
     result = vv_instance.EditTest(filename)
 
