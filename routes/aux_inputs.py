@@ -67,7 +67,7 @@ def rear_input(vv_instance: Any) -> Response:
 @auxinputs_bp.route("/rearinputunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
+def rear_input_unit(vv_instance: Any) -> Response:
     """Get units for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")
@@ -81,9 +81,7 @@ def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
             error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
         ), 400
 
-    channel_com, err, status = convert_channel_to_com_index(channel_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channel_raw)
 
     result = vv_instance.RearInputUnit(channel_com)
 
@@ -93,7 +91,7 @@ def rear_input_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @auxinputs_bp.route("/rearinputlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def rear_input_label(vv_instance: Any) -> Response | tuple[Response, int]:
+def rear_input_label(vv_instance: Any) -> Response:
     """Get label for the rear input channel (1-based indexing)"""
     # Get channel from 'channel' parameter or first unnamed parameter
     channel_raw = request.args.get("channel")
@@ -107,9 +105,7 @@ def rear_input_label(vv_instance: Any) -> Response | tuple[Response, int]:
             error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
         ), 400
 
-    channel_com, err, status = convert_channel_to_com_index(channel_raw)
-    if err:
-        return jsonify(err), status or 400
+    channel_com = convert_channel_to_com_index(channel_raw)
 
     result = vv_instance.RearInputLabel(channel_com)
 

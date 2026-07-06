@@ -285,30 +285,25 @@ def GetVectorData(vvInstance: Any, vector: int) -> Dict[str, list]:
         raise RuntimeError(f"Error retrieving vector data: {e}")
 
 
-def convert_channel_to_com_index(channel_user: Any) -> Tuple[Optional[int], Optional[Dict], Optional[int]]:
-    """
-    Convert user-provided 1-based channel number to 0-based COM index
+def convert_channel_to_com_index(channel_user: Any) -> int:
+    """Convert user-provided 1-based channel number to 0-based COM index.
 
     Args:
         channel_user: User-provided channel number (1-based)
 
     Returns:
-        tuple: (channel_com, error_response, status_code)
-               - channel_com: 0-based channel for COM calls (None if error)
-               - error_response: Error dict if invalid (None if valid)
-               - status_code: HTTP status code if error (None if valid)
+        0-based channel index for COM calls.
+
+    Raises:
+        APIError: if the channel is not a positive integer.
     """
     try:
         channel = int(channel_user)
         if channel < 1:
-            from utils.response_helpers import error_response
-
-            return None, error_response("Channel parameter must be >= 1", "INVALID_PARAMETER"), 400
-        return channel - 1, None, None
+            raise APIError("Channel parameter must be >= 1", "INVALID_PARAMETER")
+        return channel - 1
     except (ValueError, TypeError):
-        from utils.response_helpers import error_response
-
-        return None, error_response("Invalid channel parameter - must be an integer", "INVALID_PARAMETER"), 400
+        raise APIError("Invalid channel parameter - must be an integer", "INVALID_PARAMETER")
 
 
 def is_template_file(filename: str) -> bool:
