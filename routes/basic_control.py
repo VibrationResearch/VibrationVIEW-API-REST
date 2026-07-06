@@ -19,12 +19,11 @@ from utils.decorators import handle_errors
 from utils.path_validator import PathValidationError, validate_file_path
 from utils.response_helpers import error_response, success_response
 from utils.utils import (
-    detect_file_upload,
     get_filename_from_request,
     get_hardware_info,
     get_system_info,
-    handle_binary_upload,
     is_default_template_filename,
+    process_file_upload,
 )
 from utils.vv_manager import with_vibrationview
 
@@ -225,23 +224,11 @@ def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Check for file upload (PUT/POST only)
     if request.method in ("PUT", "POST"):
-        upload_result = detect_file_upload()
-        filename, binary_data, content_length = upload_result
+        file_path, filename, upload_error = process_file_upload()
+        if upload_error:
+            return jsonify(upload_error[0]), upload_error[1]
 
-        # Check if detect_file_upload returned an error
-        if isinstance(filename, dict):
-            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-        if filename is not None:
-            # File upload detected - save and run
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-            if error:
-                return jsonify(error), status_code
-
-            if result is None:
-                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
-
-            file_path = result["FilePath"]
+        if file_path:
             vv_instance.RunTest(file_path)
             result = vv_instance.IsRunning()
 
@@ -332,25 +319,11 @@ def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Check for file upload (PUT/POST only)
     if request.method in ("PUT", "POST"):
-        upload_result = detect_file_upload()
-        filename, binary_data, content_length = upload_result
+        file_path, filename, upload_error = process_file_upload()
+        if upload_error:
+            return jsonify(upload_error[0]), upload_error[1]
 
-        # Check if detect_file_upload returned an error
-        if isinstance(filename, dict):
-            return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-        if filename is not None:
-            # File upload detected - save and open
-            result, error, status_code = handle_binary_upload(filename, binary_data)
-
-            if error:
-                return jsonify(error), status_code
-
-            if result is None:
-                return jsonify(error_response("Upload failed: no result returned", "UPLOAD_ERROR")), 500
-
-            file_path = result["FilePath"]
-
+        if file_path:
             # Check if this is a default template filename that should only be copied
             if is_default_template_filename(filename):
                 return jsonify(

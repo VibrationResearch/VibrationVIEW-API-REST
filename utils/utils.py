@@ -121,6 +121,40 @@ def handle_binary_upload(
     return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}, None, 200
 
 
+def process_file_upload(
+    usetemporaryfile: bool = False,
+) -> Tuple[Optional[str], Optional[str], Optional[Tuple[Dict, int]]]:
+    """Detect an incoming file upload, save it, and return the result.
+
+    Combines ``detect_file_upload`` and ``handle_binary_upload`` into a single
+    call so route handlers don't need to repeat the boilerplate.
+
+    Returns:
+        (file_path, filename, error_tuple)
+        - Upload saved:  (saved_file_path, original_filename, None)
+        - Upload error:  (None, None, (error_dict, status_code))
+        - No upload:     (None, None, None)
+    """
+    detection = detect_file_upload()
+    filename, binary_data, _content_length = detection
+
+    # detect_file_upload signals an error by putting a dict in the first slot
+    if isinstance(filename, dict):
+        return None, None, (filename, binary_data)  # (error_dict, status_code)
+
+    if filename is None:
+        return None, None, None
+
+    result, error, status_code = handle_binary_upload(filename, binary_data, usetemporaryfile)
+    if error:
+        return None, None, (error, status_code)
+
+    if result is None:
+        return None, None, (error_response("Upload failed: no result returned", "UPLOAD_ERROR"), 500)
+
+    return result["FilePath"], filename, None
+
+
 def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
     try:
         lines = tsv_text.strip().splitlines()

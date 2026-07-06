@@ -16,9 +16,8 @@ from utils.decorators import handle_errors
 from utils.response_helpers import error_response, success_response
 from utils.utils import (
     convert_channel_to_com_index,
-    detect_file_upload,
     get_filename_from_request,
-    handle_binary_upload,
+    process_file_upload,
 )
 from utils.vv_manager import with_vibrationview
 
@@ -647,23 +646,11 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
             Example: POST /api/v1/inputconfigurationfile?filename=10mv per G.vic
     """
     # POST/PUT - check for file upload first
-    upload_result = detect_file_upload()
-    filename, binary_data, content_length = upload_result
+    file_path, filename, upload_error = process_file_upload()
+    if upload_error:
+        return jsonify(upload_error[0]), upload_error[1]
 
-    # Check if detect_file_upload returned an error
-    if isinstance(filename, dict):
-        return jsonify(filename), binary_data  # filename is error dict, binary_data is status code
-
-    if filename is not None:
-        # File upload detected - save and load
-        result, error, status_code = handle_binary_upload(filename, binary_data)
-
-        if error:
-            return jsonify(error), status_code
-
-        assert result is not None
-        file_path = result["FilePath"]
-
+    if file_path:
         vv_instance.SetInputConfigurationFile(file_path)
 
         return jsonify(

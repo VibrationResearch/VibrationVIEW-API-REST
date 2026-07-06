@@ -67,16 +67,12 @@ class TestReportGeneration:
         mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_output.pdf"
 
         with (
-            patch("routes.report_generation.handle_binary_upload") as mock_upload,
+            patch("routes.report_generation.process_file_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
-            mock_upload.return_value = (
-                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": file_size},
-                None,
-                200,
-            )
+            mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd", None)
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
@@ -136,16 +132,12 @@ class TestReportGeneration:
         mock_generated_path = "C:\\VibrationVIEW\\Reports\\test.vvtemplate"
 
         with (
-            patch("routes.report_generation.handle_binary_upload") as mock_upload,
+            patch("routes.report_generation.process_file_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
-            mock_upload.return_value = (
-                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
-                None,
-                200,
-            )
+            mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd", None)
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
             mock_send_file.return_value = MagicMock()
@@ -230,11 +222,14 @@ class TestReportGeneration:
         # Test with malicious output path
         malicious_output = "..\\..\\Windows\\System32\\evil.exe"
 
-        response = client.post(
-            f"/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name={malicious_output}",
-            data=vrd_content,
-            headers={"Content-Length": str(len(vrd_content)), "Content-Type": "application/octet-stream"},
-        )
+        with patch("routes.report_generation.process_file_upload") as mock_upload:
+            mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd", None)
+
+            response = client.post(
+                f"/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name={malicious_output}",
+                data=vrd_content,
+                headers={"Content-Length": str(len(vrd_content)), "Content-Type": "application/octet-stream"},
+            )
 
         assert response.status_code == 403  # Forbidden due to path validation
         data = response.get_json()
@@ -254,16 +249,12 @@ class TestReportGeneration:
 
         for template_name in templates_to_test:
             with (
-                patch("routes.report_generation.handle_binary_upload") as mock_upload,
+                patch("routes.report_generation.process_file_upload") as mock_upload,
                 patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
                 patch("routes.report_generation.os.path.exists") as mock_exists,
                 patch("routes.report_generation.send_file") as mock_send_file,
             ):
-                mock_upload.return_value = (
-                    {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
-                    None,
-                    200,
-                )
+                mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd", None)
                 mock_generated_path = f"C:\\VibrationVIEW\\Reports\\output_{template_name.replace(' ', '_')}.pdf"
                 mock_generate.return_value = mock_generated_path
                 mock_exists.return_value = True
@@ -296,16 +287,12 @@ class TestReportGeneration:
         output_name = "test_report_2025-09-22_final.pdf"
 
         with (
-            patch("routes.report_generation.handle_binary_upload") as mock_upload,
+            patch("routes.report_generation.process_file_upload") as mock_upload,
             patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
             patch("routes.report_generation.os.path.exists") as mock_exists,
             patch("routes.report_generation.send_file") as mock_send_file,
         ):
-            mock_upload.return_value = (
-                {"FilePath": "C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "Filename": "test.vrd", "Size": 1024},
-                None,
-                200,
-            )
+            mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd", None)
             mock_generated_path = "C:\\VibrationVIEW\\Reports\\test_report_2025-09-22_final.pdf"
             mock_generate.return_value = mock_generated_path
             mock_exists.return_value = True
