@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Standardized error messages** (#16): Missing-parameter errors now use the format `"Missing required parameter: <name>"` instead of `"Missing required query parameter: <name>"`.
 - **Standardized error response format** (#16): Error responses from `/rearinputunit` and `/rearinputlabel` now use the structured format `"error": {"code": "...", "message": "..."}` consistent with all other endpoints.
+- **Standardized file upload error responses** (#64): File upload error responses previously returned `{"Error": "..."}`. They now use the standard API format `{"success": false, "error": {"code": "UPLOAD_ERROR", "message": "..."}, "timestamp": "..."}`. Clients parsing the old `Error` key must update to use `error.message`.
 
 ### Security
 
@@ -53,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Consistent parameter parsing**: All query parameters use shared helpers (`get_query_param`, `get_query_param_string`) supporting both named and unnamed styles. (#16)
 - **Centralized NaN/Inf handling**: Custom Flask JSON provider automatically converts NaN and Inf to `null` in all responses. (#17)
 - **Centralized error handling**: Improved exception handling with `APIError` and COM error formatting. (#14)
+- **File upload refactoring**: Extracted `process_file_upload()` helper combining `detect_file_upload()` and `handle_binary_upload()`. Both now raise `APIError` instead of returning error tuples, reducing upload boilerplate across 5 route modules. (#64)
 - **Duplicate handler fix**: Merged two conflicting route handlers for `/importvirtualchannels` into a single POST/PUT handler. (#11)
 - **Insomnia submodule**: Extracted the Insomnia collection into a separate git submodule. (#34)
 - **Ruff migration**: Replaced flake8, black, and isort with ruff for linting, formatting, and import sorting. (#25)
