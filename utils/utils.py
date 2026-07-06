@@ -12,6 +12,7 @@ from flask import request
 from werkzeug.utils import secure_filename
 
 from config import Config
+from utils.exceptions import APIError
 from utils.response_helpers import error_response
 
 logger = logging.getLogger(__name__)
@@ -135,12 +136,10 @@ def process_file_upload(
         - Upload error:  (None, None, (error_dict, status_code))
         - No upload:     (None, None, None)
     """
-    detection = detect_file_upload()
-    filename, binary_data, _content_length = detection
-
-    # detect_file_upload signals an error by putting a dict in the first slot
-    if isinstance(filename, dict):
-        return None, None, (filename, binary_data)  # (error_dict, status_code)
+    try:
+        filename, binary_data, _content_length = detect_file_upload()
+    except APIError as e:
+        return None, None, (error_response(e.message, e.error_code), e.http_status)
 
     if filename is None:
         return None, None, None
@@ -390,14 +389,16 @@ def is_valid_urn(value: Any) -> bool:
     return bool(URN_PATTERN.match(value.strip()))
 
 
-def detect_file_upload() -> Tuple[Any, Any, Any]:
+def detect_file_upload() -> Tuple[Optional[str], Optional[bytes], Optional[int]]:
     """
     Detect if the current request contains a file upload.
 
     Returns:
         tuple: (filename, binary_data, content_length) if file upload detected
         tuple: (None, None, None) if no file upload
-        tuple: (error_response, status_code, None) if error occurred
+
+    Raises:
+        APIError: if the upload is malformed (missing filename, etc.)
 
     Supports:
         - multipart/form-data with any file field name
@@ -435,7 +436,7 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
         )
 
         if not filename:
-            return (error_response("Multipart file field has no filename", "UPLOAD_ERROR"), 400, None)
+            raise APIError("Multipart file field has no filename", "UPLOAD_ERROR")
 
         return (filename, binary_data, content_length)
 
@@ -449,12 +450,8 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
                 filename = unquote(query_string)
 
         if not filename:
-            return (
-                error_response(
-                    "Missing filename: provide via multipart/form-data file field or query parameter", "UPLOAD_ERROR"
-                ),
-                400,
-                None,
+            raise APIError(
+                "Missing filename: provide via multipart/form-data file field or query parameter", "UPLOAD_ERROR"
             )
 
         content_length = request.content_length
