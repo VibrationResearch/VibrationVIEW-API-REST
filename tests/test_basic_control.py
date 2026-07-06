@@ -13,7 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from app import get_vv_instance
-from utils.response_helpers import error_response
+from utils.exceptions import APIError
 
 
 class TestBasicControl:
@@ -36,7 +36,7 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\random.vrandomt"
 
         with patch("routes.basic_control.process_file_upload") as mock_upload:
-            mock_upload.return_value = (mock_file_path, filename, None)
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance (not actually called for default templates)
             self.mock_instance.OpenTest.return_value = True
@@ -69,7 +69,7 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\custom_test.vrandomt"
 
         with patch("routes.basic_control.process_file_upload") as mock_upload:
-            mock_upload.return_value = (mock_file_path, filename, None)
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -107,7 +107,7 @@ class TestBasicControl:
         mock_file_path = r"C:\VibrationVIEW\New Test Defaults\Uploads\test_template_custom.vrandomt"
 
         with patch("routes.basic_control.process_file_upload") as mock_upload:
-            mock_upload.return_value = (mock_file_path, filename, None)
+            mock_upload.return_value = (mock_file_path, filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -134,7 +134,7 @@ class TestBasicControl:
         filename = "test_regular.vsp"
 
         with patch("routes.basic_control.process_file_upload") as mock_upload:
-            mock_upload.return_value = (f"/regular/upload/path/{filename}", filename, None)
+            mock_upload.return_value = (f"/regular/upload/path/{filename}", filename)
 
             # Configure mock VV instance
             self.mock_instance.OpenTest.return_value = True
@@ -197,13 +197,9 @@ class TestBasicControl:
         file_content = b"dummy content"
         filename = "test.vrandomt"
 
-        # Mock process_file_upload to return an error
+        # Mock process_file_upload to raise an APIError
         with patch("routes.basic_control.process_file_upload") as mock_upload:
-            mock_upload.return_value = (
-                None,
-                None,
-                (error_response("File upload failed", "UPLOAD_ERROR"), 500),
-            )
+            mock_upload.side_effect = APIError("File upload failed", "UPLOAD_ERROR")
 
             response = client.put(
                 f"/api/v1/opentest?filename={filename}",
@@ -211,7 +207,7 @@ class TestBasicControl:
                 headers={"Content-Length": str(len(file_content))},
             )
 
-            assert response.status_code == 500
+            assert response.status_code == 400
             data = json.loads(response.data)
             assert data["success"] is False
             assert "File upload failed" in data["error"]["message"]

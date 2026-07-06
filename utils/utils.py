@@ -131,32 +131,27 @@ def handle_binary_upload(filename: str, binary_data: bytes, usetemporaryfile: bo
 
 def process_file_upload(
     usetemporaryfile: bool = False,
-) -> Tuple[Optional[str], Optional[str], Optional[Tuple[Dict, int]]]:
+) -> Tuple[Optional[str], Optional[str]]:
     """Detect an incoming file upload, save it, and return the result.
 
     Combines ``detect_file_upload`` and ``handle_binary_upload`` into a single
     call so route handlers don't need to repeat the boilerplate.
 
     Returns:
-        (file_path, filename, error_tuple)
-        - Upload saved:  (saved_file_path, original_filename, None)
-        - Upload error:  (None, None, (error_dict, status_code))
-        - No upload:     (None, None, None)
+        (file_path, filename)
+        - Upload saved:  (saved_file_path, original_filename)
+        - No upload:     (None, None)
+
+    Raises:
+        APIError: if the upload is malformed or fails validation.
     """
-    try:
-        filename, binary_data, _content_length = detect_file_upload()
-    except APIError as e:
-        return None, None, (error_response(e.message, e.error_code), e.http_status)
+    filename, binary_data, _content_length = detect_file_upload()
 
     if filename is None:
-        return None, None, None
+        return None, None
 
-    try:
-        result = handle_binary_upload(filename, binary_data, usetemporaryfile)
-    except APIError as e:
-        return None, None, (error_response(e.message, e.error_code), e.http_status)
-
-    return result["FilePath"], filename, None
+    result = handle_binary_upload(filename, binary_data, usetemporaryfile)
+    return result["FilePath"], filename
 
 
 def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:

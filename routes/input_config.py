@@ -646,10 +646,7 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
             Example: POST /api/v1/inputconfigurationfile?filename=10mv per G.vic
     """
     # POST/PUT - check for file upload first
-    file_path, filename, upload_error = process_file_upload()
-    if upload_error:
-        return jsonify(upload_error[0]), upload_error[1]
-
+    file_path, filename = process_file_upload()
     if file_path:
         vv_instance.SetInputConfigurationFile(file_path)
 

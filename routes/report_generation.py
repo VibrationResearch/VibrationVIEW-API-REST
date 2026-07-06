@@ -194,10 +194,7 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
 
     # Check for file upload using common utility
     if request.method in ("PUT", "POST"):
-        file_path, filename, upload_error = process_file_upload()
-        if upload_error:
-            return jsonify(upload_error[0]), upload_error[1]
-
+        file_path, filename = process_file_upload()
         if file_path:
             # File upload detected - validate parameters
             template_name = request.args.get("template_name")
@@ -493,10 +490,7 @@ def _generate_files_common(
 
     # Check for file upload using common utility
     if request.method in ("PUT", "POST"):
-        file_path, filename, upload_error = process_file_upload()
-        if upload_error:
-            return jsonify(upload_error[0]), upload_error[1]
-
+        file_path, filename = process_file_upload()
         if file_path:
             # File upload detected - validate parameters
             output_name = request.args.get("output_name")

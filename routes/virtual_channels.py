@@ -118,10 +118,7 @@ def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]
     """
     # Check for file upload (PUT/POST only)
     if request.method in ("PUT", "POST"):
-        file_path, filename, upload_error = process_file_upload()
-        if upload_error:
-            return jsonify(upload_error[0]), upload_error[1]
-
+        file_path, filename = process_file_upload()
         if file_path:
 
             # Import the uploaded virtual channels file
