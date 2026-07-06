@@ -149,6 +149,7 @@ def process_file_upload(
     if filename is None:
         return None, None
 
+    assert binary_data is not None
     result = handle_binary_upload(filename, binary_data, usetemporaryfile)
     return result["FilePath"], filename
 
