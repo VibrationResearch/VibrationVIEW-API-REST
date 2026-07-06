@@ -13,7 +13,6 @@ from werkzeug.utils import secure_filename
 
 from config import Config
 from utils.exceptions import APIError
-from utils.response_helpers import error_response
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +154,11 @@ def process_file_upload(
 
 
 def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
+    """Parse a TSV string (from VibrationVIEW ReportField) into a list of dicts.
+
+    Raises:
+        APIError: if the TSV text cannot be parsed.
+    """
     try:
         lines = tsv_text.strip().splitlines()
         if len(lines) < 2:
@@ -173,7 +177,7 @@ def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
         return data
 
     except Exception as e:
-        return [error_response(f"Error parsing TSV: {e}", "PARSE_ERROR")]
+        raise APIError(f"Error parsing TSV: {e}", "PARSE_ERROR") from e
 
 
 def DecodeStatusColor(status: Dict[str, int]) -> str:
