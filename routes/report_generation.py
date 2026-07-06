@@ -196,6 +196,7 @@ def generate_report(vv_instance: Any) -> Response | tuple[Response, int]:
     if request.method in ("PUT", "POST"):
         file_path, filename = process_file_upload()
         if file_path:
+            assert filename is not None
             # File upload detected - validate parameters
             template_name = request.args.get("template_name")
             output_name = request.args.get("output_name")
@@ -492,6 +493,7 @@ def _generate_files_common(
     if request.method in ("PUT", "POST"):
         file_path, filename = process_file_upload()
         if file_path:
+            assert filename is not None
             # File upload detected - validate parameters
             output_name = request.args.get("output_name")
 

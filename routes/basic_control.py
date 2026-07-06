@@ -226,6 +226,7 @@ def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
     if request.method in ("PUT", "POST"):
         file_path, filename = process_file_upload()
         if file_path:
+            assert filename is not None
             vv_instance.RunTest(file_path)
             result = vv_instance.IsRunning()
 
@@ -318,6 +319,7 @@ def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
     if request.method in ("PUT", "POST"):
         file_path, filename = process_file_upload()
         if file_path:
+            assert filename is not None
             # Check if this is a default template filename that should only be copied
             if is_default_template_filename(filename):
                 return jsonify(

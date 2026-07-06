@@ -14,7 +14,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import convert_channel_to_com_index
 from utils.vv_manager import with_vibrationview
 
@@ -77,9 +78,7 @@ def rear_input_unit(vv_instance: Any) -> Response:
             channel_raw = args[0]
 
     if channel_raw is None:
-        return jsonify(
-            error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
-        ), 400
+        raise APIError("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(channel_raw)
 
@@ -101,9 +100,7 @@ def rear_input_label(vv_instance: Any) -> Response:
             channel_raw = args[0]
 
     if channel_raw is None:
-        return jsonify(
-            error_response("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
-        ), 400
+        raise APIError("Missing required parameter: channel (or unnamed numeric parameter)", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(channel_raw)
 
