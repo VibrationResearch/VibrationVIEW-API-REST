@@ -224,7 +224,8 @@ class TestBinaryUploadAcceptance:
         result, error, status = handle_binary_upload("test.xyz", b"data")
         assert status == 400
         assert result is None
-        assert "Invalid file extension" in error["Error"]
+        assert error["success"] is False
+        assert "Invalid file extension" in error["error"]["message"]
 
 
 class TestSecureFilenameValidation:

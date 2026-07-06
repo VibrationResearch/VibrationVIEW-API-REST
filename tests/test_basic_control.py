@@ -13,6 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from app import get_vv_instance
+from utils.response_helpers import error_response
 
 
 class TestBasicControl:
@@ -228,7 +229,8 @@ class TestBasicControl:
 
         assert response.status_code == 400
         data = json.loads(response.data)
-        assert "Missing filename" in data["Error"]
+        assert data["success"] is False
+        assert "Missing filename" in data["error"]["message"]
 
     def test_opentest_upload_error_handling(self, client):
         """Test PUT /opentest error handling from handle_binary_upload"""
@@ -240,7 +242,7 @@ class TestBasicControl:
         with patch("routes.basic_control.handle_binary_upload") as mock_upload:
             mock_upload.return_value = (
                 None,  # No result
-                {"Error": "File upload failed"},  # Error
+                error_response("File upload failed", "UPLOAD_ERROR"),  # Error
                 500,  # Status code
             )
 
@@ -252,7 +254,8 @@ class TestBasicControl:
 
             assert response.status_code == 500
             data = json.loads(response.data)
-            assert "File upload failed" in data["Error"]
+            assert data["success"] is False
+            assert "File upload failed" in data["error"]["message"]
 
     def test_closetest_get_success(self, client):
         """Test GET /closetest with successful profile close"""

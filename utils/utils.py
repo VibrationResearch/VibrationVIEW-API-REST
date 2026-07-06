@@ -12,6 +12,7 @@ from flask import request
 from werkzeug.utils import secure_filename
 
 from config import Config
+from utils.response_helpers import error_response
 
 logger = logging.getLogger(__name__)
 
@@ -89,11 +90,11 @@ def handle_binary_upload(
     filename: str, binary_data: bytes, usetemporaryfile: bool = False
 ) -> Tuple[Optional[Dict], Optional[Dict], int]:
     if not filename or "." not in filename:
-        return None, {"Error": "Missing or invalid filename"}, 400
+        return None, error_response("Missing or invalid filename", "UPLOAD_ERROR"), 400
 
     ext = filename.rsplit(".", 1)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        return None, {"Error": f"Invalid file extension: .{ext}"}, 400
+        return None, error_response(f"Invalid file extension: .{ext}", "UPLOAD_ERROR"), 400
 
     base_folder = get_folder_for_extension(ext)
     temp_folder = os.path.join(base_folder, "Uploads")
@@ -107,9 +108,9 @@ def handle_binary_upload(
 
     safe_filename = secure_filename(filename)
     if not safe_filename or safe_filename.count(".") != 1:
-        return None, {"Error": "Filename is not valid after sanitization"}, 400
+        return None, error_response("Filename is not valid after sanitization", "UPLOAD_ERROR"), 400
     if safe_filename.rsplit(".", 1)[1].lower() != ext:
-        return None, {"Error": "File extension changed during sanitization"}, 400
+        return None, error_response("File extension changed during sanitization", "UPLOAD_ERROR"), 400
     file_path = os.path.join(temp_folder, safe_filename)
 
     with open(file_path, "wb") as f:
@@ -139,7 +140,7 @@ def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
         return data
 
     except Exception as e:
-        return [{"Error": f"Error parsing TSV: {e}"}]
+        return [error_response(f"Error parsing TSV: {e}", "PARSE_ERROR")]
 
 
 def DecodeStatusColor(status: Dict[str, int]) -> str:
@@ -400,7 +401,7 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
         )
 
         if not filename:
-            return ({"Error": "Multipart file field has no filename"}, 400, None)
+            return (error_response("Multipart file field has no filename", "UPLOAD_ERROR"), 400, None)
 
         return (filename, binary_data, content_length)
 
@@ -415,7 +416,9 @@ def detect_file_upload() -> Tuple[Any, Any, Any]:
 
         if not filename:
             return (
-                {"Error": "Missing filename: provide via multipart/form-data file field or query parameter"},
+                error_response(
+                    "Missing filename: provide via multipart/form-data file field or query parameter", "UPLOAD_ERROR"
+                ),
                 400,
                 None,
             )
