@@ -87,15 +87,22 @@ def get_folder_for_extension(filename_or_ext: str) -> str:
         return Config.VIBRATIONVIEW_FOLDER
 
 
-def handle_binary_upload(
-    filename: str, binary_data: bytes, usetemporaryfile: bool = False
-) -> Tuple[Optional[Dict], Optional[Dict], int]:
+def handle_binary_upload(filename: str, binary_data: bytes, usetemporaryfile: bool = False) -> Dict:
+    """Save uploaded binary data to disk.
+
+    Returns:
+        dict with FilePath, Filename, and Size keys.
+
+    Raises:
+        APIError: if the filename is missing, has a disallowed extension,
+                  or fails sanitization.
+    """
     if not filename or "." not in filename:
-        return None, error_response("Missing or invalid filename", "UPLOAD_ERROR"), 400
+        raise APIError("Missing or invalid filename", "UPLOAD_ERROR")
 
     ext = filename.rsplit(".", 1)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        return None, error_response(f"Invalid file extension: .{ext}", "UPLOAD_ERROR"), 400
+        raise APIError(f"Invalid file extension: .{ext}", "UPLOAD_ERROR")
 
     base_folder = get_folder_for_extension(ext)
     temp_folder = os.path.join(base_folder, "Uploads")
@@ -109,9 +116,9 @@ def handle_binary_upload(
 
     safe_filename = secure_filename(filename)
     if not safe_filename or safe_filename.count(".") != 1:
-        return None, error_response("Filename is not valid after sanitization", "UPLOAD_ERROR"), 400
+        raise APIError("Filename is not valid after sanitization", "UPLOAD_ERROR")
     if safe_filename.rsplit(".", 1)[1].lower() != ext:
-        return None, error_response("File extension changed during sanitization", "UPLOAD_ERROR"), 400
+        raise APIError("File extension changed during sanitization", "UPLOAD_ERROR")
     file_path = os.path.join(temp_folder, safe_filename)
 
     with open(file_path, "wb") as f:
@@ -119,7 +126,7 @@ def handle_binary_upload(
 
     logger.info(f"Binary file saved: {file_path}")
 
-    return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}, None, 200
+    return {"FilePath": file_path, "Filename": filename, "Size": os.path.getsize(file_path)}
 
 
 def process_file_upload(
@@ -144,12 +151,10 @@ def process_file_upload(
     if filename is None:
         return None, None, None
 
-    result, error, status_code = handle_binary_upload(filename, binary_data, usetemporaryfile)
-    if error:
-        return None, None, (error, status_code)
-
-    if result is None:
-        return None, None, (error_response("Upload failed: no result returned", "UPLOAD_ERROR"), 500)
+    try:
+        result = handle_binary_upload(filename, binary_data, usetemporaryfile)
+    except APIError as e:
+        return None, None, (error_response(e.message, e.error_code), e.http_status)
 
     return result["FilePath"], filename, None
 

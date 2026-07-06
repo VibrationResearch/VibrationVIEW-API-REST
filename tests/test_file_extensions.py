@@ -12,6 +12,7 @@ from unittest.mock import patch
 import pytest
 
 from config import Config
+from utils.exceptions import APIError
 from utils.utils import (
     ALLOWED_EXTENSIONS,
     DATA_EXTENSIONS,
@@ -215,17 +216,12 @@ class TestBinaryUploadAcceptance:
     )
     def test_upload_accepted(self, tmp_path, ext, folder_attr):
         with patch.object(Config, folder_attr, str(tmp_path)):
-            result, error, status = handle_binary_upload(f"test.{ext}", b"data")
-            assert status == 200
-            assert error is None
+            result = handle_binary_upload(f"test.{ext}", b"data")
             assert result["FilePath"].endswith(f".{ext}")
 
     def test_upload_rejected_for_unknown_extension(self):
-        result, error, status = handle_binary_upload("test.xyz", b"data")
-        assert status == 400
-        assert result is None
-        assert error["success"] is False
-        assert "Invalid file extension" in error["error"]["message"]
+        with pytest.raises(APIError, match="Invalid file extension"):
+            handle_binary_upload("test.xyz", b"data")
 
 
 class TestSecureFilenameValidation:
@@ -243,25 +239,21 @@ class TestSecureFilenameValidation:
         ],
     )
     def test_rejects_unsafe_filename(self, filename):
-        result, error, status = handle_binary_upload(filename, b"data")
-        assert status == 400
-        assert result is None
+        with pytest.raises(APIError):
+            handle_binary_upload(filename, b"data")
 
     def test_accepts_ascii_filename(self, tmp_path):
         with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
-            result, error, status = handle_binary_upload("valid_test.vyp", b"data")
-            assert status == 200
-            assert error is None
+            result = handle_binary_upload("valid_test.vyp", b"data")
+            assert result["FilePath"].endswith(".vyp")
 
     def test_accepts_mixed_ascii_non_ascii_filename(self, tmp_path):
         """secure_filename keeps ASCII portion, so mixed names survive."""
         with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
-            result, error, status = handle_binary_upload("test\u6d4b\u8bd5_file.vyp", b"data")
-            assert status == 200
-            assert error is None
+            result = handle_binary_upload("test\u6d4b\u8bd5_file.vyp", b"data")
+            assert result["FilePath"].endswith(".vyp")
 
     def test_accepts_filename_with_temporary_file(self, tmp_path):
         with patch.object(Config, "PROFILE_FOLDER", str(tmp_path)):
-            result, error, status = handle_binary_upload("valid.vyp", b"data", usetemporaryfile=True)
-            assert status == 200
-            assert error is None
+            result = handle_binary_upload("valid.vyp", b"data", usetemporaryfile=True)
+            assert result["FilePath"].endswith(".vyp")
