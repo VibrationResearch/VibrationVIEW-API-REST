@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import (
     convert_channel_to_com_index,
     get_filename_from_request,
@@ -187,7 +188,7 @@ def get_documentation() -> Response:
 @input_config_bp.route("/inputcaldate", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_cal_date(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_cal_date(vv_instance: Any) -> Response:
     """
     Get Input Calibration Date
 
@@ -202,7 +203,7 @@ def input_cal_date(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -219,7 +220,7 @@ def input_cal_date(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputserialnumber", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_serial_number(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_serial_number(vv_instance: Any) -> Response:
     """
     Get Input Serial Number
 
@@ -234,7 +235,7 @@ def input_serial_number(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -249,7 +250,7 @@ def input_serial_number(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputsensitivity", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_sensitivity(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_sensitivity(vv_instance: Any) -> Response:
     """
     Get Input Sensitivity
 
@@ -264,7 +265,7 @@ def input_sensitivity(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -279,7 +280,7 @@ def input_sensitivity(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputengineeringscale", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def input_engineering_scale(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_engineering_scale(vv_instance: Any) -> Response:
     """
     Get Input Engineering Scale
 
@@ -294,7 +295,7 @@ def input_engineering_scale(vv_instance: Any) -> Response | tuple[Response, int]
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -312,7 +313,7 @@ def input_engineering_scale(vv_instance: Any) -> Response | tuple[Response, int]
 @input_config_bp.route("/inputcapacitorcoupled", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_capacitor_coupled(vv_instance: Any) -> Response:
     """
     Get/Set Input Capacitor Coupled
 
@@ -331,7 +332,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -348,7 +349,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]
         try:
             value = query_args[1].lower() == "true"
         except (ValueError, IndexError):
-            return jsonify(error_response("Invalid value parameter - must be true or false", "INVALID_PARAMETER")), 400
+            raise APIError("Invalid value parameter - must be true or false", "INVALID_PARAMETER")
 
         result = vv_instance.InputCapacitorCoupled(channel_com, value)
         return jsonify(
@@ -362,7 +363,7 @@ def input_capacitor_coupled(vv_instance: Any) -> Response | tuple[Response, int]
 @input_config_bp.route("/inputaccelpowersource", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_accel_power_source(vv_instance: Any) -> Response:
     """
     Get/Set Input Accelerometer Power Source
 
@@ -381,7 +382,7 @@ def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -398,7 +399,7 @@ def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int
         try:
             value = query_args[1].lower() == "true"
         except (ValueError, IndexError):
-            return jsonify(error_response("Invalid value parameter - must be true or false", "INVALID_PARAMETER")), 400
+            raise APIError("Invalid value parameter - must be true or false", "INVALID_PARAMETER")
 
         result = vv_instance.InputAccelPowerSource(channel_com, value)
         return jsonify(
@@ -412,7 +413,7 @@ def input_accel_power_source(vv_instance: Any) -> Response | tuple[Response, int
 @input_config_bp.route("/inputdifferential", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_differential(vv_instance: Any) -> Response:
     """
     Get/Set Input Differential
 
@@ -431,7 +432,7 @@ def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
     # Get channel from query parameters (first parameter after ?)
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -448,7 +449,7 @@ def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
         try:
             value = query_args[1].lower() == "true"
         except (ValueError, IndexError):
-            return jsonify(error_response("Invalid value parameter - must be true or false", "INVALID_PARAMETER")), 400
+            raise APIError("Invalid value parameter - must be true or false", "INVALID_PARAMETER")
 
         result = vv_instance.InputDifferential(channel_com, value)
         return jsonify(
@@ -463,7 +464,7 @@ def input_differential(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputmode", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_mode(vv_instance: Any) -> Response:
     """
     Set Input Mode
 
@@ -500,15 +501,11 @@ def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
         data = request.get_json(silent=True)
 
     if not data:
-        return jsonify(
-            error_response("Missing parameters (provide query params or JSON body)", "MISSING_PARAMETERS")
-        ), 400
+        raise APIError("Missing parameters (provide query params or JSON body)", "MISSING_PARAMETERS")
 
     missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
-        return jsonify(
-            error_response(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
-        ), 400
+        raise APIError(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(data["channel"])
 
@@ -534,7 +531,7 @@ def input_mode(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputcalibration", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_calibration(vv_instance: Any) -> Response:
     """
     Set Input Calibration
 
@@ -563,16 +560,12 @@ def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
     else:
         data = request.get_json(silent=True)
         if not data:
-            return jsonify(
-                error_response("Missing parameters (provide query params or JSON body)", "MISSING_PARAMETERS")
-            ), 400
+            raise APIError("Missing parameters (provide query params or JSON body)", "MISSING_PARAMETERS")
 
     required_params = ["channel", "sensitivity", "serialnumber", "caldate"]
-    missing_params = [param for param in required_params if not data.get(param)]
+    missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
-        return jsonify(
-            error_response(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
-        ), 400
+        raise APIError(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(data["channel"])
 
@@ -582,7 +575,7 @@ def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
     try:
         sensitivity = float(data["sensitivity"])
     except (ValueError, TypeError):
-        return jsonify(error_response(f"Invalid sensitivity value: {data['sensitivity']}", "INVALID_PARAMETER")), 400
+        raise APIError(f"Invalid sensitivity value: {data['sensitivity']}", "INVALID_PARAMETER")
 
     result = True  # If no exception, assume success
     vv_instance.InputCalibration(channel_com, sensitivity, data["serialnumber"], data["caldate"])
@@ -604,7 +597,7 @@ def input_calibration(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/inputconfigurationfile", methods=["POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int]:
+def input_configuration_file(vv_instance: Any) -> Response:
     """
     Set Input Configuration File
 
@@ -643,7 +636,7 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response("Missing required parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: filename", "MISSING_PARAMETER")
 
     vv_instance.SetInputConfigurationFile(filename)
 
@@ -656,7 +649,7 @@ def input_configuration_file(vv_instance: Any) -> Response | tuple[Response, int
 @input_config_bp.route("/ischanneldifferentdatabase", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def is_channel_different_database(vv_instance: Any) -> Response | tuple[Response, int]:
+def is_channel_different_database(vv_instance: Any) -> Response:
     """
     Check if Channel Configuration Differs from Database
 
@@ -670,7 +663,7 @@ def is_channel_different_database(vv_instance: Any) -> Response | tuple[Response
     """
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -688,7 +681,7 @@ def is_channel_different_database(vv_instance: Any) -> Response | tuple[Response
 @input_config_bp.route("/channeldatabaseids", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_database_ids(vv_instance: Any) -> Response | tuple[Response, int]:
+def channel_database_ids(vv_instance: Any) -> Response:
     """
     Get Channel Database IDs
 
@@ -702,7 +695,7 @@ def channel_database_ids(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -717,7 +710,7 @@ def channel_database_ids(vv_instance: Any) -> Response | tuple[Response, int]:
 @input_config_bp.route("/updatechannelconfigfromdatabase", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def update_channel_config_from_database(vv_instance: Any) -> Response | tuple[Response, int]:
+def update_channel_config_from_database(vv_instance: Any) -> Response:
     """
     Update Channel Configuration from Database
 
@@ -731,7 +724,7 @@ def update_channel_config_from_database(vv_instance: Any) -> Response | tuple[Re
     """
     query_args = list(request.args.keys())
     if not query_args:
-        return jsonify(error_response("Missing required query parameter: channel", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channel", "MISSING_PARAMETER")
 
     channel_com = convert_channel_to_com_index(query_args[0])
 
@@ -749,7 +742,7 @@ def update_channel_config_from_database(vv_instance: Any) -> Response | tuple[Re
 @input_config_bp.route("/transducerdatabaserecord", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def transducer_database_record(vv_instance: Any) -> Response | tuple[Response, int]:
+def transducer_database_record(vv_instance: Any) -> Response:
     """
     Get Transducer Database Record
 
@@ -763,7 +756,7 @@ def transducer_database_record(vv_instance: Any) -> Response | tuple[Response, i
     """
     guid = request.args.get("guid")
     if not guid:
-        return jsonify(error_response("Missing required query parameter: guid", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: guid", "MISSING_PARAMETER")
 
     result = vv_instance.TransducerDatabaseRecord(guid)
 

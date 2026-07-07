@@ -23,8 +23,9 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request, send_file
 
 from utils.decorators import handle_errors
+from utils.exceptions import APIError
 from utils.path_validator import PathValidationError, validate_file_path
-from utils.response_helpers import error_response, success_response
+from utils.response_helpers import success_response
 from utils.utils import convert_channel_to_com_index, get_last_data_file
 from utils.vv_manager import with_vibrationview
 
@@ -207,7 +208,7 @@ def output(vv_instance: Any) -> Response:
 @data_retrieval_bp.route("/channelunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_unit(vv_instance: Any) -> Response | tuple[Response, int]:
+def channel_unit(vv_instance: Any) -> Response:
     """
     Get the channel unit associated with channel number (1-based)
 
@@ -222,7 +223,7 @@ def channel_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Get channelnum from named parameter or first positional key
     if not request.args:
-        return jsonify(error_response("Missing required query parameter: channelnum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channelnum", "MISSING_PARAMETER")
 
     channelnum_raw = request.args.get("channelnum")
     if channelnum_raw is None:
@@ -240,7 +241,7 @@ def channel_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @data_retrieval_bp.route("/channellabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def channel_label(vv_instance: Any) -> Response | tuple[Response, int]:
+def channel_label(vv_instance: Any) -> Response:
     """
     Get the channel unit label associated with channel number (1-based)
 
@@ -255,7 +256,7 @@ def channel_label(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Get channelnum from named parameter or first positional key
     if not request.args:
-        return jsonify(error_response("Missing required query parameter: channelnum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: channelnum", "MISSING_PARAMETER")
 
     channelnum_raw = request.args.get("channelnum")
     if channelnum_raw is None:
@@ -278,7 +279,7 @@ def channel_label(vv_instance: Any) -> Response | tuple[Response, int]:
 @data_retrieval_bp.route("/controlunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
+def control_unit(vv_instance: Any) -> Response:
     """
     Get control loop units
 
@@ -306,13 +307,11 @@ def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
                 first_key = list(request.args.keys())[0]
                 loopnum = int(first_key)
         except (ValueError, IndexError):
-            return jsonify(error_response("loopnum must be an integer", "INVALID_PARAMETER")), 400
+            raise APIError("loopnum must be an integer", "INVALID_PARAMETER")
 
     # Convert from 1-based to 0-based
     if loopnum < 1:
-        return jsonify(
-            error_response(f"loopnum must be >= 1 (1-based indexing), got {loopnum}", "INVALID_PARAMETER")
-        ), 400
+        raise APIError(f"loopnum must be >= 1 (1-based indexing), got {loopnum}", "INVALID_PARAMETER")
 
     loop_num_0based = loopnum - 1
 
@@ -331,7 +330,7 @@ def control_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @data_retrieval_bp.route("/controllabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def control_label(vv_instance: Any) -> Response | tuple[Response, int]:
+def control_label(vv_instance: Any) -> Response:
     """
     Get control loop label
 
@@ -359,13 +358,11 @@ def control_label(vv_instance: Any) -> Response | tuple[Response, int]:
                 first_key = list(request.args.keys())[0]
                 loopnum = int(first_key)
         except (ValueError, IndexError):
-            return jsonify(error_response("loopnum must be an integer", "INVALID_PARAMETER")), 400
+            raise APIError("loopnum must be an integer", "INVALID_PARAMETER")
 
     # Convert from 1-based to 0-based
     if loopnum < 1:
-        return jsonify(
-            error_response(f"loopnum must be >= 1 (1-based indexing), got {loopnum}", "INVALID_PARAMETER")
-        ), 400
+        raise APIError(f"loopnum must be >= 1 (1-based indexing), got {loopnum}", "INVALID_PARAMETER")
 
     loop_num_0based = loopnum - 1
 
@@ -386,7 +383,7 @@ def control_label(vv_instance: Any) -> Response | tuple[Response, int]:
 @data_retrieval_bp.route("/getdatafile", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def get_data_file(vv_instance: Any) -> Response | tuple[Response, int]:
+def get_data_file(vv_instance: Any) -> Response:
     """
     Get Raw VibrationVIEW Data File
 
@@ -420,10 +417,10 @@ def get_data_file(vv_instance: Any) -> Response | tuple[Response, int]:
     try:
         validated_file_path = validate_file_path(file_path, "data file retrieval")
     except PathValidationError as e:
-        return jsonify(error_response(str(e), "PATH_VALIDATION_ERROR")), 403
+        raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
     if not os.path.exists(validated_file_path):
-        return jsonify(error_response(f"File not found: {validated_file_path}", "FILE_NOT_FOUND")), 404
+        raise APIError(f"File not found: {validated_file_path}", "FILE_NOT_FOUND", 404)
 
     # Use validated path
     file_path = validated_file_path

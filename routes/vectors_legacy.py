@@ -20,7 +20,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -207,7 +208,7 @@ def get_vector_enumerations() -> Response:
 @vectors_legacy_bp.route("/vector", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def vector(vv_instance: Any) -> Response | tuple[Response, int]:
+def vector(vv_instance: Any) -> Response:
     """
     Get raw data vector
 
@@ -259,11 +260,11 @@ def vector(vv_instance: Any) -> Response | tuple[Response, int]:
             columns = data.get("columns", 1)
 
     if vectorenum is None:
-        return jsonify(error_response("Missing required parameter: vectorenum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required parameter: vectorenum", "MISSING_PARAMETER")
 
     # Validate columns parameter
     if columns < 1:
-        return jsonify(error_response(f"columns must be >= 1, got {columns}", "INVALID_PARAMETER")), 400
+        raise APIError(f"columns must be >= 1, got {columns}", "INVALID_PARAMETER")
 
     # Note: library wrapper suppresses COM exceptions and returns dummy array on failure
     result = vv_instance.Vector(vectorenum, columns)
@@ -284,7 +285,7 @@ def vector(vv_instance: Any) -> Response | tuple[Response, int]:
 @vectors_legacy_bp.route("/vectorunit", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_unit(vv_instance: Any) -> Response | tuple[Response, int]:
+def vector_unit(vv_instance: Any) -> Response:
     """
     Get units for raw data vector
 
@@ -301,7 +302,7 @@ def vector_unit(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
-        return jsonify(error_response("Missing required query parameter: vectorenum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: vectorenum", "MISSING_PARAMETER")
 
     # Get first query parameter (key or value)
     try:
@@ -312,7 +313,7 @@ def vector_unit(vv_instance: Any) -> Response | tuple[Response, int]:
             first_key = list(request.args.keys())[0]
             vectorenum = int(first_key)
     except (ValueError, IndexError):
-        return jsonify(error_response("vectorenum must be an integer", "INVALID_PARAMETER")), 400
+        raise APIError("vectorenum must be an integer", "INVALID_PARAMETER")
 
     result = vv_instance.VectorUnit(vectorenum)
 
@@ -322,7 +323,7 @@ def vector_unit(vv_instance: Any) -> Response | tuple[Response, int]:
 @vectors_legacy_bp.route("/vectorlabel", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_label(vv_instance: Any) -> Response | tuple[Response, int]:
+def vector_label(vv_instance: Any) -> Response:
     """
     Get label for raw data vector
 
@@ -339,7 +340,7 @@ def vector_label(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
-        return jsonify(error_response("Missing required query parameter: vectorenum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: vectorenum", "MISSING_PARAMETER")
 
     # Get first query parameter (key or value)
     try:
@@ -350,7 +351,7 @@ def vector_label(vv_instance: Any) -> Response | tuple[Response, int]:
             first_key = list(request.args.keys())[0]
             vectorenum = int(first_key)
     except (ValueError, IndexError):
-        return jsonify(error_response("vectorenum must be an integer", "INVALID_PARAMETER")), 400
+        raise APIError("vectorenum must be an integer", "INVALID_PARAMETER")
 
     result = vv_instance.VectorLabel(vectorenum)
 
@@ -360,7 +361,7 @@ def vector_label(vv_instance: Any) -> Response | tuple[Response, int]:
 @vectors_legacy_bp.route("/vectorlength", methods=["GET"])
 @handle_errors
 @with_vibrationview
-def vector_length(vv_instance: Any) -> Response | tuple[Response, int]:
+def vector_length(vv_instance: Any) -> Response:
     """
     Get required array length for Raw Data Vector Array
 
@@ -377,7 +378,7 @@ def vector_length(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     # Get vectorenum from query parameters (first parameter)
     if not request.args:
-        return jsonify(error_response("Missing required query parameter: vectorenum", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: vectorenum", "MISSING_PARAMETER")
 
     # Get first query parameter (key or value)
     try:
@@ -388,7 +389,7 @@ def vector_length(vv_instance: Any) -> Response | tuple[Response, int]:
             first_key = list(request.args.keys())[0]
             vectorenum = int(first_key)
     except (ValueError, IndexError):
-        return jsonify(error_response("vectorenum must be an integer", "INVALID_PARAMETER")), 400
+        raise APIError("vectorenum must be an integer", "INVALID_PARAMETER")
 
     result = vv_instance.VectorLength(vectorenum)
 

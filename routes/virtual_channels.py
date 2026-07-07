@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.utils import get_filename_from_request, process_file_upload
 from utils.vv_manager import with_vibrationview
 
@@ -86,7 +87,7 @@ def remove_all_virtual_channels(vv_instance: Any) -> Response:
 @virtual_channels_bp.route("/importvirtualchannels", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]:
+def import_virtual_channels(vv_instance: Any) -> Response:
     """
     Import Virtual Channels from File
 
@@ -120,7 +121,6 @@ def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]
     if request.method in ("PUT", "POST"):
         file_path, filename = process_file_upload()
         if file_path:
-
             # Import the uploaded virtual channels file
             vv_instance.ImportVirtualChannels(file_path)
 
@@ -135,7 +135,7 @@ def import_virtual_channels(vv_instance: Any) -> Response | tuple[Response, int]
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: filename", "MISSING_PARAMETER")
 
     vv_instance.ImportVirtualChannels(filename)
 

@@ -16,8 +16,9 @@ from flask import Blueprint, Response, jsonify, request
 
 from config import Config
 from utils.decorators import handle_errors
+from utils.exceptions import APIError
 from utils.path_validator import PathValidationError, validate_file_path
-from utils.response_helpers import error_response, success_response
+from utils.response_helpers import success_response
 from utils.utils import (
     get_filename_from_request,
     get_hardware_info,
@@ -192,7 +193,7 @@ def start_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/runtest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
+def run_test(vv_instance: Any) -> Response:
     """
     Run Complete Test (Open + Start)
 
@@ -241,7 +242,7 @@ def run_test(vv_instance: Any) -> Response | tuple[Response, int]:
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: filename", "MISSING_PARAMETER")
 
     vv_instance.RunTest(filename)
     result = vv_instance.IsRunning()
@@ -284,7 +285,7 @@ def resume_test(vv_instance: Any) -> Response:
 @basic_control_bp.route("/opentest", methods=["GET", "POST", "PUT"])
 @handle_errors
 @with_vibrationview
-def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
+def open_test(vv_instance: Any) -> Response:
     """
     Open Test Profile File
 
@@ -352,7 +353,7 @@ def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
     filename = get_filename_from_request()
 
     if not filename:
-        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: filename", "MISSING_PARAMETER")
 
     vv_instance.OpenTest(filename)
 
@@ -362,7 +363,7 @@ def open_test(vv_instance: Any) -> Response | tuple[Response, int]:
 @basic_control_bp.route("/closetest", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_test(vv_instance: Any) -> Response | tuple[Response, int]:
+def close_test(vv_instance: Any) -> Response:
     """
     Close Test Profile by Name
 
@@ -389,11 +390,9 @@ def close_test(vv_instance: Any) -> Response | tuple[Response, int]:
             profile_name = unquote(query_string)
 
     if not profile_name:
-        return jsonify(
-            error_response(
-                "Missing required query parameter: profilename (or unnamed profile name parameter)", "MISSING_PARAMETER"
-            )
-        ), 400
+        raise APIError(
+            "Missing required query parameter: profilename (or unnamed profile name parameter)", "MISSING_PARAMETER"
+        )
 
     # Call CloseTest method
     test_was_closed = vv_instance.CloseTest(profile_name)
@@ -409,7 +408,7 @@ def close_test(vv_instance: Any) -> Response | tuple[Response, int]:
 @basic_control_bp.route("/closetab", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def close_tab(vv_instance: Any) -> Response | tuple[Response, int]:
+def close_tab(vv_instance: Any) -> Response:
     """
     Close Test Tab by Index
 
@@ -439,29 +438,23 @@ def close_tab(vv_instance: Any) -> Response | tuple[Response, int]:
             tab_index_str = unquote(query_string)
 
     if not tab_index_str:
-        return jsonify(
-            error_response(
-                "Missing required query parameter: tabindex (or unnamed tab index parameter)", "MISSING_PARAMETER"
-            )
-        ), 400
+        raise APIError(
+            "Missing required query parameter: tabindex (or unnamed tab index parameter)", "MISSING_PARAMETER"
+        )
 
     try:
         tab_index = int(tab_index_str)
     except ValueError:
-        return jsonify(
-            error_response(f"Invalid tab index: {tab_index_str}. Must be an integer.", "INVALID_PARAMETER")
-        ), 400
+        raise APIError(f"Invalid tab index: {tab_index_str}. Must be an integer.", "INVALID_PARAMETER")
 
     # Call CloseTab method
     test_was_closed = vv_instance.CloseTab(tab_index)
 
     # Return 405 if the tab was not closed
     if not test_was_closed:
-        return jsonify(
-            error_response(
-                f"Tab {tab_index} could not be closed (may not exist or may be running a test)", "TAB_NOT_CLOSED"
-            )
-        ), 405
+        raise APIError(
+            f"Tab {tab_index} could not be closed (may not exist or may be running a test)", "TAB_NOT_CLOSED", 405
+        )
 
     return jsonify(
         success_response(
@@ -522,7 +515,7 @@ def list_open_tests(vv_instance: Any) -> Response:
 @basic_control_bp.route("/savedata", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def save_data(vv_instance: Any) -> Response | tuple[Response, int]:
+def save_data(vv_instance: Any) -> Response:
     """
     Save Current Test Data
 
@@ -540,7 +533,7 @@ def save_data(vv_instance: Any) -> Response | tuple[Response, int]:
     """
     filename = request.args.get("filename")
     if not filename:
-        return jsonify(error_response("Missing required query parameter: filename", "MISSING_PARAMETER")), 400
+        raise APIError("Missing required query parameter: filename", "MISSING_PARAMETER")
 
     # If filename has no path separators, prepend DATA_FOLDER
     if not os.path.dirname(filename):
@@ -552,7 +545,7 @@ def save_data(vv_instance: Any) -> Response | tuple[Response, int]:
     try:
         validated_file_path = validate_file_path(file_path, "save data")
     except PathValidationError as e:
-        return jsonify(error_response(str(e), "PATH_VALIDATION_ERROR")), 403
+        raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
     # SaveData has no return value, raises exception on failure
     vv_instance.SaveData(validated_file_path)

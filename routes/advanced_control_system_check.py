@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -75,7 +76,7 @@ def get_docs() -> Response:
 @advanced_control_system_check_bp.route("/systemcheckfrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
+def system_check_frequency(vv_instance: Any) -> Response:
     """
     Get/Set System Check Frequency
 
@@ -104,13 +105,8 @@ def system_check_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
                     pass
 
         if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
+            raise APIError(
+                "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
             )
 
         result = vv_instance.SystemCheckFrequency(value)
@@ -125,7 +121,7 @@ def system_check_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
 @advanced_control_system_check_bp.route("/systemcheckoutputvoltage", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def system_check_output_voltage(vv_instance: Any) -> Response | tuple[Response, int]:
+def system_check_output_voltage(vv_instance: Any) -> Response:
     """
     Get/Set System Check Output Voltage
 
@@ -154,13 +150,8 @@ def system_check_output_voltage(vv_instance: Any) -> Response | tuple[Response, 
                     pass
 
         if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
+            raise APIError(
+                "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
             )
 
         result = vv_instance.SystemCheckOutputVoltage(value)
