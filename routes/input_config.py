@@ -563,7 +563,7 @@ def input_calibration(vv_instance: Any) -> Response:
             raise APIError("Missing parameters (provide query params or JSON body)", "MISSING_PARAMETERS")
 
     required_params = ["channel", "sensitivity", "serialnumber", "caldate"]
-    missing_params = [param for param in required_params if not data.get(param)]
+    missing_params = [param for param in required_params if data.get(param) is None]
     if missing_params:
         raise APIError(f"Missing required parameters: {', '.join(missing_params)}", "MISSING_PARAMETER")
 
