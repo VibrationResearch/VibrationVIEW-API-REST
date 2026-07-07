@@ -79,3 +79,6 @@ class TestHardwareSupportsChannelIndexing:
         c, _ = client
         response = c.get(endpoint)
         assert response.status_code == 400
+        data = response.get_json()
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"

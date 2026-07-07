@@ -163,6 +163,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETERS"
         assert "missing" in data["error"]["message"].lower()
 
     def test_inputmode_invalid_channel_zero(self, client):
@@ -209,6 +210,7 @@ class TestInputConfig:
         data = json.loads(response.data)
         assert data["success"] is False
         assert data["error"]["code"] == "MISSING_PARAMETER"
+        assert "channel" in data["error"]["message"].lower()
 
     def test_inputcaldate_invalid_channel(self, client):
         """Test GET /inputcaldate with invalid channel"""
@@ -217,6 +219,41 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+
+    @pytest.mark.parametrize(
+        "endpoint",
+        [
+            "/api/v1/inputserialnumber?0",
+            "/api/v1/inputsensitivity?0",
+            "/api/v1/inputengineeringscale?0",
+            "/api/v1/inputcapacitorcoupled?0",
+            "/api/v1/inputaccelpowersource?0",
+            "/api/v1/inputdifferential?0",
+            "/api/v1/ischanneldifferentdatabase?0",
+            "/api/v1/channeldatabaseids?0",
+            "/api/v1/updatechannelconfigfromdatabase?0",
+        ],
+    )
+    def test_channel_zero_rejected(self, client, endpoint):
+        """Test that channel 0 is rejected (1-based indexing)"""
+        response = client.get(endpoint)
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
+
+    def test_inputcalibration_channel_zero_rejected(self, client):
+        """Test POST /inputcalibration with channel 0 is rejected"""
+        response = client.post(
+            "/api/v1/inputcalibration",
+            json={"channel": 0, "sensitivity": 100.0, "serialnumber": "SN123", "caldate": "2025-01-15"},
+        )
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
 
     def test_inputserialnumber_success(self, client):
         """Test GET /inputserialnumber with valid channel"""
@@ -238,6 +275,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_inputsensitivity_success(self, client):
         """Test GET /inputsensitivity with valid channel"""
@@ -259,6 +297,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_inputengineeringscale_success(self, client):
         """Test GET /inputengineeringscale with valid channel"""
@@ -280,6 +319,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     # -------------------------------------------------------------------------
     # Input Channel Settings (Get/Set) tests
@@ -328,6 +368,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_inputaccelpowersource_get(self, client):
         """Test GET /inputaccelpowersource"""
@@ -358,6 +399,9 @@ class TestInputConfig:
         response = client.get("/api/v1/inputaccelpowersource")
 
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_inputdifferential_get(self, client):
         """Test GET /inputdifferential"""
@@ -388,6 +432,9 @@ class TestInputConfig:
         response = client.get("/api/v1/inputdifferential")
 
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     # -------------------------------------------------------------------------
     # InputCalibration tests
@@ -433,7 +480,17 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
         assert "serialnumber" in data["error"]["message"].lower() or "caldate" in data["error"]["message"].lower()
+
+    def test_inputcalibration_no_body_or_params(self, client):
+        """Test POST /inputcalibration with no body and no query params"""
+        response = client.post("/api/v1/inputcalibration")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETERS"
 
     def test_inputcalibration_invalid_sensitivity(self, client):
         """Test POST /inputcalibration with invalid sensitivity"""
@@ -445,6 +502,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
         assert "sensitivity" in data["error"]["message"].lower()
 
     # -------------------------------------------------------------------------
@@ -468,6 +526,7 @@ class TestInputConfig:
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     # -------------------------------------------------------------------------
     # Transducer Database tests
@@ -502,6 +561,9 @@ class TestInputConfig:
         response = client.get("/api/v1/ischanneldifferentdatabase")
 
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_channeldatabaseids_success(self, client):
         """Test GET /channeldatabaseids"""
@@ -521,6 +583,9 @@ class TestInputConfig:
         response = client.get("/api/v1/channeldatabaseids")
 
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_updatechannelconfigfromdatabase_success(self, client):
         """Test POST /updatechannelconfigfromdatabase"""
@@ -550,6 +615,9 @@ class TestInputConfig:
         response = client.post("/api/v1/updatechannelconfigfromdatabase")
 
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
 
     def test_transducerdatabaserecord_success(self, client):
         """Test GET /transducerdatabaserecord"""
