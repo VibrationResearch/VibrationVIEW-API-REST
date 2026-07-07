@@ -207,6 +207,26 @@ class TestTEDSRoutes:
 
         print("✓ GET /inputtedschannel (1-based pattern) works!")
 
+    def test_inputtedschannel_missing_channel(self, client, mock_vv):
+        """Test GET /inputtedschannel with no channel parameter"""
+        response = client.get("/api/v1/inputtedschannel")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
+
+    def test_inputtedschannel_out_of_range(self, client, mock_vv):
+        """Test GET /inputtedschannel with channel beyond hardware range"""
+        mock_vv.GetHardwareInputChannels.return_value = 4
+
+        response = client.get("/api/v1/inputtedschannel?5")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "CHANNEL_OUT_OF_RANGE"
+
     def test_inputtedschannel_invalid_channel_zero(self, client, mock_vv):
         """Test GET /inputtedschannel with invalid channel 0 (now 1-based)"""
         response = client.get("/api/v1/inputtedschannel?0")
@@ -265,6 +285,19 @@ class TestTEDSRoutes:
         assert result[1]["success"] is True
 
         print("✓ GET /inputteds (all channels) works!")
+
+    def test_teds_channel_returns_teds_error(self, client, mock_vv):
+        """Test GET /teds?N when channel has TEDS error (formatted as error)"""
+        mock_vv.GetHardwareInputChannels.return_value = 4
+        # Return a dict with "Error" key - format_single_channel_teds returns {"error": ...}
+        mock_vv.Teds.return_value = {"Error": "No TEDS sensor detected"}
+
+        response = client.get("/api/v1/teds?1")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "TEDS_ERROR"
 
     def test_teds_error_handling(self, client, mock_vv):
         """Test error handling when TEDS read fails"""
@@ -484,6 +517,56 @@ class TestTEDSRoutes:
         assert data["success"] is True
         assert data["data"]["transducer_count"] == 1
         assert data["data"]["channel_count"] == 1
+
+    # -------------------------------------------------------------------------
+    # /tedsverifyandapply validation tests
+    # -------------------------------------------------------------------------
+
+    def test_tedsverifyandapply_missing_body(self, client, mock_vv):
+        """Test POST /tedsverifyandapply with no request body"""
+        response = client.post("/api/v1/tedsverifyandapply")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_BODY"
+
+    def test_tedsverifyandapply_missing_urns(self, client, mock_vv):
+        """Test POST /tedsverifyandapply with body but no urns key"""
+        response = client.post("/api/v1/tedsverifyandapply", json={"other": "value"})
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
+
+    def test_tedsverifyandapply_urns_not_array(self, client, mock_vv):
+        """Test POST /tedsverifyandapply with urns as string instead of array"""
+        response = client.post("/api/v1/tedsverifyandapply", json={"urns": "not-an-array"})
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER_TYPE"
+
+    def test_tedsverifyandapply_urns_empty(self, client, mock_vv):
+        """Test POST /tedsverifyandapply with empty urns array"""
+        response = client.post("/api/v1/tedsverifyandapply", json={"urns": []})
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "EMPTY_PARAMETER"
+
+    def test_tedsverifyandapply_urns_invalid_type(self, client, mock_vv):
+        """Test POST /tedsverifyandapply with non-string URN in array"""
+        response = client.post("/api/v1/tedsverifyandapply", json={"urns": [123, "valid-urn"]})
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_URN_TYPE"
+        assert "index 0" in data["error"]["message"]
 
     def test_is_valid_urn_function(self, client, mock_vv):
         """Test the is_valid_urn utility function"""

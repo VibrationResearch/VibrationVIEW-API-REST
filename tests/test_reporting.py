@@ -374,6 +374,33 @@ class TestReportVectorHeader:
         assert data["error"]["code"] == "MISSING_PARAMETER"
 
 
+class TestReportVectorHistory:
+    """Test /reportvectorhistory endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
+
+    def test_reportvectorhistory_missing_vectors(self, client):
+        """Test /reportvectorhistory with no vectors returns 400"""
+        response = client.get("/api/v1/reportvectorhistory")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
+
+    def test_reportvectorhistory_post_missing_vectors(self, client):
+        """Test POST /reportvectorhistory with empty body returns 400"""
+        response = client.post("/api/v1/reportvectorhistory", json={})
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "MISSING_PARAMETER"
+
+
 class TestFormFields:
     """Test /formfields endpoint"""
 
