@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -234,7 +235,7 @@ def sweep_resonance_hold(vv_instance: Any) -> Response:
 @advanced_control_sine_bp.route("/demandmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def demand_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
+def demand_multiplier(vv_instance: Any) -> Response:
     """
     Get/Set Demand Output Multiplier
 
@@ -262,13 +263,8 @@ def demand_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
                     pass
 
         if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
+            raise APIError(
+                "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
             )
 
         result = vv_instance.DemandMultiplier(value)
@@ -283,7 +279,7 @@ def demand_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
 @advanced_control_sine_bp.route("/sweepmultiplier", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sweep_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
+def sweep_multiplier(vv_instance: Any) -> Response:
     """
     Get/Set Sine Sweep Multiplier
 
@@ -311,13 +307,8 @@ def sweep_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
                     pass
 
         if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
+            raise APIError(
+                "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
             )
 
         result = vv_instance.SweepMultiplier(value)
@@ -332,7 +323,7 @@ def sweep_multiplier(vv_instance: Any) -> Response | tuple[Response, int]:
 @advanced_control_sine_bp.route("/sinefrequency", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def sine_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
+def sine_frequency(vv_instance: Any) -> Response:
     """
     Get/Set Sine Frequency
 
@@ -360,13 +351,8 @@ def sine_frequency(vv_instance: Any) -> Response | tuple[Response, int]:
                     pass
 
         if value is None:
-            return (
-                jsonify(
-                    error_response(
-                        "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
-                    )
-                ),
-                400,
+            raise APIError(
+                "Missing required URL parameter: value (or unnamed numeric parameter)", "MISSING_PARAMETER"
             )
 
         result = vv_instance.SineFrequency(value)

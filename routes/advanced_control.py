@@ -13,7 +13,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from utils.decorators import handle_errors
-from utils.response_helpers import error_response, success_response
+from utils.exceptions import APIError
+from utils.response_helpers import success_response
 from utils.vv_manager import with_vibrationview
 
 # Create blueprint
@@ -54,7 +55,7 @@ def get_documentation() -> Response:
 @advanced_control_bp.route("/testtype", methods=["GET", "POST"])
 @handle_errors
 @with_vibrationview
-def test_type(vv_instance: Any) -> Response | tuple[Response, int]:
+def test_type(vv_instance: Any) -> Response:
     """
     Get/Set Test Type
 
@@ -72,10 +73,7 @@ def test_type(vv_instance: Any) -> Response | tuple[Response, int]:
     else:
         value = request.args.get("value", type=int)
         if value is None:
-            return (
-                jsonify(error_response("Missing required URL parameter: value", "MISSING_PARAMETER")),
-                400,
-            )
+            raise APIError("Missing required URL parameter: value", "MISSING_PARAMETER")
 
         result = vv_instance.TestType(value)
         return jsonify(
