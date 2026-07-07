@@ -210,6 +210,35 @@ class TestReportGeneration:
             assert data["success"] is False
             assert "Report generation failed" in data["error"]["message"]
 
+    def test_generatereport_generated_file_not_found(self, client, mock_vv, sample_vrd_path):
+        """Test POST /generatereport when generated file does not exist on disk"""
+
+        if not os.path.exists(sample_vrd_path):
+            pytest.skip(f"Sample VRD file not found: {sample_vrd_path}")
+
+        with open(sample_vrd_path, "rb") as f:
+            vrd_content = f.read()
+
+        with (
+            patch("routes.report_generation.process_file_upload") as mock_upload,
+            patch("routes.report_generation.GenerateReportFromVV") as mock_generate,
+            patch("routes.report_generation.os.path.exists") as mock_exists,
+        ):
+            mock_upload.return_value = ("C:\\VibrationVIEW\\Data\\Uploads\\test.vrd", "test.vrd")
+            mock_generate.return_value = "C:\\VibrationVIEW\\Reports\\missing_report.pdf"
+            mock_exists.return_value = False  # Generated file doesn't exist
+
+            response = client.post(
+                "/api/v1/generatereport?template_name=Test Report.vvtemplate&output_name=test.pdf",
+                data=vrd_content,
+                headers={"Content-Length": str(len(vrd_content)), "Content-Type": "application/octet-stream"},
+            )
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data["success"] is False
+            assert data["error"]["code"] == "FILE_NOT_FOUND"
+
     def test_generatereport_path_validation_security(self, client, mock_vv, sample_vrd_path):
         """Test POST /generatereport with path validation for output_name"""
 
@@ -761,6 +790,51 @@ class TestGenerateTxtPathValidation:
         assert data["success"] is False
         assert data["error"]["code"] == "PATH_VALIDATION_ERROR"
 
+    def test_generatetxt_file_not_found(self, client, mock_vv):
+        """Test GET /generatetxt when authorized file does not exist"""
+        from config import Config
+
+        authorized_dir = getattr(Config, "DATA_FOLDER", None) or getattr(Config, "REPORT_FOLDER", None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, "nonexistent.vrd")
+
+        with patch("routes.report_generation.os.path.exists") as mock_exists:
+            mock_exists.return_value = False
+
+            response = client.get(f"/api/v1/generatetxt?file_path={valid_input}")
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data["success"] is False
+            assert data["error"]["code"] == "FILE_NOT_FOUND"
+
+    def test_generatetxt_generated_file_not_found(self, client, mock_vv):
+        """Test GET /generatetxt when generated file does not exist after generation"""
+        from config import Config
+
+        authorized_dir = getattr(Config, "DATA_FOLDER", None) or getattr(Config, "REPORT_FOLDER", None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, "test.vrd")
+
+        with (
+            patch("routes.report_generation.os.path.exists") as mock_exists,
+            patch("routes.report_generation.GenerateTXTFromVV") as mock_generate,
+        ):
+            # File exists for input validation, but generated output doesn't exist
+            mock_exists.side_effect = lambda p: p == valid_input
+            mock_generate.return_value = "C:\\temp\\output.txt"
+
+            response = client.get(f"/api/v1/generatetxt?file_path={valid_input}&output_name=output.txt")
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data["success"] is False
+            assert data["error"]["code"] == "FILE_NOT_FOUND"
+
     def test_generatetxt_rejects_malicious_output_path(self, client, mock_vv):
         """Test that generatetxt rejects malicious output paths"""
         from config import Config
@@ -851,6 +925,51 @@ class TestGenerateUffPathValidation:
         data = response.get_json()
         assert data["success"] is False
         assert data["error"]["code"] == "PATH_VALIDATION_ERROR"
+
+    def test_generateuff_file_not_found(self, client, mock_vv):
+        """Test GET /generateuff when authorized file does not exist"""
+        from config import Config
+
+        authorized_dir = getattr(Config, "DATA_FOLDER", None) or getattr(Config, "REPORT_FOLDER", None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, "nonexistent.vrd")
+
+        with patch("routes.report_generation.os.path.exists") as mock_exists:
+            mock_exists.return_value = False
+
+            response = client.get(f"/api/v1/generateuff?file_path={valid_input}")
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data["success"] is False
+            assert data["error"]["code"] == "FILE_NOT_FOUND"
+
+    def test_generateuff_generated_file_not_found(self, client, mock_vv):
+        """Test GET /generateuff when generated file does not exist after generation"""
+        from config import Config
+
+        authorized_dir = getattr(Config, "DATA_FOLDER", None) or getattr(Config, "REPORT_FOLDER", None)
+        if not authorized_dir:
+            pytest.skip("No authorized directory configured")
+
+        valid_input = os.path.join(authorized_dir, "test.vrd")
+
+        with (
+            patch("routes.report_generation.os.path.exists") as mock_exists,
+            patch("routes.report_generation.GenerateUFFFromVV") as mock_generate,
+        ):
+            # File exists for input validation, but generated output doesn't exist
+            mock_exists.side_effect = lambda p: p == valid_input
+            mock_generate.return_value = "C:\\temp\\output.uff"
+
+            response = client.get(f"/api/v1/generateuff?file_path={valid_input}&output_name=output.uff")
+
+            assert response.status_code == 404
+            data = response.get_json()
+            assert data["success"] is False
+            assert data["error"]["code"] == "FILE_NOT_FOUND"
 
     def test_generateuff_rejects_malicious_output_path(self, client, mock_vv):
         """Test that generateuff rejects malicious output paths"""

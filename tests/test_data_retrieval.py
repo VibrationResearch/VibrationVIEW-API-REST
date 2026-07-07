@@ -486,6 +486,15 @@ class TestDataRetrieval:
 
         print("✓ ChannelLabel base-1 conversion works!")
 
+    def test_channel_label_invalid_channel_zero(self, client):
+        """Test that channellabel rejects channel 0 (1-based indexing)"""
+        response = client.get("/api/v1/channellabel?channelnum=0")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
+
     def test_channel_missing_parameters(self, client):
         """Test channel endpoints with missing channelnum parameter"""
 
