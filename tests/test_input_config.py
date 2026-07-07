@@ -220,6 +220,41 @@ class TestInputConfig:
         data = json.loads(response.data)
         assert data["success"] is False
 
+    @pytest.mark.parametrize(
+        "endpoint",
+        [
+            "/api/v1/inputserialnumber?0",
+            "/api/v1/inputsensitivity?0",
+            "/api/v1/inputengineeringscale?0",
+            "/api/v1/inputcapacitorcoupled?0",
+            "/api/v1/inputaccelpowersource?0",
+            "/api/v1/inputdifferential?0",
+            "/api/v1/ischanneldifferentdatabase?0",
+            "/api/v1/channeldatabaseids?0",
+            "/api/v1/updatechannelconfigfromdatabase?0",
+        ],
+    )
+    def test_channel_zero_rejected(self, client, endpoint):
+        """Test that channel 0 is rejected (1-based indexing)"""
+        response = client.get(endpoint)
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
+
+    def test_inputcalibration_channel_zero_rejected(self, client):
+        """Test POST /inputcalibration with channel 0 is rejected"""
+        response = client.post(
+            "/api/v1/inputcalibration",
+            json={"channel": 0, "sensitivity": 100.0, "serialnumber": "SN123", "caldate": "2025-01-15"},
+        )
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "INVALID_PARAMETER"
+
     def test_inputserialnumber_success(self, client):
         """Test GET /inputserialnumber with valid channel"""
         self.mock_instance.InputSerialNumber.return_value = "SN-12345"
