@@ -224,7 +224,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["result"] is True
         assert data["data"]["profile_name"] == profile_name
         assert "CloseTest command executed" in data["message"]
 
@@ -243,7 +243,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["result"] is True
         assert data["data"]["profile_name"] == profile_name
 
         # Verify the COM method was called
@@ -276,7 +276,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is False
+        assert data["data"]["result"] is False
 
     def test_closetest_missing_parameter(self, client):
         """Test /closetest without required profile name parameter"""
@@ -299,7 +299,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["result"] is True
         assert data["data"]["tab_index"] == tab_index
         assert "CloseTab command executed" in data["message"]
 
@@ -318,7 +318,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["result"] is True
         assert data["data"]["tab_index"] == tab_index
 
         # Verify the COM method was called
@@ -337,7 +337,7 @@ class TestBasicControl:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data["success"] is True
-        assert data["data"]["test_was_closed"] is True
+        assert data["data"]["result"] is True
         assert data["data"]["tab_index"] == tab_index
 
     def test_closetab_not_closed(self, client):

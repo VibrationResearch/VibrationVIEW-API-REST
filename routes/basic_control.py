@@ -399,7 +399,7 @@ def close_test(vv_instance: Any) -> Response:
 
     return jsonify(
         success_response(
-            {"test_was_closed": test_was_closed, "profile_name": profile_name},
+            {"result": test_was_closed, "profile_name": profile_name},
             f"CloseTest command executed: {profile_name}",
         )
     )
@@ -458,7 +458,7 @@ def close_tab(vv_instance: Any) -> Response:
 
     return jsonify(
         success_response(
-            {"test_was_closed": test_was_closed, "tab_index": tab_index}, f"CloseTab command executed: tab {tab_index}"
+            {"result": test_was_closed, "tab_index": tab_index}, f"CloseTab command executed: tab {tab_index}"
         )
     )
 
