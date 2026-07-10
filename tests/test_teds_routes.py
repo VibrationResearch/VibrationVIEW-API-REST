@@ -76,6 +76,42 @@ class TestTEDSRoutes:
 
         print("✓ GET /Teds (all channels) works!")
 
+    def test_teds_all_channels_dict_format(self, client, mock_vv):
+        """Test GET /teds with COM dict format: [{'Channel': N, 'Teds': [...]}, {'Channel': N, 'Error': '...'}]"""
+        mock_all_teds = [
+            {"Channel": 1, "Teds": [["Sensitivity", "100.0", "mV/g"], ["Model number", "3055D1", ""]]},
+            {"Channel": 2, "Teds": [["Sensitivity", "200.0", "mV/g"], ["Model number", "3055D2", ""]]},
+            {"Channel": 3, "Error": "No data available"},
+            {"Channel": 4, "Error": "No data available"},
+        ]
+        mock_vv.clear_method_calls()
+        mock_vv.Teds.return_value = mock_all_teds
+
+        response = client.get("/api/v1/teds")
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["success"] is True
+
+        result = data["data"]["result"]
+        assert len(result["transducers"]) == 2
+        assert len(result["errors"]) == 2
+
+        # Verify transducer data was parsed correctly
+        t1 = result["transducers"][0]
+        assert t1["channel"] == 1
+        assert t1["sensitivity"]["value"] == 100.0
+        assert t1["sensitivity"]["unit"] == "mV/g"
+
+        t2 = result["transducers"][1]
+        assert t2["channel"] == 2
+        assert t2["sensitivity"]["value"] == 200.0
+
+        # Verify errors include channel numbers and messages
+        assert result["errors"][0]["channel"] == 3
+        assert result["errors"][0]["error"] == "No data available"
+        assert result["errors"][1]["channel"] == 4
+
     def test_teds_specific_channel_1based(self, client, mock_vv):
         """Test GET /Teds with 1-based channel parameter"""
         # Configure mock - TEDS data should be in list format for the formatter
