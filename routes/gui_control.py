@@ -160,11 +160,10 @@ def abort_edit(vv_instance: Any) -> Response:
     COM Method: AbortEdit()
     Aborts any currently open edit session without saving changes.
     """
-    result = vv_instance.AbortEdit()
+    vv_instance.AbortEdit()
+    result = True  # If no exception, assume success
 
-    return jsonify(
-        success_response({"result": result, "executed": True}, f"AbortEdit command executed - Result: {result}")
-    )
+    return jsonify(success_response({"result": result}, "AbortEdit command executed"))
 
 
 # Window Management Control
@@ -178,11 +177,10 @@ def minimize(vv_instance: Any) -> Response:
     COM Method: Minimize()
     Minimizes the VibrationVIEW application window.
     """
-    result = vv_instance.Minimize()
+    vv_instance.Minimize()
+    result = True  # If no exception, assume success
 
-    return jsonify(
-        success_response({"result": result, "executed": True}, f"Minimize command executed - Result: {result}")
-    )
+    return jsonify(success_response({"result": result}, "Minimize command executed"))
 
 
 @gui_control_bp.route("/restore", methods=["GET", "POST"])
@@ -195,11 +193,10 @@ def restore(vv_instance: Any) -> Response:
     COM Method: Restore()
     Restores the VibrationVIEW application window from minimized state.
     """
-    result = vv_instance.Restore()
+    vv_instance.Restore()
+    result = True  # If no exception, assume success
 
-    return jsonify(
-        success_response({"result": result, "executed": True}, f"Restore command executed - Result: {result}")
-    )
+    return jsonify(success_response({"result": result}, "Restore command executed"))
 
 
 @gui_control_bp.route("/maximize", methods=["GET", "POST"])
@@ -212,11 +209,10 @@ def maximize(vv_instance: Any) -> Response:
     COM Method: Maximize()
     Maximizes the VibrationVIEW application window.
     """
-    result = vv_instance.Maximize()
+    vv_instance.Maximize()
+    result = True  # If no exception, assume success
 
-    return jsonify(
-        success_response({"result": result, "executed": True}, f"Maximize command executed - Result: {result}")
-    )
+    return jsonify(success_response({"result": result}, "Maximize command executed"))
 
 
 @gui_control_bp.route("/activate", methods=["GET", "POST"])
@@ -229,8 +225,7 @@ def activate(vv_instance: Any) -> Response:
     COM Method: Activate()
     Brings the VibrationVIEW application window to the foreground and activates it.
     """
-    result = vv_instance.Activate()
+    vv_instance.Activate()
+    result = True  # If no exception, assume success
 
-    return jsonify(
-        success_response({"result": result, "executed": True}, f"Activate command executed - Result: {result}")
-    )
+    return jsonify(success_response({"result": result}, "Activate command executed"))
