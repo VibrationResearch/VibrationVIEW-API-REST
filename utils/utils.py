@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import subprocess
 import sys
 import threading
 import uuid
@@ -233,37 +232,6 @@ def get_last_data_file(vv_instance: Any) -> str:
         )
     return file_path
 
-
-def GenerateReportFromVV(filePath: str, templateName: str, outputName: str) -> str:
-    """
-    Runs the external report generator,
-    and returns the path to the generated report.
-
-    Args:
-        filePath (str): The VV filename
-        templateName (str): Name of the report template to use
-        outputName (str): Desired name of the generated report file
-
-    Returns:
-        str: Path to the generated report file
-    """
-
-    # Prepare report output directory based on output file extension
-    base_folder = get_folder_for_extension(outputName)
-    reportFolder = os.path.join(base_folder, "Temporary")
-    os.makedirs(reportFolder, exist_ok=True)
-
-    outPath = os.path.join(reportFolder, outputName)
-
-    # Build and run report generation command
-    command = [Config.EXE_NAME, "/savereport", filePath, "/template", templateName, "/output", outPath]
-
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    if result.returncode != 0:
-        raise RuntimeError(f"Report generation failed.\nCommand: {' '.join(command)}\nStderr: {result.stderr.strip()}")
-
-    return outPath
 
 
 def GetVectorData(vvInstance: Any, vector: int) -> Dict[str, list]:
