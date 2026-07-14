@@ -50,7 +50,7 @@ def get_documentation() -> Response:
                 },
                 "filepath_parameters": {
                     "file_path": "string - Path to VibrationVIEW data file (optional - uses last data file if not specified)",
-                    "template_name": 'string - Name of the report template to use (optional - uses "Test Report.rtf" if not specified)',
+                    "template_name": 'string - Name of the report template to use (optional - uses "Test Report.vvtemplate" if not specified)',
                     "output_name": "string - Desired name of the generated report file (optional - auto-generated with same extension as template_name if not specified)",
                 },
                 "returns": "object - Success status, path to generated report file, and file content (text or base64-encoded binary)",
@@ -211,7 +211,7 @@ def generate_report(vv_instance: Any) -> Response:
                 if template_ext:
                     output_name = f"{base_name}{template_ext}"
                 else:
-                    output_name = f"{base_name}.rtf"
+                    output_name = f"{base_name}.docx"
 
             # Validate output path security
             try:
@@ -248,7 +248,7 @@ def generate_report(vv_instance: Any) -> Response:
 
     # Use default template if not provided
     if not template_name:
-        template_name = "Test Report.rtf"
+        template_name = "Test Report.vvtemplate"
 
     # Use default output_name if not provided - base it on the data file name
     if not output_name:
