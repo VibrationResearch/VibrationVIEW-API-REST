@@ -430,3 +430,42 @@ class TestBasicControl:
         assert data["data"]["count"] == 0
         assert "columns" in data["data"]
         assert data["data"]["columns"] == ["Tab Index", "Test Type", "File Path", "Test Name"]
+
+
+class TestSaveData:
+    @pytest.fixture(autouse=True)
+    def _setup_mock(self, client):
+        """Get the mock instance from the singleton after client/app fixtures resolve."""
+        self.mock_instance = get_vv_instance()
+
+    def test_savedata_creates_missing_directory(self, client, tmp_path):
+        """Test that savedata creates missing directories before saving"""
+        new_dir = tmp_path / "subdir" / "nested"
+        file_path = str(new_dir / "testfile.vsd")
+
+        with patch("routes.basic_control.validate_file_path", return_value=file_path):
+            response = client.post(f"/api/v1/savedata?filename={file_path}")
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
+        assert new_dir.is_dir()
+        self.mock_instance.SaveData.assert_called_once_with(file_path)
+
+    def test_savedata_directory_creation_failure(self, client):
+        """Test that savedata returns error when directory cannot be created"""
+        file_path = r"Z:\no_permission\testfile.vsd"
+
+        with (
+            patch("routes.basic_control.validate_file_path", return_value=file_path),
+            patch("os.path.isdir", return_value=False),
+            patch("os.makedirs", side_effect=OSError("Permission denied")),
+        ):
+            response = client.post(f"/api/v1/savedata?filename={file_path}")
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["success"] is False
+        assert data["error"]["code"] == "DIRECTORY_CREATE_ERROR"
+        assert "Permission denied" in data["error"]["message"]
+        self.mock_instance.SaveData.assert_not_called()
