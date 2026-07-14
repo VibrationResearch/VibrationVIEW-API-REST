@@ -547,6 +547,14 @@ def save_data(vv_instance: Any) -> Response:
     except PathValidationError as e:
         raise APIError(str(e), "PATH_VALIDATION_ERROR", 403)
 
+    # Ensure the target directory exists
+    target_dir = os.path.dirname(validated_file_path)
+    if target_dir and not os.path.isdir(target_dir):
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+        except OSError as e:
+            raise APIError(f"Failed to create directory '{target_dir}': {e}", "DIRECTORY_CREATE_ERROR")
+
     # SaveData has no return value, raises exception on failure
     vv_instance.SaveData(validated_file_path)
 
