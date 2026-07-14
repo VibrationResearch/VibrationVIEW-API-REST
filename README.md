@@ -226,7 +226,7 @@ curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all&loop=1" \
 # Generate a report from VibrationVIEW data
 curl -X POST "http://localhost:5000/api/v1/generatereport" \
   -H "Content-Type: application/json" \
-  -d '{"template_name": "Test Report.rtf", "output_name": "report.rtf"}'
+  -d '{"template_name": "Test Report.vvtemplate", "output_name": "report.docx"}'
 
 # Generate text file from data (one file per plot)
 curl -X POST "http://localhost:5000/api/v1/generatetxt" \
