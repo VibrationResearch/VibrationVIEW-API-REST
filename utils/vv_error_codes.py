@@ -40,7 +40,8 @@ VVIEW_E_LENGTH_MISMATCH = -2147220968          # 0x80040218  # Only raised by CO
 VVIEW_E_FAILED_INPUT_CONFIG = -2147220967      # 0x80040219
 VVIEW_E_UNEXPECTED = -2147220966               # 0x8004021a
 VVIEW_E_MISMATCH = -2147220965                 # 0x8004021b
-VVIEW_E_DATABASE_NOT_AVAILABLE = -2147220963   # 0x8004021d  # Only raised by COM methods not exposed by this API
+VVIEW_E_DATABASE_NOT_AVAILABLE = -2147220963   # 0x8004021d  
+VVIEW_E_ENTER_YOUR_MASS = -2147220962          # 0x8004021e  
 
 # VibrationVIEW Depricated codes (no longer used by current VibrationVIEW versions, but may still be encountered in older versions)
 VVIEW_E_UNDEFINED = -2147220979                # 0x8004020d
@@ -87,6 +88,7 @@ _VVIEW_ERROR_CLASSIFICATION = {
     VVIEW_E_STRING_CONVERSION_FAILED: (500, "STRING_CONVERSION_ERROR", "String conversion failed"),
     VVIEW_E_FAILED_INPUT_CONFIG: (500, "INPUT_CONFIG_ERROR", "Failed loading input configuration"),
     VVIEW_E_DATABASE_NOT_AVAILABLE: (503, "DATABASE_UNAVAILABLE", "Database not available"),
+    VVIEW_E_ENTER_YOUR_MASS: (500, "MASS_NOT_ENTERED", "System Limit mass must be entered"),
     # Licensing / capability errors
     VVIEW_E_ACTIVEX_KEYMISSING: (403, "LICENSE_ERROR", "Automation Interface Software option is not enabled"),
     VVIEW_E_TED_TEMPLATE_MISSING: (404, "TEMPLATE_MISSING", "TEDs template file not found"),
