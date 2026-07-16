@@ -44,30 +44,6 @@ def normalize_field_name(field_name: str) -> str:
     return field_name.lower().replace(" ", "_").replace("(", "").replace(")", "").replace(",", "").replace(".", "")
 
 
-def extract_teds_field(teds_data: List[List[str]], field_name: str) -> Dict[str, str]:
-    """
-    Extract a specific field from TEDS data array.
-
-    Args:
-        teds_data: List of [field_name, value, unit] arrays or tuples
-        field_name: Name of field to extract
-
-    Returns:
-        Dictionary with 'value' and 'unit' keys
-    """
-    for item in teds_data:
-        # Handle both list and tuple formats
-        if len(item) >= 2:
-            # Convert first element to string and check if it matches
-            first_element = str(item[0]) if item[0] is not None else ""
-            if first_element.lower() == field_name.lower():
-                return {
-                    "value": str(item[1]) if len(item) > 1 and item[1] is not None else "",
-                    "unit": str(item[2]) if len(item) > 2 and item[2] is not None else "",
-                }
-    return {"value": "", "unit": ""}
-
-
 def extract_all_teds_fields(
     teds_data: List[List[str]], channel_index: int, include_channel: bool = True
 ) -> Dict[str, Any]:

@@ -180,14 +180,6 @@ def ParseVvTable(tsv_text: str) -> List[Dict[str, str]]:
         raise APIError(f"Error parsing TSV: {e}", "PARSE_ERROR") from e
 
 
-def DecodeStatusColor(status: Dict[str, int]) -> str:
-    color_map = {0: "healthy", 1: "yellow", 2: "critical"}
-    # Convert string to integer if needed
-
-    return_color_code = status["stop_code_index"] >> 12
-    return color_map.get(return_color_code, "unknown")
-
-
 def get_channel_data(vv_instance: Any, field_keys: List[str]) -> Optional[List[Dict[str, Any]]]:
     """
     Common function to get channel data for multiple routes
@@ -232,26 +224,6 @@ def get_last_data_file(vv_instance: Any) -> str:
         )
     return file_path
 
-
-
-def GetVectorData(vvInstance: Any, vector: int) -> Dict[str, list]:
-    try:
-        cols = vvInstance.GetHardwareInputChannels() + 1
-        dataList = []
-        dataList.append(vvInstance.Vector(vector))
-
-        headers = [vvInstance.VectorLabel(vector)]
-        for i in range(cols - 1):
-            field = f"CH{i + 1}NAME"
-            headers.append(vvInstance.ReportField(field))
-            dataList.append(vvInstance.Vector(vector + i))
-
-        units = [vvInstance.VectorUnit(vector + i) for i in range(cols)]
-
-        return {"headers": headers, "units": units, "columns": dataList}
-
-    except Exception as e:
-        raise RuntimeError(f"Error retrieving vector data: {e}")
 
 
 def convert_channel_to_com_index(channel_user: Any) -> int:
