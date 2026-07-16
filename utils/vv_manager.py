@@ -59,34 +59,3 @@ def with_vibrationview(func: Callable) -> Callable:
         return func(vv, *args, **kwargs)
 
     return wrapper
-
-
-def with_vibrationview_safe(func: Callable) -> Callable:
-    """
-    Decorator with built-in error handling and ready check
-    Now uses the app singleton for consistent testing
-    """
-
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        vv = VibrationVIEWManager.get_instance()
-
-        # Ensure connection if needed
-        if hasattr(vv, "is_connected") and not vv.is_connected():
-            if hasattr(vv, "connect"):
-                if not vv.connect():
-                    return {"success": False, "error": "Failed to connect to VibrationVIEW", "data": None}
-
-        # Check if VibrationVIEW is ready
-        if hasattr(vv, "IsReady") and not vv.IsReady():
-            return {"success": False, "error": "VibrationVIEW is not ready", "data": None}
-
-        result = func(vv, *args, **kwargs)
-
-        # Ensure result is in proper format
-        if isinstance(result, dict) and "success" in result:
-            return result
-        else:
-            return {"success": True, "data": {"result": result}, "error": None}
-
-    return wrapper
