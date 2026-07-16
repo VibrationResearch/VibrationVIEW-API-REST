@@ -93,28 +93,3 @@ def handle_errors(func: Callable) -> Callable:
 
     return wrapper
 
-
-def require_vv_connection(func: Callable) -> Callable:
-    """
-    Decorator to ensure VibrationVIEW connection is available
-
-    Can be used to add connection validation before method execution.
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        try:
-            # This could be expanded to pre-validate connection
-            return func(*args, **kwargs)
-        except Exception as e:
-            if "connection" in str(e).lower() or "dispatch" in str(e).lower():
-                logger.error(f"VibrationVIEW connection error in {func.__name__}: {str(e)}")
-                return jsonify(
-                    error_response(
-                        "Unable to connect to VibrationVIEW. Ensure VibrationVIEW is running and COM interface is available.",
-                        "CONNECTION_ERROR",
-                    )
-                ), 503
-            raise
-
-    return wrapper
