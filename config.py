@@ -22,7 +22,7 @@ class Config:
     """Application configuration"""
 
     # API Settings
-    API_VERSION = os.environ.get("API_VERSION") or "1.0.0"
+    API_VERSION = os.environ.get("API_VERSION") or "1.1.0"
     SECRET_KEY = os.environ.get("SECRET_KEY") or _DEV_SECRET_KEY
 
     # API Key Authentication

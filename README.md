@@ -386,7 +386,7 @@ MAX_CONTENT_LENGTH=10485760
 ### Environment Variables (.env)
 ```ini
 # API Configuration
-API_VERSION=1.0.0
+API_VERSION=1.1.0
 SECRET_KEY=your-secret-key
 
 # CORS Settings — restricts browser-based cross-origin requests.

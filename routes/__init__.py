@@ -8,8 +8,6 @@ Routes package for VibrationVIEW API
 This package contains all the route modules organized by functionality.
 """
 
-__version__ = "1.0.0"
-
 # Import all blueprints for easy access
 from .advanced_control import advanced_control_bp
 from .advanced_control_sine import advanced_control_sine_bp
