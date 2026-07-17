@@ -4,7 +4,7 @@ All notable changes to the VibrationVIEW REST API are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.1.0] - Unreleased
+## [1.1.0] - 2026-07-17
 
 ### Breaking Changes
 
@@ -62,6 +62,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Ruff migration**: Replaced flake8, black, and isort with ruff for linting, formatting, and import sorting. (#25)
 - **Path validation**: Confirmed case-insensitive on Windows via `PureWindowsPath.relative_to`. (#8)
 - **Logging configuration**: Added `RotatingFileHandler` with configurable log directory. (#10)
+
+### Cleanup
+
+- **Dead code removal**: Removed unused `with_vibrationview_safe`, `require_vv_connection`, `DecodeStatusColor`, `GetVectorData`, `extract_teds_field`, and `__version__` in `routes/__init__.py`. Deleted unused `utils/vv_context_manager.py`.
+- **Removed obsolete deployment scripts**: `setup.bat`, `setup.ps1`, `start-api.bat`, and `prepare-offline.ps1` replaced by bundled executable in GitHub release zips.
+- **README rewrite**: Converted all API examples from curl/bash to PowerShell `Invoke-RestMethod`. Fixed parameter names, POST methods for state-changing endpoints, UTC timestamp format, and removed references to nonexistent endpoints and files. Replaced `0.0.0.0` with `127.0.0.1` in all docs.
+- **SETUP-README updates**: Simplified breaking changes section to link to CHANGELOG. Added system limits and key generation troubleshooting. Fixed PowerShell key generation command for Windows PowerShell 5.1 compatibility.
+- **Renamed "Simulation mode" to "Demonstration mode"** in README and SETUP-README.
 
 ### Bug Fixes
 
