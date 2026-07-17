@@ -82,201 +82,114 @@ The API is organized into functional modules with consistent patterns:
 
 ## API Usage Examples
 
-> **Note:** If `API_KEY` is configured, all requests must include the header `-H "Authorization: Bearer <your-api-key>"`. 
-This header is omitted from the examples below for brevity.
+> **Note:** If `API_KEY` is configured, add `-Headers @{Authorization = "Bearer <your-api-key>"}` to each request.
+> This header is omitted from the examples below for brevity.
+>
+> **Tip:** Pipe any response through `| ConvertTo-Json -Depth 5` to pretty-print nested results.
 
 ### Basic Test Control
-```bash
-# Start a test (existing file)
-curl -X POST "http://localhost:5000/api/v1/runtest?filename=my_test.vsp"
+```powershell
+# Start a test
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/starttest"
 
 # Stop a test
-curl -X POST "http://localhost:5000/api/v1/stoptest"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/stoptest"
 
 # Check if running
-curl "http://localhost:5000/api/v1/isrunning"
-
-# Upload and run test file
-curl -X PUT "http://localhost:5000/api/v1/runtest?filename=test.vsp" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @test.vsp
+Invoke-RestMethod "http://localhost:5000/api/v1/isrunning"
 ```
 
 ### Status Monitoring
-```bash
-# Get comprehensive status
-curl "http://localhost:5000/api/v1/status"
+```powershell
+# Get status
+Invoke-RestMethod "http://localhost:5000/api/v1/status" | ConvertTo-Json -Depth 5
 
 # Check hardware readiness
-curl "http://localhost:5000/api/v1/isready"
+Invoke-RestMethod "http://localhost:5000/api/v1/isready"
 
 # Get all status flags at once
-curl "http://localhost:5000/api/v1/allstatus"
+Invoke-RestMethod "http://localhost:5000/api/v1/allstatus" | ConvertTo-Json -Depth 5
 ```
 
 ### Real-Time Data Access
-```bash
+```powershell
 # Get channel data
-curl "http://localhost:5000/api/v1/channel"
+Invoke-RestMethod "http://localhost:5000/api/v1/channel" | ConvertTo-Json -Depth 5
 
 # Get control values
-curl "http://localhost:5000/api/v1/control"
+Invoke-RestMethod "http://localhost:5000/api/v1/control" | ConvertTo-Json -Depth 5
 
-# Get demand values  
-curl "http://localhost:5000/api/v1/demand"
+# Get demand values
+Invoke-RestMethod "http://localhost:5000/api/v1/demand" | ConvertTo-Json -Depth 5
 
 # Get output values
-curl "http://localhost:5000/api/v1/output"
+Invoke-RestMethod "http://localhost:5000/api/v1/output" | ConvertTo-Json -Depth 5
 ```
 
 ### Sine Control
-```bash
+```powershell
 # Get sine frequency
-curl "http://localhost:5000/api/v1/sinefrequency"
+Invoke-RestMethod "http://localhost:5000/api/v1/sinefrequency"
 
-# Set sine frequency
-curl -X POST "http://localhost:5000/api/v1/sinefrequency?value=100.0"
+# Set sine frequency (while test is running)
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/sinefrequency?value=100.0"
 ```
 
 ### Hardware Configuration
-```bash
+```powershell
 # Get hardware info
-curl "http://localhost:5000/api/v1/gethardwareinputchannels"
-curl "http://localhost:5000/api/v1/getsoftwareversion"
+Invoke-RestMethod "http://localhost:5000/api/v1/gethardwareinputchannels" 
+Invoke-RestMethod "http://localhost:5000/api/v1/getsoftwareversion"
 
 # Get channel sensitivity
-curl "http://localhost:5000/api/v1/inputsensitivity?1"
+Invoke-RestMethod "http://localhost:5000/api/v1/inputsensitivity?1"
 
 # Check hardware capabilities
-curl "http://localhost:5000/api/v1/hardwaresupportscapacitorcoupled?1"
+Invoke-RestMethod "http://localhost:5000/api/v1/hardwaresupportscapacitorcoupled?1"
 ```
 
 ### GUI Control
-```bash
+```powershell
 # Window management
-curl -X POST "http://localhost:5000/api/v1/minimize"
-curl -X POST "http://localhost:5000/api/v1/maximize"
-curl -X POST "http://localhost:5000/api/v1/activate"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/minimize"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/maximize"
 ```
 
 ### Reporting (Advanced)
-```bash
+```powershell
 # Get single report field
-curl "http://localhost:5000/api/v1/reportfield?field=TestName"
+Invoke-RestMethod "http://localhost:5000/api/v1/reportfield?field=TestName"
 
-# Get multiple fields with channel/loop support
-curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all&loop=1" \
-  -H "Content-Type: application/json" \
-  -d '{"fields": ["MaxLevel", "RMS", "TestResult"]}'
+# Get multiple fields for all channels (browser-friendly)
+Invoke-RestMethod "http://localhost:5000/api/v1/reportfields?ChSensitivity*|&ChAccel*|" | ConvertTo-Json -Depth 5
 
-# Response format includes separated values and metadata:
+# Same request via POST with JSON body (pipe to ConvertTo-Json for readable output)
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/reportfields?channel=all" -ContentType "application/json" -Body '{"fields": ["ChSensitivity", "ChAccel"]}' | ConvertTo-Json -Depth 5
+
+# Response format — results keyed by channel number:
 # {
-#   "results": {
-#     "MaxLevel": [
-#       {"value": "5.2 g", "channel": 1, "loop": 1},
-#       {"value": "4.8 g", "channel": 2, "loop": 1}
-#     ]
+#   "data": {
+#     "results": {
+#       "1": {"ChSensitivity": "102 mV/G", "ChAccel": "1.004e-07 m/s²"},
+#       "2": {"ChSensitivity": "10.41 mV/G", "ChAccel": "3.372e-06 m/s²"}
+#     }
 #   }
 # }
 ```
 
-### Report Generation & Data Export
-```bash
-# Generate a report from VibrationVIEW data
-curl -X POST "http://localhost:5000/api/v1/generatereport" \
-  -H "Content-Type: application/json" \
-  -d '{"templatename": "Test Report.vvtemplate", "outputname": "report.docx"}'
-
-# Generate text file from data (one file per plot)
-curl -X POST "http://localhost:5000/api/v1/generatetxt" \
-  -H "Content-Type: application/json" \
-  -d '{"outputname": "data.txt"}'
-
-# Generate UFF (Universal File Format) from data
-curl -X POST "http://localhost:5000/api/v1/generateuff" \
-  -H "Content-Type: application/json" \
-  -d '{"outputname": "data.uff"}'
-
-# Get raw data file (.vrd)
-curl "http://localhost:5000/api/v1/datafile" --output data.vrd
-
-# Get all data files from last test as zip
-curl "http://localhost:5000/api/v1/datafiles" --output test_data.zip
-
-# Upload and generate report in one operation
-curl -X POST "http://localhost:5000/api/v1/generatereport?templatename=Standard%20Report&outputname=report.pdf" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @test.vrd
-```
-
-### Virtual Channels
-```bash
-# Import virtual channels from file
-curl -X POST "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc"
-
-# Upload and import virtual channels
-curl -X PUT "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @channels.vvc
-
-# Remove all virtual channels
-curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
-```
-
 ### Event Log
-```bash
+```powershell
 # Get event log as structured JSON
-curl "http://localhost:5000/api/v1/log"
+Invoke-RestMethod "http://localhost:5000/api/v1/log" | ConvertTo-Json -Depth 5
 ```
 
-### Report Fields History
-```bash
+### Report Fields History (available while NOT running tests)
+```powershell
 # Get report fields for all data files from last test
-curl "http://localhost:5000/api/v1/reportfieldshistory?fields=StopCode,RunTime,Time"
+Invoke-RestMethod "http://localhost:5000/api/v1/reportfieldshistory?fields=StopCode,RunTime,Time"  | ConvertTo-Json -Depth 5
 
 # With POST
-curl -X POST "http://localhost:5000/api/v1/reportfieldshistory" \
-  -H "Content-Type: application/json" \
-  -d '{"fields": ["StopCode", "RunTime", "Time"]}'
-```
-
-### Utility Operations
-```bash
-# Vector enumeration reference (for use with /vector endpoint)
-curl "http://localhost:5000/api/v1/docs/vector_enums"
-
-# Connection diagnostics
-curl "http://localhost:5000/api/v1/testcom"
-```
-
-## Request Patterns
-
-### GET Requests
-Read-only endpoints use GET requests with URL parameters:
-```bash
-# Single parameter
-curl "http://localhost:5000/api/v1/reportfield?field=TestName"
-
-# Multiple parameters  
-curl "http://localhost:5000/api/v1/inputsensitivity?1"
-
-# Boolean parameters
-curl "http://localhost:5000/api/v1/inputcapacitorcoupled?1&true"
-```
-
-### POST Requests
-Used for operations that modify state or require complex parameters:
-```bash
-# Simple operations
-curl -X POST "http://localhost:5000/api/v1/starttest"
-
-# With URL parameter
-curl -X POST "http://localhost:5000/api/v1/demandmultiplier?value=6.0"
-
-# Bulk operations
-curl -X POST "http://localhost:5000/api/v1/reportfields" \
-  -H "Content-Type: application/json" \
-  -d '{"fields": ["TestName", "Duration", "MaxLevel"]}'
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/reportfieldshistory" -ContentType "application/json" -Body '{"fields": ["StopCode", "RunTime", "Time"]}'  | ConvertTo-Json -Depth 5
 ```
 
 ## Response Format
@@ -405,28 +318,24 @@ This pins every package (including transitive dependencies) to exact versions fo
 ### Bulk Operations
 Efficient operations that combine multiple COM calls:
 - `POST /api/v1/reportfields` - Multiple report fields with channel/loop support
-- `POST /api/v1/reportfieldshistory` - Report fields for all data files from last test
+- `POST /api/v1/reportfieldshistory` - Report fields for all data files from last run test
 - `GET /api/v1/allstatus` - All status flags in single request
-- `GET /api/v1/docs/vector_enums` - Vector enumeration reference
 - `GET /api/v1/datafiles` - All data files from last test as zip archive
 - `GET /api/v1/log` - Event log as structured JSON array
 
 ### Channel/Loop Support
 Advanced reporting with automatic field name formatting:
-```bash
-# Get MaxLevel for all channels
-curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all" \
-  -d '{"fields": ["MaxLevel"]}'
+```powershell
+# Get acceleration for all channels
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/reportfields?channel=all" -ContentType "application/json" -Body '{"fields": ["ChAcceleration"]}'
 
-# Results in COM calls: MaxLevel1:, MaxLevel2:, MaxLevel3:, etc.
+# Results in COM calls: ChAcceleration1, ChAcceleration2, ChAcceleration3, etc.
 ```
 
 ### File Upload Support
 Binary file uploads for test profiles:
-```bash
-curl -X PUT "http://localhost:5000/api/v1/runtest?filename=test.vsp" \
-  -H "Content-Length: $(stat -c%s test.vsp)" \
-  --data-binary @test.vsp
+```powershell
+Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/runtest?filename=test.vsp" -InFile "C:\VibrationVIEW\Profiles\test.vsp" -ContentType "application/octet-stream"
 ```
 
 ### Data Export Support
@@ -438,19 +347,19 @@ Export test data in multiple formats:
 
 ### Virtual Channel Management
 Import and manage virtual channels programmatically:
-```bash
+```powershell
 # Import virtual channels configuration
-curl -X POST "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/importvirtualchannels?filename=channels.vvc"
 
 # Remove all virtual channels
-curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/removeallvirtualchannels"
 ```
 
 ## Configuration
 
 ### Secret Key
 The `SECRET_KEY` is used by Flask for cryptographic signing. In production mode, the server will refuse to start if `SECRET_KEY` is still set to the development default. Generate a secure value:
-```bash
+```powershell
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
@@ -458,7 +367,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 All requests must include an `Authorization: Bearer <key>` header. To set up:
 
 1. Generate a key:
-   ```bash
+   ```powershell
    python -c "import secrets; print(secrets.token_hex(32))"
    ```
 2. Set `API_KEY` in your `.env` file to the generated value.
@@ -479,7 +388,7 @@ MAX_CONTENT_LENGTH=10485760
 ```
 
 ### Environment Variables (.env)
-```bash
+```ini
 # API Configuration
 API_VERSION=1.0.0
 SECRET_KEY=your-secret-key
@@ -513,9 +422,9 @@ REPORT_FOLDER=C:\VibrationVIEW\Reports
 
 ### Configure Waitress to Bind to the VLAN Interface IP
 
-By default `start-api.bat` binds to `127.0.0.1`. To accept connections from the controller PC, use `--host` with the VLAN adapter IP:
+By default the server binds to `127.0.0.1`. To accept connections from the controller PC, use `--host` with the VLAN adapter IP:
 ```
-start-api.bat --host 192.168.1.10 --port 5000
+VibrationVIEW-API.exe --host 192.168.1.10 --port 5000
 ```
 Do not use `0.0.0.0`, which would expose the API on all network interfaces.
 
@@ -532,29 +441,29 @@ Replace `5000` with the Waitress port and `192.168.1.20` with the controller PC'
 ### Common Issues
 
 1. **COM Connection Failures**
-   ```bash
+   ```powershell
    # Test basic connectivity
-   curl "http://localhost:5000/api/v1/testcom"
-   
+   Invoke-RestMethod "http://localhost:5000/api/v1/testcom"
+
    # Check hardware status
-   curl "http://localhost:5000/api/v1/isready"
+   Invoke-RestMethod "http://localhost:5000/api/v1/isready"
    ```
 
 2. **Module-Specific Diagnostics**
-   ```bash
+   ```powershell
    # Test specific modules
-   curl "http://localhost:5000/api/v1/allstatus"
-   curl "http://localhost:5000/api/v1/testrecording"
+   Invoke-RestMethod "http://localhost:5000/api/v1/allstatus"
+   Invoke-RestMethod "http://localhost:5000/api/v1/testrecording"
    ```
 
 3. **Get Available Endpoints**
-   ```bash
+   ```powershell
    # Main documentation
-   curl "http://localhost:5000/api/v1/docs"
-   
-   # Module documentation  
-   curl "http://localhost:5000/api/v1/docs/basic_control"
-   curl "http://localhost:5000/api/v1/docs/reporting"
+   Invoke-RestMethod "http://localhost:5000/api/v1/docs"
+
+   # Module documentation
+   Invoke-RestMethod "http://localhost:5000/api/v1/docs/basic_control"
+   Invoke-RestMethod "http://localhost:5000/api/v1/docs/reporting"
    ```
 
 ## License
