@@ -4,6 +4,7 @@
 
 - **Windows** machine
 - **VibrationVIEW** installed on the target machine
+- VibrationVIEW automation option (VR9604) — or VibrationVIEW may be run in Demonstration mode without any additional hardware or software
 
 ## Quick Start
 
@@ -12,12 +13,13 @@
    At minimum, generate secure values for `SECRET_KEY` and `API_KEY`:
 
    ```cmd
-   powershell -Command "[Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))"
+   powershell -Command "$b = New-Object byte[] 32; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); -join ($b | ForEach-Object { '{0:X2}' -f $_ })"
    ```
 
-   Copy the output into `.env` for each key. The server will refuse to start
-   in production mode if `SECRET_KEY` is still the development default or if
-   `API_KEY` is still the placeholder value.
+   Run the command twice and paste each output into `.env` 
+   — once for `SECRET_KEY` 
+   — once for`API_KEY`
+   The server will refuse to start in production mode if either key is still set to its default placeholder.
 
 3. Run the executable:
 
@@ -25,7 +27,7 @@
 VibrationVIEW-API.exe
 VibrationVIEW-API.exe --port 8080
 VibrationVIEW-API.exe --debug
-VibrationVIEW-API.exe --host 0.0.0.0 --port 5000 --threads 8
+VibrationVIEW-API.exe --host 127.0.0.1 --port 5000 --threads 8
 ```
 
 No Python installation or virtual environment is required — everything is
@@ -53,65 +55,15 @@ Once running, access the API documentation at:
 - **Docs**: `http://localhost:5000/api/v1/docs`
 - **Health check**: `http://localhost:5000/api/v1/health`
 
-## Breaking Changes (1.1.0)
+## Breaking Changes
 
 See the [CHANGELOG](https://github.com/VibrationResearch/VibrationVIEW-API-REST/blob/main/CHANGELOG.md)
-for the full list of breaking changes, security updates, and improvements in
-each release.
-
-- **UTC timestamps**: All API response timestamps now use UTC with an explicit
-  `+00:00` offset (e.g., `2026-06-19T18:30:00+00:00`). Previously, timestamps
-  used local time without a timezone indicator. Update any client-side parsing
-  that assumes local time.
-
-- **1-based channel indexing**: Hardware capability endpoints
-  (`hardwaresupportscapacitorcoupled`, `hardwaresupportsaccelpowersource`,
-  `hardwaresupportsdifferential`) now use 1-based channel indexing, consistent
-  with all other channel-based endpoints. Previously these used 0-based
-  indexing. Clients passing channel 0 must update to channel 1.
-
-- **POST-only state-changing endpoints**: Endpoints that modify state (e.g.,
-  `starttest`, `stoptest`, `savedata`) now require POST requests. GET requests
-  return 405. Set `ALLOW_GET_WRITE=true` in `.env` to restore the previous
-  behavior during migration.
-
-- **Simplified configuration**: Removed `DevelopmentConfig`, `ProductionConfig`,
-  and the config map. A single `Config` class is used for all environments; use
-  `--debug` flag to enable debug mode.
-
-- **Renamed query parameters**:
-
-  | Old Name | New Name | Endpoints |
-  |----------|----------|-----------|
-  | `channelnum` | `channel` | `/channelunit`, `/channellabel` |
-  | `loopnum` | `loop` | `/controlunit`, `/controllabel` |
-  | `file_path` | `filename` | `/getdatafile`, `/datafile`, `/generatereport`, `/generatetxt`, `/generateuff` |
-  | `template_name` | `templatename` | `/generatereport` |
-  | `output_name` | `outputname` | `/generatereport`, `/generatetxt`, `/generateuff` |
-
-- **Renamed response fields**:
-
-  | Old Field | New Field | Endpoints |
-  |-----------|-----------|-----------|
-  | `data.channelnum` | `data.channel` | `/channelunit`, `/channellabel` |
-  | `data.loopnum` | `data.loop` | `/controlunit`, `/controllabel` |
-  | `data.internal_loopnum` | `data.internal_loop` | `/controllabel` |
-
-- **Standardized error messages**: Missing-parameter errors now use the format
-  `"Missing required parameter: <name>"` instead of
-  `"Missing required query parameter: <name>"`.
-
-- **Standardized error response format**: Error responses from `/rearinputunit`
-  and `/rearinputlabel` now use the structured format
-  `"error": {"code": "...", "message": "..."}` consistent with all other
-  endpoints.
+for the full list of breaking changes, security updates, and improvements in each release.
 
 ## Troubleshooting
 
-- **"VCRUNTIME" or DLL errors**: Install the
-  [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-  for your platform.
-- **VibrationVIEW connection errors**: Verify VibrationVIEW is installed and
-  the paths in `.env` are correct.
-- **Port already in use**: Another process is using the default port. Choose a
-  different port with `--port`.
+- **Server refuses to start**: `SECRET_KEY` or `API_KEY` in `.env` are still set to their default placeholder values. Generate secure values using the command in [Quick Start](#quick-start) step 2.
+- **"VCRUNTIME" or DLL errors**: Install the [Microsoft Visual C++ Redistributable] (https://aka.ms/vs/17/release/vc_redist.x64.exe)
+- **VibrationVIEW connection errors**: Verify VibrationVIEW is installed and the paths in `.env` are correct.
+- **Port already in use**: Another process is using the default port. Choose a different port with `--port`.
+- **Test fails to run**: VibrationVIEW requires system limits to be configured before running a test. Set them in VibrationVIEW via Configuration → System Limits.

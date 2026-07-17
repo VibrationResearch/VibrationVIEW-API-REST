@@ -9,46 +9,22 @@ A comprehensive, modular REST interface providing 1:1 functionality with Vibrati
 - **Thread-Safe Operations**: Supports concurrent requests in multi-user environments
 - **Comprehensive Documentation**: Built-in API documentation with examples for every endpoint
 - **Robust Error Handling**: Detailed COM error extraction and standardized response format
-- **GET-First Design**: Prioritizes GET requests with URL parameters for simplicity
+- **REST Conventions**: GET for queries, POST for state-changing operations
 - **Bulk Operations**: Efficient batch operations for data retrieval and reporting
 
 ## Requirements
 
 - Windows operating system (compatible with Windows 10 and Windows 11)
 - VibrationVIEW software installed
-- VibrationVIEW automation option (VR9604) - OR - VibrationVIEW may be run in Simulation mode without any additional hardware or software
-- Python 3.7 or higher
+- VibrationVIEW automation option (VR9604) - OR - VibrationVIEW may be run in Demonstration mode without any additional hardware or software
 
-## Offline Deployment
+## Deployment
 
-If the target machine has no internet access, use `prepare-offline.ps1` on a machine that does to create a self-contained deployment zip.
+Download the latest release zip from https://github.com/VibrationResearch/VibrationVIEW-API-REST/releases and follow the [SETUP-README](SETUP-README.md) instructions.
 
-### 1. Prepare the package (on a machine with internet)
-```powershell
-.\prepare-offline.ps1
-```
-This downloads all Python dependencies into a `vendor/` folder and packages everything into `VibrationVIEW-API.zip`. You can customize the output name:
-```powershell
-.\prepare-offline.ps1 -ZipName "MyDeployment.zip"
-```
-
-### 2. Deploy (on the target machine)
-Copy the zip to the target machine, extract it, and run:
-```cmd
-setup.bat
-```
-This creates a virtual environment, installs all dependencies from the bundled `vendor/` folder (no internet required), and creates a `.env` file from `.env.example`. Use `setup.bat --start` to set up and immediately start the server.
-
-## Quick Start
+## Quick Start (from source)
 
 ### 1. Install Dependencies
-
-**Option A: Using batch file (recommended for offline deployment)**
-```cmd
-setup.bat
-```
-
-**Option B: Using pip directly (requires internet)**
 ```bash
 pip install -r requirements.txt
 ```
@@ -57,30 +33,22 @@ pip install -r requirements.txt
 VibrationVIEW must be installed and configured, but does not need to be running before starting the server.
 
 - **With hardware**: Configure VibrationVIEW for your controller
-- **Demo/Simulation mode**: Download and install from https://vibrationresearch.com/download-demo/. When prompted, request a demo activation code. Once activated, you can run simulated tests without a physical controller.
+- **Demonstration mode**: Download and install from https://vibrationresearch.com/download-demo/. When prompted, request a demo activation code. Once activated, you can run simulated tests without a physical controller.
 
 ### 3. Configure Environment
 ```bash
 copy .env.example .env
-# Edit .env with your VibrationVIEW settings
 ```
+Generate secure values for `SECRET_KEY` and `API_KEY`:
+   ```cmd
+   powershell -Command "$b = New-Object byte[] 32; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); -join ($b | ForEach-Object { '{0:X2}' -f $_ })"
+   ```
+   Run the command twice and paste each output into `.env` — once for `SECRET_KEY` and once for `API_KEY`. 
+   Set `API_KEY` to empty to disable Bearer token authentication during development.
 
 ### 4. Start the Server
-
-**Option A: Using batch file**
-```cmd
-start-api.bat                    # defaults: port 5000
-start-api.bat --port 8080        # custom port
-start-api.bat --debug            # enable debug mode
-```
-
-**Option B: Using Python directly**
 ```bash
-# Development mode
-python app.py --host 0.0.0.0 --port 5000 --debug
-
-# Production mode
-python app.py --host 0.0.0.0 --port 5000
+python app.py --debug
 ```
 
 ### 5. Access Documentation
@@ -111,18 +79,16 @@ The API is organized into functional modules with consistent patterns:
 - **vector_properties**: Vector metadata, units, and properties
 - **virtual_channels**: Virtual channel management (import, remove all)
 - **log**: Event log retrieval in structured JSON format
-- **utility**: Enum references and bulk data operations
 
 ## API Usage Examples
 
-> **Note:** If `API_KEY` is configured, all requests must include the header
-> `-H "Authorization: Bearer <your-api-key>"`. This header is omitted from the
-> examples below for brevity.
+> **Note:** If `API_KEY` is configured, all requests must include the header `-H "Authorization: Bearer <your-api-key>"`. 
+This header is omitted from the examples below for brevity.
 
 ### Basic Test Control
 ```bash
 # Start a test (existing file)
-curl -X POST "http://localhost:5000/api/v1/runtest?testname=my_test.vsp"
+curl -X POST "http://localhost:5000/api/v1/runtest?filename=my_test.vsp"
 
 # Stop a test
 curl -X POST "http://localhost:5000/api/v1/stoptest"
@@ -163,16 +129,13 @@ curl "http://localhost:5000/api/v1/demand"
 curl "http://localhost:5000/api/v1/output"
 ```
 
-### Parameter Control
+### Sine Control
 ```bash
 # Get sine frequency
 curl "http://localhost:5000/api/v1/sinefrequency"
 
 # Set sine frequency
 curl -X POST "http://localhost:5000/api/v1/sinefrequency?value=100.0"
-
-# Get demand multiplier
-curl "http://localhost:5000/api/v1/demandmultiplier"
 ```
 
 ### Hardware Configuration
@@ -185,19 +148,15 @@ curl "http://localhost:5000/api/v1/getsoftwareversion"
 curl "http://localhost:5000/api/v1/inputsensitivity?1"
 
 # Check hardware capabilities
-curl "http://localhost:5000/api/v1/hardwaresupportscapacitorcoupled?0"
+curl "http://localhost:5000/api/v1/hardwaresupportscapacitorcoupled?1"
 ```
 
 ### GUI Control
 ```bash
 # Window management
-curl "http://localhost:5000/api/v1/minimize"
-curl "http://localhost:5000/api/v1/maximize"
-curl "http://localhost:5000/api/v1/activate"
-
-# Test editing
-curl "http://localhost:5000/api/v1/edittest?testname=test.vsp"
-curl "http://localhost:5000/api/v1/abortedit"
+curl -X POST "http://localhost:5000/api/v1/minimize"
+curl -X POST "http://localhost:5000/api/v1/maximize"
+curl -X POST "http://localhost:5000/api/v1/activate"
 ```
 
 ### Reporting (Advanced)
@@ -226,17 +185,17 @@ curl -X POST "http://localhost:5000/api/v1/reportfields?channel=all&loop=1" \
 # Generate a report from VibrationVIEW data
 curl -X POST "http://localhost:5000/api/v1/generatereport" \
   -H "Content-Type: application/json" \
-  -d '{"template_name": "Test Report.vvtemplate", "output_name": "report.docx"}'
+  -d '{"templatename": "Test Report.vvtemplate", "outputname": "report.docx"}'
 
 # Generate text file from data (one file per plot)
 curl -X POST "http://localhost:5000/api/v1/generatetxt" \
   -H "Content-Type: application/json" \
-  -d '{"output_name": "data.txt"}'
+  -d '{"outputname": "data.txt"}'
 
 # Generate UFF (Universal File Format) from data
 curl -X POST "http://localhost:5000/api/v1/generateuff" \
   -H "Content-Type: application/json" \
-  -d '{"output_name": "data.uff"}'
+  -d '{"outputname": "data.uff"}'
 
 # Get raw data file (.vrd)
 curl "http://localhost:5000/api/v1/datafile" --output data.vrd
@@ -245,7 +204,7 @@ curl "http://localhost:5000/api/v1/datafile" --output data.vrd
 curl "http://localhost:5000/api/v1/datafiles" --output test_data.zip
 
 # Upload and generate report in one operation
-curl -X POST "http://localhost:5000/api/v1/generatereport?template_name=Standard%20Report&output_name=report.pdf" \
+curl -X POST "http://localhost:5000/api/v1/generatereport?templatename=Standard%20Report&outputname=report.pdf" \
   -H "Content-Type: application/octet-stream" \
   --data-binary @test.vrd
 ```
@@ -292,8 +251,8 @@ curl "http://localhost:5000/api/v1/testcom"
 
 ## Request Patterns
 
-### GET Requests (Preferred)
-Most endpoints use GET requests with URL parameters:
+### GET Requests
+Read-only endpoints use GET requests with URL parameters:
 ```bash
 # Single parameter
 curl "http://localhost:5000/api/v1/reportfield?field=TestName"
@@ -329,11 +288,10 @@ All endpoints return consistent JSON responses:
 {
   "success": true,
   "data": {
-    "result": "actual_value",
-    "executed": true
+    "result": "actual_value"
   },
   "message": "Operation completed successfully",
-  "timestamp": "2025-01-31T10:30:00"
+  "timestamp": "2025-01-31T10:30:00+00:00"
 }
 ```
 
@@ -343,7 +301,7 @@ All endpoints return consistent JSON responses:
   "success": false,
   "error": "Error description",
   "error_code": "ERROR_TYPE",
-  "timestamp": "2025-01-31T10:30:00"
+  "timestamp": "2025-01-31T10:30:00+00:00"
 }
 ```
 
@@ -380,11 +338,10 @@ vibrationview_api/
 │   ├── log.py               # Event log retrieval
 │   ├── aux_inputs.py        # Auxiliary inputs
 │   ├── teds.py              # TEDS information
-│   ├── vectors_legacy.py    # Vector metadata
-│   └── common.py            # Shared utilities
+│   └── vectors_legacy.py    # Vector metadata
 ├── utils/                    # Utility modules
 │   ├── vv_manager.py        # VibrationVIEW connection management
-│   ├── vv_context_manager.py # VibrationVIEW COM context manager
+│   ├── vv_singleton.py       # VibrationVIEW instance singleton
 │   ├── vv_error_codes.py    # VibrationVIEW error code definitions
 │   ├── response_helpers.py  # Response formatting
 │   ├── decorators.py        # Common decorators
@@ -437,7 +394,7 @@ This pins every package (including transitive dependencies) to exact versions fo
 ### Key Design Principles
 
 - **1:1 COM Mapping**: Every REST endpoint maps directly to a VibrationVIEW COM method
-- **GET-First**: Use GET requests with URL parameters when possible
+- **REST Conventions**: GET for queries, POST for state-changing operations
 - **Consistent Responses**: Standardized success/error response format
 - **Thread Safety**: All VibrationVIEW operations use proper connection management
 - **Comprehensive Documentation**: Every endpoint includes COM method signature and examples
@@ -492,7 +449,7 @@ curl -X POST "http://localhost:5000/api/v1/removeallvirtualchannels"
 ## Configuration
 
 ### Secret Key
-The `SECRET_KEY` is not currently required — the API is stateless and does not use sessions, cookies, or CSRF protection. However, it is pre-configured in `.env` in case future features (authentication, sessions, Flask extensions) need it. To generate a random key:
+The `SECRET_KEY` is used by Flask for cryptographic signing. In production mode, the server will refuse to start if `SECRET_KEY` is still set to the development default. Generate a secure value:
 ```bash
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
@@ -587,7 +544,6 @@ Replace `5000` with the Waitress port and `192.168.1.20` with the controller PC'
    ```bash
    # Test specific modules
    curl "http://localhost:5000/api/v1/allstatus"
-   curl "http://localhost:5000/api/v1/testreporting" 
    curl "http://localhost:5000/api/v1/testrecording"
    ```
 
