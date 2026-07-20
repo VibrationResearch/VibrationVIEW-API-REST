@@ -368,6 +368,7 @@ if __name__ == "__main__":
             Config.validate_production()
         except RuntimeError as e:
             print(f"Failed to initialize: {e}")
+            input("Press Enter to exit...")
             sys.exit(-1)
 
     print("Starting Flask server...")
