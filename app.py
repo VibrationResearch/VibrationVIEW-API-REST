@@ -383,6 +383,26 @@ if __name__ == "__main__":
         reset_vv_instance()
         logger.info("Shutdown complete.")
 
+    # On Windows, register a console control handler so that closing the
+    # console window (CTRL_CLOSE_EVENT) still releases the COM object.
+    # The OS enforces a ~5 s deadline after which the process is killed,
+    # but reset_vv_instance() is fast enough to complete within that.
+    if sys.platform != "win32":
+        print("WARNING: This application requires Windows for COM support.")
+    else:
+        import win32api  # type: ignore[import-untyped]
+
+        def _console_ctrl_handler(ctrl_type: int) -> bool:
+            # Handle CTRL_CLOSE_EVENT (2), CTRL_LOGOFF_EVENT (5),
+            # CTRL_SHUTDOWN_EVENT (6).  CTRL_C_EVENT (0) is already
+            # translated to KeyboardInterrupt by Python.
+            if ctrl_type in (2, 5, 6):
+                shutdown()
+                return True  # signal handled
+            return False  # let default handler run
+
+        win32api.SetConsoleCtrlHandler(_console_ctrl_handler, True)
+
     try:
         if args.debug:
             app.run(host=args.host, port=args.port, debug=True, threaded=False)
