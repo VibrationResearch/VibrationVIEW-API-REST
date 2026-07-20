@@ -4,6 +4,21 @@ All notable changes to the VibrationVIEW REST API are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - Unreleased
+
+### Bug Fixes
+
+- **PyInstaller exit crash**: Replaced `exit()` with `sys.exit()` to fix `NameError` in frozen/PyInstaller builds where the `exit` builtin is unavailable.
+
+### Improvements
+
+- **COM cleanup on console close**: Added `win32api.SetConsoleCtrlHandler` to ensure the VibrationVIEW COM object is released when the console window is closed, or on logoff/shutdown events.
+- **Startup error visibility**: Added `input()` pause before `sys.exit()` on startup failure so error messages remain visible in PyInstaller console windows.
+
+### Cleanup
+
+- **Removed obsolete PyInstaller hidden import**: Removed `utils.vv_context_manager` from `app.spec` (module was deleted in 1.1.0).
+
 ## [1.1.0] - 2026-07-17
 
 ### Breaking Changes
