@@ -69,7 +69,6 @@ hidden_imports = [
     "utils.response_helpers",
     "utils.teds_formatter",
     "utils.utils",
-    "utils.vv_context_manager",
     "utils.vv_error_codes",
     "utils.vv_manager",
     "utils.vv_singleton",
