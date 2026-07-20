@@ -12,6 +12,7 @@ import hmac
 import logging
 import math
 import os
+import sys
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -367,7 +368,7 @@ if __name__ == "__main__":
             Config.validate_production()
         except RuntimeError as e:
             print(f"Failed to initialize: {e}")
-            exit(-1)
+            sys.exit(-1)
 
     print("Starting Flask server...")
     app = create_app()
