@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Cleanup
 
 - **Removed obsolete PyInstaller hidden import**: Removed `utils.vv_context_manager` from `app.spec` (module was deleted in 1.1.0).
+- **Removed `API_VERSION` from `.env.example`**: Version is managed in `config.py` and should not need per-environment override.
 
 ## [1.1.0] - 2026-07-17
 
