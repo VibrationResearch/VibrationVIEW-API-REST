@@ -4,7 +4,7 @@ All notable changes to the VibrationVIEW REST API are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.2.0] - Unreleased
+## [1.2.0] - 2026-07-22
 
 ### Bug Fixes
 
@@ -144,6 +144,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Path validation for file operations
 - Configurable profile, report, and data folders
 
-[1.1.0]: https://github.com/VibrationResearch/VibrationVIEW-API-REST/compare/1.0.0...HEAD
+[1.2.0]: https://github.com/VibrationResearch/VibrationVIEW-API-REST/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/VibrationResearch/VibrationVIEW-API-REST/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/VibrationResearch/VibrationVIEW-API-REST/compare/2025.4.3...1.0.0
 [2025.4.3]: https://github.com/VibrationResearch/VibrationVIEW-API-REST/releases/tag/2025.4.3
